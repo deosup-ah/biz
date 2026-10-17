@@ -51,17 +51,18 @@ button:focus-visible,input:focus-visible,a:focus-visible,textarea:focus-visible{
 .gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 
 /* ── app bar ── */
-.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--brand);color:var(--brand-fg);padding-block:12px 10px;overflow:hidden}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--brand);color:var(--brand-fg);padding-block:7px 7px;overflow:hidden}
 .bar::after{content:"";position:absolute;right:-22px;top:-14px;width:150px;height:150px;background:url(logo.png) no-repeat center/contain;opacity:.12;pointer-events:none}
 .bar>*{position:relative;z-index:1}
 .bar-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
-.brand img{width:42px;height:42px;flex:none}
-.brand small{display:block;font-size:11px;opacity:.75;letter-spacing:.3px}
-.brand h1{margin:0;font-family:var(--f-head);font-size:21px;font-weight:700;letter-spacing:-.2px;white-space:nowrap}
-.quick{display:flex;gap:6px}
-.qbtn{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;text-decoration:none;color:var(--brand-fg);opacity:.92;min-width:44px}
-.qbtn span.i{width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.12);display:grid;place-items:center}
+.brand img{width:32px;height:32px;flex:none}
+.brand small{display:block;font-size:10px;opacity:.75;letter-spacing:.3px}
+.brand h1{margin:0;font-family:var(--f-head);font-size:18px;font-weight:700;letter-spacing:-.2px;white-space:nowrap}
+.quick{display:flex;gap:4px}
+.qbtn{display:flex;flex-direction:column;align-items:center;gap:1px;font-size:10px;white-space:nowrap;text-decoration:none;color:var(--brand-fg);opacity:.92;min-width:44px}
+.qbtn span.i{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,.12);display:grid;place-items:center;font-size:16px}
+.qbtn{color:var(--brand-fg)}
 .qbtn:active span.i{background:rgba(255,255,255,.22)}
 .owners{display:flex;gap:6px;overflow-x:auto;margin-top:10px;scrollbar-width:none;padding-bottom:2px}
 .owners::-webkit-scrollbar{display:none}
@@ -102,7 +103,7 @@ main{flex:1;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 .ft-title{font-size:11px;letter-spacing:.4px;color:var(--faint);margin-top:2px}
 
 /* ── compact today strip ── */
-.tstrip{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding-block:12px 0}
+.tstrip{display:grid;grid-template-columns:2fr 1fr 1fr;gap:6px;padding-block:12px 0}
 .tstrip::-webkit-scrollbar{display:none}
 .tchip{min-width:0;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:2px 6px;min-height:40px;padding:5px 10px;border-radius:14px;text-align:center;line-height:1.25;background:var(--surface);border:1px solid var(--line);font-size:13px;text-decoration:none;color:var(--fg)}
 .tchip.w{background:#245a7a;border-color:#245a7a;color:#f1f6fa}
@@ -136,6 +137,10 @@ main{flex:1;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 .ftbox>div:first-child{margin-top:0!important}
 
 /* ── compact home ── */
+.tl-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.tl-head b{font-family:var(--f-head);font-size:15px}
+.tl-head span{font-size:11.5px;color:var(--muted)}
+#v-home .week{margin-top:5px}
 #v-home .sec{margin-top:10px}
 #v-home .sec-h{margin-bottom:6px}
 #v-home .sec-h h2{font-size:16px}
@@ -408,6 +413,7 @@ textarea.msg{display:block;width:calc(100% - 28px);margin:0 14px;min-height:260p
         <a class="qbtn" href="https://mail.google.com/mail/u/?authuser=biz@deosup.com" target="_blank" rel="noopener"><span class="i"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg></span>biz 메일</a>
         <a class="qbtn" href="https://academyhouse.deosup.com/" target="_blank" rel="noopener"><span class="i"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg></span>홈페이지</a>
         <a class="qbtn" href="https://academyhouse.deosup.com/admin-cases" target="_blank" rel="noopener"><span class="i"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>건 대장</a>
+        <button class="qbtn" id="wxq" data-pop="wx"><span class="i" id="wxi">🌳</span><span id="wxt">날씨</span></button>
       </nav>
     </div>
     
@@ -497,10 +503,8 @@ function renderOwners(){
 /* ---------- weather & fortune ---------- */
 const WMO={0:["맑음","☀️"],1:["대체로 맑음","🌤️"],2:["구름 조금","⛅"],3:["흐림","☁️"],45:["안개","🌫️"],48:["안개","🌫️"],51:["이슬비","🌦️"],53:["이슬비","🌦️"],55:["이슬비","🌦️"],61:["비","🌧️"],63:["비","🌧️"],65:["강한 비","🌧️"],71:["눈","🌨️"],73:["눈","🌨️"],75:["많은 눈","❄️"],80:["소나기","🌦️"],81:["소나기","🌧️"],82:["강한 소나기","⛈️"],95:["뇌우","⛈️"]};
 let WX=D.weather&&D.weather.date===TODAY_S?D.weather:null;
-function wxHTML(){
-  const w=WX?(WMO[WX.code]||[WX.desc||"","🌤️"]):["","🌳"];
-  return `<button class="tchip w" id="wx" data-pop="wx" aria-pressed="${pop==="wx"}"><span class="e">${w[1]}</span><b class="num">${WX?Math.round(WX.t)+"°":"날씨"}</b>${WX?esc(w[0]):""}</button>`;
-}
+function wxHTML(){return ""}
+function paintWx(){const i=document.getElementById("wxi"),t=document.getElementById("wxt");if(!i)return;if(WX){const w=WMO[WX.code]||["","🌤️"];i.textContent=w[1];t.textContent=Math.round(WX.t)+"° "+w[0].replace(/^대체로 /,"")}}
 function wxBox(){
   if(!WX) return `<div class="ftbox">날씨를 불러오지 못했습니다. <a href="https://www.weather.go.kr/w/index.do" target="_blank" rel="noopener">기상청 날씨 보기 ›</a></div>`;
   const w=WMO[WX.code]||[WX.desc||"",""];
@@ -511,7 +515,7 @@ async function loadWeather(){
     const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude=37.66&longitude=127.0&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=1");
     if(!r.ok) return; const j=await r.json();
     WX={date:TODAY_S,t:j.current.temperature_2m,code:j.current.weather_code,hi:j.daily.temperature_2m_max[0],lo:j.daily.temperature_2m_min[0],pop:j.daily.precipitation_probability_max[0]};
-    const el=document.getElementById("wx"); if(el) el.outerHTML=wxHTML();
+    paintWx();
   }catch(e){}
 }
 let pop="";
@@ -615,9 +619,11 @@ function renderHome(){
     return `<button class="wd ${i===0?"today":""} ${d.getDay()===0?"sun":""}" data-day="${s}"><span class="w">${i===0?"오늘":WD[d.getDay()]}</span><span class="d num">${d.getDate()}</span><span class="c">${cs.slice(0,4).map(c=>`<i class="${c.st==="conf"?"":"h"}"></i>`).join("")}</span></button>`}).join("");
   document.getElementById("v-home").innerHTML=`
     <div class="tstrip">${wxHTML()}${fortuneHTML()}</div>${popBox()}
-    <div class="sec"><div class="sec-h"><h2>오늘 ${mdw(TODAY_S)}</h2><span class="more">${todays.length}건</span></div>
-      <div class="card tl-card"><div class="tline"><div class="tl-axis" style="margin-left:86px">${[7,9,11,13,15,17,19,21].map(h=>`<span>${h}</span>`).join("")}</div>${tl}</div>${stayHTML}</div></div>
-    <div class="sec"><div class="sec-h"><h2>이번 주</h2><span class="more">날짜를 누르면 그날 일정</span></div><div class="week">${weekHTML}</div></div>
+    <div class="sec"><div class="card tl-card">
+      <div class="tl-head"><b>오늘 ${mdw(TODAY_S)}</b><span>${todays.length}건</span></div>
+      <div class="tline"><div class="tl-axis" style="margin-left:86px">${[7,9,11,13,15,17,19,21].map(h=>`<span>${h}</span>`).join("")}</div>${tl}</div>${stayHTML}
+      <div class="tl-head" style="margin-top:8px"><b>이번 주</b><span>날짜를 누르면 그날 일정</span></div>
+      <div class="week">${weekHTML}</div></div></div>
     <div class="sec"><div class="sec-h"><h2>지금 할 일</h2><button class="go-btn" data-go="todo">모두 보기 ${acts.length} ›</button></div>
       <div class="card">${acts.length?acts.slice(0,2).map(({c,a})=>`<button class="act ${a.lv}" data-id="${esc(c.id)}"><span class="bar4"></span><span><span class="t">${esc(a.t)}</span><span class="w">${esc(c.name)}</span></span><span class="dd">${dday(c)}</span></button>`).join(""):`<div class="okline">지금 급한 일이 없습니다.</div>`}</div></div>
     <div class="sec"><div class="sec-h"><h2>다가오는 단체</h2><button class="go-btn" data-go="list:up">전체 일정 ›</button></div>
@@ -706,6 +712,7 @@ function render(){
   const bt=document.getElementById("b-todo");bt.textContent=hi;bt.hidden=!hi;
   const bm=document.getElementById("b-money");bm.textContent=late;bm.hidden=!late;
   ({home:renderHome,list:renderList,todo:renderTodo,money:renderMoney,space:renderSpace})[tab]();
+  paintWx();
 }
 
 /* ---------- DETAIL ---------- */
@@ -815,7 +822,7 @@ document.addEventListener("click",async e=>{
   const t=e.target;
   const tc=t.closest("[data-tarot]"); if(tc){tarotPick=+tc.dataset.tarot;renderHome();return}
   const mb=t.closest("[data-mbti]"); if(mb){myMbti=mb.dataset.mbti;LS.set("gs2-mbti",myMbti);renderHome();return}
-  const pp=t.closest("[data-pop]"); if(pp){pop=pop===pp.dataset.pop?"":pp.dataset.pop;renderHome();return}
+  const pp=t.closest("[data-pop]"); if(pp){pop=pop===pp.dataset.pop?"":pp.dataset.pop;if(tab!=="home"){tab="home";render()}else renderHome();window.scrollTo(0,0);return}
   if(t.closest("[data-close]")){closeDetail();return}
   const cn=t.closest("[data-copyno]"); if(cn){if(!await copyText(cn.dataset.copyno))toast(cn.dataset.copyno);return}
   if(t.closest("[data-copymsg]")){const ta=document.getElementById("msg");if(!await copyText(ta.value)){ta.focus();ta.select();toast("선택했습니다 · 길게 눌러 복사")}return}
