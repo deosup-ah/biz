@@ -302,6 +302,15 @@ main{flex:1;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 .fac-t td.pk{color:var(--muted);font-size:11.5px}
 .fac-t td.pax{color:var(--brand-2);font-weight:600}
 .fac-t tr:last-child td{border-bottom:none}
+.fac-t tr.fg td{background:var(--surface-2,rgba(0,0,0,.04));font-weight:700;font-size:13px;padding:7px 6px;color:var(--brand-2);white-space:normal}
+.fac-t tr.fg td small{display:block;font-weight:400;color:var(--faint);font-size:10.5px}
+.fac-t td.pr{white-space:normal;text-align:right;line-height:1.5}
+.fac-t .fpx{display:block;white-space:nowrap;font-weight:600}
+.fac-t .fpx em{font-style:normal;font-weight:400;color:var(--faint);font-size:10.5px;margin-right:2px}
+.fac-t td.pk{text-align:center;white-space:normal}
+.fac-t.fx{table-layout:fixed}
+.fac-t.fx th{text-align:center}.fac-t.fx th:first-child{text-align:left}.fac-t.fx th:last-child{text-align:right}
+.fac-t.fx td.pax{text-align:center}
 .fac-rule{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
 .fac-rule span{color:var(--muted);flex:none}.fac-rule b{text-align:right;font-weight:500}
 .sp-card{margin-bottom:10px;overflow:hidden}
@@ -831,18 +840,16 @@ const FAC_RULE=[
  ["견적서 유효","발행일로부터 30일"],
  ["대관 주차","대화의 집 5대 · 여해의 집 세미나룸 2대 · C300 3대 · C301·C302·C303 각 2대 · C202-1·C202-2·C203-1·C203-2 각 1대 — 대관 시간 내에만 혜택"],
  ["주차 요금","10분당 1,300원 · 전체 129면"]];
-let facK=LS.get("gs2-fac","hall");
-const facV=v=>v==null?"—":typeof v==="number"?(v&&v%10000===0?(v/10000).toLocaleString("ko-KR")+"만":won(v)):esc(v);
+const facV=v=>v==null?"—":typeof v==="number"?(v&&v%1000===0?(v/10000).toLocaleString("ko-KR",{maximumFractionDigits:1})+"만":won(v)):esc(v);
 function facText(g){const f=v=>typeof v==="number"?won(v)+"원":v;return `[더숲 아카데미하우스 · ${g.t}]\n`+g.rows.map((r,j)=>{if(g.k==="meal")return r[0]?`- ${r[0]}: ${r[3]} ${f(r[4])}`:`   ${r[3]} ${f(r[4])}`;return `- ${r[0]}${r[2]?` (기준 ${r[2]}명)`:""}: `+g.cols.slice(1).map((c,i)=>[c,r[3+i]]).filter(([c,v])=>v!=="—").map(([c,v])=>`${c} ${f(v)}`).join(" / ")}).join("\n")+`\n※ ${g.note} · 부가세 포함`}
+function facPrice(g,r){if(g.k==="meal")return `<span class="fpx"><em>${esc(r[3])}</em> ${facV(r[4])}</span>`;const off=g.cols.indexOf("주차")>=0?1:0;return g.cols.slice(1+off).map((c,i)=>`<span class="fpx"><em>${c.replace("시간","h").replace("성수기 평일","성수기")}</em>${facV(r[3+off+i])}</span>`).join("")}
 function renderFac(){
-  const g=FAC.find(x=>x.k===facK)||FAC[0];
+  const body=FAC.map(g=>`<tr class="fg"><td colspan="4">${esc(g.t)}<small>${esc(g.note)}</small></td></tr>`+g.rows.map(r=>{const pk=g.cols.indexOf("주차")>=0?r[3]:"";return `<tr><td><b>${esc(r[0])}</b>${r[1]?`<small>${esc(r[1])}</small>`:""}</td><td class="pax">${r[2]?r[2]+"명":""}</td><td class="pk">${pk&&pk!=="—"?esc(pk):""}</td><td class="pr">${facPrice(g,r)}</td></tr>`}).join("")).join("");
   document.getElementById("v-fac").innerHTML=`
-  <div class="fac-tabs">${FAC.map(x=>`<button class="chip" data-fac="${x.k}" aria-pressed="${x.k===g.k}">${x.t.replace(" (숙박형)","").replace("내일을위한집 ","")}</button>`).join("")}<button class="chip" data-fac="rule" aria-pressed="${facK==="rule"}">운영 기준</button></div>
-  ${facK==="rule"?`<div class="card fac-card"><h3>운영 기준</h3>${FAC_RULE.map(([a,b])=>`<div class="fac-rule"><span>${a}</span><b>${b}</b></div>`).join("")}</div>`:
-  `<div class="card fac-card"><h3>${esc(g.t)}<button class="go-btn" data-faccopy="${g.k}">안내문 복사</button></h3><p class="fac-note">${esc(g.note)}</p>
-   <table class="fac-t"><thead><tr><th>공간</th>${g.cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>
-   ${g.rows.map(r=>`<tr><td><b>${esc(r[0])}</b>${r[1]?`<small>${esc(r[1])}</small>`:""}</td><td class="pax">${g.k==="meal"?esc(r[3]):(r[2]?r[2]+"명":"—")}</td>${(g.k==="meal"?[r[4]]:r.slice(3)).map((v,i)=>`<td class="${g.cols[i+1]==="주차"?"pk":"num"}">${facV(v)}</td>`).join("")}</tr>`).join("")}
-   </tbody></table></div>`}
+  <div class="card fac-card"><h3>시설 · 요금 한눈에<button class="go-btn" data-faccopy="all">안내문 복사</button></h3>
+   <p class="fac-note">견적안내 가이드 · 부가세 포함 · 만 = 만원 · 대관 주차는 대관 시간 내에만 혜택</p>
+   <table class="fac-t fx"><colgroup><col style="width:37%"><col style="width:14%"><col style="width:15%"><col style="width:34%"></colgroup><thead><tr><th>공간</th><th>기준</th><th>주차</th><th>요금</th></tr></thead><tbody>${body}</tbody></table></div>
+  <div class="card fac-card" style="margin-top:10px"><h3>운영 기준</h3>${FAC_RULE.map(([a,b])=>`<div class="fac-rule"><span>${a}</span><b>${b}</b></div>`).join("")}</div>
   <p class="note" style="padding:6px 2px 0">${FAC_AS}. 요금은 마스터 관리(기획이사)에서만 바뀝니다.</p>`;
 }
 
@@ -1035,8 +1042,7 @@ document.addEventListener("click",async e=>{
   const t=e.target;
   const cm=t.closest("[data-calm]"); if(cm){calM=new Date(calM.getFullYear(),calM.getMonth()+(+cm.dataset.calm),1);renderCal();return}
   const cp=t.closest("[data-cap]"); if(cp){doCapture(cp.dataset.cap);return}
-  const fk=t.closest("[data-fac]");if(fk){facK=fk.dataset.fac;LS.set("gs2-fac",facK);renderFac();return}
-  const fc=t.closest("[data-faccopy]");if(fc){copyText(facText(FAC.find(x=>x.k===fc.dataset.faccopy)));return}
+  const fc=t.closest("[data-faccopy]");if(fc){copyText(FAC.map(facText).join("\n\n"));return}
   if(t.closest("[data-capclear]")){capSel.clear();renderCap();return}
   if(t.closest("[data-shotclose]")){document.getElementById("shot").hidden=true;return}
   if(t.closest("[data-shotshare]")){shareShot();return}
