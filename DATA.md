@@ -44,9 +44,11 @@
 - 미수가 견적보다 큼 → mid/lo
 
 ## fortune (하루 한 번)
-`{"date":"YYYY-MM-DD","items":[{"name","tti","icon","text","lucky"}]}`
-- 최형근 뱀띠 🐍 · 허윤정 원숭이띠 🐒 · 신효근 토끼띠 🐇 (나이는 넣지 않는다)
-- date 가 오늘이 아니면 새로 쓴다. 다른 사이트 운세를 베끼지 말고 직접 쓴 짧은 덕담 1~2문장(업무에 어울리게, 부정적 예언 금지) + lucky "색 · 숫자".
+`{"date":"YYYY-MM-DD","items":[{"name","sex","total","work","money","people","health","lucky"}],"mbti":{"INTJ":"…", … 16개}}`
+- 최형근 남 (1977년생) · 허윤정 여 (1980년생) · 신효근 남 (1987년생). 화면에는 이름·성별만 — 띠·나이는 쓰지 않는다.
+- date 가 오늘이 아니면 새로 쓴다. total 2문장, work·money·people·health 각 1문장, lucky "색 · 숫자 · 방향".
+- mbti: 16유형 모두 1~2문장.
+- 다른 사이트 운세를 베끼지 말고 직접 쓴 덕담으로. 업무(단체 예약·현장 응대)에 어울리게, 겁주는 예언·건강 진단 금지.
 
 ## weather
 화면이 open-meteo 에서 바로 불러온다. data.js 의 weather 는 null 로 둔다.
