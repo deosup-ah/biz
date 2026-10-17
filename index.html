@@ -96,9 +96,9 @@ main{flex:1;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 .ft-title{font-size:11px;letter-spacing:.4px;color:var(--faint);margin-top:2px}
 
 /* ── compact today strip ── */
-.tstrip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-block:12px 0}
+.tstrip{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding-block:12px 0}
 .tstrip::-webkit-scrollbar{display:none}
-.tchip{flex:none;display:flex;align-items:center;gap:6px;height:38px;padding:0 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:13px;white-space:nowrap;text-decoration:none;color:var(--fg)}
+.tchip{min-width:0;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:2px 6px;min-height:40px;padding:5px 10px;border-radius:14px;text-align:center;line-height:1.25;background:var(--surface);border:1px solid var(--line);font-size:13px;text-decoration:none;color:var(--fg)}
 .tchip.w{background:#245a7a;border-color:#245a7a;color:#f1f6fa}
 .tchip b{font-weight:700}
 .tchip .e{font-size:17px;line-height:1}
@@ -582,8 +582,8 @@ function renderHome(){
     <div class="sec"><div class="sec-h"><h2>오늘 ${mdw(TODAY_S)}</h2><span class="more">${todays.length}건</span></div>
       <div class="card tl-card"><div class="tline"><div class="tl-axis" style="margin-left:86px">${[7,9,11,13,15,17,19,21].map(h=>`<span>${h}</span>`).join("")}</div>${tl}</div>${stayHTML}</div></div>
     <div class="sec"><div class="sec-h"><h2>이번 주</h2><span class="more">날짜를 누르면 그날 일정</span></div><div class="week">${weekHTML}</div></div>
-    <div class="sec"><div class="sec-h"><h2>지금 할 일</h2><button class="more" data-go="todo">모두 보기 ›</button></div>
-      <div class="card">${acts.length?acts.slice(0,6).map(({c,a})=>`<button class="act ${a.lv}" data-id="${esc(c.id)}"><span class="bar4"></span><span><span class="t">${esc(a.t)}</span><span class="w">${esc(c.name)}</span></span><span class="dd">${dday(c)}</span></button>`).join(""):`<div class="okline">지금 급한 일이 없습니다.</div>`}</div></div>
+    <div class="sec"><div class="sec-h"><h2>지금 할 일</h2><button class="more" data-go="todo">모두 보기 ${acts.length} ›</button></div>
+      <div class="card">${acts.length?acts.slice(0,4).map(({c,a})=>`<button class="act ${a.lv}" data-id="${esc(c.id)}"><span class="bar4"></span><span><span class="t">${esc(a.t)}</span><span class="w">${esc(c.name)}</span></span><span class="dd">${dday(c)}</span></button>`).join(""):`<div class="okline">지금 급한 일이 없습니다.</div>`}</div></div>
     <div class="sec"><div class="sec-h"><h2>다가오는 단체</h2><button class="more" data-go="list:up">전체 일정 ›</button></div>
       ${L.filter(c=>c.s&&diff(c.e||c.s)>=0).sort(byDate).slice(0,5).map(card).join("")||`<p class="empty">다가오는 단체가 없습니다.</p>`}</div>`;
 }
