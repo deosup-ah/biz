@@ -70,7 +70,7 @@ button:focus-visible,input:focus-visible,a:focus-visible,textarea:focus-visible{
 .ow small{opacity:.7;margin-left:3px}
 
 main{flex:1;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
-.sec{margin-top:18px}
+.sec{margin-top:14px}
 .sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
 .sec-h h2{margin:0;font-family:var(--f-head);font-size:17px;font-weight:700}
 .sec-h .more{font-size:13px;color:var(--brand-2);font-weight:600}
@@ -95,6 +95,19 @@ main{flex:1;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 .ft .lk{margin-top:auto;padding-top:6px;font-size:11.5px;color:var(--gold)}
 .ft-title{font-size:11px;letter-spacing:.4px;color:var(--faint);margin-top:2px}
 
+/* ── compact today strip ── */
+.tstrip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-block:12px 0}
+.tstrip::-webkit-scrollbar{display:none}
+.tchip{flex:none;display:flex;align-items:center;gap:6px;height:38px;padding:0 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:13px;white-space:nowrap;text-decoration:none;color:var(--fg)}
+.tchip.w{background:#245a7a;border-color:#245a7a;color:#f1f6fa}
+.tchip b{font-weight:700}
+.tchip .e{font-size:17px;line-height:1}
+.tchip small{color:var(--muted);font-size:11.5px}
+.tchip.w small{color:#d4e4ee}
+.tchip[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft)}
+.ftbox{margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--gold-soft);font-size:13.5px;line-height:1.5}
+.ftbox b{font-weight:700}
+.ftbox small{display:block;color:var(--gold);font-size:12px;margin-top:2px}
 /* ── kpis ── */
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .kpi{padding:10px 10px 9px;text-align:left;display:flex;flex-direction:column;gap:1px}
@@ -429,24 +442,28 @@ function renderOwners(){
 const WMO={0:["맑음","☀️"],1:["대체로 맑음","🌤️"],2:["구름 조금","⛅"],3:["흐림","☁️"],45:["안개","🌫️"],48:["안개","🌫️"],51:["이슬비","🌦️"],53:["이슬비","🌦️"],55:["이슬비","🌦️"],61:["비","🌧️"],63:["비","🌧️"],65:["강한 비","🌧️"],71:["눈","🌨️"],73:["눈","🌨️"],75:["많은 눈","❄️"],80:["소나기","🌦️"],81:["소나기","🌧️"],82:["강한 소나기","⛈️"],95:["뇌우","⛈️"]};
 let WX=D.weather&&D.weather.date===TODAY_S?D.weather:null;
 function wxHTML(){
-  if(!WX) return `<a class="wx" href="https://www.weather.go.kr/w/index.do" target="_blank" rel="noopener"><span class="ico">🌳</span><span class="t" style="font-size:20px;margin-top:10px">수유동 날씨</span><span class="s">불러오는 중 · 누르면 기상청</span></a>`;
-  const w=WMO[WX.code]||[WX.desc||"",""];
-  return `<a class="wx" href="https://www.weather.go.kr/w/index.do" target="_blank" rel="noopener"><span class="ico">${w[1]}</span><span class="t num">${Math.round(WX.t)}°</span><span class="d">${esc(w[0])} · ${Math.round(WX.hi)}° / ${Math.round(WX.lo)}°</span><span class="s">강수 ${WX.pop??"—"}% · 수유동 북한산</span></a>`;
+  if(!WX) return `<a class="tchip w" id="wx" href="https://www.weather.go.kr/w/index.do" target="_blank" rel="noopener"><span class="e">🌳</span><b>수유동 날씨</b></a>`;
+  const w=WMO[WX.code]||[WX.desc||"","🌤️"];
+  return `<a class="tchip w" id="wx" href="https://www.weather.go.kr/w/index.do" target="_blank" rel="noopener"><span class="e">${w[1]}</span><b class="num">${Math.round(WX.t)}°</b>${esc(w[0])} <small class="num">${Math.round(WX.hi)}°/${Math.round(WX.lo)}° · 비 ${WX.pop??"—"}%</small></a>`;
 }
 async function loadWeather(){
   try{
     const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude=37.66&longitude=127.0&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FSeoul&forecast_days=1");
     if(!r.ok) return; const j=await r.json();
     WX={date:TODAY_S,t:j.current.temperature_2m,code:j.current.weather_code,hi:j.daily.temperature_2m_max[0],lo:j.daily.temperature_2m_min[0],pop:j.daily.precipitation_probability_max[0]};
-    const el=document.getElementById("wx"); if(el) el.outerHTML=wxHTML().replace('<a class="wx"','<a class="wx" id="wx"');
+    const el=document.getElementById("wx"); if(el) el.outerHTML=wxHTML();
   }catch(e){}
 }
+let ftOpen=-1;
 function fortuneHTML(){
   const F=D.fortune; if(!F||!F.items) return "";
-  const stale=F.date!==TODAY_S;
-  return F.items.map((f,i)=>`<button class="ft" data-ft="${i}"><span class="ani" aria-hidden="true">${f.icon}</span><span class="ft-title">${stale?esc(md(F.date))+" 운세":"오늘의 운세"}</span><span class="nm">${esc(f.name)}</span><span class="tt">${esc(f.tti)}띠</span><p>${esc(f.text)}</p><span class="lk">행운 · ${esc(f.lucky)}</span></button>`).join("");
+  return F.items.map((f,i)=>`<button class="tchip" data-ft="${i}" aria-pressed="${ftOpen===i}"><span class="e" aria-hidden="true">${f.icon}</span><b>${esc(f.name)}</b><small>${esc(f.tti)}띠 운세</small></button>`).join("");
 }
-
+function ftBox(){
+  const F=D.fortune; if(!F||ftOpen<0||!F.items[ftOpen]) return "";
+  const f=F.items[ftOpen]; const stale=F.date!==TODAY_S;
+  return `<div class="ftbox"><b>${esc(f.name)} · ${esc(f.tti)}띠${stale?" ("+esc(md(F.date))+")":""}</b> ${esc(f.text)}<small>행운 · ${esc(f.lucky)}</small></div>`;
+}
 /* ---------- helpers ---------- */
 function dday(c){
   if(!c.s) return "날짜 미정";
@@ -497,13 +514,7 @@ function renderHome(){
   const weekHTML=days.map((d,i)=>{const s=ymd(d);const cs=CASES.filter(c=>mine(c)&&c.s&&c.s<=s&&(c.e||c.s)>=s);
     return `<button class="wd ${i===0?"today":""} ${d.getDay()===0?"sun":""}" data-day="${s}"><span class="w">${i===0?"오늘":WD[d.getDay()]}</span><span class="d num">${d.getDate()}</span><span class="c">${cs.slice(0,4).map(c=>`<i class="${c.st==="conf"?"":"h"}"></i>`).join("")}</span></button>`}).join("");
   document.getElementById("v-home").innerHTML=`
-    <div class="strip" id="strip">${wxHTML().replace('<a class="wx"','<a class="wx" id="wx"')}${fortuneHTML()}</div>
-    <div class="sec"><div class="kpis">
-      <button class="card kpi" data-go="list:week"><b class="num">${week}</b><span>7일 안 시작</span></button>
-      <button class="card kpi red" data-go="todo"><b class="num">${hi}</b><span>급한 건</span></button>
-      <button class="card kpi amb" data-go="money"><b class="num">${manwon(dueSum)}</b><span>받을 돈</span></button>
-      <button class="card kpi ${late.length?"red":""}" data-go="money"><b class="num">${late.length}</b><span>입금 지연</span></button>
-    </div></div>
+    <div class="tstrip">${wxHTML()}${fortuneHTML()}</div>${ftBox()}
     <div class="sec"><div class="sec-h"><h2>오늘 ${mdw(TODAY_S)}</h2><span class="more">${todays.length}건</span></div>
       <div class="card tl-card"><div class="tline"><div class="tl-axis" style="margin-left:86px">${[7,9,11,13,15,17,19,21].map(h=>`<span>${h}</span>`).join("")}</div>${tl}</div>${stayHTML}</div></div>
     <div class="sec"><div class="sec-h"><h2>이번 주</h2><span class="more">날짜를 누르면 그날 일정</span></div><div class="week">${weekHTML}</div></div>
@@ -703,7 +714,7 @@ function setMailto(){const a=document.getElementById("mailto");if(!a)return;cons
 /* ---------- events ---------- */
 document.addEventListener("click",async e=>{
   const t=e.target;
-  const ft=t.closest("[data-ft]"); if(ft){ft.classList.toggle("open");return}
+  const ft=t.closest("[data-ft]"); if(ft){const i=+ft.dataset.ft;ftOpen=ftOpen===i?-1:i;renderHome();return}
   if(t.closest("[data-close]")){closeDetail();return}
   const cn=t.closest("[data-copyno]"); if(cn){if(!await copyText(cn.dataset.copyno))toast(cn.dataset.copyno);return}
   if(t.closest("[data-copymsg]")){const ta=document.getElementById("msg");if(!await copyText(ta.value)){ta.focus();ta.select();toast("선택했습니다 · 길게 눌러 복사")}return}
