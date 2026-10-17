@@ -73,8 +73,14 @@ main{flex:1;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 .sec{margin-top:14px}
 .sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
 .sec-h h2{margin:0;font-family:var(--f-head);font-size:17px;font-weight:700}
+.go-btn{background:var(--brand);color:var(--brand-fg);font-size:13px;font-weight:700;border-radius:999px;padding:6px 13px;box-shadow:var(--shadow)}
+.go-btn:active{transform:scale(.97)}
+.sec-h{align-items:center}
 .sec-h .more{font-size:13px;color:var(--brand-2);font-weight:600}
-.dark .sec-h .more{color:var(--ok)}
+.dark .go-btn{background:var(--brand);color:var(--brand-fg);font-size:13px;font-weight:700;border-radius:999px;padding:6px 13px;box-shadow:var(--shadow)}
+.go-btn:active{transform:scale(.97)}
+.sec-h{align-items:center}
+.sec-h .more{color:var(--ok)}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
 
 /* ── today strip: weather + fortunes ── */
@@ -582,10 +588,10 @@ function renderHome(){
     <div class="sec"><div class="sec-h"><h2>오늘 ${mdw(TODAY_S)}</h2><span class="more">${todays.length}건</span></div>
       <div class="card tl-card"><div class="tline"><div class="tl-axis" style="margin-left:86px">${[7,9,11,13,15,17,19,21].map(h=>`<span>${h}</span>`).join("")}</div>${tl}</div>${stayHTML}</div></div>
     <div class="sec"><div class="sec-h"><h2>이번 주</h2><span class="more">날짜를 누르면 그날 일정</span></div><div class="week">${weekHTML}</div></div>
-    <div class="sec"><div class="sec-h"><h2>지금 할 일</h2><button class="more" data-go="todo">모두 보기 ${acts.length} ›</button></div>
+    <div class="sec"><div class="sec-h"><h2>지금 할 일</h2><button class="go-btn" data-go="todo">모두 보기 ${acts.length} ›</button></div>
       <div class="card">${acts.length?acts.slice(0,4).map(({c,a})=>`<button class="act ${a.lv}" data-id="${esc(c.id)}"><span class="bar4"></span><span><span class="t">${esc(a.t)}</span><span class="w">${esc(c.name)}</span></span><span class="dd">${dday(c)}</span></button>`).join(""):`<div class="okline">지금 급한 일이 없습니다.</div>`}</div></div>
-    <div class="sec"><div class="sec-h"><h2>다가오는 단체</h2><button class="more" data-go="list:up">전체 일정 ›</button></div>
-      ${L.filter(c=>c.s&&diff(c.e||c.s)>=0).sort(byDate).slice(0,5).map(card).join("")||`<p class="empty">다가오는 단체가 없습니다.</p>`}</div>`;
+    <div class="sec"><div class="sec-h"><h2>다가오는 단체</h2><button class="go-btn" data-go="list:up">전체 일정 ›</button></div>
+      ${L.filter(c=>c.s&&diff(c.e||c.s)>=0).sort(byDate).slice(0,3).map(card).join("")||`<p class="empty">다가오는 단체가 없습니다.</p>`}</div>`;
 }
 
 /* ---------- LIST ---------- */
