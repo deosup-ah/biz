@@ -463,7 +463,7 @@ async function loadWeather(){
 let pop="";
 function fortuneHTML(){
   const F=D.fortune; if(!F||!F.items) return "";
-  return `<button class="tchip" data-pop="ft" aria-pressed="${pop==="ft"}"><span class="e" aria-hidden="true">${F.items.map(f=>f.icon).join("")}</span><b>오늘의 운세</b></button>`;
+  return `<button class="tchip" data-pop="ft" aria-pressed="${pop==="ft"}"><b>${F.items.map(f=>esc(f.name)).join(", ")}</b> 오늘의 운세</button>`;
 }
 function ftBox(){
   const F=D.fortune; if(!F||!F.items) return "";
