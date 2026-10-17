@@ -51,17 +51,17 @@ button:focus-visible,input:focus-visible,a:focus-visible,textarea:focus-visible{
 .gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 
 /* ── app bar ── */
-.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--brand);color:var(--brand-fg);padding-block:5px 5px;overflow:hidden}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--brand);color:var(--brand-fg);padding-block:8px 8px;overflow:hidden}
 .bar::after{content:"";position:absolute;right:-22px;top:-14px;width:150px;height:150px;background:url(logo.png) no-repeat center/contain;opacity:.12;pointer-events:none}
 .bar>*{position:relative;z-index:1}
 .bar-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
-.brand img{width:29px;height:29px;flex:none}
-.brand small{display:block;font-size:10px;opacity:.75;letter-spacing:.3px}
-.brand h1{margin:0;font-family:var(--f-head);font-size:17.5px;line-height:1.15;font-weight:700;letter-spacing:-.2px;white-space:nowrap}
-.quick{display:flex;gap:4px}
-.qbtn{display:flex;flex-direction:column;align-items:center;gap:0;font-size:10.5px;white-space:nowrap;text-decoration:none;color:var(--brand-fg);opacity:.92;min-width:44px}
-.qbtn span.i{width:29px;height:29px;border-radius:10px;background:rgba(255,255,255,.12);display:grid;place-items:center;font-size:16px}
+.brand img{width:36px;height:36px;flex:none}
+.brand small{display:block;white-space:nowrap;font-size:11px;opacity:.75;letter-spacing:.3px}
+.brand h1{margin:0;font-family:var(--f-head);font-size:21px;line-height:1.15;font-weight:700;letter-spacing:-.2px;white-space:nowrap}
+.quick{display:flex;gap:2px;flex:none}
+.qbtn{display:flex;flex-direction:column;align-items:center;gap:1px;font-size:11px;white-space:nowrap;text-decoration:none;color:var(--brand-fg);opacity:.92;min-width:42px}
+.qbtn span.i{width:33px;height:33px;border-radius:11px;background:rgba(255,255,255,.12);display:grid;place-items:center;font-size:16px}
 .qbtn{color:var(--brand-fg)}
 .qbtn:active span.i{background:rgba(255,255,255,.22)}
 .owners{display:flex;gap:6px;overflow-x:auto;margin-top:10px;scrollbar-width:none;padding-bottom:2px}
