@@ -738,9 +738,9 @@ function drawPane(){
     el.innerHTML=`
       <div class="box">
         <div class="msg-kind"><button data-kind="guest" aria-pressed="${msgKind==="guest"}">단체 담당자에게</button><button data-kind="front" aria-pressed="${msgKind==="front"}">현장·프론트 전달</button></div>
-        ${msgKind==="guest"?`<div class="msg-opts"><label><input type="checkbox" id="o-amt" ${msgOpt.amt?"checked":""}> 금액·잔금</label><label><input type="checkbox" id="o-acct" ${msgOpt.acct?"checked":""}> 입금 계좌</label><label><input type="checkbox" id="o-park" ${msgOpt.park?"checked":""}> 주차·오시는 길</label></div>`:`<div style="height:12px"></div>`}
+        ${msgKind==="guest"?`<div class="msg-opts"><label><input type="checkbox" id="o-acct" ${msgOpt.acct?"checked":""}> 입금 계좌</label><label><input type="checkbox" id="o-park" ${msgOpt.park?"checked":""}> 주차·오시는 길</label></div>`:`<div style="height:12px"></div>`}
         <textarea class="msg" id="msg" aria-label="보낼 안내문">${esc(buildMsg(c))}</textarea>
-        <div class="guard"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="flex:none;margin-top:1px"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>${msgKind==="guest"?"이 단체 정보만 들어갑니다. 다른 단체·내부 체크·이력·메모는 빠집니다.":"금액은 빠집니다. 프론트·F&B에 바로 붙여 넣으세요."}</span></div>
+        <div class="guard"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="flex:none;margin-top:1px"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>${msgKind==="guest"?"이 단체 정보만 들어갑니다. 금액·다른 단체·내부 체크·이력·메모는 빠집니다.":"금액은 빠집니다. 프론트·F&B에 바로 붙여 넣으세요."}</span></div>
         <div class="msg-act"><button class="btn pri" data-copymsg>안내문 복사</button><a class="btn sec" id="mailto" href="#">메일 앱</a></div>
         <p class="note">복사한 뒤 카카오톡·문자·메일에 붙여 넣으면 됩니다. 보내기 전에 위 칸에서 바로 고칠 수 있습니다.</p>
       </div>`;
@@ -763,13 +763,8 @@ function buildMsg(c){
   L.push(`안녕하세요, 더숲 아카데미하우스입니다.`,`${c.name} 이용 안내드립니다.`,"",`■ 일정  ${when}${c.pax?` · ${c.pax}명`:""}`);
   if(sched.length)L.push("■ 공간",...sched);
   c.rooms.forEach(r=>L.push(`■ 숙박  ${r[2].length}실 (${r[1]})`,"  입실 16:00 · 퇴실 11:00"));
-  if(msgOpt.amt&&c.final){
-    L.push("",`■ 이용 금액  ${won(c.final)}원 (부가세 포함)`);
-    if(c.paid)L.push(`  받은 금액  ${won(c.paid)}원`);
-    if(c.due>0){const np=(c.amt.pay||[]).find(p=>!/확인|입금/.test(p[4]));L.push(`  남은 금액  ${won(c.due)}원${np&&np[1]?` (${md(np[1])}까지)`:""}`);}
-  }
   if(msgOpt.acct&&c.due>0)L.push("",`■ 입금 계좌  하나은행 247-910039-43404`,`  예금주 더숲 아카데미하우스`,`  입금자명에 「${c.name}」을 적어 주세요.`);
-  if(msgOpt.park)L.push("",`■ 오시는 길  서울 강북구 4.19로 135 (수유동, 아카데미하우스)`,`■ 주차  행사 시간 + 30분 무료, 이후 10분당 1,300원`,`  숙박 객실당 1대 무료 · 주차 공간이 한정되어 있어 대중교통을 권해 드립니다.`);
+  if(msgOpt.park)L.push("",`■ 오시는 길  서울 강북구 4.19로 135 (수유동, 아카데미하우스)`,`■ 주차  10분당 1,300원`,`  주차 혜택: 카페 이용 시 2시간(주말 1시간 30분) · 다이닝 이용 시 2시간 · 도서 구매 시 1시간`);
   L.push("",`문의  02-904-0206 · biz@deosup.com`,`감사합니다.`);
   return L.join("\n");
 }
@@ -795,7 +790,7 @@ document.addEventListener("click",async e=>{
   const rg=t.closest("[data-range]"); if(rg){spaceRange=rg.dataset.range;LS.set("gs2-space",spaceRange);render();return}
   const tb=t.closest("[data-tab]"); if(tb){tab=tb.dataset.tab;dayPick=null;LS.set("gs2-tab",tab);render();window.scrollTo(0,0);return}
 });
-document.addEventListener("change",e=>{const id=e.target.id;if(id==="o-amt"||id==="o-acct"||id==="o-park"){msgOpt[id.slice(2)]=e.target.checked;document.getElementById("msg").value=buildMsg(cur);setMailto()}});
+document.addEventListener("change",e=>{const id=e.target.id;if(id==="o-acct"||id==="o-park"){msgOpt[id.slice(2)]=e.target.checked;document.getElementById("msg").value=buildMsg(cur);setMailto()}});
 document.addEventListener("input",e=>{if(e.target.id==="q"){q=e.target.value.trim().toLowerCase();renderList()}if(e.target.id==="msg")setMailto()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDetail()});
 
