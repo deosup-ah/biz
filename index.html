@@ -108,6 +108,8 @@ main{flex:1;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 .ftbox{margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--gold-soft);font-size:13.5px;line-height:1.5}
 .ftbox b{font-weight:700}
 .ftbox small{display:block;color:var(--gold);font-size:12px;margin-top:2px}
+.ftbox a{color:inherit}
+.ftbox>div:first-child{margin-top:0!important}
 /* ── kpis ── */
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .kpi{padding:10px 10px 9px;text-align:left;display:flex;flex-direction:column;gap:1px}
@@ -442,9 +444,13 @@ function renderOwners(){
 const WMO={0:["맑음","☀️"],1:["대체로 맑음","🌤️"],2:["구름 조금","⛅"],3:["흐림","☁️"],45:["안개","🌫️"],48:["안개","🌫️"],51:["이슬비","🌦️"],53:["이슬비","🌦️"],55:["이슬비","🌦️"],61:["비","🌧️"],63:["비","🌧️"],65:["강한 비","🌧️"],71:["눈","🌨️"],73:["눈","🌨️"],75:["많은 눈","❄️"],80:["소나기","🌦️"],81:["소나기","🌧️"],82:["강한 소나기","⛈️"],95:["뇌우","⛈️"]};
 let WX=D.weather&&D.weather.date===TODAY_S?D.weather:null;
 function wxHTML(){
-  if(!WX) return `<a class="tchip w" id="wx" href="https://www.weather.go.kr/w/index.do" target="_blank" rel="noopener"><span class="e">🌳</span><b>수유동 날씨</b></a>`;
-  const w=WMO[WX.code]||[WX.desc||"","🌤️"];
-  return `<a class="tchip w" id="wx" href="https://www.weather.go.kr/w/index.do" target="_blank" rel="noopener"><span class="e">${w[1]}</span><b class="num">${Math.round(WX.t)}°</b>${esc(w[0])} <small class="num">${Math.round(WX.hi)}°/${Math.round(WX.lo)}° · 비 ${WX.pop??"—"}%</small></a>`;
+  const w=WX?(WMO[WX.code]||[WX.desc||"","🌤️"]):["","🌳"];
+  return `<button class="tchip w" id="wx" data-pop="wx" aria-pressed="${pop==="wx"}"><span class="e">${w[1]}</span><b class="num">${WX?Math.round(WX.t)+"°":"날씨"}</b>${WX?esc(w[0]):""}</button>`;
+}
+function wxBox(){
+  if(!WX) return `<div class="ftbox">날씨를 불러오지 못했습니다. <a href="https://www.weather.go.kr/w/index.do" target="_blank" rel="noopener">기상청 날씨 보기 ›</a></div>`;
+  const w=WMO[WX.code]||[WX.desc||"",""];
+  return `<div class="ftbox"><b>수유동 · ${esc(w[0])} ${Math.round(WX.t)}°</b> 최고 ${Math.round(WX.hi)}° · 최저 ${Math.round(WX.lo)}° · 비 올 확률 ${WX.pop??"—"}%<small><a href="https://www.weather.go.kr/w/index.do" target="_blank" rel="noopener">기상청에서 자세히 ›</a></small></div>`;
 }
 async function loadWeather(){
   try{
@@ -454,16 +460,17 @@ async function loadWeather(){
     const el=document.getElementById("wx"); if(el) el.outerHTML=wxHTML();
   }catch(e){}
 }
-let ftOpen=-1;
+let pop="";
 function fortuneHTML(){
   const F=D.fortune; if(!F||!F.items) return "";
-  return F.items.map((f,i)=>`<button class="tchip" data-ft="${i}" aria-pressed="${ftOpen===i}"><span class="e" aria-hidden="true">${f.icon}</span><b>${esc(f.name)}</b><small>${esc(f.tti)}띠 운세</small></button>`).join("");
+  return `<button class="tchip" data-pop="ft" aria-pressed="${pop==="ft"}"><span class="e" aria-hidden="true">${F.items.map(f=>f.icon).join("")}</span><b>오늘의 운세</b></button>`;
 }
 function ftBox(){
-  const F=D.fortune; if(!F||ftOpen<0||!F.items[ftOpen]) return "";
-  const f=F.items[ftOpen]; const stale=F.date!==TODAY_S;
-  return `<div class="ftbox"><b>${esc(f.name)} · ${esc(f.tti)}띠${stale?" ("+esc(md(F.date))+")":""}</b> ${esc(f.text)}<small>행운 · ${esc(f.lucky)}</small></div>`;
+  const F=D.fortune; if(!F||!F.items) return "";
+  const stale=F.date!==TODAY_S;
+  return `<div class="ftbox">${stale?`<small style="margin:0 0 4px">${esc(md(F.date))} 운세</small>`:""}${F.items.map(f=>`<div style="margin-top:6px"><b>${f.icon} ${esc(f.name)} · ${esc(f.tti)}띠</b> ${esc(f.text)}<small>행운 · ${esc(f.lucky)}</small></div>`).join("")}</div>`;
 }
+function popBox(){return pop==="wx"?wxBox():pop==="ft"?ftBox():""}
 /* ---------- helpers ---------- */
 function dday(c){
   if(!c.s) return "날짜 미정";
@@ -514,7 +521,7 @@ function renderHome(){
   const weekHTML=days.map((d,i)=>{const s=ymd(d);const cs=CASES.filter(c=>mine(c)&&c.s&&c.s<=s&&(c.e||c.s)>=s);
     return `<button class="wd ${i===0?"today":""} ${d.getDay()===0?"sun":""}" data-day="${s}"><span class="w">${i===0?"오늘":WD[d.getDay()]}</span><span class="d num">${d.getDate()}</span><span class="c">${cs.slice(0,4).map(c=>`<i class="${c.st==="conf"?"":"h"}"></i>`).join("")}</span></button>`}).join("");
   document.getElementById("v-home").innerHTML=`
-    <div class="tstrip">${wxHTML()}${fortuneHTML()}</div>${ftBox()}
+    <div class="tstrip">${wxHTML()}${fortuneHTML()}</div>${popBox()}
     <div class="sec"><div class="sec-h"><h2>오늘 ${mdw(TODAY_S)}</h2><span class="more">${todays.length}건</span></div>
       <div class="card tl-card"><div class="tline"><div class="tl-axis" style="margin-left:86px">${[7,9,11,13,15,17,19,21].map(h=>`<span>${h}</span>`).join("")}</div>${tl}</div>${stayHTML}</div></div>
     <div class="sec"><div class="sec-h"><h2>이번 주</h2><span class="more">날짜를 누르면 그날 일정</span></div><div class="week">${weekHTML}</div></div>
@@ -714,7 +721,7 @@ function setMailto(){const a=document.getElementById("mailto");if(!a)return;cons
 /* ---------- events ---------- */
 document.addEventListener("click",async e=>{
   const t=e.target;
-  const ft=t.closest("[data-ft]"); if(ft){const i=+ft.dataset.ft;ftOpen=ftOpen===i?-1:i;renderHome();return}
+  const pp=t.closest("[data-pop]"); if(pp){pop=pop===pp.dataset.pop?"":pp.dataset.pop;renderHome();return}
   if(t.closest("[data-close]")){closeDetail();return}
   const cn=t.closest("[data-copyno]"); if(cn){if(!await copyText(cn.dataset.copyno))toast(cn.dataset.copyno);return}
   if(t.closest("[data-copymsg]")){const ta=document.getElementById("msg");if(!await copyText(ta.value)){ta.focus();ta.select();toast("선택했습니다 · 길게 눌러 복사")}return}
