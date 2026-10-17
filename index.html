@@ -311,6 +311,8 @@ main{flex:1;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 .fac-t.fx{table-layout:fixed}
 .fac-t.fx th{text-align:center}.fac-t.fx th:first-child{text-align:left}.fac-t.fx th:last-child{text-align:right}
 .fac-t.fx td.pax{text-align:center}
+.fac-t tr.fxx td{white-space:normal;text-align:left;font-size:11.5px;color:var(--muted);padding:0 3px 8px;border-top:none}
+.fac-t tr.fxx td b{color:var(--fg);font-weight:600}
 .fac-rule{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
 .fac-rule span{color:var(--muted);flex:none}.fac-rule b{text-align:right;font-weight:500}
 .sp-card{margin-bottom:10px;overflow:hidden}
@@ -792,7 +794,7 @@ function renderSpace(){
 const FAC_AS="마스터 관리 요금표 10/17 기준 · 모든 금액 부가세 포함";
 const FAC=[
  {k:"hall",t:"대관 홀",note:"9시간 = 종일 · 4시간 = 반나절 · 주차는 대관 시간 내에만 혜택",cols:["기준","주차","4시간","9시간"],rows:[
-  ["새벽의 집","550인치 LED월 · 기자재 별도",200,"협의",1000000,1600000],
+  ["새벽의 집","550인치 LED월",200,"협의",1000000,1600000],
   ["대화의 집 (HALL 1966)","그랜드피아노·100인치 LED·무선마이크 2",100,"5대",600000,1000000],
   ["여해의 집 세미나룸","75인치 LED·화이트보드",15,"2대",300000,600000],
   ["본관 5F 루프탑","카페 영업 고려 개별 산정",null,"—","협의","협의"]]},
@@ -822,15 +824,7 @@ const FAC=[
   ["트리플","2실",3,205000,246000,295000],
   ["스탠다드 트리플","2실",3,230000,276000,315000],
   ["더블 스위트","2실",2,245000,294000,335000],
-  ["패밀리 스위트","2실",4,380000,456000,450000]]},
- {k:"meal",t:"식사 · 기자재 · 옵션",note:"중식·석식·케이터링은 다이닝과 협의(표준 단가 없음)",cols:["단위","금액"],rows:[
-  ["조식 단체 (스테이 조식)","다이닝 사전 협의 필수",null,"1인",14900],
-  ["LED 스크린","새벽의 집 대관 시만",null,"종일",900000],
-  ["","",null,"반나절 / 추가 1시간","500,000 / 200,000"],
-  ["음향장비","새벽의 집 대관 시만",null,"종일",300000],
-  ["","",null,"반나절 / 추가 1시간","200,000 / 40,000"],
-  ["LED+음향 패키지","새벽의 집 대관 시만",null,"종일 / 반나절","1,150,000 / 650,000"],
-  ["투숙 추가 주차","1실 1대 무료 이후",null,"1대",20000]]}
+  ["패밀리 스위트","2실",4,380000,456000,450000]]}
 ];
 const FAC_RULE=[
  ["체크인 · 체크아웃","16:00 · 11:00 (내일을위한집 기준)"],
@@ -838,13 +832,12 @@ const FAC_RULE=[
  ["계약금 · 잔금","계약금 30% · 잔금은 이용 당일까지"],
  ["가예약","등록일 + 7일 (이용 3일 전을 넘지 않음)"],
  ["견적서 유효","발행일로부터 30일"],
- ["대관 주차","대화의 집 5대 · 여해의 집 세미나룸 2대 · C300 3대 · C301·C302·C303 각 2대 · C202-1·C202-2·C203-1·C203-2 각 1대 — 대관 시간 내에만 혜택"],
- ["주차 요금","10분당 1,300원 · 전체 129면"]];
+ ["투숙 추가 주차","1실 1대 무료 · 추가 1대 2만 원"]];
 const facV=v=>v==null?"—":typeof v==="number"?(v&&v%1000===0?(v/10000).toLocaleString("ko-KR",{maximumFractionDigits:1})+"만":won(v)):esc(v);
-function facText(g){const f=v=>typeof v==="number"?won(v)+"원":v;return `[더숲 아카데미하우스 · ${g.t}]\n`+g.rows.map((r,j)=>{if(g.k==="meal")return r[0]?`- ${r[0]}: ${r[3]} ${f(r[4])}`:`   ${r[3]} ${f(r[4])}`;return `- ${r[0]}${r[2]?` (기준 ${r[2]}명)`:""}: `+g.cols.slice(1).map((c,i)=>[c,r[3+i]]).filter(([c,v])=>v!=="—").map(([c,v])=>`${c} ${f(v)}`).join(" / ")}).join("\n")+`\n※ ${g.note} · 부가세 포함`}
+function facText(g){const f=v=>typeof v==="number"?won(v)+"원":v;return `[더숲 아카데미하우스 · ${g.t}]\n`+g.rows.map((r,j)=>{if(g.k==="meal")return r[0]?`- ${r[0]}: ${r[3]} ${f(r[4])}`:`   ${r[3]} ${f(r[4])}`;return `- ${r[0]}${r[2]?` (기준 ${r[2]}명)`:""}: `+g.cols.slice(1).map((c,i)=>[c,r[3+i]]).filter(([c,v])=>v!=="—").map(([c,v])=>`${c} ${f(v)}`).join(" / ")}).join("\n")+(g.k==="hall"?"\n  (새벽의 집 기자재 종일/반나절: LED 90만/50만 · 음향 30만/20만 · LED+음향 115만/65만)":"")+`\n※ ${g.note} · 부가세 포함`}
 function facPrice(g,r){if(g.k==="meal")return `<span class="fpx"><em>${esc(r[3])}</em> ${facV(r[4])}</span>`;const off=g.cols.indexOf("주차")>=0?1:0;return g.cols.slice(1+off).map((c,i)=>`<span class="fpx"><em>${c.replace("시간","h").replace("성수기 평일","성수기")}</em>${facV(r[3+off+i])}</span>`).join("")}
 function renderFac(){
-  const body=FAC.map(g=>`<tr class="fg"><td colspan="4">${esc(g.t)}<small>${esc(g.note)}</small></td></tr>`+g.rows.map(r=>{const pk=g.cols.indexOf("주차")>=0?r[3]:"";return `<tr><td><b>${esc(r[0])}</b>${r[1]?`<small>${esc(r[1])}</small>`:""}</td><td class="pax">${r[2]?r[2]+"명":""}</td><td class="pk">${pk&&pk!=="—"?esc(pk):""}</td><td class="pr">${facPrice(g,r)}</td></tr>`}).join("")).join("");
+  const body=FAC.map(g=>`<tr class="fg"><td colspan="4">${esc(g.t)}<small>${esc(g.note)}</small></td></tr>`+g.rows.map(r=>{const pk=g.cols.indexOf("주차")>=0?r[3]:"";return `<tr><td><b>${esc(r[0])}</b>${r[1]?`<small>${esc(r[1])}</small>`:""}</td><td class="pax">${r[2]?r[2]+"명":""}</td><td class="pk">${pk&&pk!=="—"?esc(pk):""}</td><td class="pr">${facPrice(g,r)}</td></tr>`+(r[0]==="새벽의 집"?`<tr class="fxx"><td colspan="4">기자재 (종일 · 반나절) <b>LED 90·50만</b> · <b>음향 30·20만</b> · <b>LED+음향 115·65만</b> · 추가 1시간 LED 20만·음향 4만</td></tr>`:"")}).join("")).join("");
   document.getElementById("v-fac").innerHTML=`
   <div class="card fac-card"><h3>시설 · 요금 한눈에<button class="go-btn" data-faccopy="all">안내문 복사</button></h3>
    <p class="fac-note">견적안내 가이드 · 부가세 포함 · 만 = 만원 · 대관 주차는 대관 시간 내에만 혜택</p>
