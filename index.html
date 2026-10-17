@@ -341,7 +341,7 @@ textarea.msg{display:block;width:calc(100% - 28px);margin:0 14px;min-height:260p
         <a class="qbtn" href="https://academyhouse.deosup.com/admin-cases" target="_blank" rel="noopener"><span class="i"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>건 대장</a>
       </nav>
     </div>
-    <div class="owners" id="owners" role="group" aria-label="담당자"></div>
+    
   </header>
 
   <main>
@@ -412,7 +412,7 @@ const CASES=D.cases.map((c,i)=>{
 });
 
 /* ---------- state ---------- */
-let tab=LS.get("gs2-tab","home"), owner=LS.get("gs2-owner","전체"), filter="up", q="", dayPick=null;
+let tab=LS.get("gs2-tab","home"), owner="전체", filter="up", q="", dayPick=null;
 const mine=c=>owner==="전체"||ownName(c.owner)===owner;
 const live=()=>CASES.filter(c=>!c.past&&mine(c));
 
@@ -463,7 +463,7 @@ function card(c){
     <div class="mid"><div class="nm">${esc(c.name)}${c.tag?`<small>${esc(c.tag)}</small>`:""}</div>
       <div class="sub">${c.spaces.length?esc(c.spaces.join(" · ")):"공간 미정"}${c.pax?` · ${c.pax}명`:""}</div>
       ${flags?`<div class="meta">${flags}</div>`:""}</div>
-    <div class="right">${stPill(c)}<span class="dday ${isNow?"now":""}">${dday(c)}</span><span class="own">${esc(ownName(c.owner))}</span></div></button>`;
+    <div class="right">${stPill(c)}<span class="dday ${isNow?"now":""}">${dday(c)}</span></div></button>`;
 }
 function toast(t){const el=document.getElementById("toast");el.textContent=t;el.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("on"),1600)}
 async function copyText(t){try{await navigator.clipboard.writeText(t);toast("복사했습니다");return true}catch(e){return false}}
@@ -484,7 +484,7 @@ function renderHome(){
       return `<button class="tl-bar ${s[3]==="hold"||c.st==="hold"?"hold":""}" data-id="${esc(c.id)}" style="left:${l}%;width:${w}%" title="${esc(c.name+" "+s[1])}">${esc(c.name)}</button>`}).join("")}
       ${nowH>=H0&&nowH<=H1?`<span class="tl-now" style="left:${(nowH-H0)/span*100}%"></span>`:""}</div></div>`).join("")
     :`<p class="tl-empty">오늘 잡힌 공간 일정이 없습니다.</p>`;
-  const stayHTML=stays.length?`<div class="stay-row">숙박 · ${stays.map(x=>`<span><b>${esc(x.c.name)}</b> ${x.r[2].length}실</span>`).join(" · ")} <span>(입실 16:00 · 퇴실 11:00)</span></div>`:"";
+  const stayBy={};stays.forEach(x=>{stayBy[x.c.name]=(stayBy[x.c.name]||0)+x.r[2].length});const stayHTML=stays.length?`<div class="stay-row">숙박 · ${Object.entries(stayBy).map(([n,k])=>`<span><b>${esc(n)}</b> ${k}실</span>`).join(" · ")} <span>(입실 16:00 · 퇴실 11:00)</span></div>`:"";
   // KPIs
   const week=L.filter(c=>c.s&&diff(c.s)>=0&&diff(c.s)<=7).length;
   const hi=L.filter(c=>c.sev==="hi").length;
@@ -508,7 +508,7 @@ function renderHome(){
       <div class="card tl-card"><div class="tline"><div class="tl-axis" style="margin-left:86px">${[7,9,11,13,15,17,19,21].map(h=>`<span>${h}</span>`).join("")}</div>${tl}</div>${stayHTML}</div></div>
     <div class="sec"><div class="sec-h"><h2>이번 주</h2><span class="more">날짜를 누르면 그날 일정</span></div><div class="week">${weekHTML}</div></div>
     <div class="sec"><div class="sec-h"><h2>지금 할 일</h2><button class="more" data-go="todo">모두 보기 ›</button></div>
-      <div class="card">${acts.length?acts.slice(0,6).map(({c,a})=>`<button class="act ${a.lv}" data-id="${esc(c.id)}"><span class="bar4"></span><span><span class="t">${esc(a.t)}</span><span class="w">${esc(c.name)} · ${esc(ownName(c.owner))}</span></span><span class="dd">${dday(c)}</span></button>`).join(""):`<div class="okline">지금 급한 일이 없습니다.</div>`}</div></div>
+      <div class="card">${acts.length?acts.slice(0,6).map(({c,a})=>`<button class="act ${a.lv}" data-id="${esc(c.id)}"><span class="bar4"></span><span><span class="t">${esc(a.t)}</span><span class="w">${esc(c.name)}</span></span><span class="dd">${dday(c)}</span></button>`).join(""):`<div class="okline">지금 급한 일이 없습니다.</div>`}</div></div>
     <div class="sec"><div class="sec-h"><h2>다가오는 단체</h2><button class="more" data-go="list:up">전체 일정 ›</button></div>
       ${L.filter(c=>c.s&&diff(c.e||c.s)>=0).sort(byDate).slice(0,5).map(card).join("")||`<p class="empty">다가오는 단체가 없습니다.</p>`}</div>`;
 }
@@ -516,7 +516,7 @@ function renderHome(){
 /* ---------- LIST ---------- */
 const FILTERS=[["up","다가오는"],["week","7일 안"],["hold","가예약"],["conf","확정"],["nodate","날짜 미정"],["past","지난 건"]];
 const byDate=(a,b)=>(a.s||"9999").localeCompare(b.s||"9999")||a.name.localeCompare(b.name,"ko");
-const match=c=>!q||(c.name+c.no+(c.tag||"")+c.spaces.join(" ")+ownName(c.owner)).toLowerCase().includes(q);
+const match=c=>!q||(c.name+c.no+(c.tag||"")+c.spaces.join(" ")).toLowerCase().includes(q);
 function pick(){
   return CASES.filter(c=>{
     if(!mine(c)||!match(c)) return false;
@@ -555,7 +555,7 @@ function renderTodo(){
     if(lv==="mid") L.forEach(c=>c.todo.filter(t=>t.startsWith("!")).forEach(t=>items.push({c,a:{lv:"mid",t:t.slice(1),n:"시스템 남은 일"}})));
     if(!items.length) return;
     items.sort((x,y)=>(x.c.s?diff(x.c.s):999)-(y.c.s?diff(y.c.s):999));
-    h+=`<div class="grp"><span>${title}</span><span>${items.length}</span></div><div class="card">`+items.map(({c,a})=>`<button class="act ${lv==="lo"?"":lv}" data-id="${esc(c.id)}"><span class="bar4" ${lv==="lo"?'style="background:var(--line-2)"':""}></span><span><span class="t">${esc(a.t)}</span><span class="w">${esc(c.name)} · ${esc(ownName(c.owner))}${a.n?" · "+esc(a.n):""}</span></span><span class="dd">${dday(c)}</span></button>`).join("")+`</div>`;
+    h+=`<div class="grp"><span>${title}</span><span>${items.length}</span></div><div class="card">`+items.map(({c,a})=>`<button class="act ${lv==="lo"?"":lv}" data-id="${esc(c.id)}"><span class="bar4" ${lv==="lo"?'style="background:var(--line-2)"':""}></span><span><span class="t">${esc(a.t)}</span><span class="w">${esc(c.name)}${a.n?" · "+esc(a.n):""}</span></span><span class="dd">${dday(c)}</span></button>`).join("")+`</div>`;
   });
   document.getElementById("v-todo").innerHTML=h||`<p class="empty">할 일이 없습니다.</p>`;
 }
@@ -569,7 +569,7 @@ function renderMoney(){
   document.getElementById("v-money").innerHTML=`
     <div class="sec"><div class="card mhero"><div><span>받을 돈 합계</span><b class="num">${won(total)}원</b></div><div class="r"><span>입금 지연 ${late.length}건</span><b class="num">${won(lateSum)}원</b></div></div></div>
     <div class="sec"><div class="sec-h"><h2>단체별</h2><span class="more">${L.length}건</span></div><div class="card">
-    ${L.map(c=>`<button class="mrow ${c.late?"late":""}" data-id="${esc(c.id)}" data-pane="amt"><span><span class="n">${esc(c.name)}</span><span class="s">${c.s?mdw(c.s):"날짜 미정"} · ${esc(ownName(c.owner))}${nextPay(c)?" · 다음 "+esc(nextPay(c)):""}${c.late?" · 지연":""}</span></span><span class="a num">${won(c.due)}<small>청구 ${manwon(c.final)}</small></span></button>`).join("")||`<div class="okline">받을 돈이 없습니다.</div>`}
+    ${L.map(c=>`<button class="mrow ${c.late?"late":""}" data-id="${esc(c.id)}" data-pane="amt"><span><span class="n">${esc(c.name)}</span><span class="s">${c.s?mdw(c.s):"날짜 미정"}${nextPay(c)?" · 다음 "+esc(nextPay(c)):""}${c.late?" · 지연":""}</span></span><span class="a num">${won(c.due)}<small>청구 ${manwon(c.final)}</small></span></button>`).join("")||`<div class="okline">받을 돈이 없습니다.</div>`}
     </div></div>`;
 }
 
@@ -591,7 +591,6 @@ function renderSpace(){
 function render(){
   document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));
   ["home","list","todo","money","space"].forEach(v=>document.getElementById("v-"+v).hidden=v!==tab);
-  renderOwners();
   const L=live(); const hi=L.filter(c=>c.sev==="hi").length; const late=CASES.filter(c=>mine(c)&&c.late).length;
   const bt=document.getElementById("b-todo");bt.textContent=hi;bt.hidden=!hi;
   const bm=document.getElementById("b-money");bm.textContent=late;bm.hidden=!late;
@@ -622,7 +621,7 @@ function drawDetail(){
     <div style="height:18px"></div>
   </div>
   <div class="gut">
-    <div class="facts"><div class="card fact"><span>담당</span><b>${esc(ownName(c.owner))}</b></div><div class="card fact"><span>청구액</span><b class="num">${c.final?manwon(c.final):"—"}</b></div><div class="card fact ${c.due>0?"due":""}"><span>받을 돈</span><b class="num">${c.due>0?manwon(c.due):"없음"}</b></div></div>
+    <div class="facts"><div class="card fact"><span>인원</span><b>${c.pax?c.pax+"명":"—"}</b></div><div class="card fact"><span>청구액</span><b class="num">${c.final?manwon(c.final):"—"}</b></div><div class="card fact ${c.due>0?"due":""}"><span>받을 돈</span><b class="num">${c.due>0?manwon(c.due):"없음"}</b></div></div>
     <div class="seg" role="tablist">${[["sum","요약"],["amt","금액"],["hist","이력"],["msg","안내문"]].map(([k,l])=>`<button role="tab" data-pane="${k}" aria-selected="${pane===k}">${l}</button>`).join("")}</div>
     <div class="pane" id="pane"></div>
     <p class="foot">${esc(D.asOf||"")}</p>
@@ -678,7 +677,7 @@ function buildMsg(c){
   const byDay={};c.sch.forEach(s=>(byDay[s[0]]=byDay[s[0]]||[]).push(s));
   const sched=Object.keys(byDay).sort().map(d=>`· ${mdw(d)} ${byDay[d].map(s=>`${s[2].replace(/ 통합$/,"")} ${s[1]}`).join(", ")}`);
   if(msgKind==="front"){
-    L.push(`[현장 전달] ${c.name} (${c.no})`,`일정: ${when}${c.pax?` · ${c.pax}명`:""}`,`담당: ${ownName(c.owner)}`);
+    L.push(`[현장 전달] ${c.name} (${c.no})`,`일정: ${when}${c.pax?` · ${c.pax}명`:""}`);
     if(sched.length)L.push("","공간",...sched);
     c.rooms.forEach(r=>L.push("",`객실 ${r[2].length}실 (${r[1]}) 입실 16:00 · 퇴실 11:00`,r[2].join(", ")));
     const meal=(c.amt.items||[]).filter(r=>/식|조식|중식|석식|다이닝|커피|다과/.test(r[0]));
