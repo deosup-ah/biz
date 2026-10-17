@@ -316,6 +316,18 @@ main{flex:1;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 .fac-t tr.fxx td span{display:block;white-space:nowrap;line-height:1.6}
 .fac-t tr.fxx td i{font-style:normal;color:var(--faint)}
 .fac-card .nw{white-space:nowrap}
+.ph-btn{display:inline;text-align:left;padding:0;color:inherit}
+.ph-btn b{text-decoration:underline;text-decoration-color:var(--line-2);text-underline-offset:3px}
+.ph-i{display:inline-block;margin-left:5px;font-size:10px;font-weight:600;color:var(--brand-2);border:1px solid currentColor;border-radius:5px;padding:0 4px;vertical-align:1px}
+.gal{position:fixed;inset:0;z-index:96;background:rgba(8,14,11,.94);display:flex;flex-direction:column;justify-content:center;padding:max(10px,env(safe-area-inset-top,0px)) 0 max(14px,env(safe-area-inset-bottom,0px))}
+.gal[hidden]{display:none}
+.gal-bar{display:flex;align-items:center;gap:10px;color:#fff;padding:8px 16px;max-width:900px;width:100%;margin:0 auto}
+.gal-bar b{flex:1;font-size:16px}.gal-bar span{font-size:12.5px;opacity:.7}
+.gal-bar button{color:#fff;font-size:20px;width:36px;height:36px}
+.gal-s{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;max-width:900px;width:100%;margin:0 auto;scrollbar-width:none}
+.gal-s::-webkit-scrollbar{display:none}
+.gal-s img{flex:0 0 100%;width:100%;max-height:72vh;object-fit:contain;scroll-snap-align:center}
+.gal-note{color:rgba(255,255,255,.6);font-size:12px;text-align:center;margin:10px 0 0}
 .fac-rule{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
 .fac-rule span{color:var(--muted);flex:none}.fac-rule b{text-align:right;font-weight:500}
 .sp-card{margin-bottom:10px;overflow:hidden}
@@ -798,7 +810,7 @@ const FAC_AS="마스터 관리 요금표 10/17 기준 · 모든 금액 부가세
 const FAC=[
  {k:"hall",t:"대관 홀",note:"9시간 = 종일 · 4시간 = 반나절 · 주차는 대관 시간 내에만 혜택 · 외부 음식 반입 금지(음료는 가능)",cols:["기준","주차","4시간","9시간"],rows:[
   ["새벽의 집","550인치 LED월",200,"협의",1000000,1600000],
-  ["대화의 집 (HALL 1966)","그랜드피아노·100인치 LED·무선마이크 2",100,"5대",600000,1000000],
+  ["대화의 집 (HALL 1966)","최대 100명·그랜드피아노·100인치 LED·무선마이크 2",80,"5대",600000,1000000],
   ["여해의 집 세미나룸","75인치 LED·화이트보드",15,"2대",300000,600000],
   ]},
  {k:"meet",t:"회의실",note:"주차는 대관 시간 내에만 혜택 · 외부 음식 반입 금지(음료는 가능) · 통합실은 두 방 요금을 더한 값 · 75인치 모니터 무료(2F 2대·3F 2대)",cols:["기준","주차","2시간","4시간","8시간"],rows:[
@@ -837,8 +849,20 @@ const FAC_RULE=[
 const facV=v=>v==null?"—":typeof v==="number"?(v&&v%1000===0?(v/10000).toLocaleString("ko-KR",{maximumFractionDigits:1})+"만":won(v)):esc(v);
 function facText(g){const f=v=>typeof v==="number"?won(v)+"원":v;return `[더숲 아카데미하우스 · ${g.t}]\n`+g.rows.map((r,j)=>{if(g.k==="meal")return r[0]?`- ${r[0]}: ${r[3]} ${f(r[4])}`:`   ${r[3]} ${f(r[4])}`;return `- ${r[0]}${r[2]?` (기준 ${r[2]}명)`:""}: `+g.cols.slice(1).map((c,i)=>[c,r[3+i]]).filter(([c,v])=>v!=="—").map(([c,v])=>`${c} ${f(v)}`).join(" / ")}).join("\n")+(g.k==="hall"?"\n  (새벽의 집 기자재 종일/반나절: LED 스크린 90만/50만 · 음향장비 30만/20만 · LED+음향 패키지 115만/65만)":"")+`\n※ ${g.note} · 부가세 포함`}
 function facPrice(g,r){if(g.k==="meal")return `<span class="fpx"><em>${esc(r[3])}</em> ${facV(r[4])}</span>`;const off=g.cols.indexOf("주차")>=0?1:0;return g.cols.slice(1+off).map((c,i)=>`<span class="fpx"><em>${c.replace("시간","h").replace("성수기 평일","성수기")}</em>${facV(r[3+off+i])}</span>`).join("")}
+
+const PHI=(k,n)=>Array.from({length:n},(_,i)=>`img/${k}-${i+1}.jpg`);
+const PH={"대화의 집 (HALL 1966)":PHI("hall1966",3),"여해의 집 세미나룸":PHI("yeohae-s",3),
+ "세미나룸+게스트룸":[...PHI("yeohae-s",3),...PHI("yeohae-g",2)],"세미나룸 숙박형":PHI("yeohae-s",3),"게스트룸":PHI("yeohae-g",2),
+ "싱글":PHI("stay-single",1),"트윈":PHI("stay-twin",1),"스탠다드 트윈":PHI("stay-twin",1),"더블":PHI("stay-double",1),"스탠다드 더블":PHI("stay-double",1),
+ "트리플":PHI("stay-triple",1),"스탠다드 트리플":PHI("stay-triple",1),"더블 스위트":PHI("stay-dsuite",1),"패밀리 스위트":PHI("stay-fsuite",1)};
+const phOf=(g,r)=>PH[r[0]]||(g.k==="meet"?PHI("meet",1):g.k==="train"?PHI("train",5):null);
+function openGal(title,list){
+  let m=document.getElementById("gal");if(!m){m=document.createElement("div");m.id="gal";m.className="gal";document.body.appendChild(m)}
+  m.innerHTML=`<div class="gal-bar"><b>${esc(title)}</b><span id="gal-n">1 / ${list.length}</span><button data-galclose aria-label="닫기">✕</button></div><div class="gal-s" id="gal-s">${list.map(u=>`<img src="${u}" alt="${esc(title)}" loading="lazy">`).join("")}</div><p class="gal-note">${list.length>1?"옆으로 넘겨 보세요 · ":""}견적안내 가이드 사진</p>`;
+  m.hidden=false;const sc=document.getElementById("gal-s");sc.addEventListener("scroll",()=>{document.getElementById("gal-n").textContent=`${Math.round(sc.scrollLeft/sc.clientWidth)+1} / ${list.length}`},{passive:true});
+}
 function renderFac(){
-  const body=FAC.map(g=>`<tr class="fg"><td colspan="4">${esc(g.t)}<small>${g.note.split(" · ").map(x=>`<span class="nw">${esc(x)}</span>`).join(" · ")}</small></td></tr>`+g.rows.map(r=>{const pk=g.cols.indexOf("주차")>=0?r[3]:"";return `<tr><td><b>${esc(r[0])}</b>${r[1]?`<small>${r[1].split("·").map(x=>`<span class="nw">${esc(x.trim())}</span>`).join("·")}</small>`:""}</td><td class="pax">${r[2]?r[2]+"명":""}</td><td class="pk">${pk&&pk!=="—"?esc(pk):""}</td><td class="pr">${facPrice(g,r)}</td></tr>`+(r[0]==="새벽의 집"?`<tr class="fxx"><td colspan="4"><span>기자재 (종일 · 반나절)</span><span>· <b>LED 스크린</b> 90만 · 50만 <i>(추가 1시간 20만)</i></span><span>· <b>음향장비</b> 30만 · 20만 <i>(추가 1시간 4만)</i></span><span>· <b>LED+음향 패키지</b> 115만 · 65만</span></td></tr>`:"")}).join("")).join("");
+  const body=FAC.map(g=>`<tr class="fg"><td colspan="4">${esc(g.t)}<small>${g.note.split(" · ").map(x=>`<span class="nw">${esc(x)}</span>`).join(" · ")}</small></td></tr>`+g.rows.map(r=>{const pk=g.cols.indexOf("주차")>=0?r[3]:"";return `<tr><td>${phOf(g,r)?`<button class="ph-btn" data-ph="${esc(g.k)}|${esc(r[0])}"><b>${esc(r[0])}</b><span class="ph-i">사진</span></button>`:`<b>${esc(r[0])}</b>`}${r[1]?`<small>${r[1].split("·").map(x=>`<span class="nw">${esc(x.trim())}</span>`).join("·")}</small>`:""}</td><td class="pax">${r[2]?r[2]+"명":""}</td><td class="pk">${pk&&pk!=="—"?esc(pk):""}</td><td class="pr">${facPrice(g,r)}</td></tr>`+(r[0]==="새벽의 집"?`<tr class="fxx"><td colspan="4"><span>기자재 (종일 · 반나절)</span><span>· <b>LED 스크린</b> 90만 · 50만 <i>(추가 1시간 20만)</i></span><span>· <b>음향장비</b> 30만 · 20만 <i>(추가 1시간 4만)</i></span><span>· <b>LED+음향 패키지</b> 115만 · 65만</span></td></tr>`:"")}).join("")).join("");
   document.getElementById("v-fac").innerHTML=`
   <div class="card fac-card"><h3>시설 · 요금 한눈에<button class="go-btn" data-faccopy="all">안내문 복사</button></h3>
    <p class="fac-note"><span class="nw">견적안내 가이드</span> · <span class="nw">부가세 포함</span> · <span class="nw">만 = 만원</span></p>
@@ -1036,6 +1060,8 @@ document.addEventListener("click",async e=>{
   const t=e.target;
   const cm=t.closest("[data-calm]"); if(cm){calM=new Date(calM.getFullYear(),calM.getMonth()+(+cm.dataset.calm),1);renderCal();return}
   const cp=t.closest("[data-cap]"); if(cp){doCapture(cp.dataset.cap);return}
+  const ph=t.closest("[data-ph]");if(ph){const [k,n]=ph.dataset.ph.split("|");const g=FAC.find(x=>x.k===k),r=g.rows.find(x=>x[0]===n);openGal(n,phOf(g,r));return}
+  if(t.closest("[data-galclose]")){document.getElementById("gal").hidden=true;return}
   const fc=t.closest("[data-faccopy]");if(fc){copyText(FAC.map(facText).join("\n\n"));return}
   if(t.closest("[data-capclear]")){capSel.clear();renderCap();return}
   if(t.closest("[data-shotclose]")){document.getElementById("shot").hidden=true;return}
