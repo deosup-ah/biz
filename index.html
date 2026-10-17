@@ -116,6 +116,14 @@ main{flex:1;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 .fp .sx{font-size:11px;color:var(--gold);border:1px solid currentColor;border-radius:4px;padding:0 4px;margin-right:2px}
 .fr{display:grid;grid-template-columns:34px 1fr;gap:6px;margin-top:4px;font-size:13px}
 .fr span{color:var(--gold);font-weight:600}
+.tgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.tcard{aspect-ratio:2/3;max-width:100%;border-radius:8px;background:linear-gradient(160deg,#1d4a3b,#2c6650);color:#f0d68a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1.5px solid #c9a94f;transition:transform .25s}
+.tcard:active{transform:scale(.96)}
+.tcard .tb{font-size:18px;opacity:.85}
+.tcard.up{background:#fbf6e6;color:#5a4410;border-color:#c9a94f}
+.tcard .tn{font-family:var(--f-head);font-size:11px;font-weight:700}
+.tcard .te{font-size:18px;line-height:1}
+.tcard .tt{font-size:9.5px;font-weight:600;text-align:center;line-height:1.1;padding:0 2px}
 .mbti-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
 .mbti-grid button{padding:7px 0;border-radius:8px;background:var(--surface);border:1px solid var(--line);font-family:var(--f-mono);font-size:12.5px;font-weight:600}
 .mbti-grid button[aria-pressed="true"]{background:var(--gold);color:#fff;border-color:var(--gold)}
@@ -475,7 +483,7 @@ function fortuneHTML(){
   const F=D.fortune; if(!F||!F.items) return "";
   return `<button class="tchip" data-pop="ft" aria-pressed="${pop==="ft"}"><b>${F.items.map(f=>esc(f.name)).join(", ")}</b> 오늘의 운세</button>`
    +(F.mbti?`<button class="tchip" data-pop="mbti" aria-pressed="${pop==="mbti"}"><b>MBTI</b> 운세</button>`:"")
-   +`<a class="tchip" href="https://search.naver.com/search.naver?query=${encodeURIComponent("사주 운세")}" target="_blank" rel="noopener"><b>사주</b> 검색 ↗</a>`;
+   +`<button class="tchip" data-pop="tarot" aria-pressed="${pop==="tarot"}"><b>타로점</b></button>`;
 }
 function ftBox(){
   const F=D.fortune; if(!F||!F.items) return "";
@@ -489,7 +497,37 @@ function mbtiBox(){
   const M=(D.fortune||{}).mbti||{};
   return `<div class="ftbox"><div class="mbti-grid">${MBTIS.map(t=>`<button data-mbti="${t}" aria-pressed="${myMbti===t}">${t}</button>`).join("")}</div>${myMbti&&M[myMbti]?`<div style="margin-top:8px"><b>${myMbti}</b> ${esc(M[myMbti])}</div>`:`<small style="color:var(--muted)">내 MBTI를 누르면 오늘의 운세가 나옵니다. 한 번 고르면 기억합니다.</small>`}</div>`;
 }
-function popBox(){return pop==="wx"?wxBox():pop==="ft"?ftBox():pop==="mbti"?mbtiBox():""}
+const TAROT=[
+ ["0","바보","🎒","새 출발. 계획보다 마음이 먼저 가는 쪽으로 한 걸음 내디뎌 보세요. 오늘 시작한 일은 생각보다 가볍게 굴러갑니다."],
+ ["I","마법사","🪄","가진 도구로 충분한 날. 망설이던 제안을 먼저 꺼내면 일이 내 쪽으로 기웁니다."],
+ ["II","여사제","🌙","답은 이미 내 안에 있습니다. 서두르지 말고 한 번 더 확인한 뒤 움직이세요."],
+ ["III","여황제","🌾","풍성함의 카드. 손님을 넉넉하게 대하면 그만큼 좋은 소식으로 돌아옵니다."],
+ ["IV","황제","🏛️","질서와 책임. 기준을 분명히 세우면 흔들리던 일이 자리를 잡습니다."],
+ ["V","교황","📜","조언을 구하면 길이 보입니다. 경험 많은 사람의 한마디를 놓치지 마세요."],
+ ["VI","연인","💞","선택의 날. 마음이 끌리는 쪽과 옳은 쪽이 같다면 망설일 이유가 없습니다."],
+ ["VII","전차","🛞","밀고 나갈 때. 방향만 정해지면 속도는 저절로 붙습니다."],
+ ["VIII","힘","🦁","부드러움이 이기는 날. 큰소리보다 차분한 설명이 사람을 움직입니다."],
+ ["IX","은둔자","🏮","혼자 생각할 시간이 필요합니다. 잠깐 멈추면 놓친 것이 보입니다."],
+ ["X","운명의 수레바퀴","☸️","흐름이 바뀌는 날. 막혀 있던 일이 갑자기 풀릴 수 있으니 준비해 두세요."],
+ ["XI","정의","⚖️","공정함이 답입니다. 숫자와 약속을 정확히 지키면 신뢰가 쌓입니다."],
+ ["XII","매달린 사람","🙃","관점을 바꾸면 보이는 날. 오늘 기다림은 손해가 아니라 준비입니다."],
+ ["XIII","죽음","🍂","끝과 시작. 붙잡고 있던 일을 정리하면 새 자리가 생깁니다."],
+ ["XIV","절제","🫖","균형의 카드. 서두름과 미룸 사이 딱 알맞은 속도를 찾으세요."],
+ ["XV","악마","⛓️","미루던 습관을 하나 끊어 내기 좋은 날. 작은 것부터 시작하세요."],
+ ["XVI","탑","⚡","예상 밖 변화가 생겨도 당황하지 마세요. 무너진 자리에서 더 단단한 것이 섭니다."],
+ ["XVII","별","⭐","희망의 카드. 지친 일에 다시 힘이 붙고, 좋은 소식이 다가옵니다."],
+ ["XVIII","달","🌕","애매한 일은 확인부터. 짐작으로 움직이지 말고 한 번 더 물어보세요."],
+ ["XIX","태양","☀️","밝고 시원하게 풀리는 날. 웃는 얼굴이 가장 큰 무기입니다."],
+ ["XX","심판","📯","다시 부름을 받는 날. 예전에 미뤄 둔 연락이 좋은 기회로 돌아옵니다."],
+ ["XXI","세계","🌍","마무리의 카드. 진행 중인 일이 깔끔하게 끝나고 다음 단계가 열립니다."]];
+let tarotPick=-1;
+function tarotCard(i){const seed=[...(TODAY_S+"tarot"+i)].reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,7);return TAROT[seed%TAROT.length]}
+function tarotBox(){
+  const backs=[0,1,2,3,4,5].map(i=>`<button class="tcard ${tarotPick===i?"up":""}" data-tarot="${i}" aria-label="${i+1}번째 카드">${tarotPick===i?`<span class="tn">${tarotCard(i)[0]}</span><span class="te">${tarotCard(i)[2]}</span><span class="tt">${tarotCard(i)[1]}</span>`:`<span class="tb">✦</span>`}</button>`).join("");
+  const c=tarotPick>=0?tarotCard(tarotPick):null;
+  return `<div class="ftbox"><div class="tgrid">${backs}</div>${c?`<div style="margin-top:8px"><b>${c[0]} · ${c[1]}</b> ${esc(c[3])}</div>`:`<small style="color:var(--muted)">마음을 가다듬고 카드 한 장을 고르세요.</small>`}</div>`;
+}
+function popBox(){return pop==="wx"?wxBox():pop==="ft"?ftBox():pop==="mbti"?mbtiBox():pop==="tarot"?tarotBox():""}
 /* ---------- helpers ---------- */
 function dday(c){
   if(!c.s) return "날짜 미정";
@@ -740,6 +778,7 @@ function setMailto(){const a=document.getElementById("mailto");if(!a)return;cons
 /* ---------- events ---------- */
 document.addEventListener("click",async e=>{
   const t=e.target;
+  const tc=t.closest("[data-tarot]"); if(tc){tarotPick=+tc.dataset.tarot;renderHome();return}
   const mb=t.closest("[data-mbti]"); if(mb){myMbti=mb.dataset.mbti;LS.set("gs2-mbti",myMbti);renderHome();return}
   const pp=t.closest("[data-pop]"); if(pp){pop=pop===pp.dataset.pop?"":pp.dataset.pop;renderHome();return}
   if(t.closest("[data-close]")){closeDetail();return}
