@@ -134,6 +134,9 @@ main{flex:1;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 .wk-t td.none{color:var(--faint)}
 .wk-t .mk{display:inline-block;font-size:10px;font-weight:700;color:var(--brand-2);border:1px solid currentColor;border-radius:4px;padding:0 3px;margin-right:2px;line-height:1.4}
 .wk-t tfoot td{font-weight:700;border-bottom:none;padding-top:6px}
+.wk-save{width:100%;margin-top:8px;min-height:36px;padding:6px 0;font-size:13.5px}
+.cap-frame .wk-save,.cap-frame .wk-h button{visibility:hidden}
+.cap-frame .wk-save{display:none}
 .wk-n{display:block;margin-top:6px;color:var(--muted);font-size:10.5px;line-height:1.4}
 .ftbox{margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--gold-soft);font-size:13.5px;line-height:1.5}
 .ftbox b{font-weight:700}
@@ -672,7 +675,7 @@ function wkBox(){
   return `<div class="ftbox wkbox"><div class="wk-h"><button data-wk="-1" aria-label="지난주">‹</button><b>${wkOff===0?"이번 주":wkOff===1?"다음 주":wkOff===-1?"지난주":""} ${lab}</b><button data-wk="1" aria-label="다음 주">›</button></div>
   <table class="wk-t"><thead><tr><th>요일</th><th>확정 단체</th><th>이용</th><th>식사</th></tr></thead><tbody>${rows}</tbody>
   <tfoot><tr><td colspan="2">합계 ${tot.g}건</td><td class="num">${tot.p}명</td><td class="ml">${tot.m?tot.m+"식":"—"}</td></tr></tfoot></table>
-  <small class="wk-n">보드 확정 또는 확정(S60) 이상 · 여러 날 행사는 날마다 표시 · 식사: 조=조식 중=중식 석=석식(견적 기준, 계약 후 수량 변경 반영)</small></div>`;
+  <button class="btn pri wk-save" data-cap="wk">이미지로 저장</button><small class="wk-n">보드 확정 또는 확정(S60) 이상 · 여러 날 행사는 날마다 표시 · 식사: 조=조식 중=중식 석=석식(견적 기준, 계약 후 수량 변경 반영)</small></div>`;
 }
 function ftBox(){
   const F=D.fortune; if(!F||!F.items) return "";
@@ -964,7 +967,8 @@ async function doCapture(kind,id){
   try{
     await loadH2C();
     let node;
-    if(kind==="home"){node=document.getElementById("v-home");if(tab!=="home"){tab="home";render()}}
+    if(kind==="wk"){f=capFrame("주간 확정표",wkBox());node=f}
+    else if(kind==="home"){node=document.getElementById("v-home");if(tab!=="home"){tab="home";render()}}
     else if(kind==="detail"){node=document.querySelector("#detail .sheet-cap")||document.getElementById("detail")}
     else{
       let list=[],title="";
@@ -983,7 +987,7 @@ async function doCapture(kind,id){
 }
 function showShot(url,kind){
   let m=document.getElementById("shot");if(!m){m=document.createElement("div");m.id="shot";m.className="shot";document.body.appendChild(m)}
-  const name=`더숲단체일정_${TODAY_S}_${kind}.png`;
+  const name=kind==="wk"?`주간확정표_${TODAY_S}.png`:`더숲단체일정_${TODAY_S}_${kind}.png`;
   m.innerHTML=`<div class="shot-in"><div class="shot-bar"><b>캡처 이미지</b><button data-shotclose>닫기</button></div><img src="${url}" alt="캡처 이미지"><div class="shot-act"><a class="btn pri" href="${url}" download="${name}">저장</a><button class="btn sec" data-shotshare>공유</button></div><p class="note">저장이 안 되면 이미지를 길게 눌러 「사진에 저장」을 고르세요.</p></div>`;
   m.dataset.url=url;m.dataset.name=name;m.hidden=false;
 }
