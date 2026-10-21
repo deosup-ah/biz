@@ -134,7 +134,9 @@ main{flex:1;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 .wk-t td.none{color:var(--faint)}
 .wk-t .mk{display:inline-block;font-size:10px;font-weight:700;color:var(--brand-2);border:1px solid currentColor;border-radius:4px;padding:0 3px;margin-right:2px;line-height:1.4}
 .wk-t tfoot td{font-weight:700;border-bottom:none;padding-top:6px}
-.btn.wk-save{line-height:1;display:flex;align-items:center;justify-content:center;width:100%;margin-top:8px;min-height:30px;height:30px;padding:0 6px;font-size:12px;font-weight:700;border-radius:14px}
+.wk-act .btn{margin:0!important;box-sizing:border-box;border:1px solid var(--line);vertical-align:top}
+.wk-act{align-items:stretch;display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.btn.wk-save{line-height:1;display:flex;align-items:center;justify-content:center;width:100%;margin-top:0;min-height:30px;height:30px;padding:0 6px;font-size:12px;font-weight:700;border-radius:14px}
 .cap-frame .wk-save,.cap-frame .wk-h button{visibility:hidden}
 .cap-frame .wk-save{display:none}
 .wk-n{display:block;margin-top:6px;color:var(--muted);font-size:10.5px;line-height:1.4}
@@ -660,6 +662,70 @@ function mealsOn(c,ds){
   ((c.amt&&c.amt.chg)||[]).forEach(r=>{const m=(r[0]||"").match(/수량 (\d+) → (\d+)/);if(!m||!MEAL.test(r[0]))return;if(r[1]!==mmdd&&!(r[1]||"").startsWith(ds))return;const k=mealKey(r[0]);if(out[k]!=null)out[k]=out[k]-(+m[1])+(+m[2])});
   return out;
 }
+
+function wkData(){
+  const mon=new Date(TODAY);mon.setDate(mon.getDate()-((mon.getDay()+6)%7)+wkOff*7);
+  const days=[...Array(7)].map((_,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);return d});
+  const conf=c=>c.stg>=60||c.st==="conf"||c.st==="mix";
+  const tot={g:0,p:0,m:0};
+  const out=days.map(d=>{const ds=ymd(d);const L=CASES.filter(c=>c.s&&c.s<=ds&&(c.e||c.s)>=ds&&conf(c)&&c.stg<90).map(c=>{const m=mealsOn(c,ds);const mt=Object.values(m).reduce((a,b)=>a+b,0);tot.g++;tot.p+=c.pax||0;tot.m+=mt;return {c,m,mt}});return {d,ds,L}});
+  const lab=`${days[0].getMonth()+1}/${days[0].getDate()}(월) – ${days[6].getMonth()+1}/${days[6].getDate()}(일)`;
+  return {days:out,tot,lab,title:(wkOff===0?"이번 주":wkOff===1?"다음 주":wkOff===-1?"지난주":"")};
+}
+function wkCanvas(){
+  const W=wkData();const S=2,PW=720,pad=28;
+  const rowH=[];W.days.forEach(x=>{if(!x.L.length)rowH.push(54);else x.L.forEach(()=>rowH.push(48))});
+  const H=92+36+rowH.reduce((a,b)=>a+b,0)+56+34+pad/2;
+  const cv=document.createElement("canvas");cv.width=PW*S;cv.height=H*S;const g=cv.getContext("2d");g.scale(S,S);
+  const F='"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif';
+  g.fillStyle="#f6f3ea";g.fillRect(0,0,PW,H);
+  g.fillStyle="#1f3d2f";g.fillRect(0,0,PW,92);
+  g.fillStyle="#fff";g.font=`600 15px ${F}`;g.fillText("더숲 아카데미하우스",pad,36);
+  g.font=`800 26px ${F}`;g.fillText(`주간 확정표 · ${W.lab}`,pad,72);
+  let y=92+30;const X=[pad,pad+86,PW-pad-250,PW-pad-170];
+  g.fillStyle="#7a7466";g.font=`600 14px ${F}`;g.fillText("요일",X[0],y);g.fillText("확정 단체",X[1],y);g.textAlign="right";g.fillText("이용",X[2]+64,y);g.textAlign="left";g.fillText("식사",X[3],y);
+  y+=6;let k=0;
+  W.days.forEach(x=>{
+    const n=Math.max(1,x.L.length);let hh=0;for(let i=0;i<n;i++)hh+=rowH[k+i];
+    g.strokeStyle="#d9d2c0";g.lineWidth=1;g.beginPath();g.moveTo(pad,y);g.lineTo(PW-pad,y);g.stroke();
+    const isT=x.ds===TODAY_S,dw=x.d.getDay();
+    g.fillStyle=isT?"#1f3d2f":"#ece6d6";g.beginPath();g.roundRect?g.roundRect(X[0],y+6,62,hh-12,10):g.rect(X[0],y+6,62,hh-12);g.fill();
+    g.textAlign="center";g.fillStyle=isT?"#fff":(dw===0?"#c0392b":dw===6?"#2f6db3":"#222");g.font=`800 19px ${F}`;g.fillText(WD[dw],X[0]+31,y+6+(hh-12)/2-2);
+    g.font=`500 13px ${F}`;g.fillStyle=isT?"#dfe8e1":"#7a7466";g.fillText(`${x.d.getMonth()+1}/${x.d.getDate()}`,X[0]+31,y+6+(hh-12)/2+16);g.textAlign="left";
+    if(!x.L.length){g.fillStyle="#aaa29a";g.font=`500 16px ${F}`;g.fillText("—",X[1],y+32);y+=rowH[k++];return}
+    x.L.forEach((r,i)=>{const h=rowH[k++];
+      if(i>0){g.strokeStyle="#ebe5d6";g.beginPath();g.moveTo(X[1],y);g.lineTo(PW-pad,y);g.stroke()}
+      let nm=r.c.name;g.font=`700 17px ${F}`;g.fillStyle="#1d1d1b";const maxW=X[2]-X[1]-10;while(g.measureText(nm).width>maxW&&nm.length>2)nm=nm.slice(0,-2)+"…";
+      g.fillText(nm,X[1],y+(r.c.stg<60?24:30));
+      if(r.c.stg<60){g.font=`500 12.5px ${F}`;g.fillStyle="#2f6db3";g.fillText(r.c.stage,X[1],y+41)}
+      g.textAlign="right";g.font=`700 17px ${F}`;g.fillStyle="#1d1d1b";g.fillText(r.c.pax?r.c.pax+"명":"—",X[2]+64,y+30);g.textAlign="left";
+      let mx=X[3];const ent=Object.entries(r.m);if(!ent.length){g.fillStyle="#aaa29a";g.fillText("—",mx,y+30)}
+      ent.forEach(([kk,v])=>{g.strokeStyle="#2e6b4f";g.fillStyle="#2e6b4f";g.font=`800 12px ${F}`;g.lineWidth=1.2;g.strokeRect(mx,y+17,20,18);g.textAlign="center";g.fillText(kk,mx+10,y+31);g.textAlign="left";g.font=`700 16px ${F}`;g.fillStyle="#1d1d1b";g.fillText(String(v),mx+25,y+31);mx+=25+g.measureText(String(v)).width+12});
+      y+=h});
+  });
+  g.strokeStyle="#bdb4a0";g.lineWidth=1.5;g.beginPath();g.moveTo(pad,y);g.lineTo(PW-pad,y);g.stroke();
+  g.font=`800 18px ${F}`;g.fillStyle="#1d1d1b";g.fillText(`합계 ${W.tot.g}건`,X[1],y+36);g.textAlign="right";g.fillText(`${W.tot.p}명`,X[2]+64,y+36);g.textAlign="left";g.fillText(W.tot.m?`${W.tot.m}식`:"—",X[3],y+36);
+  y+=56;g.font=`500 12.5px ${F}`;g.fillStyle="#8a8270";g.fillText("보드 확정 또는 확정(S60) 이상 · 식사 조=조식 중=중식 석=석식 · "+(D.asOf||""),pad,y+18);
+  return cv;
+}
+async function wkShare(mode){
+  const cv=wkCanvas();const W=wkData();const name=`주간확정표_${ymd(W.days[0].d)}.png`;
+  const url=cv.toDataURL("image/png");
+  if(mode==="share"){
+    try{const b=await new Promise(r=>cv.toBlob(r,"image/png"));const file=new File([b],name,{type:"image/png"});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"주간 확정표 "+W.lab});return}}catch(e){if(e&&e.name==="AbortError")return}
+    const txt=wkText();try{if(navigator.share){await navigator.share({title:"주간 확정표 "+W.lab,text:txt});return}}catch(e){if(e&&e.name==="AbortError")return}
+    if(await copyText(txt)){toast("표를 글로 복사했습니다 — 붙여넣어 보내세요");return}
+  }
+  showShot(url,"wk");
+}
+function wkText(){
+  const W=wkData();let t=`[더숲 아카데미하우스 주간 확정표 ${W.lab}]\n`;
+  W.days.forEach(x=>{const h=`${WD[x.d.getDay()]} ${x.d.getMonth()+1}/${x.d.getDate()}`;
+    if(!x.L.length){t+=`${h} —\n`;return}
+    x.L.forEach((r,i)=>{const ms=Object.entries(r.m).map(([k,v])=>`${k}${v}`).join(" ");t+=`${i?"       ":h} ${r.c.name} · ${r.c.pax?r.c.pax+"명":"—"}${ms?" · 식사 "+ms:""}\n`})});
+  return t+`합계 ${W.tot.g}건 · ${W.tot.p}명${W.tot.m?" · "+W.tot.m+"식":""}`;
+}
 function wkBox(){
   const mon=new Date(TODAY);mon.setDate(mon.getDate()-((mon.getDay()+6)%7)+wkOff*7);
   const days=[...Array(7)].map((_,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);return d});
@@ -675,7 +741,7 @@ function wkBox(){
   return `<div class="ftbox wkbox"><div class="wk-h"><button data-wk="-1" aria-label="지난주">‹</button><b>${wkOff===0?"이번 주":wkOff===1?"다음 주":wkOff===-1?"지난주":""} ${lab}</b><button data-wk="1" aria-label="다음 주">›</button></div>
   <table class="wk-t"><thead><tr><th>요일</th><th>확정 단체</th><th>이용</th><th>식사</th></tr></thead><tbody>${rows}</tbody>
   <tfoot><tr><td colspan="2">합계 ${tot.g}건</td><td class="num">${tot.p}명</td><td class="ml">${tot.m?tot.m+"식":"—"}</td></tr></tfoot></table>
-  <button class="btn pri wk-save" data-cap="wk">이미지로 저장</button><small class="wk-n">보드 확정 또는 확정(S60) 이상 · 여러 날 행사는 날마다 표시 · 식사: 조=조식 중=중식 석=석식(견적 기준, 계약 후 수량 변경 반영)</small></div>`;
+  <div class="wk-act"><button class="btn pri wk-save" data-wkshare="share">공유</button><button class="btn sec wk-save" data-wkshare="img">이미지 저장</button></div><small class="wk-n">보드 확정 또는 확정(S60) 이상 · 여러 날 행사는 날마다 표시 · 식사: 조=조식 중=중식 석=석식(견적 기준, 계약 후 수량 변경 반영)</small></div>`;
 }
 function ftBox(){
   const F=D.fortune; if(!F||!F.items) return "";
@@ -987,7 +1053,7 @@ async function doCapture(kind,id){
 }
 function showShot(url,kind){
   let m=document.getElementById("shot");if(!m){m=document.createElement("div");m.id="shot";m.className="shot";document.body.appendChild(m)}
-  const name=kind==="wk"?`주간확정표_${TODAY_S}.png`:`더숲단체일정_${TODAY_S}_${kind}.png`;
+  const name=kind==="wk"?`주간확정표_${ymd(wkData().days[0].d)}.png`:`더숲단체일정_${TODAY_S}_${kind}.png`;
   m.innerHTML=`<div class="shot-in"><div class="shot-bar"><b>캡처 이미지</b><button data-shotclose>닫기</button></div><img src="${url}" alt="캡처 이미지"><div class="shot-act"><a class="btn pri" href="${url}" download="${name}">저장</a><button class="btn sec" data-shotshare>공유</button></div><p class="note">저장이 안 되면 이미지를 길게 눌러 「사진에 저장」을 고르세요.</p></div>`;
   m.dataset.url=url;m.dataset.name=name;m.hidden=false;
 }
@@ -1121,6 +1187,7 @@ document.addEventListener("click",async e=>{
   if(t.closest("[data-shotshare]")){shareShot();return}
   const tc=t.closest("[data-tarot]"); if(tc){tarotPick=+tc.dataset.tarot;renderHome();return}
   const mb=t.closest("[data-mbti]"); if(mb){myMbti=mb.dataset.mbti;LS.set("gs2-mbti",myMbti);renderHome();return}
+  const ws=t.closest("[data-wkshare]");if(ws){wkShare(ws.dataset.wkshare);return}
   const wk=t.closest("[data-wk]");if(wk){wkOff+=+wk.dataset.wk;renderHome();return}
   const pp=t.closest("[data-pop]"); if(pp){pop=pop===pp.dataset.pop?"":pp.dataset.pop;if(tab!=="home"){tab="home";render()}else renderHome();window.scrollTo(0,0);return}
   if(t.closest("[data-close]")){closeDetail();return}
