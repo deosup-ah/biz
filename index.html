@@ -103,7 +103,7 @@ main{flex:1;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 .ft-title{font-size:11px;letter-spacing:.4px;color:var(--faint);margin-top:2px}
 
 /* ── compact today strip ── */
-.tstrip{display:grid;grid-template-columns:2.3fr 1fr 1fr;gap:6px;padding-block:12px 0}
+.tstrip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding-block:12px 0}
 .tstrip::-webkit-scrollbar{display:none}
 .tchip{min-width:0;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:2px 6px;min-height:40px;padding:5px 10px;border-radius:14px;text-align:center;line-height:1.25;background:var(--surface);border:1px solid var(--line);font-size:13px;text-decoration:none;color:var(--fg)}
 .tchip.w{background:#245a7a;border-color:#245a7a;color:#f1f6fa}
@@ -112,6 +112,29 @@ main{flex:1;padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
 .tchip small{color:var(--muted);font-size:11.5px}
 .tchip.w small{color:#d4e4ee}
 .tchip[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft)}
+.wkbox{background:var(--surface);border:1px solid var(--line);padding:8px 8px 6px}
+.wk-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.wk-h b{font-size:13.5px}
+.wk-h button{width:32px;height:28px;border-radius:8px;border:1px solid var(--line);font-size:16px;color:var(--fg)}
+.wk-t{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed}
+.wk-t th{font-size:10.5px;color:var(--faint);font-weight:600;padding:3px 4px;border-bottom:1px solid var(--line);text-align:left}
+.wk-t th:nth-child(1){width:42px}.wk-t th:nth-child(3){width:46px;text-align:right}.wk-t th:nth-child(4){width:30%}
+.wk-t td{padding:5px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+.wk-t tr.dstart td{border-top:1px solid var(--line-2)}
+.wk-t td.wd{text-align:center;background:var(--bg);line-height:1.15}
+.wk-t td.wd b{display:block;font-size:13px}.wk-t td.wd span{font-size:10.5px;color:var(--muted)}
+.wk-t td.wd.sun b{color:#c0392b}.wk-t td.wd.sat b{color:#2f6db3}
+.wk-t td.wd.cont{background:transparent;border-top:none}
+.wk-t tr.cont td{border-top:none}
+.wk-t td.wd.now{background:var(--brand);color:var(--brand-fg)}.wk-t td.wd.now span{color:var(--brand-fg);opacity:.8}.wk-t td.wd.now b{color:var(--brand-fg)}
+.wk-t td.gn button{font-weight:600;text-align:left;color:var(--fg);padding:0;line-height:1.3}
+.wk-t td.gn small{display:block;font-size:10.5px;color:var(--hold,#2f6db3)}
+.wk-t td.num{text-align:right;white-space:nowrap}
+.wk-t td.ml{font-size:12px;white-space:normal}
+.wk-t td.none{color:var(--faint)}
+.wk-t .mk{display:inline-block;font-size:10px;font-weight:700;color:var(--brand-2);border:1px solid currentColor;border-radius:4px;padding:0 3px;margin-right:2px;line-height:1.4}
+.wk-t tfoot td{font-weight:700;border-bottom:none;padding-top:6px}
+.wk-n{display:block;margin-top:6px;color:var(--muted);font-size:10.5px;line-height:1.4}
 .ftbox{margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--gold-soft);font-size:13.5px;line-height:1.5}
 .ftbox b{font-weight:700}
 .ftbox small{display:block;color:var(--gold);font-size:12px;margin-top:2px}
@@ -620,10 +643,36 @@ async function loadWeather(){
 }
 let pop="";
 function fortuneHTML(){
-  const F=D.fortune; if(!F||!F.items) return "";
-  return `<button class="tchip" data-pop="ft" aria-pressed="${pop==="ft"}"><b>${F.items.map(f=>esc(f.name)).join("·")}</b> 운세</button>`
-   +(F.mbti?`<button class="tchip" data-pop="mbti" aria-pressed="${pop==="mbti"}"><b>MBTI</b> 운세</button>`:"")
-   +`<button class="tchip" data-pop="tarot" aria-pressed="${pop==="tarot"}"><b>타로점</b></button>`;
+  const F=D.fortune;
+  return `<button class="tchip" data-pop="wk" aria-pressed="${pop==="wk"}"><b>주간 확정표</b></button>`
+   +(F&&F.items?`<button class="tchip" data-pop="ft" aria-pressed="${pop==="ft"}"><b>오늘의 운세</b></button>`:"")
+   +(F&&F.mbti?`<button class="tchip" data-pop="mbti" aria-pressed="${pop==="mbti"}"><b>MBTI</b> 운세</button>`:"");
+}
+let wkOff=0;
+const MEAL=/조식|중식|석식|케이터링|식사|다과|간식/;
+const mealKey=n=>/조식/.test(n)?"조":/중식/.test(n)?"중":/석식/.test(n)?"석":"기타";
+function mealsOn(c,ds){
+  const out={};const its=(c.amt&&c.amt.items)||[];const mmdd=`${+ds.slice(5,7)}/${+ds.slice(8,10)}`;
+  its.forEach(r=>{if(!MEAL.test(r[0])||!(r[1]||"").startsWith(ds))return;const q=parseInt(r[2]);if(!q)return;const k=mealKey(r[0]);out[k]=(out[k]||0)+q});
+  ((c.amt&&c.amt.chg)||[]).forEach(r=>{const m=(r[0]||"").match(/수량 (\d+) → (\d+)/);if(!m||!MEAL.test(r[0]))return;if(r[1]!==mmdd&&!(r[1]||"").startsWith(ds))return;const k=mealKey(r[0]);if(out[k]!=null)out[k]=out[k]-(+m[1])+(+m[2])});
+  return out;
+}
+function wkBox(){
+  const mon=new Date(TODAY);mon.setDate(mon.getDate()-((mon.getDay()+6)%7)+wkOff*7);
+  const days=[...Array(7)].map((_,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);return d});
+  const conf=c=>c.stg>=60||c.st==="conf"||c.st==="mix";
+  let tot={g:0,p:0,m:0},rows="";
+  days.forEach(d=>{const ds=ymd(d);const L=CASES.filter(c=>c.s&&c.s<=ds&&(c.e||c.s)>=ds&&conf(c)&&c.stg<90);
+    const head=`<td class="wd ${d.getDay()===0?"sun":d.getDay()===6?"sat":""} ${ds===TODAY_S?"now":""}"><b>${WD[d.getDay()]}</b><span>${d.getMonth()+1}/${d.getDate()}</span></td>`;
+    if(!L.length){rows+=`<tr class="dstart">${head}<td colspan="3" class="none">—</td></tr>`;return}
+    L.forEach((c,i)=>{const m=mealsOn(c,ds);const ms=Object.entries(m).map(([k,v])=>`<span class="mk">${k}</span>${v}`).join(" ");const mt=Object.values(m).reduce((a,b)=>a+b,0);
+      tot.g++;tot.p+=c.pax||0;tot.m+=mt;
+      rows+=`<tr class="${i===0?"dstart":"cont"}">${i===0?head:`<td class="wd cont"></td>`}<td class="gn"><button data-id="${esc(c.id)}">${esc(c.name)}</button>${c.stg<60?`<small>${esc(c.stage)}</small>`:""}</td><td class="num">${c.pax?c.pax+"명":"—"}</td><td class="ml">${ms||"—"}</td></tr>`})});
+  const lab=`${days[0].getMonth()+1}/${days[0].getDate()}(월) – ${days[6].getMonth()+1}/${days[6].getDate()}(일)`;
+  return `<div class="ftbox wkbox"><div class="wk-h"><button data-wk="-1" aria-label="지난주">‹</button><b>${wkOff===0?"이번 주":wkOff===1?"다음 주":wkOff===-1?"지난주":""} ${lab}</b><button data-wk="1" aria-label="다음 주">›</button></div>
+  <table class="wk-t"><thead><tr><th>요일</th><th>확정 단체</th><th>이용</th><th>식사</th></tr></thead><tbody>${rows}</tbody>
+  <tfoot><tr><td colspan="2">합계 ${tot.g}건</td><td class="num">${tot.p}명</td><td class="ml">${tot.m?tot.m+"식":"—"}</td></tr></tfoot></table>
+  <small class="wk-n">보드 확정 또는 확정(S60) 이상 · 여러 날 행사는 날마다 표시 · 식사: 조=조식 중=중식 석=석식(견적 기준, 계약 후 수량 변경 반영)</small></div>`;
 }
 function ftBox(){
   const F=D.fortune; if(!F||!F.items) return "";
@@ -667,7 +716,7 @@ function tarotBox(){
   const c=tarotPick>=0?tarotCard(tarotPick):null;
   return `<div class="ftbox"><div class="tgrid">${backs}</div>${c?`<div style="margin-top:8px"><b>${c[0]} · ${c[1]}</b> ${esc(c[3])}</div>`:`<small style="color:var(--muted)">마음을 가다듬고 카드 한 장을 고르세요.</small>`}</div>`;
 }
-function popBox(){return pop==="wx"?wxBox():pop==="ft"?ftBox():pop==="mbti"?mbtiBox():pop==="tarot"?tarotBox():""}
+function popBox(){return pop==="wx"?wxBox():pop==="ft"?ftBox():pop==="mbti"?mbtiBox():pop==="wk"?wkBox():""}
 /* ---------- helpers ---------- */
 function dday(c){
   if(!c.s) return "날짜 미정";
@@ -1068,6 +1117,7 @@ document.addEventListener("click",async e=>{
   if(t.closest("[data-shotshare]")){shareShot();return}
   const tc=t.closest("[data-tarot]"); if(tc){tarotPick=+tc.dataset.tarot;renderHome();return}
   const mb=t.closest("[data-mbti]"); if(mb){myMbti=mb.dataset.mbti;LS.set("gs2-mbti",myMbti);renderHome();return}
+  const wk=t.closest("[data-wk]");if(wk){wkOff+=+wk.dataset.wk;renderHome();return}
   const pp=t.closest("[data-pop]"); if(pp){pop=pop===pp.dataset.pop?"":pp.dataset.pop;if(tab!=="home"){tab="home";render()}else renderHome();window.scrollTo(0,0);return}
   if(t.closest("[data-close]")){closeDetail();return}
   const cn=t.closest("[data-copyno]"); if(cn){if(!await copyText(cn.dataset.copyno))toast(cn.dataset.copyno);return}
