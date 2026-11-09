@@ -250,6 +250,9 @@ main{padding-top:14px}
 .mo .tr{display:flex;height:10px;background:var(--sunk);border-radius:5px;overflow:hidden}
 .mo .tr i{background:var(--pine)}.mo .tr i.pp{background:var(--line-2)}
 .mo .v{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.fc{padding:10px 0;border-bottom:1px solid var(--line)}.fc-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:14.5px}.fc-h span{font-size:12.5px;color:var(--mute);font-variant-numeric:tabular-nums}
+.fc-t{display:flex;height:12px;background:var(--sunk);border-radius:6px;overflow:hidden;margin-top:6px}.fc-t i{background:var(--pine)}.fc-t i.mid{background:var(--pine-2);opacity:.6}.fc-t i.pp{background:var(--line-2)}
+.ins{margin:0;padding:12px 14px 12px 32px;display:grid;gap:5px;font-size:14px}
 .kv2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .kv2 span{display:block;font-size:12.5px;color:var(--mute)}.kv2 b{font:700 17px var(--f-disp)}
 .up{color:var(--ok)}.dn{color:var(--hi)}
@@ -587,8 +590,28 @@ function renderRev(){const r=window.REV_DATA;
    <div class="kv2"><div><span>지난달 대비</span><b class="${d==null?"":d>=0?"up":"dn"}">${d==null?"비교 없음":(d>=0?"▲ ":"▼ ")+Math.abs(d)+"%"}</b></div><div><span>확정 전 견적 (진행 중)</span><b class="num">${A.pt?manwon(A.pt)+"원":"—"}</b></div></div>
    ${r.parts.map((p,i)=>`<div class="dbar"><span>${esc(p)}</span><span class="tr"><i style="width:${A.c[i]/max*100}%"></i><i class="pp" style="width:${A.p[i]/max*100}%"></i></span><span class="v">${A.c[i]?manwon(A.c[i]):"—"}</span></div>`).join("")}
    <p class="note">진한 막대 = 확정, 연한 막대 = 확정 전 견적</p></div>
+  ${revForecast()}${revInsight(A,P)}
   <div class="sec"><div class="sec-h"><h2>월별</h2><span class="cnt">누르면 그 달로</span></div><div class="card">${M.map(x=>`<button class="mo" data-smset="${x.m}" aria-pressed="${x.m===sMonth}"><span>${x.m.slice(2,4)}.${+x.m.slice(5)}월</span><span class="tr"><i style="width:${x.a.ct/mmax*100}%"></i><i class="pp" style="width:${x.a.pt/mmax*100}%"></i></span><span class="v">${x.a.ct?manwon(x.a.ct):"—"}</span></button>`).join("")}</div></div>
   <p class="note">${esc(r.asOf||"")} · 단체(건 대장) 매출만 들어 있습니다. 개인 투숙·워크인·WINGS 직접 매출은 빠져 있습니다. 확정 = 확정(S60) 이후 건, 실제 이용일 기준(숙박은 잔 날마다), 계약 후 변경 반영, 부가세 포함. 직접 넣은 기록은 「매출 입력」에서 봅니다.</p>`}
+const STG_W={10:.1,20:.2,30:.4,40:.6,50:.9};
+function revForecast(){const r=window.REV_DATA;const cur=TODAY_S.slice(0,7);
+  const rows=[0,1,2].map(k=>{const m=shiftMonth(cur,k),a=revMonth(m);let w=0;(r.pcase||[]).forEach(c=>{if((c[2]||"").startsWith(m))w+=(Number(c[4])||0)*(STG_W[c[3]]??.3)});
+    return {m,lo:a.ct,mid:Math.round(a.ct+w),hi:a.ct+a.pt}});
+  const mx=Math.max(1,...rows.map(x=>x.hi));
+  return `<div class="sec"><div class="sec-h"><h2>예측</h2><span class="cnt">앞으로 3개월</span></div><div class="card" style="padding:6px 14px 12px">
+   ${rows.map(x=>`<div class="fc"><div class="fc-h"><b>${+x.m.slice(5)}월 예상 ${manwon(x.mid)}원</b><span>${manwon(x.lo)} ~ ${manwon(x.hi)}</span></div><div class="fc-t"><i style="width:${x.lo/mx*100}%"></i><i class="mid" style="width:${(x.mid-x.lo)/mx*100}%"></i><i class="pp" style="width:${(x.hi-x.mid)/mx*100}%"></i></div></div>`).join("")}
+   <p class="note">예상 = 확정 + 진행 중 견적 × 단계별 성사 가정(계약 90% · 견적 60% · 가예약 40% · 상담 20% · 문의 10%). 범위는 확정만 ~ 전부 성사. 가정값이라 실제와 다를 수 있습니다.</p></div></div>`}
+function revInsight(A,P){const r=window.REV_DATA;if(!A.ct&&!A.pt)return "";const L=[];
+  if(A.ct){const ix=A.c.map((v,i)=>[v,i]).sort((x,y)=>y[0]-x[0]);const top=ix[0];L.push(`가장 큰 부문은 <b>${esc(r.parts[top[1]])}</b> ${Math.round(top[0]/A.ct*100)}%${ix[1]&&ix[1][0]?` · 다음은 ${esc(r.parts[ix[1][1]])} ${Math.round(ix[1][0]/A.ct*100)}%`:""}`);
+    const g=(n)=>{const i=r.parts.indexOf(n);return i<0?0:A.c[i]};const room=g("스테이")+g("연수객실"),fb=g("다이닝")+g("카페")+g("베이커리"),sp=g("대관");
+    L.push(`객실 ${Math.round(room/A.ct*100)}% · 식음 ${Math.round(fb/A.ct*100)}% · 대관 ${Math.round(sp/A.ct*100)}%`);
+    if(A.n)L.push(`단체 1건·1일당 평균 <b>${manwon(A.ct/A.n)}원</b>`);
+    if(!room&&(fb||sp))L.push("객실 매출 없이 대관·식음만 있습니다. 숙박 연계 제안 여지가 있습니다");
+    r.parts.forEach((p,i)=>{if(P.c[i]>0&&A.c[i]>0){const d=Math.round((A.c[i]-P.c[i])/P.c[i]*100);if(Math.abs(d)>=30)L.push(`${esc(p)} 지난달 대비 <b class="${d>=0?"up":"dn"}">${d>=0?"▲":"▼"} ${Math.abs(d)}%</b>`)}})}
+  if(A.pt)L.push(`확정 전 견적 <b>${manwon(A.pt)}원</b>이 모두 계약되면 이달 매출이 ${A.ct?Math.round(A.pt/A.ct*100)+"% 더 ":""}늘어납니다`);
+  const pc=(r.pcase||[]).filter(c=>(c[2]||"").startsWith(sMonth)).sort((x,y)=>y[4]-x[4]).slice(0,3);
+  return `<div class="sec"><div class="sec-h"><h2>분석</h2></div><div class="card"><ul class="ins">${L.map(t=>`<li>${t}</li>`).join("")}</ul>
+   ${pc.length?`<div class="grp" style="padding:0 14px 4px">아직 확정 전인 큰 건</div>${pc.map(c=>`<button class="mrow" data-id="${esc(c[0])}"><span><span class="n">${esc(c[1])}</span><span class="s">${mdw(c[2])} · ${STAGES[Math.max(0,Math.round(c[3]/10)-1)]} 단계${c[5]?" · 담당 "+esc(ownName(c[5])):""}</span></span><span class="a">${manwon(c[4])}</span></button>`).join("")}`:""}</div></div>`}
 function monthLabel(ym){const [y,m]=ym.split("-").map(Number);return `${y}년 ${m}월`}
 function shiftMonth(ym,n){const [y,m]=ym.split("-").map(Number);const d=new Date(y,m-1+n,1);return ymd(d).slice(0,7)}
 function renderSales(){
