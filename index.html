@@ -240,7 +240,18 @@ main{padding-top:14px}
 .stot .lab{font-size:12.5px;color:var(--mute)}
 .dbar{display:grid;grid-template-columns:72px 1fr 92px;gap:8px;align-items:center;font-size:13px}
 .dbar .tr{height:10px;background:var(--sunk);border-radius:5px;overflow:hidden}
-.dbar .tr i{display:block;height:100%;background:var(--pine);border-radius:5px}
+.dbar .tr{display:flex}
+.dbar .tr i{display:block;height:100%;background:var(--pine)}
+.dbar .tr i.pp{background:var(--line-2)}
+.mo{display:grid;grid-template-columns:64px 1fr 84px;gap:8px;align-items:center;padding:9px 14px;width:100%;border-bottom:1px solid var(--line);font-size:13.5px}
+.mo:last-child{border-bottom:0}
+.mo[aria-pressed="true"]{background:var(--pine-soft)}
+.mo .tr{display:flex;height:10px;background:var(--sunk);border-radius:5px;overflow:hidden}
+.mo .tr i{background:var(--pine)}.mo .tr i.pp{background:var(--line-2)}
+.mo .v{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.kv2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kv2 span{display:block;font-size:12.5px;color:var(--mute)}.kv2 b{font:700 17px var(--f-disp)}
+.up{color:var(--ok)}.dn{color:var(--hi)}
 .dbar .v{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
 .srow{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:11px 14px;border-bottom:1px solid var(--line);width:100%}
 .srow:last-child{border-bottom:0}
@@ -331,7 +342,7 @@ textarea.msg{width:100%;min-height:240px;border:1px solid var(--line);border-rad
 .fld label{font-size:13px;font-weight:700;color:var(--mute)}
 .fld input,.fld select,.fld textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1px solid var(--line-2);border-radius:10px;padding:11px 12px;width:100%;min-width:0}
 .fld .amt{font:700 22px var(--f-disp);text-align:right}
-.divs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.divs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .divs button{padding:11px 4px;border-radius:10px;border:1px solid var(--line-2);background:var(--surface);text-align:center;font-weight:600;font-size:14px}
 .divs button[aria-pressed="true"]{background:var(--pine);border-color:var(--pine);color:var(--on-pine)}
 .quick{display:flex;gap:6px;flex-wrap:wrap}
@@ -368,13 +379,14 @@ textarea.msg{width:100%;min-height:240px;border:1px solid var(--line);border-rad
 
 <script src="data.js"></script>
 <script src="sales.js"></script>
+<script src="rev.js" onerror="void 0"></script>
 <script>
 "use strict";
 /* ===== settings ===== */
 const TRIGGER_ID="trig_01Y4ZUpeG1niG593SaxXABs6";
 const ART_URL="https://claude.ai/artifact/3dtU9hamwcaPMCPMcVram1";
 const PUB_URL="https://deosup-ah.github.io/biz/";
-const DIVS=["대관","연수객실","북스테이","식음","카페","기타"];
+const DIVS=["대관","스테이","연수객실","다이닝","카페","베이커리","기타"];
 
 /* ===== helpers ===== */
 const WD="일월화수목금토";
@@ -550,14 +562,32 @@ function wkText(off){const mon=new Date(TODAY);mon.setDate(mon.getDate()-((mon.g
 /* ===== MONEY ===== */
 function renderMoney(){
   const L=CASES.filter(c=>c.due>0||c.late);const total=L.reduce((a,c)=>a+c.due,0),late=L.filter(c=>c.late),lateSum=late.reduce((a,c)=>a+c.due,0);
-  const head=`<div class="seg">${[["due","받을 돈"],["sales","매출 기록"]].map(([k,l])=>`<button data-mv="${k}" aria-pressed="${moneyView===k}">${l}</button>`).join("")}</div>`;
+  const head=`<div class="seg">${[["due","받을 돈"],["rev","매출 현황"],["sales","매출 입력"]].map(([k,l])=>`<button data-mv="${k}" aria-pressed="${moneyView===k}">${l}</button>`).join("")}</div>`;
   if(moneyView==="sales")return head+renderSales();
+  if(moneyView==="rev")return head+renderRev();
   L.sort((a,b)=>(b.late-a.late)||((a.s||"9999").localeCompare(b.s||"9999")));
   const nextPay=c=>{const p=(c.amt.pay||[]).find(p=>!/확인|입금/.test(p[4]||""));return p?`${p[0]} ${p[1]?md(p[1]):""}`:""};
   return head+`<div class="card mhero"><div><span>받을 돈 합계 · ${L.length}건</span><b class="num">${won(total)}원</b></div><div class="late"><span>입금 지연 · ${late.length}건</span><b class="num">${won(lateSum)}원</b></div></div>
   <div class="card">${L.map(c=>`<button class="mrow ${c.late?"late":""}" data-id="${esc(c.id)}" data-pane="amt"><span><span class="n">${esc(c.name)}</span><span class="s">${c.s?mdw(c.s):"날짜 미정"}${nextPay(c)?" · 다음 "+esc(nextPay(c)):""}${c.late?" · 입금 지연":""}${c.own?" · 담당 "+esc(c.own):""}</span></span><span class="a">${won(c.due)}<small>청구 ${manwon(c.final)}</small></span></button>`).join("")||`<div class="okline">받을 돈이 없습니다.</div>`}</div>
   <p class="note">건 대장 기준입니다. 입금 확인과 금액 수정은 건 대장에서 합니다.</p>`;
 }
+function revMonth(ym){const r=window.REV_DATA;const z=()=>((r&&r.parts)||[]).map(()=>0);const o={c:z(),p:z(),n:0,pn:0};if(!r)return o;
+  for(const[d,v]of Object.entries(r.conf||{}))if(d.startsWith(ym)){v.c.forEach((x,i)=>o.c[i]+=x);o.n+=v.n}
+  for(const[d,v]of Object.entries(r.pipe||{}))if(d.startsWith(ym)){v.c.forEach((x,i)=>o.p[i]+=x);o.pn+=v.n}
+  o.ct=o.c.reduce((a,b)=>a+b,0);o.pt=o.p.reduce((a,b)=>a+b,0);return o}
+function renderRev(){const r=window.REV_DATA;
+  if(!r)return `<div class="banner"><span><b>매출 현황은 Claude 앱 링크에서만 보입니다.</b> 공개 주소에는 매출 금액을 올리지 않습니다.</span><a class="btn" href="${ART_URL}" target="_blank" rel="noopener">매출 현황 보러 가기 ›</a></div>`;
+  const A=revMonth(sMonth),P=revMonth(shiftMonth(sMonth,-1));const max=Math.max(1,...A.c.map((x,i)=>x+A.p[i]));
+  const d=P.ct?Math.round((A.ct-P.ct)/P.ct*100):null;
+  const months=[];for(let m=(r.from||TODAY_S).slice(0,7);m<=shiftMonth(TODAY_S.slice(0,7),3);m=shiftMonth(m,1))months.push(m);
+  const M=months.map(m=>({m,a:revMonth(m)}));const mmax=Math.max(1,...M.map(x=>x.a.ct+x.a.pt));
+  return `<div class="monthnav"><button data-sm="-1" aria-label="이전 달">‹</button><b>${monthLabel(sMonth)}</b><button data-sm="1" aria-label="다음 달">›</button></div>
+  <div class="card stot"><div><div class="lab">단체 확정 매출 · 단체 ${A.n}건·일</div><div class="big num">${won(A.ct)}원</div></div>
+   <div class="kv2"><div><span>지난달 대비</span><b class="${d==null?"":d>=0?"up":"dn"}">${d==null?"비교 없음":(d>=0?"▲ ":"▼ ")+Math.abs(d)+"%"}</b></div><div><span>확정 전 견적 (진행 중)</span><b class="num">${A.pt?manwon(A.pt)+"원":"—"}</b></div></div>
+   ${r.parts.map((p,i)=>`<div class="dbar"><span>${esc(p)}</span><span class="tr"><i style="width:${A.c[i]/max*100}%"></i><i class="pp" style="width:${A.p[i]/max*100}%"></i></span><span class="v">${A.c[i]?manwon(A.c[i]):"—"}</span></div>`).join("")}
+   <p class="note">진한 막대 = 확정, 연한 막대 = 확정 전 견적</p></div>
+  <div class="sec"><div class="sec-h"><h2>월별</h2><span class="cnt">누르면 그 달로</span></div><div class="card">${M.map(x=>`<button class="mo" data-smset="${x.m}" aria-pressed="${x.m===sMonth}"><span>${x.m.slice(2,4)}.${+x.m.slice(5)}월</span><span class="tr"><i style="width:${x.a.ct/mmax*100}%"></i><i class="pp" style="width:${x.a.pt/mmax*100}%"></i></span><span class="v">${x.a.ct?manwon(x.a.ct):"—"}</span></button>`).join("")}</div></div>
+  <p class="note">${esc(r.asOf||"")} · 건 대장의 구성·금액을 이용일별로 나눈 값입니다. 직접 넣은 기록은 「매출 입력」에서 봅니다.</p>`}
 function monthLabel(ym){const [y,m]=ym.split("-").map(Number);return `${y}년 ${m}월`}
 function shiftMonth(ym,n){const [y,m]=ym.split("-").map(Number);const d=new Date(y,m-1+n,1);return ymd(d).slice(0,7)}
 function renderSales(){
@@ -715,7 +745,7 @@ async function runUpdate(){
   if(busy)return;busy=true;const b=$("btnRefresh");b.classList.add("spin");
   try{
     if(MCP){
-      try{await MCP.callTool("Claude Code Remote","fire_trigger",{trigger_id:TRIGGER_ID,text:"화면의 「지금 업데이트」 버튼으로 실행됨. 데이터가 같아도 매출 기록(sales.js)은 내보낸다."});
+      try{await MCP.callTool("Claude Code Remote","fire_trigger",{trigger_id:TRIGGER_ID,text:"화면의 「지금 업데이트」 버튼으로 실행됨."});
         LS.set("ds-fired",String(Date.now()));toast("업데이트를 시작했습니다 · 10~15분 뒤 저절로 바뀝니다");return}
       catch(e){const code=e&&e.code;
         if(code==="approval_required"||code==="not_granted"){toast("실행하려면 이 페이지에 권한을 허락해 주세요")}
@@ -745,6 +775,7 @@ document.addEventListener("click",async e=>{const t=e.target;
   const rg=t.closest("[data-range]");if(rg){spaceRange=rg.dataset.range;LS.set("ds-space",spaceRange);render();return}
   const wc=t.closest("[data-wkcopy]");if(wc){const txt=wkText(+(wc.dataset.wkcopy||0));if(!await copyText(txt))toast("복사가 막혀 있습니다");return}
   const mv=t.closest("[data-mv]");if(mv){moneyView=mv.dataset.mv;LS.set("ds-money",moneyView);render();return}
+  const ss=t.closest("[data-smset]");if(ss){sMonth=ss.dataset.smset;render();window.scrollTo(0,0);return}
   const sm=t.closest("[data-sm]");if(sm){sMonth=shiftMonth(sMonth,+sm.dataset.sm);render();return}
   if(t.closest("[data-salesadd]")){openSalesForm(null);return}
   const se=t.closest("[data-salesedit]");if(se){openSalesForm(se.dataset.salesedit);return}

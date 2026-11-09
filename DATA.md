@@ -1,6 +1,6 @@
 # 더숲 단체 일정 — data.js 형식과 갱신 규칙
 
-화면(index.html)은 고치지 않는다. 매일 오전 8시 작업(또는 화면의 「지금 업데이트」 버튼)은 **data.js · sales.js 두 파일만** 새로 쓴다.
+화면(index.html)은 고치지 않는다. 매일 오전 8시 작업(또는 화면의 「지금 업데이트」 버튼)은 **data.js 한 파일만** 새로 쓴다.
 `window.APP_DATA = {asOf, weather:null, cases:[...]};` (11/10 개편부터 운세 fortune 은 쓰지 않는다)
 
 ## 출처 (모두 읽기만 — 시스템에는 아무것도 쓰지 않는다)
@@ -47,12 +47,11 @@
 화면이 open-meteo 에서 바로 불러온다. data.js 의 weather 는 null 로 둔다.
 
 
-## sales.js — 매출 기록 (11/10 추가)
-- 입력은 Claude 링크(https://claude.ai/artifact/3dtU9hamwcaPMCPMcVram1)의 「돈 → 매출 기록」에서 한다. 저장소는 그 Artifact 의 공유 DB 컬렉션 `sales`.
-- 문서 필드: `date` YYYY-MM-DD · `div` 대관/연수객실/북스테이/식음/카페/기타 · `amt` 원(정수, 부가세 포함) · `no` 건 번호(선택) · `name` 단체명(선택) · `memo` · `at` 입력 시각 · `by` 입력자 id
-- 공개 앱용으로 매 실행마다 ArtifactData `list`(collection "sales", 끝까지 페이지 넘김)로 읽어
-  `window.SALES_DATA = {"asOf":"매출 M/D HH:MM 기준","rows":[{id,date,div,amt,no,name,memo}, …]};` 로 쓴다. `by`·`at` 은 빼고, 날짜 내림차순.
-- 매출 기록은 시스템(보드·건 대장)에 쓰지 않는다.
+## 매출 (11/10)
+- 매출 금액은 **공개 주소에 올리지 않는다.** Claude 링크(https://claude.ai/artifact/3dtU9hamwcaPMCPMcVram1)에서만 보인다.
+- 매출 현황: Artifact 의 rev.js (`window.REV_DATA` — 건 대장 구성·금액을 이용일·부문별로 나눈 값). 저장소에는 넣지 않는다.
+- 매출 입력: 「돈 → 매출 입력」. Artifact 공유 DB 컬렉션 `sales` — `date` YYYY-MM-DD · `div` 대관/스테이/연수객실/다이닝/카페/베이커리/기타 · `amt` 원(부가세 포함) · `no` · `name` · `memo` · `at` · `by`
+- 저장소의 sales.js 는 빈 채로 둔다(`{"asOf":"","rows":[]}`).
 
-## 바뀜 판단 (11/10)
-data.js 는 asOf 를 빼고, sales.js 는 asOf 를 빼고 각각 비교한다. 둘 다 같으면 아무 데도 올리지 않는다.
+## 바뀜 판단
+새 data.js 와 지금 data.js 를 asOf 를 빼고 비교한다. 같으면 아무 데도 올리지 않는다.
