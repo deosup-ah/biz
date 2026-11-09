@@ -6,6 +6,7 @@
 <title>더숲 단체 일정</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#1d4636">
+<meta name="robots" content="noindex,nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="더숲 일정">
@@ -587,7 +588,7 @@ function renderRev(){const r=window.REV_DATA;
    ${r.parts.map((p,i)=>`<div class="dbar"><span>${esc(p)}</span><span class="tr"><i style="width:${A.c[i]/max*100}%"></i><i class="pp" style="width:${A.p[i]/max*100}%"></i></span><span class="v">${A.c[i]?manwon(A.c[i]):"—"}</span></div>`).join("")}
    <p class="note">진한 막대 = 확정, 연한 막대 = 확정 전 견적</p></div>
   <div class="sec"><div class="sec-h"><h2>월별</h2><span class="cnt">누르면 그 달로</span></div><div class="card">${M.map(x=>`<button class="mo" data-smset="${x.m}" aria-pressed="${x.m===sMonth}"><span>${x.m.slice(2,4)}.${+x.m.slice(5)}월</span><span class="tr"><i style="width:${x.a.ct/mmax*100}%"></i><i class="pp" style="width:${x.a.pt/mmax*100}%"></i></span><span class="v">${x.a.ct?manwon(x.a.ct):"—"}</span></button>`).join("")}</div></div>
-  <p class="note">${esc(r.asOf||"")} · 건 대장의 구성·금액을 이용일별로 나눈 값입니다. 직접 넣은 기록은 「매출 입력」에서 봅니다.</p>`}
+  <p class="note">${esc(r.asOf||"")} · 단체(건 대장) 매출만 들어 있습니다. 개인 투숙·워크인·WINGS 직접 매출은 빠져 있습니다. 확정 = 확정(S60) 이후 건, 실제 이용일 기준(숙박은 잔 날마다), 계약 후 변경 반영, 부가세 포함. 직접 넣은 기록은 「매출 입력」에서 봅니다.</p>`}
 function monthLabel(ym){const [y,m]=ym.split("-").map(Number);return `${y}년 ${m}월`}
 function shiftMonth(ym,n){const [y,m]=ym.split("-").map(Number);const d=new Date(y,m-1+n,1);return ymd(d).slice(0,7)}
 function renderSales(){
