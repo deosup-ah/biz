@@ -1,7 +1,7 @@
 # 더숲 단체 일정 — data.js 형식과 갱신 규칙
 
-화면(index.html)은 고치지 않는다. 매시간 작업은 **data.js 한 파일만** 새로 쓴다.
-`window.APP_DATA = {asOf, fortune, weather, cases:[...]};`
+화면(index.html)은 고치지 않는다. 매일 오전 8시 작업(또는 화면의 「지금 업데이트」 버튼)은 **data.js · sales.js 두 파일만** 새로 쓴다.
+`window.APP_DATA = {asOf, weather:null, cases:[...]};` (11/10 개편부터 운세 fortune 은 쓰지 않는다)
 
 ## 출처 (모두 읽기만 — 시스템에는 아무것도 쓰지 않는다)
 1. 공간 보드 https://academyhouse.deosup.com/space-board → 「예약 현황표」 탭 · 「앞으로 3개월」 · 불러오기
@@ -43,15 +43,16 @@
 - 보드·대장 대조 이상: 날짜 불일치, 보드엔 자리 있는데 건 일정 미정, 이름 다름, 이용일 지났는데 가예약, 한 행사가 두 건에 나뉨, 비대관 공간(명상센터·기도의 집) 점유, 새벽 시작·자정 넘김·분 단위(17:59) 오입력 의심, 기자재가 회의실보다 김, 회의실 없이 기자재만, 같은 호실 같은 날 퇴실→입실
 - 미수가 견적보다 큼 → mid/lo
 
-## fortune (하루 한 번)
-`{"date":"YYYY-MM-DD","items":[{"name","sex","total","work","money","people","health","lucky"}],"mbti":{"INTJ":"…", … 16개}}`
-- 최형근 남 (1977년생) · 허윤정 여 (1980년생) · 신효근 남 (1987년생). 화면에는 이름·성별만 — 띠·나이는 쓰지 않는다.
-- date 가 오늘이 아니면 새로 쓴다. total 2문장, work·money·people·health 각 1문장, lucky "색 · 숫자 · 방향".
-- mbti: 16유형 모두 1~2문장.
-- 다른 사이트 운세를 베끼지 말고 직접 쓴 덕담으로. 업무(단체 예약·현장 응대)에 어울리게, 겁주는 예언·건강 진단 금지.
-
 ## weather
 화면이 open-meteo 에서 바로 불러온다. data.js 의 weather 는 null 로 둔다.
 
-## 바뀜 판단
-새 data.js 와 지금 data.js 를 asOf 를 빼고 비교한다. 같으면 아무 데도 올리지 않는다.
+
+## sales.js — 매출 기록 (11/10 추가)
+- 입력은 Claude 링크(https://claude.ai/artifact/3dtU9hamwcaPMCPMcVram1)의 「돈 → 매출 기록」에서 한다. 저장소는 그 Artifact 의 공유 DB 컬렉션 `sales`.
+- 문서 필드: `date` YYYY-MM-DD · `div` 대관/연수객실/북스테이/식음/카페/기타 · `amt` 원(정수, 부가세 포함) · `no` 건 번호(선택) · `name` 단체명(선택) · `memo` · `at` 입력 시각 · `by` 입력자 id
+- 공개 앱용으로 매 실행마다 ArtifactData `list`(collection "sales", 끝까지 페이지 넘김)로 읽어
+  `window.SALES_DATA = {"asOf":"매출 M/D HH:MM 기준","rows":[{id,date,div,amt,no,name,memo}, …]};` 로 쓴다. `by`·`at` 은 빼고, 날짜 내림차순.
+- 매출 기록은 시스템(보드·건 대장)에 쓰지 않는다.
+
+## 바뀜 판단 (11/10)
+data.js 는 asOf 를 빼고, sales.js 는 asOf 를 빼고 각각 비교한다. 둘 다 같으면 아무 데도 올리지 않는다.
