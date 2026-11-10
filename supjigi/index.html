@@ -217,6 +217,11 @@ button.brand{border:0;background:none;padding:0;cursor:pointer;display:flex;alig
 .tabs .tg{align-self:center;font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:.04em;padding:0 2px 0 0;margin-right:-4px;white-space:nowrap}.tabs .tg:not(:first-child){margin-left:14px;padding-left:16px;border-left:1px solid var(--line)}
 .akx{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:-4px 0 16px}
 .gbar{padding:12px 16px;margin-bottom:14px}
+#scan{position:fixed;inset:0;background:#000;z-index:300;display:flex;flex-direction:column}#scan video{flex:1;min-height:0;width:100%;object-fit:cover}.scanF{position:absolute;left:10%;right:10%;top:28%;height:22%;border:2px solid rgba(255,255,255,.85);border-radius:14px;pointer-events:none;transition:border-color .2s}#scan.ok .scanF{border-color:#5fd08a;box-shadow:0 0 0 4px rgba(95,208,138,.35)}#scanList{background:#111;color:#fff;padding:12px 16px;display:grid;gap:6px;font-size:14px;max-height:34vh;overflow:auto}#scanList small{color:#bbb}#scan .btn{margin:10px 16px 18px}
+.tkr{display:grid;grid-template-columns:1fr 1.4fr 1.6fr auto;gap:8px}.tkr input{min-width:0;font-size:16px;padding:12px 13px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-family:inherit}@media(max-width:720px){.tkr{grid-template-columns:1fr 1fr}.tkr input:nth-child(3),.tkr button{grid-column:1/-1}}
+.tkh{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}.tkh b{font-size:18px;display:block}.tkh small{color:var(--muted)}.tkb{display:flex;gap:10px;align-items:center}
+.tkc{flex:0 0 22px;width:22px;height:22px;border-radius:50%;border:1.5px solid #999;background:none;cursor:pointer;padding:0}.tkc[aria-pressed="true"]{background:#1a1a1a;border-color:#1a1a1a;box-shadow:inset 0 0 0 4px #fff}.tkl.done b{color:var(--muted);text-decoration:line-through;font-weight:500}.tkl small.late{color:#b3402a;font-weight:600}.tkq{margin:12px 0;padding-left:20px;display:grid;gap:8px;font-size:15px}
+.dpsel{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0 10px}.dpsel select{width:auto;flex:0 1 auto;font:inherit;font-size:14px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
 </style>
 </head>
 <body>
@@ -235,7 +240,7 @@ button.brand{border:0;background:none;padding:0;cursor:pointer;display:flex;alig
 <script src="cur.js"></script>
 <script src="design.js"></script>
 <script src="dp.js"></script>
-<script src="academy.js"></script><script src="auto.js"></script><script src="aka2.js"></script><script src="trend.js"></script><script src="dp2.js"></script><script src="order2.js"></script><script src="quick.js"></script><script src="nav.js"></script>
+<script src="academy.js"></script><script src="auto.js"></script><script src="aka2.js"></script><script src="trend.js"></script><script src="dp2.js"></script><script src="order2.js"></script><script src="quick.js"></script><script src="talk.js"></script><script src="nav.js"></script>
 <script>boot();</script>
 </body>
 </html>
