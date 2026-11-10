@@ -433,6 +433,30 @@ body.vm .sact .li{flex-wrap:wrap;gap:6px 10px}body.vm .sact .li .t{flex:1 1 calc
 .hpq:hover,.hpq[aria-expanded="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
 .hpw{display:flex;justify-content:flex-end;margin-bottom:8px}.hpw .hpq{margin-left:0}
 .hpd{margin:0 0 18px;padding:10px 14px;border-left:3px solid var(--gold);background:var(--surface);font-size:14.5px;line-height:1.6;color:var(--ink)}
+
+/* ══ 쓰는 사람 쪽 구성 ══ */
+/* 한 줄 입력 하나: 어느 화면에서나 맨 위 */
+.gbarx{display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--ink);padding:0 0 10px;margin:0 0 26px}
+.gbarx input[type=text]{flex:1;min-width:0;border:0;background:none;font:500 19px/1.4 "Pretendard",sans-serif;letter-spacing:-.01em;padding:8px 0;color:var(--ink);border-radius:0}
+.gbarx input[type=text]:focus{outline:0;box-shadow:none}.gbarx input::placeholder{color:var(--muted);opacity:.75}
+.gbarx .btn{flex:0 0 auto;padding:9px 14px}
+body .card.qadd:not(.tkf){display:none}
+@media(max-width:720px){.gbarx{flex-wrap:wrap}.gbarx input[type=text]{flex:1 1 100%;font-size:17px}.gbarx .btn{flex:1}}
+body.vm .gbarx{flex-wrap:wrap}body.vm .gbarx input[type=text]{flex:1 1 100%;font-size:17px}body.vm .gbarx .btn{flex:1}
+/* 보관함 */
+.mkg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:22px 18px;margin-bottom:18px}
+.mki{display:grid;gap:8px;align-content:start}.mkt{border:1px solid var(--line);background:var(--surface);padding:0;cursor:pointer;display:block}.mkt svg{display:block;width:100%;height:auto}.mkt:hover{border-color:var(--ink)}
+.mkc b{display:block;font-size:14px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mkc small{color:var(--muted);font-size:13px}.mki .lnk{justify-self:start;font-size:13px}
+/* 한 벌 뽑기 */
+#setp{position:fixed;inset:0;z-index:85;background:rgba(20,22,20,.5);display:grid;place-items:center;padding:18px}
+.setb{background:var(--surface);border:1px solid var(--ink);padding:26px;width:min(100%,440px);display:grid;gap:14px}.setb h3{margin:0;font-size:21px;font-weight:800;letter-spacing:-.02em}.setb p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.6}.setb .chips{display:flex;flex-wrap:wrap;gap:6px}
+/* 매출: 자세한 것은 접어 둔다 */
+.anaf{margin-top:26px;border-top:1px solid var(--ink)}.anaf>summary{cursor:pointer;padding:16px 0;font-weight:700;font-size:16px;list-style:none;display:flex;justify-content:space-between}.anaf>summary::after{content:"+";font-weight:400;font-size:20px;line-height:1}.anaf[open]>summary::after{content:"–"}.anaf>summary::-webkit-details-marker{display:none}.anaf>*+*{margin-top:18px}
+/* 글씨: 가장 작은 글씨도 13px, 흐린 글씨는 한 단계 진하게 */
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){--muted:#5d5d57}}:root[data-theme="light"]{--muted:#5d5d57}
+main small,main .note,main .pill,main th{font-size:max(13px,1em)}
+main small,main .note{font-size:13px;line-height:1.55}main .pill{font-size:12.5px}
+.card h3{margin-bottom:12px}.card>*+h3{margin-top:22px}
 </style>
 </head>
 <body>
@@ -452,7 +476,7 @@ body.vm .sact .li{flex-wrap:wrap;gap:6px 10px}body.vm .sact .li .t{flex:1 1 calc
 <script src="cur.js"></script>
 <script src="design.js"></script>
 <script src="dp.js"></script>
-<script src="academy.js"></script><script src="auto.js"></script><script src="aka2.js"></script><script src="trend.js"></script><script src="dp2.js"></script><script src="order2.js"></script><script src="quick.js"></script><script src="talk.js"></script><script src="space.js"></script><script src="nav.js"></script>
+<script src="academy.js"></script><script src="auto.js"></script><script src="aka2.js"></script><script src="trend.js"></script><script src="dp2.js"></script><script src="order2.js"></script><script src="quick.js"></script><script src="talk.js"></script><script src="space.js"></script><script src="nav.js"></script><script src="ux.js"></script>
 <script>boot();</script>
 </body>
 </html>
