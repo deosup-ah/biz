@@ -56,12 +56,14 @@ JSON 배열로만 답하세요:
 A.curSave=async d=>{const t=S.ui.cur[+d.i];await put('curations',nid(),{...clone(t),at:new Date().toISOString()},true);S.ui.cur.splice(+d.i,1);toast('주제를 저장했습니다');render()};
 A.curDel=d=>del('curations',d.i);
 A.curOrder=d=>{const t=getTheme(d),br=t.br||S.br;if(br==='all'){toast('지점을 먼저 고르세요');return}const its=items(br);let n=0;(t.books||[]).forEach(b=>{const it=its.find(x=>nt(x.t)===nt(b.t));if(!it||!(it.stock>0)){addCart(br,{t:b.t,a:b.a,p:b.p,isbn:(it||{}).isbn,price:(it||{}).price},2,'큐레이션: '+t.title);n++}});toast(n?`${n}종을 ${brN(br)} 북센 주문에 담았습니다`:'모두 매장에 있습니다')};
-A.toDesign=d=>{const t=getTheme(d)||{},b=(t.books||[])[0]||{},k=d.kind,D=Object.assign(defD(),{kind:k,br:t.br||curBr(),sym:t.sym||'none',books:(t.books||[]).map(x=>({t:x.t,a:x.a,p:x.p,why:x.why}))});D.tag=BRAND[D.br]||D.tag;
+function mkD(t,k){const b=(t.books||[])[0]||{},D=Object.assign(defD(),{kind:k,br:t.br||curBr(),sym:t.sym||'none',books:(t.books||[]).map(x=>({t:x.t,a:x.a,p:x.p,why:x.why}))});D.tag=BRAND[D.br]||D.tag;
   if(k==='band'){D.phrases=t.band||(t.pop||{}).head||t.title||'';if(t.bpal!=null){D.pal=t.bpal;D.pals=[t.bpal]}if(t.sym)D.syms=[t.sym]}
   else if(k==='list'){D.head=t.title||'이 평대의 책';D.body=t.hook||'';D.tag='더숲 '+(BRAND[D.br]||'');D.list=D.books.map(x=>`${x.t} | ${[x.a,x.p].filter(Boolean).join(' · ')} | `).join('\n')}
   else if(k==='shelf'){D.head=t.title||'';D.body=t.hook||'';if(t.ppal!=null)D.pal=t.ppal}
   else{D.head=(t.pop||{}).head||t.title||'';D.body=(t.pop||{}).body||'';if(t.ppal!=null)D.pal=t.ppal}
-  S.ui.D=D;S.ui.dlog=[];S.view[S.mode]='design';window.scrollTo(0,0);render()};
+  if(k==='pop'){D.st=FEEL[t.sym]??(D.pal===2?1:0);if(b.t&&!D.book){D.book=b.t;D.author=[b.a,b.p].filter(Boolean).join(' · ')}}return D}
+const FEEL={moon:1,star:1,candle:1,snow:2,rain:2,leaf:2,wave:2,cup:3,pencil:3,house:3,sun:3,walk:3,book:0,drop:2};
+A.toDesign=d=>{S.ui.D=mkD(getTheme(d)||{},d.kind);S.ui.dlog=[];S.view[S.mode]='design';window.scrollTo(0,0);render()};
 
 /* ── 공간 배치 ── */
 const FX={shelf:{n:'서가',w:1.8,h:.4,f:'#8a6b4a'},table:{n:'평대',w:1.2,h:.8,f:'#c9a36a'},face:{n:'면진열대',w:.9,h:.4,f:'#b08a5a'},counter:{n:'계산대',w:1.5,h:.7,f:'#6b7a71'},door:{n:'입구',w:1,h:.2,f:'#b23a2b'},sofa:{n:'읽는 자리',w:1.4,h:.7,f:'#1baf7a'},stage:{n:'무대 · 스크린',w:2.4,h:.5,f:'#6250d6'},seat:{n:'좌석',w:.45,h:.45,f:'#2a78d6'},wall:{n:'벽 · 기둥',w:.4,h:.4,f:'#444c48'}};
