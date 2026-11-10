@@ -1,6 +1,6 @@
 'use strict';
 /* 아카데미: 오늘 · 일정(북토크·영화·프로그램) · 행사 기획 · 인스타 · 네이버 */
-const EK=['북토크','영화','프로그램','기타'];
+const EK=['북토크','책모임','영화','프로그램','기타'];
 const evUp=()=>S.db.events.filter(e=>(e.date||'')>=TODAY).sort((a,b)=>(a.date+(a.time||''))<(b.date+(b.time||''))?-1:1);
 const evRow=e=>{const d=pd(e.date),r=e.cap?Math.round((e.booked||0)/e.cap*100):null;return `<div class="li"><span class="pill ${dayDiff(e.date,TODAY)<=3?'p-low':'p-mute'}">${dday(e.date)}</span><div class="t"><b>${esc(e.title)}</b><small>${mdw(e.date)} ${esc(e.time||'')} · ${esc(e.kind||'')}${e.place?' · '+esc(e.place):''}${e.cap?` · ${e.booked||0}/${e.cap}명${r!=null?' ('+r+'%)':''}`:''}</small>${e.memo?`<small>${esc(e.memo)}</small>`:''}</div><button class="btn sm" data-a="evEdit" data-id="${e.id}">고치기</button></div>`};
 V.aka.today=()=>{const up=evUp(),wk=up.filter(e=>dayDiff(e.date,TODAY)<=14),low=up.filter(e=>e.cap&&dayDiff(e.date,TODAY)<=10&&(e.booked||0)/e.cap<.3),I=S.db.insta.slice().sort((a,b)=>a.id<b.id?1:-1)[0];

@@ -155,6 +155,10 @@ details.menu{position:relative;margin-left:auto}details.menu>summary{list-style:
 .stage{padding:22px;border-radius:var(--r)}
 @media(max-width:760px){.dz .stagecol{order:-1}}
 .feel{display:grid;gap:8px}.feels{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.feels button{background:none;border:0;padding:0;cursor:pointer;display:grid;gap:6px;justify-items:center;color:var(--muted);font:inherit}.feels svg{width:100%;height:auto;border-radius:6px;box-shadow:0 1px 6px rgba(0,0,0,.14);outline:2px solid transparent;outline-offset:3px;transition:outline-color .15s}.feels button[aria-pressed=true] svg{outline-color:var(--pine)}.feels button[aria-pressed=true] small{color:var(--ink);font-weight:700}
+.auto{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;margin-bottom:16px}.auto small{color:var(--muted)}.auto ul{margin:8px 0 0;padding-left:18px;display:grid;gap:5px}.auto .fc{display:grid;gap:2px;text-align:right;padding-left:24px;border-left:1px solid var(--line)}.auto .fc b{font-size:34px;font-family:var(--display);line-height:1.15}.auto .fc span{font-size:13px;color:var(--muted)}.auto .fc em{font-style:normal;font-size:12px;color:var(--muted)}@media(max-width:720px){.auto{grid-template-columns:1fr}.auto .fc{text-align:left;border-left:0;border-top:1px solid var(--line);padding:14px 0 0}}
+.pthumb{flex:none;width:84px;padding:0;border:0;background:none;cursor:pointer}.pthumb svg{width:100%;height:auto;border-radius:5px;box-shadow:0 2px 8px rgba(0,0,0,.16);display:block}
+.flow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:0 0 16px;padding:0;list-style:none}.flow li{display:flex;gap:8px;align-items:center;padding:8px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--muted);font-weight:600}.flow li b{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--surface2);font-size:12.5px}.flow li.on{color:var(--ink);border-color:var(--pine)}.flow li.on b{background:var(--pine);color:#fff}.flow li.done b{background:var(--ok);color:#fff}.flow i{color:var(--muted);font-style:normal}
+.sws{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -173,7 +177,7 @@ details.menu{position:relative;margin-left:auto}details.menu>summary{list-style:
 <script src="cur.js"></script>
 <script src="design.js"></script>
 <script src="dp.js"></script>
-<script src="academy.js"></script>
+<script src="academy.js"></script><script src="auto.js"></script>
 <script>boot();</script>
 </body>
 </html>
