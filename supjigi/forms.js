@@ -1,7 +1,7 @@
 /* 더숲 워크룸 — 아카데미 서식 자동 작성: 견적서 · 단체 문의 접수표 · 이용 확인서 */
 TABS.aka=[['today','오늘'],['cal','일정'],['design','POP'],['forms','서식'],['insta','인스타'],['naver','네이버'],['plan','기획'],['trend','트렌드']];
 const FNOTE=['본 견적은 추후 협의 과정에 따라 내용 및 금액이 변경될 수 있습니다.','회의실 내 케이터링 및 조리음식 반입은 불가합니다.','본 견적은 부가세(10%)가 포함된 금액입니다.','참가 인원에 대한 변경은 사전 협의가 필요하며, 견적 검토 후 계약 절차에 따라 진행됩니다.','계약금은 총액의 50%이며, 취소 위약 규정은 다음과 같습니다.','- 30~59일 전 취소: 계약금 몰취','- 15~29일 전 취소: 총액의 30% 위약금','- 7~14일 전 취소: 총액의 50% 위약금','- 6일 이내 취소: 총액의 100% 위약금'];
-const fOrg=()=>Object.assign({name:'더숲 아카데미하우스',ceo:'',brn:'',addr:'서울시 강북구 4.19로 135',tel:'02-904-0206'},(SEED||{}).org||{},ls.get('org',{})),fSeal=()=>ls.get('seal','');
+const fOrg=()=>Object.assign({name:'더숲 아카데미하우스',ceo:'',brn:'',addr:'서울시 강북구 4.19로 135',tel:'02-904-0206'},(SEED||{}).org||{},ls.get('org',{})),fSeal=()=>ls.get('seal','')||(SEED||{}).seal||'';
 const fD=()=>S.ui.F=S.ui.F||{k:'est',to:'',title:'',date:TODAY,when:'',n:'',place:'',meal:'',items:'시설대관 | 회의실 6시간 | 1 | 0 | \n식사 | 석식(인당) | 0 | 0 | ',notes:FNOTE.join('\n'),memo:'',seal:false};
 const fItems=t=>String(t||'').split('\n').map(r=>r.trim()).filter(Boolean).map(r=>{const a=r.split('|').map(x=>x.trim()),q=+String(a[2]||'').replace(/[^\d.]/g,'')||0,p=+String(a[3]||'').replace(/[^\d]/g,'')||0;return{a:a[0]||'',b:a[1]||'',q,p,amt:q*p,note:a[4]||''}});
 function fHTML(F,forWord){const O=fOrg(),e=esc,td='border:1px solid #777;padding:6px 9px',th=td+';background:#eef0e6;text-align:left;font-weight:700',tb=(rows)=>`<table style="border-collapse:collapse;width:100%;font-size:10.5pt">${rows}</table>`,seal=F.seal&&fSeal()?`<img src="${fSeal()}" alt="" style="width:62px;height:62px;object-fit:contain;position:absolute;right:-8px;top:-18px;opacity:.9">`:'',sup=`<td style="${th};width:16%">상호</td><td style="${td};position:relative">${e(O.name)} ${F.seal?'<span style="color:#999">(인)</span>':''}${seal}</td>`,d=F.date?`${+F.date.slice(0,4)}년 ${+F.date.slice(5,7)}월 ${+F.date.slice(8)}일`:'';
@@ -22,11 +22,11 @@ V.aka.forms=()=>{const F=fD(),O=fOrg(),U=S.ui,I=(id,l,k,ph,rows)=>`<div class="f
     ${I('fWh','일정 및 시간','when','예: 2026년 12월 3일(목) 10:00~17:00')}
     <div class="f2">${I('fPl','시설','place','예: 내일을 위한 집 C204 회의실')}${I('fMl','식사','meal','예: 석식 15명')}</div>
     ${F.k==='est'?I('fIt','비용 (한 줄에: 항목 | 구분 | 수량 | 단가 | 비고)','items','',5)+I('fNt','참고 및 유의사항','notes','',5):I('fMm',F.k==='inq'?'요청 · 메모':'비고','memo','',3)}
-    ${F.k!=='inq'?`<label class="chk"><input type="checkbox" data-c="fSeal" ${F.seal?'checked':''}> 도장 찍기 ${fSeal()?'':'<small style="color:var(--warn)">— 아래에서 도장 그림을 먼저 불러오세요</small>'}</label>`:''}
+    ${F.k!=='inq'?`<label class="chk"><input type="checkbox" data-c="fSeal" ${F.seal?'checked':''}> 도장 찍기 ${fSeal()?'':'<small style="color:var(--warn)">— 도장 그림이 없습니다</small>'}</label>`:''}
     <div class="btns"><button class="btn pri" data-a="fPrint">인쇄 · PDF 저장</button><button class="btn" data-a="fWord">워드로 받기</button><button class="btn ghost" style="margin-left:auto" data-a="fNew">새로</button></div>
     <details class="fold" data-o="forg" ${U.o_forg?'open':''}><summary>우리 정보 · 도장 <small>${O.brn?'사업자등록증에서 채움':'비어 있음'} · 도장 ${fSeal()?'있음':'없음'}</small></summary><div class="form" style="margin-top:12px"><div class="f2">${og('상호','name')}${og('대표','ceo')}</div><div class="f2">${og('사업자등록번호','brn')}${og('전화','tel')}</div>${og('주소','addr')}<div class="f2">${og('담당자','staff','이 기기에만 저장')}${og('E-Mail','email','이 기기에만 저장')}</div>${og('입금계좌','bank','예: ○○은행 000-000000-00000 예금주')}
       <div class="btns"><label class="btn">도장 그림 불러오기<input type="file" accept="image/*" data-c="fSealFile" hidden></label>${fSeal()?`<img src="${fSeal()}" alt="도장" style="height:44px"><button class="btn ghost" data-a="fSealDel">도장 지우기</button>`:''}</div>
-      <p class="note">담당자 · 이메일 · 계좌 · 도장은 이 기기에만 저장되고 공개 주소에는 올라가지 않습니다. 도장은 문서마다 「도장 찍기」를 켜야 들어갑니다.</p></div></details></div>
+      <p class="note">법인 도장은 프로젝트에 올린 그림을 넣어 두었습니다(다른 그림을 불러오면 이 기기에서는 그것을 씁니다). 담당자 · 이메일 · 계좌는 이 기기에만 저장됩니다. 도장은 문서마다 「도장 찍기」를 켜야 들어갑니다.</p></div></details></div>
    <div class="card" style="background:#fff;color:#111;padding:28px;overflow:auto" id="fPrev">${fHTML(F)}</div></div>
   <p class="note" style="margin-top:10px">견적서 틀과 유의사항은 공유 드라이브의 기존 견적서를 따랐습니다. 시설 이용 계약서는 법적 문구라 자동으로 만들지 않고, 드라이브의 한글 양식을 그대로 씁니다. 단가는 견적 안내 가이드를 보고 직접 적어 주세요.</p>`};
 const fRe=()=>{const p=$('fPrev');if(p)p.innerHTML=fHTML(fD())};

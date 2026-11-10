@@ -7,7 +7,7 @@ const brN=k=>k==='all'?'전체':(BR.find(b=>b.k===k)||{}).n||k;
 const brC=k=>(BR.find(b=>b.k===k)||{}).c||'var(--pine)';
 const GR=['문학','인문','예술','과학','기타'];
 function grp(c){c=String(c||'');if(/문학|소설|에세이|산문|희곡|^시$|시집/.test(c))return'문학';if(/인문|철학|역사|사회|심리|종교|정치|교양/.test(c))return'인문';if(/예술|미술|음악|사진|디자인|건축|영화|만화/.test(c))return'예술';if(/과학|자연|수학|기술|공학|의학|환경/.test(c))return'과학';return'기타'}
-const TABS={store:[['cur','큐레이션'],['design','POP'],['ana','매출'],['stock','주문'],['more','더보기']],
+const TABS={store:[['cur','큐레이션'],['design','POP'],['ana','매출'],['stock','주문'],['more','More']],
   aka:[['today','오늘'],['cal','일정'],['plan','기획'],['insta','인스타'],['design','POP']]};
 const COLS=['credit','sales','stock','carts','orders','returns','events','plans','insta','curations','ideas'];
 const S={locked:true,mode:'aka',br:'all',view:{store:'cur',aka:'today'},loaded:false,demoPref:null,db:{},ui:{per:3},got:{}};
