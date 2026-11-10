@@ -8,7 +8,7 @@ const GR=['문학','인문','예술','과학','기타'];
 function grp(c){c=String(c||'');if(/문학|소설|에세이|산문|희곡|^시$|시집/.test(c))return'문학';if(/인문|철학|역사|사회|심리|종교|정치|교양/.test(c))return'인문';if(/예술|미술|음악|사진|디자인|건축|영화|만화/.test(c))return'예술';if(/과학|자연|수학|기술|공학|의학|환경/.test(c))return'과학';return'기타'}
 const TABS={store:[['today','오늘'],['ana','매출 분석'],['stock','재고 · 주문'],['rank','순위'],['cur','큐레이션'],['space','공간'],['design','POP · 띠지'],['ret','반품'],['data','자료 · 설정']],
   aka:[['today','오늘'],['cal','일정'],['plan','행사 기획'],['insta','인스타'],['naver','네이버'],['space','공간'],['design','POP · 디자인']]};
-const COLS=['sales','stock','carts','orders','returns','events','plans','insta','curations','ideas'];
+const COLS=['credit','sales','stock','carts','orders','returns','events','plans','insta','curations','ideas'];
 const S={locked:true,mode:'store',br:'all',view:{store:'today',aka:'today'},loaded:false,demoPref:null,db:{},ui:{per:3},got:{}};
 COLS.forEach(c=>S.db[c]=[]);
 const V={store:{},aka:{}},A={},C={},AFTER={};
@@ -76,15 +76,16 @@ let _demo;function demo(){if(_demo)return _demo;const sales=[],stock=[];const W=
         if(qty)top.push({t:x[0],a:x[1],p:x[2],cat:x[3],qty,amt:qty*x[4]})});
       GR.forEach((g,gi)=>{const amt=Math.round(tot*W[b.k][gi]*(.9+r()*.2));cats[g==='기타'?'아동·취미·기타':g]={amt,qty:Math.round(amt/16500)}});
       const sum=Object.values(cats).reduce((a,o)=>a+o.amt,0);Object.values(cats).forEach(o=>o.amt=Math.round(o.amt*tot/sum));
-      sales.push({id:b.k+'-'+ym,br:b.k,ym,days,cats,top})});
+      const nr=.25+r()*.2;sales.push({id:b.k+'-'+ym,br:b.k,ym,days,cats,top,nb:{new:{qty:Math.round(tot*nr/17000),amt:Math.round(tot*nr)},old:{qty:Math.round(tot*(1-nr)/15500),amt:Math.round(tot*(1-nr))}}})});
     const r2=rng(900+bi);stock.push({id:b.k+'-0',br:b.k,asOf:'예시',items:DT.map(x=>{const s30=Math.round(r2()*r2()*26*SC[b.k]);return{t:x[0],a:x[1],p:x[2],cat:x[3],price:x[4],isbn:'',sold30:s30,sold7:Math.round(s30/4*(.5+r2())),stock:r2()<.12?0:Math.round(r2()*9)}})})});
   return _demo={sales,stock}}
-const SEED={sales:[],stock:[],asOf:''};
+const SEED={sales:[],stock:[],asOf:'',credit:{}};
+const credit=br=>S.db.credit.find(c=>c.id===br)||(SEED.credit||{})[br]||null;
 const realSales=()=>S.db.sales.length?S.db.sales:SEED.sales,realStock=()=>S.db.stock.length?S.db.stock:SEED.stock;
 const hasReal=()=>realSales().length>0||realStock().length>0;
 const isDemo=()=>S.demoPref??!hasReal();
 const sales=()=>isDemo()?demo().sales:realSales();
-async function loadSeed(p){try{const r=await fetch('priv.enc',{cache:'no-store'});if(!r.ok)return;const j=await r.json(),b=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0)),E=new TextEncoder();
+async function loadSeed(p){try{let r=await fetch('priv.enc',{cache:'no-store'}).catch(()=>null);if(!r||!r.ok)r=await fetch('priv.json',{cache:'no-store'});if(!r.ok)return;const j=await r.json(),b=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0)),E=new TextEncoder();
   const km=await crypto.subtle.importKey('raw',E.encode(p),'PBKDF2',false,['deriveKey']),key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b(j.s),iterations:150000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
   const o=JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b(j.i)},key,b(j.d))));Object.assign(SEED,o);if(S.solo&&o.events&&!S.db.events.length)S.db.events=o.events;render()}catch(e){}}
 function recentQty(br){const m={};const docs=sales().filter(d=>d.br===br).sort((a,b)=>a.ym<b.ym?1:-1).slice(0,2);let days=0;docs.forEach(d=>{days+=Object.keys(d.days||{}).length;(d.top||[]).forEach(x=>{const k=x.isbn||nt(x.t);m[k]=(m[k]||0)+(x.qty||0)})});const f=days?30/days:0;Object.keys(m).forEach(k=>m[k]=Math.round(m[k]*f));return m}
@@ -135,7 +136,7 @@ A.mode=d=>{S.mode=d.m;ls.set('mode',d.m);window.scrollTo(0,0);render()};
 A.br=d=>{S.br=d.k;ls.set('br',d.k);render()};
 A.go=d=>{if(d.m)S.mode=d.m;S.view[S.mode]=d.v;ls.set('view',S.view);window.scrollTo(0,0);render()};
 A.big=()=>{const b=document.body.classList.toggle('big');ls.set('big',b);render()};
-A.ui=d=>{S.ui[d.k]=isNaN(+d.v)||d.v===''?d.v:+d.v;render()};
+A.ui=d=>{S.ui[d.k]=isNaN(+d.v)||d.v===''?d.v:+d.v;if(d.k==='per'){S.ui.pf=S.ui.pt=null}render()};
 document.addEventListener('click',e=>{if(e.target.id==='sheet'){closeSheet();return}const el=e.target.closest('[data-a]');if(el&&A[el.dataset.a])A[el.dataset.a](el.dataset,el,e)});
 document.addEventListener('change',e=>{const el=e.target.closest('[data-c]');if(el&&C[el.dataset.c])C[el.dataset.c](el,el.dataset)});
 document.addEventListener('mousemove',e=>{const el=e.target.closest&&e.target.closest('[data-tip]'),t=$('tip');if(!el){t.style.display='none';return}t.textContent=el.dataset.tip;t.style.display='block';t.style.left=Math.min(e.clientX+12,innerWidth-250)+'px';t.style.top=e.clientY+14+'px'});
