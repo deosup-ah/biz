@@ -75,13 +75,13 @@ a{color:var(--pine)}
 .tabs{background:var(--pine);padding:0 max(10px,env(safe-area-inset-right,0px)) 10px max(10px,env(safe-area-inset-left,0px))}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tabs{background:#16302a}}
 :root[data-theme="dark"] .tabs{background:#16302a}
-.tabs .in{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:rgba(0,0,0,.22);border-radius:14px;padding:5px}
-.tab{display:flex;align-items:center;justify-content:center;gap:6px;min-height:46px;border-radius:10px;font-size:16px;font-weight:700;color:#fff;text-align:center;position:relative}
-.tab svg{width:22px;height:22px;flex:none}
+.tabs .in{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:rgba(0,0,0,.22);border-radius:14px;padding:5px}
+.tab{display:flex;align-items:center;justify-content:center;gap:4px;min-height:46px;border-radius:10px;font-size:15px;font-weight:700;color:#fff;text-align:center;position:relative}
+.tab svg{width:19px;height:19px;flex:none}
 .tab b{font-weight:700}
 .tab[aria-current="page"]{background:#fff;color:#1d4636;box-shadow:0 1px 3px rgba(0,0,0,.25)}
 .tab .badge{position:absolute;top:-4px;right:-2px;min-width:20px;height:20px;border-radius:10px;background:#e5484d;color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;padding:0 5px;border:2px solid var(--pine)}
-@media (max-width:380px){.tab{font-size:15px;gap:4px}.tab svg{width:19px;height:19px}}
+@media (max-width:380px){.tab{font-size:14px;gap:3px}.tab svg{width:17px;height:17px}}
 
 /* sections */
 main{padding-top:14px}
@@ -306,6 +306,15 @@ body.hascart .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 80px)}
 .pad button{height:62px;border-radius:14px;background:rgba(255,255,255,.14);color:#fff;font:700 24px var(--f-disp);text-align:center}
 .pad button:active{background:rgba(255,255,255,.3)}
 .pad button.sm{font-size:15px;font-weight:600;background:none}
+.bk{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}
+.bk:last-child{border-bottom:0}
+.bk .rk{width:26px;height:26px;border-radius:8px;background:var(--pine-soft);color:var(--pine);font-weight:700;font-size:13px;display:grid;place-items:center}
+.bk .bt{min-width:0;display:grid;gap:2px}.bk .bt:first-child{grid-column:1/3}
+.bk .bt b{font-size:14.5px;word-break:keep-all}.bk .bt small{font-size:12px;color:var(--mute)}
+.bk .bs{text-align:right;font-weight:700;font-size:14px;white-space:nowrap}.bk .bs small{display:block;font-weight:500;font-size:11.5px;color:var(--mute)}
+.rin{font:inherit;font-weight:700;font-size:14.5px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;width:100%;min-width:0}
+.chip:disabled{opacity:.5}
+.fld textarea{resize:vertical}
 .kv2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .kv2 span{display:block;font-size:12.5px;color:var(--mute)}.kv2 b{font:700 17px var(--f-disp)}
 .up{color:var(--ok)}.dn{color:var(--hi)}
@@ -430,6 +439,7 @@ textarea.msg{width:100%;min-height:240px;border:1px solid var(--line);border-rad
   <button class="tab" data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><b>오늘</b></button>
   <button class="tab" data-tab="plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg><b>일정</b></button>
   <button class="tab" data-tab="money"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="13" rx="2.5"/><circle cx="12" cy="12.5" r="2.6"/><path d="M6 9.5h.01M18 15.5h.01"/></svg><b>돈</b></button>
+  <button class="tab" data-tab="book"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><b>서점</b></button>
   <button class="tab" data-tab="info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5h.01"/></svg><b>안내</b></button>
 </div></nav></header>
 
@@ -450,6 +460,8 @@ textarea.msg{width:100%;min-height:240px;border:1px solid var(--line);border-rad
 <script src="sales.js"></script>
 <script src="rev.js" onerror="void 0"></script>
 <script src="reports.js" onerror="void 0"></script>
+<script src="books.js" onerror="void 0"></script>
+<script src="ext.js" onerror="void 0"></script>
 <script>
 "use strict";
 /* ===== settings ===== */
@@ -512,7 +524,7 @@ let SALES=[], salesMode="snapshot", salesAsOf="", DB=null, USER=null, MCP=null, 
 function loadSnapshot(){const S=window.SALES_DATA||{rows:[],asOf:""};salesAsOf=S.asOf||"";if(salesMode==="snapshot")SALES=(S.rows||[]).slice()}
 
 /* ===== state ===== */
-let tab=LS.get("ds-tab","today"); if(!["today","plan","money","info"].includes(tab))tab="today";
+let tab=LS.get("ds-tab","today"); if(!["today","plan","money","book","info"].includes(tab))tab="today";
 let planView=LS.get("ds-plan","list"), filter="up", q="", dayPick=null, moneyView=LS.get("ds-money2",window.REV_DATA?"rev":"due");
 let calM=new Date(TODAY.getFullYear(),TODAY.getMonth(),1);
 let sMonth=TODAY_S.slice(0,7);
@@ -593,6 +605,7 @@ function renderToday(){
   ${PINS.some(id=>CASES.some(c=>c.id===id))?`<div class="sec"><div class="sec-h"><h2>고정한 단체</h2><span class="cnt">단체 화면의 ☆로 고정 · 해제</span></div><div class="card">${PINS.map(id=>CASES.find(c=>c.id===id)).filter(Boolean).map(gCard).join("")}</div></div>`:""}
   <div class="sec" id="s-today"><div class="sec-h"><h2>${lab} 이용</h2><span class="cnt">${X.groups.length}건 · ${X.pax}명</span></div>
     ${X.groups.length?`<div class="card">${X.groups.map(c=>todayCard(c,ds)).join("")}</div>${timeline(X.groups,ds)}`:`<div class="card empty">${lab} 이용하는 단체가 없습니다.</div>`}</div>
+  ${(()=>{const N=EXT().naver;if(!N)return "";const L=(N.items||[]).filter(x=>x.date===ds).sort((a,b)=>(a.time||"").localeCompare(b.time||""));return `<div class="sec"><div class="sec-h"><h2>네이버 예약</h2><span class="cnt">${L.length}건</span></div><div class="card">${L.length?L.map(x=>`<div class="mrow"><span><span class="n">${esc(x.item||"예약")}</span><span class="s">${esc([x.name,x.pax?x.pax+"명":"",x.status].filter(Boolean).join(" · "))}</span></span><span class="a">${esc(x.time||"")}</span></div>`).join(""):`<div class="empty">${lab} 네이버 예약이 없습니다.</div>`}</div></div>`})()}
   <div class="sec" id="s-meal"><div class="sec-h"><h2>식사 인원</h2><span class="cnt">${mealStr(X.mt)||"없음"}</span></div>
     <div class="card">${X.meals.length?X.meals.map(({c,m})=>`<button class="mrow" data-id="${esc(c.id)}"><span><span class="n">${esc(c.name)}</span><span class="s">${c.pax?c.pax+"명 단체":""}</span></span><span class="a">${mealStr(m)}</span></button>`).join(""):`<div class="empty">${lab} 잡힌 단체 식사가 없습니다.</div>`}</div></div>
   ${X.ins.length||X.outs.length?`<div class="sec"><div class="sec-h"><h2>연수객실 입실 · 퇴실</h2></div><div class="card">${X.outs.map(x=>`<button class="mrow" data-id="${esc(x.c.id)}"><span><span class="n">${esc(x.c.name)}</span><span class="s">${esc(x.r[2].join(" "))}</span></span><span class="a">퇴실 11:00<small>${x.r[2].length}실</small></span></button>`).join("")}${X.ins.map(x=>`<button class="mrow" data-id="${esc(x.c.id)}"><span><span class="n">${esc(x.c.name)}</span><span class="s">${esc(x.r[2].join(" "))}</span></span><span class="a">입실 16:00<small>${x.r[2].length}실</small></span></button>`).join("")}</div></div>`:""}
@@ -799,6 +812,80 @@ let installEvt=null;
 const jget=(k)=>{try{const v=JSON.parse(LS.get(k,"[]"));return Array.isArray(v)?v:[]}catch(e){return []}};
 let PINS=jget("ds-pins"), RECENT=jget("ds-recent"), CART=jget("ds-cart"), BIG=LS.get("ds-big","")==="1";
 const applyBig=()=>{document.body.style.zoom=BIG?"1.15":""};
+/* ===== 서점 ===== */
+let bookView=LS.get("ds-book","store"), bkSrc="yes24", ORD=jget("ds-ord"), RET=[], retBusy=false, retMsg="", igKind="책", igOut=[], igBusy=false, igMsg="", SAMPLE=null, SLIM=null;
+const EXT=()=>window.EXT||{};
+const SRC=[["yes24","예스24"],["aladin","알라딘"],["kyobo","교보문고"]];
+const nt=s=>String(s||"").replace(/\(.*?\)|\[.*?\]/g,"").replace(/[^0-9a-z가-힣]/gi,"").toLowerCase();
+const storeItem=t=>{const S=EXT().store;if(!S||!S.items)return null;const k=nt(t);return S.items.find(x=>nt(x.t)===k)||null};
+const saveOrd=()=>LS.set("ds-ord",JSON.stringify(ORD));
+function addOrd(b,why,n){const k=nt(b.t);const x=ORD.find(o=>nt(o.t)===k);if(x)x.qty+=n||1;else ORD.push({t:b.t,a:b.a||"",p:b.p||"",qty:n||1,why:why||""});saveOrd()}
+function sugg(){const S=EXT().store;if(!S||!S.items)return[];return S.items.map(x=>({...x,need:Math.ceil((x.sold30||0)/30*14)-(x.stock||0)})).filter(x=>x.need>0&&x.sold30>0).sort((a,b)=>b.need-a.need)}
+const waitCard=(title,lines,need)=>`<div class="card" style="padding:14px;display:grid;gap:8px"><b>${title} · 연결 대기</b><ul class="ins" style="padding:0 0 0 18px">${lines.map(l=>`<li>${l}</li>`).join("")}</ul><p class="note">${need}</p></div>`;
+function renderBook(){
+  return `<div class="seg">${[["store","아카 서점"],["rank","순위 비교"],["order","주문 · 반품"],["insta","인스타"]].map(([k,l])=>`<button data-bv="${k}" aria-pressed="${bookView===k}">${l}</button>`).join("")}</div>`+(bookView==="rank"?bkRank():bookView==="order"?bkOrder():bookView==="insta"?bkInsta():bkStore())}
+function bkStore(){const S=EXT().store;
+  if(!S)return waitCard("아카 서점 매출 (이지정보)",["오늘 · 이번 달 서점 매출과 날짜별 흐름","많이 팔린 책과 남은 재고","2주 안에 떨어질 책 → 북센 주문 목록 자동 작성","교보 · 예스24 · 알라딘 순위권인데 매장에 없는 책"],"이지정보 판매 · 재고 화면을 읽을 수 있게 되면 이 자리에 바로 나옵니다. 그 전에도 「순위 비교」와 「주문 · 반품」은 쓸 수 있습니다.")+bkNaver();
+  const days=Object.entries(S.days||{}).sort(),cur=TODAY_S.slice(0,7),mt=days.filter(([d])=>d.startsWith(cur)).reduce((a,[,v])=>a+v,0),td=(S.days||{})[TODAY_S]||0,last=days.slice(-14),mx=Math.max(1,...last.map(x=>x[1]));
+  const top=(S.items||[]).slice().sort((a,b)=>(b.sold7||0)-(a.sold7||0)).filter(x=>x.sold7>0).slice(0,10),sg=sugg();
+  return `<div class="card mhero"><div><span>${+cur.slice(5)}월 서점 매출</span><b class="num">${won(mt)}원</b></div><div><span>오늘</span><b class="num">${won(td)}원</b></div></div>
+  <div class="sec"><div class="sec-h"><h2>최근 14일</h2></div><div class="card" style="padding:10px 14px">${last.map(([d,v])=>`<div class="dbar"><span>${mdw(d)}</span><span class="tr"><i style="width:${v/mx*100}%"></i></span><span class="v">${v?manwon(v):"—"}</span></div>`).join("")}</div></div>
+  <div class="sec"><div class="sec-h"><h2>이번 주 많이 팔린 책</h2></div><div class="card">${top.map((x,i)=>`<div class="bk"><span class="rk">${i+1}</span><span class="bt"><b>${esc(x.t)}</b><small>${esc([x.a,x.p].filter(Boolean).join(" · "))}</small></span><span class="bs">${x.sold7}권<small>재고 ${x.stock??"—"}</small></span></div>`).join("")||`<div class="empty">이번 주 판매 기록이 없습니다.</div>`}</div></div>
+  ${sg.length?`<div class="sec"><div class="sec-h"><h2>곧 떨어질 책</h2><span class="cnt">${sg.length}종</span><button class="more" data-suggall>모두 주문 목록에 ›</button></div><div class="card">${sg.slice(0,8).map(x=>`<div class="bk"><span class="bt"><b>${esc(x.t)}</b><small>30일 ${x.sold30}권 판매 · 재고 ${x.stock||0}</small></span><span class="bs">${x.need}권 필요</span></div>`).join("")}</div></div>`:""}
+  <p class="note">${esc(S.asOf||"")}</p>`+bkNaver()}
+function bkNaver(){return ""}
+function bkRank(){const B=window.BOOKS;if(!B)return `<div class="card empty">순위 자료가 아직 없습니다.</div>`;
+  const have=SRC.filter(([k])=>(B[k]||[]).length);if(!(B[bkSrc]||[]).length&&have.length)bkSrc=have[0][0];
+  const L=B[bkSrc]||[],S=EXT().store,others=have.filter(([k])=>k!==bkSrc);
+  const rankIn=(k,t)=>{const x=(B[k]||[]).find(b=>nt(b.t)===nt(t));return x?x.r:0};
+  const both=L.filter(b=>others.length&&others.every(([k])=>rankIn(k,b.t))).length,miss=S?L.filter(b=>{const it=storeItem(b.t);return !it||!(it.stock>0)}):[];
+  return `<div class="chips">${SRC.map(([k,l])=>`<button class="chip" data-bksrc="${k}" aria-pressed="${bkSrc===k}" ${(B[k]||[]).length?"":"disabled"}>${l}${(B[k]||[]).length?"":" (대기)"}</button>`).join("")}</div>
+  <div class="card mhero"><div><span>${others.length?"모든 서점 공통 순위권":"순위권"}</span><b class="num">${others.length?both:L.length}권</b></div><div><span>${S?"순위권인데 매장 재고 없음":"우리 매장과 비교"}</span><b class="num">${S?miss.length+"권":"연결 대기"}</b></div></div>
+  ${S&&miss.length?`<button class="btn pri block" data-missall>재고 없는 순위권 ${miss.length}권을 주문 목록에 담기</button>`:""}
+  <div class="card">${L.map((b,i)=>{const it=S?storeItem(b.t):null,inOrd=ORD.some(o=>nt(o.t)===nt(b.t));
+    return `<div class="bk"><span class="rk">${b.r}</span><span class="bt"><b>${esc(b.t)}</b><small>${esc([b.a,b.p].filter(Boolean).join(" · "))}</small><span class="flags">${others.map(([k,l])=>{const r=rankIn(k,b.t);return r?`<span class="flag">${l} ${r}위</span>`:""}).join("")}${S?(it?`<span class="flag ${it.stock>0?"money":"hi"}">우리 30일 ${it.sold30||0}권 · 재고 ${it.stock||0}</span>`:`<span class="flag hi">매장에 없음</span>`):""}</span></span><button class="pb" data-ordadd="${i}" aria-label="${esc(b.t)} 주문 목록에 담기">${inOrd?"담김":"주문"}<i>＋</i></button></div>`}).join("")}</div>
+  <p class="note">${esc(B.asOf||"")} · ${esc(B.week||"")}. 국내도서 주간 종합 20위까지. 교보문고는 사무실 컴퓨터가 연결되면 함께 수집합니다.</p>`}
+function ordText(){return `[북센 주문 목록 ${md(TODAY_S)}]\n`+ORD.map((o,i)=>`${i+1}. ${o.t} / ${o.a||"-"} / ${o.p||"-"} / ${o.qty}권`).join("\n")+`\n합계 ${ORD.length}종 ${ORD.reduce((a,o)=>a+o.qty,0)}권`}
+function retText(){return `[반품 목록 ${md(TODAY_S)}]\n`+RET.map((o,i)=>`${i+1}. ${o.t} / ${o.a||"-"} / ${o.p||"-"}${o.isbn?" / "+o.isbn:""} / ${o.qty}권`).join("\n")+`\n합계 ${RET.length}종 ${RET.reduce((a,o)=>a+o.qty,0)}권`}
+function bkOrder(){const sg=sugg(),canImg=!!(SAMPLE&&SLIM&&SLIM.images);
+  return `<div class="sec"><div class="sec-h"><h2>북센 주문 목록</h2><span class="cnt">${ORD.length}종 ${ORD.reduce((a,o)=>a+o.qty,0)}권</span></div>
+   ${sg.length?`<button class="btn block" data-suggall>판매량으로 계산한 ${sg.length}종 자동으로 담기</button>`:""}
+   <div class="card">${ORD.length?ORD.map((o,i)=>`<div class="bk"><span class="bt"><b>${esc(o.t)}</b><small>${esc([o.a,o.p].filter(Boolean).join(" · "))}${o.why?" · "+esc(o.why):""}</small></span><span class="qty"><button data-oq="${i}|-1" aria-label="줄이기">−</button><b>${o.qty}</b><button data-oq="${i}|1" aria-label="늘리기">＋</button></span></div>`).join(""):`<div class="empty">담긴 책이 없습니다.<br>「순위 비교」에서 「주문 ＋」를 누르면 담깁니다.</div>`}</div>
+   ${ORD.length?`<div class="row2"><button class="btn pri" data-ordcopy>주문 목록 복사</button><button class="btn" data-ordclear>비우기</button></div>`:""}
+   <p class="note">지금은 목록을 복사해 북센에 직접 넣습니다. 북센 주문 화면이 연결되면 「확인 후 발주」 버튼으로 바뀝니다. 이 목록은 이 기기에만 저장됩니다.</p></div>
+  <div class="sec"><div class="sec-h"><h2>반품 — 사진으로 입력</h2><span class="cnt">${RET.length?RET.length+"종":""}</span></div>
+   ${canImg?`<label class="btn pri block" for="retFile">${retBusy?"사진을 읽는 중…":"반품할 책 사진 올리기"}</label><input id="retFile" type="file" accept="image/*" multiple hidden ${retBusy?"disabled":""}>`
+    :`<div class="banner"><span><b>사진 인식은 Claude 앱 링크에서 됩니다.</b> 책등이나 바코드가 보이게 찍어 올리면 제목 · 저자 · 출판사 · 권수를 목록으로 만들어 줍니다.</span>${DB?"":`<a class="btn" href="${ART_URL}" target="_blank" rel="noopener">사진 올리러 가기 ›</a>`}</div>`}
+   ${retMsg?`<div class="banner ${/못|없|실패|막혀/.test(retMsg)?"warn":""}">${esc(retMsg)}</div>`:""}
+   ${RET.length?`<div class="card">${RET.map((o,i)=>`<div class="bk"><span class="bt"><input class="rin" data-rett="${i}" value="${esc(o.t)}" aria-label="제목"><small>${esc([o.a,o.p,o.isbn].filter(Boolean).join(" · "))||"저자 · 출판사 안 보임"}</small></span><span class="qty"><button data-rq="${i}|-1" aria-label="줄이기">−</button><b>${o.qty}</b><button data-rq="${i}|1" aria-label="늘리기">＋</button></span></div>`).join("")}</div>
+   <div class="row2"><button class="btn pri" data-retsave>${DB?"저장 + 복사":"반품 목록 복사"}</button><button class="btn" data-retclear>비우기</button></div>`:""}
+   <p class="note">(?)가 붙은 제목은 글자가 흐려 확실하지 않은 것입니다. 저장 전에 고쳐 주세요. 이지정보 반품 입력 화면이 연결되면 저장한 목록이 그대로 들어갑니다.</p></div>`}
+const IGK=["책","영화","공간","행사","메뉴"];
+function bkInsta(){const I=EXT().insta;
+  const dash=I?`<div class="stats"><div class="stat"><span>팔로워</span><b class="num">${won(I.followers)}</b><small>${I.followersDelta!=null?(I.followersDelta>=0?"+":"")+I.followersDelta+" (7일)":""}</small></div><div class="stat"><span>방문(도달)</span><b class="num">${won(I.reach)}</b><small>최근 7일</small></div><div class="stat"><span>프로필 방문</span><b class="num">${won(I.profileVisits)}</b><small>최근 7일</small></div></div>
+   <div class="sec"><div class="sec-h"><h2>반응 좋은 게시물</h2></div><div class="card">${(I.posts||[]).slice(0,8).map(p=>`<div class="bk"><span class="bt"><b>${esc(p.title)}</b><small>${esc(p.date||"")} · ${esc(p.kind||"")}</small></span><span class="bs">♥ ${won(p.likes||0)}<small>도달 ${won(p.reach||0)} · 저장 ${won(p.saves||0)}</small></span></div>`).join("")}</div><p class="note">${esc(I.asOf||"")}</p></div>`
+   :waitCard("아카 인스타그램 현황",["팔로워 수와 7일 증감","방문(도달) · 프로필 방문 · 홈페이지 클릭","게시물별 좋아요 · 저장 · 도달, 반응 좋은 소재"],"인스타그램 계정이 사무실 컴퓨터의 Claude 앱 브라우저에 로그인되어 있으면 매일 업데이트 때 함께 읽어 옵니다.");
+  const picks=[...((EXT().store||{}).items||[]).slice().sort((a,b)=>(b.sold7||0)-(a.sold7||0)).slice(0,4).map(x=>x.t),...((window.BOOKS||{}).yes24||[]).slice(0,4).map(x=>x.t)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,6);
+  return dash+`<div class="sec"><div class="sec-h"><h2>게시물 초안 만들기</h2></div>
+   ${SAMPLE?`<div class="card form" style="padding:14px"><div class="fld"><label>소재</label><div class="chips">${IGK.map(k=>`<button class="chip" data-igk="${k}" aria-pressed="${igKind===k}">${k}</button>`).join("")}</div></div>
+    <div class="fld"><label for="igTopic">무엇에 대해 쓸까요</label><textarea id="igTopic" rows="3" placeholder="예: 무라카미 하루키 『가호』 입고, 서가 맨 앞에 진열 / 11월 숲 산책하기 좋은 날"></textarea>${igKind==="책"&&picks.length?`<div class="quick">${picks.map(t=>`<button type="button" data-igpick="${esc(t)}">${esc(t.length>14?t.slice(0,14)+"…":t)}</button>`).join("")}</div>`:""}</div>
+    <button class="btn pri block" data-iggen ${igBusy?"disabled":""}>${igBusy?"쓰는 중…":"초안 3개 만들기"}</button>${igMsg?`<div class="err">${esc(igMsg)}</div>`:""}</div>
+    ${igOut.map((o,i)=>`<div class="card" style="padding:14px;display:grid;gap:8px"><span class="pill p-mix" style="justify-self:start">${esc(o.tone||"초안 "+(i+1))}</span><div style="white-space:pre-wrap;font-size:14.5px">${esc(o.caption||"")}</div><div class="note" style="color:var(--info)">${esc(o.hashtags||"")}</div><button class="btn" data-igcopy="${i}">복사</button></div>`).join("")}
+    <p class="note">초안입니다. 가격 · 날짜 같은 사실은 넣지 않으니 올리기 전에 확인해 덧붙이세요. 인스타그램에 올리는 것은 직접 합니다.</p>`
+   :`<div class="banner"><span><b>초안 만들기는 Claude 앱 링크에서 됩니다.</b> 책 · 영화 · 공간 · 행사 · 메뉴를 고르고 한 줄만 적으면 문구 3개와 해시태그를 만들어 줍니다.</span><a class="btn" href="${ART_URL}" target="_blank" rel="noopener">초안 만들러 가기 ›</a></div>`}</div>`}
+const sErr=e=>({not_granted:"Claude 사용을 허락해야 쓸 수 있습니다.",rate_limited:"사용량 한도에 걸렸습니다. 잠시 뒤 다시 눌러 주세요.",image_rejected:"사진을 읽지 못했습니다. 다른 사진으로 해 보세요.",images_unavailable:"이 화면에서는 사진을 보낼 수 없습니다.",refused:"이 내용은 만들 수 없습니다.",sampling_disabled:"이 계정에서는 이 기능이 꺼져 있습니다."}[e&&e.code]||"실패했습니다. 잠시 뒤 다시 눌러 주세요.");
+async function shrink(f){try{const bm=await createImageBitmap(f);const k=Math.min(1,1800/Math.max(bm.width,bm.height));const c=document.createElement("canvas");c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext("2d").drawImage(bm,0,0,c.width,c.height);return await new Promise(r=>c.toBlob(b=>r(b||f),"image/jpeg",.85))}catch(e){return f}}
+async function scanReturn(files){if(!SAMPLE||retBusy||!files.length)return;retBusy=true;retMsg="사진을 읽는 중입니다. 20~40초쯤 걸립니다.";render();
+  try{const max=(SLIM&&SLIM.images&&SLIM.images.maxCount)||4;const imgs=await Promise.all([...files].slice(0,max).map(shrink));
+    const out=await SAMPLE.json('첨부한 사진은 서점에서 반품할 책들을 찍은 것입니다. 사진에 보이는 책을 빠뜨리지 말고 JSON 배열로만 답하세요. 각 항목은 {"title":"제목","author":"저자(안 보이면 빈 문자열)","publisher":"출판사(안 보이면 빈 문자열)","isbn":"바코드 아래 13자리 숫자가 또렷이 보일 때만, 아니면 빈 문자열","qty":같은 책이 여러 권 보이면 권수 아니면 1}. 글자가 흐려 확신이 없으면 title 끝에 " (?)" 를 붙이세요. 보이지 않는 정보는 지어내지 마세요. 책이 없으면 [] 로 답하세요.',{images:imgs,cache:false});
+    const arr=Array.isArray(out)?out:(out&&(out.books||out.items))||[];arr.forEach(b=>{if(b&&b.title)RET.push({t:String(b.title),a:String(b.author||""),p:String(b.publisher||""),isbn:String(b.isbn||"").replace(/[^\d]/g,""),qty:Math.max(1,+b.qty||1)})});
+    retMsg=arr.length?`${arr.length}종을 읽었습니다. 틀린 곳을 고친 뒤 저장하세요.${files.length>max?` (사진은 한 번에 ${max}장까지)`:""}`:"책을 찾지 못했습니다. 더 가까이, 밝게 찍어 보세요."}
+  catch(e){retMsg=sErr(e)}finally{retBusy=false;render()}}
+async function genInsta(){const topic=($("igTopic")||{}).value?.trim()||"";if(!topic){igMsg="무엇에 대해 쓸지 한 줄 적어 주세요.";render();return}if(!SAMPLE||igBusy)return;igBusy=true;igMsg="";render();const el=$("igTopic");if(el)el.value=topic;
+  try{const out=await SAMPLE.json(`서울 강북구 수유동 북한산 자락 숲속에 있는 "더숲 아카데미하우스"(서점 · 북스테이 · 카페 · 다이닝 · 대관 공간)의 인스타그램 게시물 문구 초안을 3개 써 주세요.\n소재 종류: ${igKind}\n내용: ${topic}\n\n규칙: 세 개의 말투를 서로 다르게(담백하게 / 따뜻하게 / 정보 위주로). 각 120~220자. 과장하지 말고, 주어지지 않은 사실(가격, 날짜, 시간, 할인, 수상 이력, 줄거리의 구체적 내용)은 지어내지 마세요. 이모지는 0~2개. 해시태그는 6~10개, 한글 위주.\nJSON 배열로만 답하세요: [{"tone":"말투 이름","caption":"문구","hashtags":"#태그 #태그"}]`,{cache:false});
+    igOut=(Array.isArray(out)?out:(out&&out.drafts)||[]).slice(0,3);if(!igOut.length)igMsg="초안을 만들지 못했습니다. 다시 눌러 주세요."}
+  catch(e){igMsg=sErr(e)}finally{igBusy=false;render();const el2=$("igTopic");if(el2)el2.value=topic}}
+
 /* ----- 예상 견적 ----- */
 const cartSum=()=>CART.reduce((a,x)=>a+x.price*x.qty,0);
 function paintCart(){const el=$("cartbar");const n=CART.reduce((a,x)=>a+x.qty,0);el.hidden=!n;document.body.classList.toggle("hascart",!!n);if(n)el.innerHTML=`<span><b>예상 견적 ${n}개</b> · ${won(cartSum())}원</span><span class="go">보기 ›</span>`}
@@ -838,7 +925,7 @@ function renderInfo(){
    ${inClaude?"":`<a class="btn" href="${ART_URL}" target="_blank" rel="noopener">실시간 업데이트 실행하러 가기 ›</a>`}</div></div>
   <div class="sec"><div class="sec-h"><h2>보기 설정</h2></div><div class="card" style="padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span><b>글자 크게</b><br><span class="note">화면 전체를 15% 키웁니다</span></span><button class="btn ${BIG?"pri":""}" data-big>${BIG?"켜짐":"꺼짐"}</button></div></div>
   <div class="sec"><div class="sec-h"><h2>연결 준비 상태</h2></div><div class="card">
-   ${[["보드 · 건 대장","ok","연결됨. 매일 08시에 읽습니다. 컴퓨터가 꺼져 있었으면 09:17 · 13:17 · 17:17에 자동으로 다시 시도하고, 위쪽 「업데이트」 버튼으로 바로 실행할 수도 있습니다."],["WINGS (객실 매출)","wait","접속 주소 필요 → 사무실 컴퓨터 Claude 앱 브라우저에서 로그인"],["OKPOS (다이닝 · 카페 매출)","wait","접속 주소 필요 → 같은 브라우저에서 로그인"],["주차 (아마노 무인정산)","wait","관리자 페이지 주소 필요"],["견적안내 가이드 사진","wait","가이드 파일 첨부 필요 (지금 사진은 예전 앱 것)"]].map(([a,s,b])=>`<div class="al ${s==="ok"?"":"mid"}" style="padding:10px 14px"><i ${s==="ok"?'style="background:var(--ok)"':""}></i><div><b>${a} · ${s==="ok"?"사용 중":"대기"}</b><small>${b}</small></div></div>`).join("")}</div></div>
+   ${[["보드 · 건 대장","ok","연결됨. 매일 08시에 읽습니다. 컴퓨터가 꺼져 있었으면 09:17 · 13:17 · 17:17에 자동으로 다시 시도하고, 위쪽 「업데이트」 버튼으로 바로 실행할 수도 있습니다."],["이지정보 (서점 판매 · 재고 · 매입 · 반품)","wait","컴퓨터 연결 후 화면 확인 필요. 화면은 「서점」 메뉴에 준비됨"],["북센 (주문)","wait","주문 사이트 주소 · 로그인 필요. 지금은 주문 목록 복사까지"],["네이버 예약","wait","예약 관리 로그인 필요. 연결되면 「오늘」 화면에 표시"],["인스타그램 현황","wait","계정 로그인 필요. 게시물 초안 만들기는 지금 가능"],["WINGS (객실 매출)","wait","접속 주소 필요 → 사무실 컴퓨터 Claude 앱 브라우저에서 로그인"],["OKPOS (다이닝 · 카페 매출)","wait","접속 주소 필요 → 같은 브라우저에서 로그인"],["주차 (아마노 무인정산)","wait","관리자 페이지 주소 필요"],["견적안내 가이드 사진","wait","가이드 파일 첨부 필요 (지금 사진은 예전 앱 것)"]].map(([a,s,b])=>`<div class="al ${s==="ok"?"":"mid"}" style="padding:10px 14px"><i ${s==="ok"?'style="background:var(--ok)"':""}></i><div><b>${a} · ${s==="ok"?"사용 중":"대기"}</b><small>${b}</small></div></div>`).join("")}</div></div>
   <div class="sec"><div class="sec-h"><h2>휴대폰에 앱으로 설치</h2></div><div class="card">
    ${standalone?`<div class="okline">앱으로 실행 중입니다.</div>`:installEvt?`<div style="padding:14px"><button class="btn pri block" data-install>홈 화면에 설치</button></div>`:""}
    <ol class="steps"><li><b>아이폰</b> · Safari로 <span class="num">${esc(PUB_URL.replace("https://",""))}</span> 열기 → 공유 버튼 → 「홈 화면에 추가」</li><li><b>안드로이드</b> · Chrome으로 열기 → 오른쪽 위 ⋮ → 「앱 설치」 또는 「홈 화면에 추가」</li><li>홈 화면의 <b>더숲 일정</b> 아이콘으로 열면 앱처럼 전체 화면으로 열립니다.</li></ol>
@@ -910,7 +997,7 @@ function render(){
   if(!UNLOCKED)return;
   document.querySelectorAll(".tab").forEach(b=>{b.setAttribute("aria-current",b.dataset.tab===tab?"page":"false");b.querySelector(".badge")?.remove()});
   const hiN=actions().filter(x=>x.a.lv==="hi").length;if(hiN){const b=document.querySelector('.tab[data-tab="today"]');b.insertAdjacentHTML("beforeend",`<span class="badge">${hiN}</span>`)}
-  $("view").innerHTML=tab==="today"?renderToday():tab==="plan"?renderPlan():tab==="money"?renderMoney():renderInfo();
+  $("view").innerHTML=tab==="today"?renderToday():tab==="plan"?renderPlan():tab==="money"?renderMoney():tab==="book"?renderBook():renderInfo();
   paintFresh();
 }
 
@@ -952,6 +1039,21 @@ document.addEventListener("click",async e=>{const t=e.target;
   if(!UNLOCKED)return;
   if(t.closest("#btnRefresh")){runUpdate();return}
   if(t.closest("#cartbar")){openSheet(cartHTML(),"cart");return}
+  const bv=t.closest("[data-bv]");if(bv){bookView=bv.dataset.bv;LS.set("ds-book",bookView);render();return}
+  const bs=t.closest("[data-bksrc]");if(bs){bkSrc=bs.dataset.bksrc;render();return}
+  const oa=t.closest("[data-ordadd]");if(oa){const b=((window.BOOKS||{})[bkSrc]||[])[+oa.dataset.ordadd];if(b){addOrd(b,SRC.find(x=>x[0]===bkSrc)[1]+" "+b.r+"위");toast("주문 목록에 담았습니다");render()}return}
+  if(t.closest("[data-missall]")){((window.BOOKS||{})[bkSrc]||[]).forEach(b=>{const it=storeItem(b.t);if((!it||!(it.stock>0))&&!ORD.some(o=>nt(o.t)===nt(b.t)))addOrd(b,"순위권 · 재고 없음")});toast("주문 목록에 담았습니다");render();return}
+  if(t.closest("[data-suggall]")){sugg().forEach(x=>{if(!ORD.some(o=>nt(o.t)===nt(x.t)))addOrd(x,"30일 "+x.sold30+"권 판매 · 재고 "+(x.stock||0),x.need)});bookView="order";toast("주문 목록에 담았습니다");render();return}
+  const oq=t.closest("[data-oq]");if(oq){const [i,dv]=oq.dataset.oq.split("|").map(Number);ORD[i].qty+=dv;if(ORD[i].qty<=0)ORD.splice(i,1);saveOrd();render();return}
+  if(t.closest("[data-ordcopy]")){if(!await copyText(ordText()))toast("복사가 막혀 있습니다");return}
+  if(t.closest("[data-ordclear]")){ORD=[];saveOrd();render();return}
+  const rq=t.closest("[data-rq]");if(rq){const [i,dv]=rq.dataset.rq.split("|").map(Number);RET[i].qty+=dv;if(RET[i].qty<=0)RET.splice(i,1);render();return}
+  if(t.closest("[data-retclear]")){RET=[];retMsg="";render();return}
+  if(t.closest("[data-retsave]")){const tx=retText();if(DB){try{const doc={date:TODAY_S,items:RET.map(o=>({...o})),at:new Date().toISOString()};if(USER){try{doc.by=await USER.id()}catch(e){}}await DB.collection("returns").add(doc);retMsg="반품 목록을 저장했습니다."}catch(e){retMsg="저장하지 못했습니다. 목록은 복사해 두었습니다."}}if(!await copyText(tx))toast("복사가 막혀 있습니다");render();return}
+  const ik=t.closest("[data-igk]");if(ik){const v=($("igTopic")||{}).value||"";igKind=ik.dataset.igk;render();if($("igTopic"))$("igTopic").value=v;return}
+  const ip=t.closest("[data-igpick]");if(ip){if($("igTopic"))$("igTopic").value="『"+ip.dataset.igpick+"』 ";$("igTopic")?.focus();return}
+  if(t.closest("[data-iggen]")){genInsta();return}
+  const ic=t.closest("[data-igcopy]");if(ic){const o=igOut[+ic.dataset.igcopy];if(o&&!await copyText((o.caption||"")+"\n\n"+(o.hashtags||"")))toast("복사가 막혀 있습니다");return}
   const ad=t.closest("[data-add]");if(ad){const [gi,ri,ci]=ad.dataset.add.split("|").map(Number);const g=FAC[gi],r=g.rows[ri],k=ad.dataset.add;const x=CART.find(v=>v.k===k);if(x)x.qty++;else CART.push({k,name:r[0],col:g.cols[ci],price:r[2+ci],qty:1});saveCart();toast(`담았습니다 · ${r[0]} ${g.cols[ci]}`);return}
   const cq=t.closest("[data-cq]");if(cq){const [i,dv]=cq.dataset.cq.split("|").map(Number);CART[i].qty+=dv;if(CART[i].qty<=0)CART.splice(i,1);saveCart();$("sheetIn").innerHTML=cartHTML();return}
   if(t.closest("[data-cartcopy]")){if(!await copyText(cartText()))toast("복사가 막혀 있습니다");return}
@@ -1001,7 +1103,7 @@ document.addEventListener("click",async e=>{const t=e.target;
 document.addEventListener("submit",e=>{if(e.target.id==="sf"){e.preventDefault();saveSales()}});
 document.addEventListener("input",e=>{if(e.target.id==="q"){q=e.target.value.trim().toLowerCase();const pos=e.target.selectionStart;render();const n=$("q");if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(x){}}}
   if(e.target.id==="sfAmt"){const v=e.target.value.replace(/[^\d]/g,"");e.target.value=v?won(+v):""}});
-document.addEventListener("change",e=>{const id=e.target.id;if(id==="freeDate"){freeDay=e.target.value||TODAY_S;render();return}if(id==="freePax"){freePax=e.target.value.replace(/[^\d]/g,"");render();return}if(id==="oAmt"||id==="oPark"){msgOpt[id==="oAmt"?"amt":"park"]=e.target.checked;$("msg").value=buildMsg(cur)}});
+document.addEventListener("change",e=>{const id=e.target.id;if(id==="retFile"){const fs=[...e.target.files];e.target.value="";scanReturn(fs);return}if(e.target.dataset&&e.target.dataset.rett!=null){RET[+e.target.dataset.rett].t=e.target.value;return}if(id==="freeDate"){freeDay=e.target.value||TODAY_S;render();return}if(id==="freePax"){freePax=e.target.value.replace(/[^\d]/g,"");render();return}if(id==="oAmt"||id==="oPark"){msgOpt[id==="oAmt"?"amt":"park"]=e.target.checked;$("msg").value=buildMsg(cur)}});
 document.addEventListener("keydown",e=>{if(!UNLOCKED){if(/^\d$/.test(e.key))pinKey(e.key);else if(e.key==="Backspace")pinKey("del");return}if(e.key==="Escape"&&sheetKind)closeSheet()});
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;if(tab==="info")render()});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&/^https?:/.test(location.protocol)&&!window.claude){const d=parseAsOf(D.asOf);if(!d||Date.now()-d>3*36e5)pullLatest(true)}});
@@ -1014,8 +1116,8 @@ if("serviceWorker" in navigator&&/github\.io$/.test(location.hostname)){navigato
 (async()=>{
   const cl=window.claude;if(!cl||typeof cl.use!=="function")return;
   try{
-    const [db,user,mcp]=await Promise.all([cl.use("db").catch(()=>null),cl.use("user").catch(()=>null),cl.use("mcp").catch(()=>null)]);
-    USER=user;MCP=mcp;if(tab==="info")render();
+    const [db,user,mcp,smp]=await Promise.all([cl.use("db").catch(()=>null),cl.use("user").catch(()=>null),cl.use("mcp").catch(()=>null),cl.use("sample").catch(()=>null)]);
+    USER=user;MCP=mcp;SAMPLE=smp;if(smp){try{SLIM=await smp.limits()}catch(e){SLIM=null}}if(tab==="info"||tab==="book")render();
     if(db){DB=db;salesMode="live";let got=false;const timer=setTimeout(()=>{if(!got){salesErr="매출 기록을 불러오는 데 시간이 걸립니다. 잠시 뒤 다시 열어 주세요.";if(tab==="money")render()}},10000);
       db.collection("sales").onSnapshot(snap=>{got=true;clearTimeout(timer);salesErr="";SALES=snap.docs.map(d=>({id:d.id,...d.data()}));if(tab==="money"&&sheetKind!=="sales")render()},
         err=>{got=true;clearTimeout(timer);salesErr="매출 기록을 불러오지 못했습니다. 페이지를 다시 열어 주세요.";if(tab==="money")render()});

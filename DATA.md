@@ -81,3 +81,28 @@
 
 ## 접속 비밀번호 (11/10)
 앱을 열면 4자리 비밀번호 화면이 먼저 나온다(사용자 지정, 같은 기기에서는 30일 동안 다시 묻지 않음). 화면 잠금일 뿐이다 — 저장소가 공개라 data.js 주소를 직접 열면 내용이 보인다. 비밀번호 숫자는 문서·커밋에 적지 않는다.
+
+## 서점 (11/10)
+### books.js — 온라인 서점 순위 (공개, 저장소 + Artifact 둘 다)
+`window.BOOKS = {asOf:"순위 M/D HH:MM 기준", week:"출처별 주차 설명", yes24:[{r,t,a,p}…20], aladin:[…20], kyobo:[…20]};` — r 순위, t 제목, a 저자, p 출판사. 국내도서 주간 종합 20위.
+- 예스24: https://www.yes24.com/product/category/weekbestseller?categoryNumber=001
+- 알라딘: https://www.aladin.co.kr/shop/common/wbest.aspx?BranchType=1
+- 교보문고: https://store.kyobobook.co.kr/bestseller/total/weekly/ — 화면이 스크립트로 그려져서 WebFetch 로는 빈 목록이 온다. 브라우저 도구가 있을 때만 읽고, 못 읽으면 직전 kyobo 를 그대로 둔다.
+- 한 곳을 못 읽으면 그 목록만 직전 값을 두고 나머지는 올린다. 제목·저자를 지어내지 않는다.
+
+### ext.js — 연결된 외부 자료 (Artifact 에만. 저장소에는 넣지 않는다)
+`window.EXT = {store, naver, insta};` — 아직 연결 안 된 것은 그 키를 넣지 않는다(화면이 「연결 대기」로 보인다).
+- store (이지정보): `{asOf, days:{"YYYY-MM-DD":그날 서점 매출 원}, items:[{t,a,p,isbn,price,sold7,sold30,stock}]}` — 최근 60일 매출, 최근 30일 안에 팔렸거나 재고가 있는 책. 화면이 「곧 떨어질 책」(30일 판매÷30×14 − 재고)과 순위 비교를 계산한다.
+- naver (네이버 예약): `{asOf, items:[{date,time,item,name,pax,status}]}` — 오늘부터 14일. name 은 성만 남기고 가린다(예: "김**"). 전화번호는 넣지 않는다.
+- insta (인스타그램): `{asOf, followers, followersDelta(7일), reach(7일 도달), profileVisits(7일), posts:[{title(첫 줄 30자), date:"M/D", kind:"사진|릴스|…", likes, saves, reach}]}` — 최근 게시물 12개.
+- 반품 사진 목록은 Artifact DB 컬렉션 `returns` (`{date, items:[{t,a,p,isbn,qty}], at, by}`), 주문 목록은 각 기기에만 저장된다.
+
+### 연결 주소 (비어 있으면 그 자료는 건너뛴다)
+- 이지정보: (미정 — 설치 프로그램인지 웹인지 확인 필요)
+- 북센 주문: (미정)
+- 네이버 예약 관리: (미정)
+- 인스타그램 계정: (미정)
+- WINGS: (미정)
+- OKPOS: (미정)
+- 주차(아마노): (미정)
+주소가 적히면 매일 업데이트 때 내장 브라우저로 읽어 ext.js 를 만든다. 로그인 화면이면 그 자료만 건너뛰고 알림에 한 줄 적는다. 북센 발주·이지정보 매입/반품 입력·차단기 제어처럼 **쓰는 일은 자동으로 하지 않는다**(사용자가 화면에서 확인 버튼을 눌렀을 때만, 별도 작업으로).
