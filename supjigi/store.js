@@ -2,7 +2,7 @@
 /* 서점: 오늘 · 매출 분석 · 재고/주문 · 순위 · 반품 · 자료/설정 */
 const yms=()=>[...new Set(sales().map(d=>d.ym))].sort();
 function agg(br,list){const r={amt:0,qty:0,cats:{},mon:{},dow:[0,0,0,0,0,0,0],dowN:[0,0,0,0,0,0,0],top:{}};
-  sales().filter(d=>(br==='all'||d.br===br)&&list.includes(d.ym)).forEach(d=>{let m=0;Object.entries(d.days||{}).forEach(([dd,v])=>{m+=v;const w=pd(d.ym+'-'+dd).getDay();r.dow[w]+=v;r.dowN[w]++});
+  sales().filter(d=>(br==='all'||d.br===br)&&list.includes(d.ym)).forEach(d=>{let m=0;Object.entries(d.days||{}).forEach(([dd,v])=>{m+=v;const w=pd(d.ym+'-'+dd).getDay();r.dow[w]+=v;r.dowN[w]++});if(!m)m=d.amt||0;
     r.mon[d.ym]=(r.mon[d.ym]||0)+m;r.amt+=m;Object.entries(d.cats||{}).forEach(([c,o])=>{const g=grp(c),t=r.cats[g]=r.cats[g]||{amt:0,qty:0};t.amt+=o.amt||0;t.qty+=o.qty||0;r.qty+=o.qty||0});
     (d.top||[]).forEach(x=>{const k=x.isbn||nt(x.t),o=r.top[k]=r.top[k]||{t:x.t,a:x.a,p:x.p,cat:x.cat,qty:0,amt:0,by:{}};o.qty+=x.qty||0;o.amt+=x.amt||0;o.by[d.br]=(o.by[d.br]||0)+(x.qty||0)})});return r}
 function period(){const all=yms(),n=S.ui.per||all.length;return{cur:all.slice(-n),prev:all.slice(-2*n,-n),all}}
@@ -12,7 +12,7 @@ const stPill=(it)=>!it||!(it.stock>0)?'<span class="pill p-none">없음</span>':
 
 V.store.today=()=>{const brs=S.br==='all'?BR:BR.filter(b=>b.k===S.br),cm=TODAY.slice(0,7),yd=addDays(TODAY,-1),an=anomalies(S.br),hk=hooks(30);
   return `<div class="sec"><h2>${mdw(TODAY)} 오늘</h2><p>${brN(S.br)} · 어제까지의 판매와 오늘 할 일</p></div>
-  <div class="grid g4">${brs.map(b=>{const d=sales().find(x=>x.br===b.k&&x.ym===cm),ydv=sales().find(x=>x.br===b.k&&x.ym===yd.slice(0,7)),mt=d?Object.values(d.days||{}).reduce((a,v)=>a+v,0):null,yv=ydv?(ydv.days||{})[yd.slice(8)]:null,nd=needs(b.k).length,c=cart(b.k);
+  <div class="grid g4">${brs.map(b=>{const d=sales().find(x=>x.br===b.k&&x.ym===cm),ydv=sales().find(x=>x.br===b.k&&x.ym===yd.slice(0,7)),mt=d?(Object.values(d.days||{}).reduce((a,v)=>a+v,0)||d.amt||0):null,yv=ydv?(ydv.days||{})[yd.slice(8)]:null,nd=needs(b.k).length,c=cart(b.k);
     return `<div class="card kpi" style="border-top:4px solid ${b.c}"><h3>${b.n}</h3><span>어제 매출</span><b class="num">${yv!=null?won(yv)+'원':'—'}</b><small>${+cm.slice(5)}월 누적 ${mt!=null?man(mt)+'원':'자료 없음'}</small>
      <div class="btns" style="margin-top:10px"><span class="pill ${nd?'p-low':'p-ok'}">주문 필요 ${nd}종</span><span class="pill ${c.items.length?'p-info':'p-mute'}">${c.items.length?`담은 주문 ${c.items.length}종 · ${esc(c.status||'담음')}`:'담은 주문 없음'}</span></div></div>`}).join('')}</div>
   <div class="grid g2"><div class="card"><h3>오늘 순서 <small>위에서부터 하면 됩니다</small></h3><ol class="steps">
@@ -41,7 +41,7 @@ V.store.ana=()=>{const P=period();if(!P.all.length)return `<div class="card empt
     per.forEach(x=>{const g=gs.slice().sort((a,b)=>share(x,b)-share(x,a))[0];if(g&&x.a.amt)ins.push(`${x.b.n}: ${g} 비중이 ${Math.round(share(x,g)*100)}%로 가장 높습니다.`)})}
   else{const me=per.find(x=>x.b.k===S.br),oth=per.filter(x=>x.b.k!==S.br),avg=oth.reduce((a,x)=>a+x.a.amt,0)/Math.max(1,oth.length);ins.push(`${me.b.n}은 4개 지점 가운데 매출 ${rank.indexOf(me)+1}위이고, 다른 지점 평균의 ${avg?Math.round(me.a.amt/avg*100):0}% 수준입니다.`);
     gs.forEach(g=>{const m=share(me,g),o=oth.reduce((a,x)=>a+share(x,g),0)/Math.max(1,oth.length);if(Math.abs(m-o)>=.05)ins.push(`${g} 비중 ${Math.round(m*100)}% — 다른 지점 평균(${Math.round(o*100)}%)보다 ${m>o?'높습니다':'낮습니다'}.`)})}
-  return `<div class="sec"><h2>매출 분석</h2><p>${brN(S.br)} · ${ymL(P.cur[0])}~${ymL(P.cur[P.cur.length-1])}</p>
+  return `<div class="sec"><h2>매출 분석</h2><p>${brN(S.br)} · ${ymL(P.cur[0])}~${ymL(P.cur[P.cur.length-1])}${!isDemo()&&SEED.asOf?' · '+esc(SEED.asOf):''}</p>
     <div class="chips" style="margin-left:auto">${[[1,'최근 1개월'],[3,'3개월'],[6,'6개월'],[0,'전체']].map(([n,l])=>`<button class="chip" data-a="ui" data-k="per" data-v="${n}" aria-pressed="${(S.ui.per||0)===n}">${l}</button>`).join('')}</div></div>
   <div class="grid g4"><div class="card kpi"><span>매출</span><b class="num">${man(cur.amt)}원</b><small>앞 기간 대비 ${delta(cur.amt,prev.amt)||'—'}</small></div>
    <div class="card kpi"><span>판매 권수</span><b class="num">${won(cur.qty)}권</b><small>${delta(cur.qty,prev.qty)||'—'}</small></div>
@@ -53,7 +53,8 @@ V.store.ana=()=>{const P=period();if(!P.all.length)return `<div class="card empt
   <div class="grid g2"><div class="card"><h3>분야별 매출 <small>${brN(S.br)}</small></h3>${gs.map(g=>{const o=cur.cats[g]||{amt:0,qty:0},p=(prev.cats[g]||{}).amt;return hbar(g,o.amt,gmx,`${man(o.amt)} ${delta(o.amt,p)}`,'',`${g} · ${won(o.amt)}원 · ${won(o.qty)}권`)}).join('')}<p class="note" style="margin-top:8px">문학 · 인문 · 예술 · 과학 밖의 분야는 「기타」로 묶습니다.</p></div>
    <div class="card"><h3>분야 × 지점 <small>지점 안에서 차지하는 비중</small></h3><div class="tw"><table class="heat"><tr><th>분야</th>${BR.map(b=>`<th class="r">${b.n}</th>`).join('')}</tr>
     ${gs.map(g=>`<tr><td>${g}</td>${per.map(x=>{const s=share(x,g);return `<td class="c" style="background:color-mix(in srgb,var(--pine) ${Math.round(s*90)}%,transparent);${s>.45?'color:var(--pine-ink)':''}" data-tip="${x.b.n} ${g} · ${won((x.a.cats[g]||{}).amt||0)}원">${x.a.amt?Math.round(s*100)+'%':'—'}</td>`}).join('')}</tr>`).join('')}</table></div></div></div>
-  <div class="grid g2"><div class="card"><h3>요일별 하루 평균</h3>${[1,2,3,4,5,6,0].map(i=>{const v=cur.dowN[i]?cur.dow[i]/cur.dowN[i]:0;return hbar(WD[i],v,dmx,man(v),'',`${WD[i]}요일 하루 평균 ${won(v)}원`)}).join('')}</div>
+  ${cur.dowN.some(n=>n)||top.length?'':`<p class="note">지금 자료는 월 · 분류 합계까지입니다. 요일별 흐름과 책별 판매는 날짜 · 책 단위 자료가 들어오면 채워집니다.</p>`}
+  <div class="grid g2" ${cur.dowN.some(n=>n)||top.length?'':'hidden'}><div class="card"><h3>요일별 하루 평균</h3>${[1,2,3,4,5,6,0].map(i=>{const v=cur.dowN[i]?cur.dow[i]/cur.dowN[i]:0;return hbar(WD[i],v,dmx,man(v),'',`${WD[i]}요일 하루 평균 ${won(v)}원`)}).join('')}</div>
    <div class="card"><h3>많이 팔린 책 <small>기간 합계</small></h3><div class="tw"><table><tr><th>책</th><th class="r">권수</th>${S.br==='all'?BR.map(b=>`<th class="r">${b.n}</th>`).join(''):'<th class="r">매출</th>'}</tr>
     ${top.map(x=>`<tr><td>${esc(x.t)}<small>${esc([x.a,grp(x.cat)].filter(Boolean).join(' · '))}</small></td><td class="r"><b>${x.qty}</b></td>${S.br==='all'?BR.map(b=>`<td class="r">${x.by[b.k]||'·'}</td>`).join(''):`<td class="r">${man(x.amt)}</td>`}</tr>`).join('')||'<tr><td colspan="6" class="empty">책별 판매 기록이 없습니다.</td></tr>'}</table></div></div></div>`};
 

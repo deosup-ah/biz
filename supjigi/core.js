@@ -127,6 +127,7 @@ function render(){if(S.locked)return;const m=S.mode,v=V[m][S.view[m]]?S.view[m]:
    <nav class="tabs">${TABS[m].map(([k,l])=>`<button data-a="go" data-v="${k}" ${v===k?'aria-current="page"':''}>${l}${k==='today'&&al?`<span class="b">${al}</span>`:''}${k==='stock'&&cn?`<span class="b" style="background:var(--pine)">${cn}</span>`:''}</button>`).join('')}</nav></header>
    <main>${!S.loaded?`<div class="card empty">자료를 불러오는 중입니다…</div>`:''}${S.slow?`<div class="al">저장된 자료에 아직 닿지 못했습니다. 보이는 내용이 최신이 아닐 수 있습니다.</div>`:''}
    ${S.solo?`<div class="al" style="border-color:var(--info);background:var(--info-soft)">공개 주소로 여셨습니다. 담은 주문 · 일정 · 배치도는 <b>이 기기에만</b> 저장되고, 추천 기능(큐레이션 · 문구 · 기획 · 사진 읽기)은 Claude 안의 숲지기에서만 됩니다.</div>`:''}
+   ${m==='store'&&!isDemo()&&!realStock().length&&v==='stock'?`<div class="al">재고 자료가 아직 없어 주문 필요 계산은 비어 있습니다. 매출은 실제 숫자입니다.</div>`:''}
    ${m==='store'&&isDemo()&&['today','ana','stock'].includes(v)?`<div class="demo"><span><b>예시 자료입니다.</b> 실제 매출 · 재고가 아닙니다. 이지정보에서 내보낸 엑셀을 「자료 · 설정」에 올리면 진짜 숫자로 바뀝니다.</span><button class="btn sm" data-a="go" data-v="data">자료 올리러 가기</button></div>`:''}
    ${V[m][v]()}</main>`;
   window.scrollTo(sx,sy);if(AFTER[v])AFTER[v]()}
