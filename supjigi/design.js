@@ -17,12 +17,12 @@ function wrap(text,font,size,maxW,maxLines,weight){const out=[];String(text||'')
       if(line.trim()){out.push(line.trim());line=''}let w=tok.trim();while(w.length>1&&mw(w,font,size,weight)>maxW){let i=w.length;while(i>1&&mw(w.slice(0,i),font,size,weight)>maxW)i--;out.push(w.slice(0,i));w=w.slice(i)}line=w}
     if(line.trim())out.push(line.trim())});return maxLines&&out.length>maxLines?out.slice(0,maxLines-1).concat(out[maxLines-1]+'…'):out}
 function fit(text,font,size,maxW,maxLines,min,weight){let s=size,l=wrap(text,font,s,maxW,0,weight);while(l.length>maxLines&&s>min){s*=.93;l=wrap(text,font,s,maxW,0,weight)}return{s,l:l.slice(0,maxLines)}}
-function layout(D){const pr=[],brand='더숲 '+(BRAND[D.br]||brN(!D.br||D.br==='all'?'aka':D.br));
+function layout(D){const pr=[],brand=BP(D.br)+(BRAND[D.br]||brN(!D.br||D.br==='all'?'aka':D.br));
   const T=(x,y,txt,size,o={})=>pr.push({k:'t',x,y,txt:String(txt),size,font:o.font||SANS,fill:o.fill||'#111',anchor:o.anchor||'start',weight:o.weight||500,ls:o.ls||0});
   const R=(x,y,w,h,fill,o={})=>pr.push({k:'r',x,y,w,h,fill,...o});
   const O=(x,y,rx,ry,fill,o={})=>pr.push({k:'o',x,y,rx,ry,fill,...o});
   /* 로고: 받은 그림 그대로. 밝은 바탕은 검정 · 짙은 초록, 어두운 바탕은 흰색 */
-  const LOGO=(x,y,size,dark,anchor,kind)=>{const kd=kind||D.logo||'plain',h=size*(kd==='book'?1.75:1.2),w=h*LOGOS[kd],x0=anchor==='end'?x-w:anchor==='middle'?x-w/2:x;pr.push({k:'i',src:(kd==='book'?'logob-':'logo-')+(dark?'w':D.lc==='k'?'k':'g'),x:x0,y:y-h*(kd==='book'?.56:.8),w,h});return w};
+  const LOGO=(x,y,size,dark,anchor,kind)=>{if(NM(D.br)){const nm='노원문고',fs=size*.95,tw=mw(nm,SANS,fs,800);T(x,y,nm,fs,{fill:dark?'#ffffff':D.lc==='k'?'#111111':'#003128',weight:800,anchor:anchor||'start'});return tw}const kd=kind||D.logo||'plain',h=size*(kd==='book'?1.75:1.2),w=h*LOGOS[kd],x0=anchor==='end'?x-w:anchor==='middle'?x-w/2:x;pr.push({k:'i',src:(kd==='book'?'logob-':'logo-')+(dark?'w':D.lc==='k'?'k':'g'),x:x0,y:y-h*(kd==='book'?.56:.8),w,h});return w};
   const SYM=(key,cx,cy,r,ac,fg,halo)=>{if(!ICON[key])return;if(halo!==false)O(cx,cy,r*1.25,r*1.25,ac,{op:.22});pr.push({k:'p',d:ICON[key],x:cx-r,y:cy-r,s:r/12,stroke:fg,sw:Math.max(.25,r*.085)})};
   if(D.kind==='band'){const w=420,h=297,n=8,sh=h/n,ph=(D.phrases||'').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,4);if(!ph.length)ph.push('문구를 한 줄에 하나씩 적어 주세요');
     for(let i=0;i<n;i++){const j=Math.min(ph.length-1,Math.floor(i*ph.length/n)),P=BANDC[((D.pals||[])[j]??(D.pal+j))%BANDC.length],key=(D.syms||[])[j]||(D.sym&&D.sym!=='none'?D.sym:MOTIF[(j*3)%13][0]),y=i*sh,cy=y+sh/2;R(0,y,w,sh,P.a,{fill2:P.b});
@@ -105,7 +105,7 @@ V.store.design=()=>{if(!S.ui.D&&S.mode==='store'){try{const br=curBr(),t=(corner
     <div class="card form"><div class="btns" style="flex-wrap:nowrap">${canMic()?`<button class="btn mic ${S.ui.mic?'on':''}" data-a="dMic" aria-label="말로 고치기" title="말로 고치기">${S.ui.mic?'듣는 중…':'말하기'}</button>`:''}<input type="text" id="dchat" placeholder="예: 제목 더 크게 · 색 밤으로 · 가로로"><button class="btn pri" data-a="dChatGo">고치기</button></div>
      ${log.length?`<p class="note" id="dlog">${esc(log[log.length-1].t)}</p>`:`<div class="chips">${['느낌 바꿔','제목 더 크게','색 바꿔','그림 바꿔','가로로'].map(t=>`<button class="chip" data-a="dChatQ" data-t="${t}">${t}</button>`).join('')}</div>`}</div></div>
    <div class="card form"><div class="chips">${KINDS.map(([v,l])=>`<button class="chip" data-a="dKind" data-k="${v}" aria-pressed="${k===v}">${l}</button>`).join('')}</div>
-    <div class="chips">${BR.map(b=>`<button class="chip" data-a="dBr" data-k="${b.k}" aria-pressed="${D.br===b.k}">${BRAND[b.k]}</button>`).join('')}</div>
+    <div class="chips">${BR.map(b=>`<button class="chip" data-a="dBr" data-k="${b.k}" aria-pressed="${D.br===b.k}">${NM(b.k)?'노원문고 ':''}${BRAND[b.k]}</button>`).join('')}</div>
     ${main}
     <details data-o="dmore" ${S.ui.o_dmore?'open':''}><summary>더 고치기 <small>크기 · 그림 · 색 · 로고${k==='pop'?' · 책 상자':''}</small></summary><div class="form" style="margin-top:12px">${more}</div></details></div></div>`};
 V.aka.design=V.store.design;
@@ -115,7 +115,7 @@ document.addEventListener('input',e=>{const el=e.target.closest&&e.target.closes
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='dchat'){e.preventDefault();A.dChatGo()}});
 A.dKind=d=>{const D=S.ui.D;D.kind=d.k;D.size=0;D.pal=0;if(d.k==='band'&&!D.phrases)D.phrases=(D.head||'').replace(/\n/g,' ');if(d.k==='list'&&!D.list&&(D.books||[]).length)D.list=D.books.map(b=>`${b.t} | ${[b.a,b.p].filter(Boolean).join(' · ')} | ${b.why||''}`).join('\n');render()};
 A.dPick=d=>{S.ui.D[d.k]=+d.v;if(d.k==='pal')S.ui.D.pals=[];render()};A.dStr=d=>{S.ui.D[d.k]=d.v;render()};A.dSym=d=>{S.ui.D.sym=d.k;S.ui.D.syms=[];render()};
-A.dBr=d=>{const D=S.ui.D;if(!D.tag||Object.values(BRAND).includes(D.tag)||/^더숲 /.test(D.tag))D.tag=D.kind==='list'?'더숲 '+BRAND[d.k]:BRAND[d.k];D.br=d.k;render()};
+A.dBr=d=>{const D=S.ui.D;if(!D.tag||Object.values(BRAND).includes(D.tag)||/^(더숲|노원문고) /.test(D.tag))D.tag=D.kind==='list'?BP(d.k)+BRAND[d.k]:BRAND[d.k];D.br=d.k;render()};
 A.dSt=d=>{S.ui.D.st=+d.v;render()};
 A.dLand=d=>{S.ui.D.land=d.v==='1';render()};
 A.dNew=()=>{S.ui.D=defD();S.ui.dlog=[];render()};

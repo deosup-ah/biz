@@ -1,7 +1,8 @@
 'use strict';
 /* 숲지기 — 공통: 상태 · 저장 · 잠금 · 머리줄 · 도우미 */
 const PIN_HASH='29034ea8787d9397e8532aaafed1d44c7fb23fc664eaa4f5e5e51a669db408ec';
-const BR=[{k:'aka',n:'아카',c:'var(--s1)'},{k:'choso',n:'초소',c:'var(--s2)'},{k:'sojeon',n:'소전',c:'var(--s3)'},{k:'nowon',n:'노원더숲',c:'var(--s4)'}];
+const BR=[{k:'aka',n:'아카',c:'var(--s1)'},{k:'choso',n:'초소',c:'var(--s2)'},{k:'sojeon',n:'소전',c:'var(--s3)'},{k:'nowon',n:'노원더숲',c:'var(--s4)'},{k:'nmain',n:'노원문고 본점',c:'var(--s5)'},{k:'njung',n:'노원문고 중계',c:'var(--s6)'}];
+const NM=br=>br==='nmain'||br==='njung',BP=br=>NM(br)?'노원문고 ':'더숲 ';
 const brN=k=>k==='all'?'전체':(BR.find(b=>b.k===k)||{}).n||k;
 const brC=k=>(BR.find(b=>b.k===k)||{}).c||'var(--pine)';
 const GR=['문학','인문','예술','과학','기타'];
@@ -68,7 +69,7 @@ const DT=[['가호','무라카미 하루키','문학동네','소설',16800],['�
  ['방구석 미술관','조원재','블랙피쉬','미술',16800],['건축가의 도시','이규빈','샘터','건축',18000],['사진의 용도','아니 에르노','1984Books','사진',15000],
  ['트렌드 코리아 2027','김난도 외','미래의창','경제경영',21000],['루이&후이 보물 같은 나날들','류정훈','한스미디어','취미',22000],['가짜 돈 진짜 부','박종훈','글로퍼스','경제경영',21000]];
 function rng(seed){let s=seed>>>0;return()=>(s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296}
-let _demo;function demo(){if(_demo)return _demo;const sales=[],stock=[];const W={aka:[.42,.27,.12,.09,.10],choso:[.55,.2,.14,.04,.07],sojeon:[.3,.22,.08,.12,.28],nowon:[.36,.3,.07,.11,.16]},SC={aka:1,choso:.78,sojeon:.46,nowon:.62};
+let _demo;function demo(){if(_demo)return _demo;const sales=[],stock=[];const W={aka:[.42,.27,.12,.09,.10],choso:[.55,.2,.14,.04,.07],sojeon:[.3,.22,.08,.12,.28],nowon:[.36,.3,.07,.11,.16],nmain:[.3,.2,.06,.1,.34],njung:[.3,.2,.06,.1,.34]},SC={aka:1,choso:.78,sojeon:.46,nowon:.62,nmain:1.6,njung:.9};
   const t=pd(TODAY),months=[];for(let i=5;i>=0;i--){const d=new Date(t.getFullYear(),t.getMonth()-i,1);months.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'))}
   BR.forEach((b,bi)=>{const r=rng(77+bi*13);months.forEach((ym,mi)=>{const [y,m]=ym.split('-').map(Number),nd=new Date(y,m,0).getDate(),days={};let tot=0;
       for(let d=1;d<=nd;d++){const ds=ym+'-'+String(d).padStart(2,'0');if(ds>=TODAY)break;const w=pd(ds).getDay();const v=Math.round((260000+r()*240000)*SC[b.k]*(w===0||w===6?1.7:1)*(1+mi*.035)/100)*100;days[String(d).padStart(2,'0')]=v;tot+=v}

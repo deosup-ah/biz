@@ -1,7 +1,7 @@
 'use strict';
 /* 큐레이션: 때 · 계절 · 날씨에 맞춘 코너 제안 → 지점 성격 → 들여놓을 책. 계산으로만 돌아가서 어디서 열어도 같다.
    품절 · 절판으로 표시된 책(window.SOLD)은 어디에도 내지 않는다. */
-const BRAND={aka:'사유의숲',choso:'초소책방',sojeon:'소전미술관',nowon:'노원'};
+const BRAND={aka:'사유의숲',choso:'초소책방',sojeon:'소전미술관',nowon:'노원',nmain:'본점',njung:'중계점'};
 const RC={문학:'문학',에세이:'문학',인문:'인문',예술:'예술',과학:'과학'};
 const TLAB=['오전(12시 이전)','점심 뒤(12~15시)','오후(15~18시)','저녁(18시 이후)'];
 const sellable=b=>!(b&&b.isbn&&(window.SOLD||{})[b.isbn]);
@@ -52,7 +52,7 @@ const isbnChip=b=>b.isbn?`<button class="chip num" data-a="cp" data-t="${b.isbn}
 const symSVG=(key,pal)=>{const P=BANDC[pal]||BANDC[1];return `<svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true" style="flex:none"><rect width="64" height="64" rx="14" fill="${P.a}"/><circle cx="32" cy="32" r="21" fill="${P.ac}" opacity=".25"/><path d="${ICON[key]||''}" transform="translate(14 14) scale(1.5)" fill="none" stroke="${P.fg}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`};
 V.store.cur=()=>{const br=S.br;if(S.solo)loadWx();
   if(br==='all')return `<div class="hero"><p>${hooks(1).season}</p><h2>어느 책방을 볼까요</h2></div>
-   <div class="grid g4">${BR.map(b=>{const P=profile(b.k);return `<button class="card pick" data-a="br" data-k="${b.k}" style="border-top:4px solid ${b.c}"><b>${BRAND[b.k]}</b><small>${b.n} · ${P.amt?`${P.order[0]} ${Math.round(P.sh[P.order[0]]*100)}%`:'자료 없음'}</small></button>`}).join('')}</div>`;
+   <div class="grid g4">${BR.map(b=>{const P=profile(b.k);return `<button class="card pick" data-a="br" data-k="${b.k}" style="border-top:4px solid ${b.c}"><b>${NM(b.k)?'노원문고 ':''}${BRAND[b.k]}</b><small>${b.n} · ${P.amt?`${P.order[0]} ${Math.round(P.sh[P.order[0]]*100)}%`:'자료 없음'}</small></button>`}).join('')}</div>`;
   const C=corners(br),X=C.X,P=X.P;S.ui.cor=C.all;const hk=hooks(21).list.filter(h=>!h.ev).slice(0,2).map(h=>`${h.label.replace(/\(.*?\)/g,'')} ${dday(h.date)}`);
   const lackN=t=>t.books.slice(0,5).filter(b=>b.src!=='재고').length,thumb=(t,i)=>{try{return `<button class="pthumb" data-a="toDesign" data-kind="pop" data-s="c" data-i="${i}" aria-label="POP 미리보기">${toSVG(layout(mkD({...t,br},'pop')))}</button>`}catch(e){return symSVG(t.sym,t.bpal)}};
   const card=(t,i)=>`<div class="card pcard"><div class="phead">${thumb(t,i)}<div><h3>${esc(t.title)}</h3><p>${esc(t.hook)}</p></div></div>

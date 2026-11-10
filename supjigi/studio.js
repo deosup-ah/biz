@@ -58,7 +58,7 @@ A.curDel=d=>del('curations',d.i);
 A.curOrder=d=>{const t=getTheme(d),br=t.br||S.br;if(br==='all'){toast('지점을 먼저 고르세요');return}const its=items(br);let n=0;(t.books||[]).forEach(b=>{const it=its.find(x=>nt(x.t)===nt(b.t));if(!it||!(it.stock>0)){addCart(br,{t:b.t,a:b.a,p:b.p,isbn:(it||{}).isbn,price:(it||{}).price},2,'큐레이션: '+t.title);n++}});toast(n?`${n}종을 ${brN(br)} 북센 주문에 담았습니다`:'모두 매장에 있습니다')};
 function mkD(t,k){const b=(t.books||[])[0]||{},D=Object.assign(defD(),{kind:k,br:t.br||curBr(),sym:t.sym||'none',books:(t.books||[]).map(x=>({t:x.t,a:x.a,p:x.p,why:x.why}))});D.tag=BRAND[D.br]||D.tag;
   if(k==='band'){D.phrases=t.band||(t.pop||{}).head||t.title||'';if(t.bpal!=null){D.pal=t.bpal;D.pals=[t.bpal]}if(t.sym)D.syms=[t.sym]}
-  else if(k==='list'){D.head=t.title||'이 평대의 책';D.body=t.hook||'';D.tag='더숲 '+(BRAND[D.br]||'');D.list=D.books.map(x=>`${x.t} | ${[x.a,x.p].filter(Boolean).join(' · ')} | `).join('\n')}
+  else if(k==='list'){D.head=t.title||'이 평대의 책';D.body=t.hook||'';D.tag=BP(D.br)+(BRAND[D.br]||'');D.list=D.books.map(x=>`${x.t} | ${[x.a,x.p].filter(Boolean).join(' · ')} | `).join('\n')}
   else if(k==='shelf'){D.head=t.title||'';D.body=t.hook||'';if(t.ppal!=null)D.pal=t.ppal}
   else{D.head=(t.pop||{}).head||t.title||'';D.body=(t.pop||{}).body||'';if(t.ppal!=null)D.pal=t.ppal}
   if(k==='pop'){D.st=FEEL[t.sym]??(D.pal===2?1:0);if(b.t&&!D.book){D.book=b.t;D.author=[b.a,b.p].filter(Boolean).join(' · ')}}return D}
