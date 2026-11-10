@@ -120,9 +120,9 @@ A.lock=()=>{S.locked=true;pin='';try{sessionStorage.removeItem('sj.p')}catch(e){
 document.addEventListener('keydown',e=>{if(!S.locked)return;if(/^\d$/.test(e.key))A.pin({n:e.key});else if(e.key==='Backspace')A.pin({n:'x'})});
 
 /* 머리줄 · 그리기 */
-function render(){if(S.locked)return;if(S.view.store==='today'&&!S.ui.seenToday){}const m=S.mode,v=V[m][S.view[m]]?S.view[m]:TABS[m][0][0],tv=TABS[m].some(t=>t[0]===v)?v:(m==='aka'&&typeof GRP!=='undefined'&&GRP[v])||'more';const al=m==='store'?anomalies('all').length:0,cn=BR.reduce((a,b)=>a+cart(b.k).items.length,0);
+function render(){if(S.locked)return;try{sessionStorage.setItem('sj.view',JSON.stringify(S.view))}catch(e){}if(S.view.store==='today'&&!S.ui.seenToday){}const m=S.mode,v=V[m][S.view[m]]?S.view[m]:TABS[m][0][0],tv=TABS[m].some(t=>t[0]===v)?v:(m==='aka'&&typeof GRP!=='undefined'&&GRP[v])||'more';const al=m==='store'?anomalies('all').length:0,cn=BR.reduce((a,b)=>a+cart(b.k).items.length,0);
   const sx=window.scrollX,sy=window.scrollY;
-  $('app').innerHTML=`<header class="top"><div class="bar"><div class="brand"><img class="blogo" src="logo-g.png" alt="deosup" height="20"><span>워크룸</span></div>
+  $('app').innerHTML=`<header class="top"><div class="bar"><button class="brand" data-a="home" title="첫 화면으로" aria-label="첫 화면으로"><img class="blogo" src="logo-g.png" alt="deosup" height="20"><span>워크룸</span></button><button class="homeb" data-a="home" aria-label="홈" title="홈"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg><span>홈</span></button>
     <div class="mode" role="group" aria-label="일 고르기"><button data-a="mode" data-m="aka" aria-pressed="${m==='aka'}">아카데미</button><button data-a="mode" data-m="store" aria-pressed="${m==='store'}">서점</button></div>
     </div>
    ${m==='store'?`<div class="row2" role="group" aria-label="지점 고르기">${[{k:'all',n:'전체'},...BR].map(b=>`<button class="brchip" data-a="br" data-k="${b.k}" aria-pressed="${S.br===b.k}">${b.c?`<i style="background:${b.c}"></i>`:''}${b.n}</button>`).join('')}</div>`:''}
@@ -133,9 +133,11 @@ function render(){if(S.locked)return;if(S.view.store==='today'&&!S.ui.seenToday)
    ${m==='store'&&isDemo()&&['today','ana','stock'].includes(v)?`<div class="demo"><span><b>예시 자료입니다.</b> 실제 매출 · 재고가 아닙니다. 이지정보에서 내보낸 엑셀을 「자료 · 설정」에 올리면 진짜 숫자로 바뀝니다.</span><button class="btn sm" data-a="go" data-v="data">자료 올리러 가기</button></div>`:''}
    ${V[m][v]()}</main>`;
   window.scrollTo(sx,sy);if(AFTER[v])AFTER[v]()}
-A.mode=d=>{if(d.m!==S.mode){S.ui['D_'+S.mode]=S.ui.D;S.ui.D=S.ui['D_'+d.m]||null;S.ui.dH=[];S.ui.dlog=[]}S.mode=d.m;ls.set('mode2',d.m);window.scrollTo(0,0);render()};
+A.mode=d=>{if(d.m!==S.mode){S.ui['D_'+S.mode]=S.ui.D;S.ui.D=S.ui['D_'+d.m]||null;S.ui.dH=[];S.ui.dlog=[]}S.mode=d.m;if(!S.view[d.m]||!TABS[d.m])S.view[d.m]=TABS[d.m][0][0];try{sessionStorage.setItem('sj.mode',d.m)}catch(e){}window.scrollTo(0,0);render()};
 A.br=d=>{S.br=d.k;ls.set('br',d.k);render()};
-A.go=d=>{if(d.m)S.mode=d.m;S.view[S.mode]=d.v;ls.set('view',S.view);window.scrollTo(0,0);render()};
+const ss={get(k,d){try{const v=sessionStorage.getItem('sj.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{sessionStorage.setItem('sj.'+k,JSON.stringify(v))}catch(e){}}};
+A.home=()=>{S.view[S.mode]=TABS[S.mode][0][0];ss.set('view',S.view);window.scrollTo(0,0);render()};
+A.go=d=>{if(d.m)S.mode=d.m;S.view[S.mode]=d.v;ss.set('view',S.view);window.scrollTo(0,0);render()};
 A.big=()=>{const b=document.body.classList.toggle('big');ls.set('big',b);render()};
 A.ui=d=>{S.ui[d.k]=isNaN(+d.v)||d.v===''?d.v:+d.v;if(d.k==='per'){S.ui.pf=S.ui.pt=null}render()};
 document.addEventListener('click',e=>{if(e.target.id==='sheet'){closeSheet();return}const el=e.target.closest('[data-a]');if(el&&A[el.dataset.a])A[el.dataset.a](el.dataset,el,e)});
@@ -143,7 +145,7 @@ document.addEventListener('toggle',e=>{const k=e.target&&e.target.dataset&&e.tar
 document.addEventListener('change',e=>{const el=e.target.closest('[data-c]');if(el&&C[el.dataset.c])C[el.dataset.c](el,el.dataset)});
 document.addEventListener('mousemove',e=>{const el=e.target.closest&&e.target.closest('[data-tip]'),t=$('tip');if(!el){t.style.display='none';return}t.textContent=el.dataset.tip;t.style.display='block';t.style.left=Math.min(e.clientX+12,innerWidth-250)+'px';t.style.top=e.clientY+14+'px'});
 
-function boot(){S.mode=ls.get('mode2','aka');S.br=ls.get('br','all');S.view=Object.assign(S.view,ls.get('view',{}));if(ls.get('big',false))document.body.classList.add('big');
+function boot(){S.mode=(()=>{try{return sessionStorage.getItem('sj.mode')||'aka'}catch(e){return 'aka'}})();S.br=ls.get('br','all');S.view=(()=>{try{const v=JSON.parse(sessionStorage.getItem('sj.view')||'null');return v&&typeof v==='object'?v:{}}catch(e){return {}}})();if(ls.get('big',false))document.body.classList.add('big');
   let sp='';try{sp=sessionStorage.getItem('sj.p')||''}catch(e){}if(/^\d{4}$/.test(sp)){pin=sp;lockUI();tryPin()}else lockUI();
   if(!(window.claude&&window.claude.use)){S.solo=true;const o=ls.get('db',null);if(o)COLS.forEach(c=>{if(Array.isArray(o[c]))S.db[c]=o[c]});S.loaded=true;render();return}
   render();Promise.all(['db','user','sample','downloads','dictation'].map(n=>window.claude.use(n).catch(()=>null))).then(([d,u,a,l,dc])=>{DB=d;USER=u;AI=a;DL=l;DICT=dc;if(DICT){try{DICT.onFinal(({text})=>{micHeard(text);DICT.stop().catch(()=>{})});DICT.onState(({state})=>{const on=state==='listening';if(S.ui.mic!==on){S.ui.mic=on;render()}})}catch(e){DICT=null}}if(DB)subscribe();else{S.solo=true;S.loaded=true}render()});
