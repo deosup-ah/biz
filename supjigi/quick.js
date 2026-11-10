@@ -233,3 +233,27 @@ function ideaPolish(D,w){const T=topicsOf(w)[0],full=w.replace(/\s+/g,' ').trim(
 (()=>{const f=noticeLocal;noticeLocal=function(v){const D=f(v),po=s=>s.replace(/닫아요|닫음/g,'닫습니다').replace(/쉬어요|쉼(?=$|[.\s])/g,'쉽니다').replace(/열어요|엶/g,'엽니다').replace(/해요(?=$|[.\s])/g,'합니다').replace(/돼요|되요/g,'됩니다').replace(/있어요/g,'있습니다').replace(/없어요/g,'없습니다').replace(/이에요|예요/g,'입니다').replace(/하지\s*마(세요)?(?=$|[.\s])/g,'삼가 주세요').replace(/금지(?=$|[.\s])/g,'삼가 주세요').trim();D.head=po(D.head);D.body=po(D.body);return D}})();
 A.akDp=()=>{let L=[];try{L=corners('aka').all||[]}catch(e){}const i=L.findIndex(t=>t.title===S.ui.akT);if(i<0){toast('주제를 먼저 골라 주세요');return}S.ui.cor=L;A.dpOpen({i})};
 (()=>{const f=A.akThm;A.akThm=d=>{const T=akThemes(),t=T[+d.i];if(t&&T.filter(x=>x.tone===t.tone).indexOf(t)>=8)S.ui.akAll=1;if(t)S.ui.akTn=t.tone;f(d)}})();
+
+/* ── 진열 방법 더하기: 계단 · 한 줄 · 둥글게 · 대칭 · 탑 하나 · 짝지어 ── */
+DMOOD.push('계단처럼','한 줄로','둥글게','대칭으로','탑 하나','짝지어');
+(()=>{const g=dpPlan,h=shelfPlan;shelfPlan=function(t,m){return h(t,(m|0)%3)};
+ dpPlan=function(t,mode){const md=mode==null?(S.ui.dpM||0):mode;if(md<3)return g(t,md);
+  const B=(t.books||[]).slice(0,S.ui.dpCap||8),n=B.length,it=[{k:'table'}],rows=[],bw=150,bd=210,th=20;
+  const put=(i,x,y,q,pl,face)=>{x=Math.round(Math.max(20,Math.min(730,x)));y=Math.round(Math.max(face?250:60,Math.min(670,y)));if(face)it.push({k:'face',x,y:y-235,c:DPC[i%6],n:i+1});it.push({k:'stack',x,y,w:bw,d:bd,h:q*th,c:DPC[i%6],n:i+1});rows.push({n:i+1,b:B[i],place:pl,qty:q+(face?1:0)})};
+  let tips=[],need=['A5 POP 꽂이 1개'],pop=[345,40];
+  if(md===3){const cols=n<=4?2:3,R=Math.ceil(n/cols),gx=cols===2?[200,550]:[90,375,660],gy=R<=1?[420]:R===2?[300,600]:[200,430,660];B.forEach((b,i)=>{const r=Math.floor(i/cols),c=i%cols,q=Math.max(1,(R-r)*2+(R===1?1:0));put(i,gx[c],gy[r],q,`${['뒷줄','가운뎃줄','앞줄'][R===1?2:R===2?r*2:r]} ${c+1}번째 · ${q}권`,r===0&&R>1)});
+    tips=['뒷줄을 가장 높게, 앞으로 올수록 낮게. 어디서 봐도 모든 표지가 보입니다.','뒷줄은 한 권씩 세워 얼굴을 보여 줍니다.','줄과 줄 사이는 손이 들어갈 만큼 띄웁니다.'];need=['북엔드 '+Math.min(4,cols)+'개','A5 POP 꽂이 1개']}
+  else if(md===4){B.forEach((b,i)=>{const f=n>1?i/(n-1):.5,q=[2,3,1,3,2,1,3,2][i];put(i,40+f*(690),300+f*220,q,`왼쪽 뒤에서 오른쪽 앞으로 ${i+1}번째 · ${q}권`,i===0)});pop=[600,60];
+    tips=['사선 한 줄. 걸어오는 방향에서 차례로 읽힙니다.','첫 권만 세우고 나머지는 눕힙니다. 순서가 있는 주제에 좋습니다.','줄 바깥은 비워 둡니다. POP 은 줄이 끝나는 반대편에.'];need=['북엔드 1개','A5 POP 꽂이 1개']}
+  else if(md===5){B.forEach((b,i)=>{const a=-Math.PI/2+i/n*Math.PI*2,q=1+(i%2);put(i,375+Math.cos(a)*300,380+Math.sin(a)*250,q,`둥근 자리 ${i+1}번째 (시계 방향) · ${q}권`)});pop=[345,330];
+    tips=['가운데를 비우고 둘러 놓습니다. 평대를 한 바퀴 돌게 됩니다.','POP 은 가운데에 세웁니다. 어느 쪽에서도 보이게 양면으로.','높이는 1~2권으로 낮게. 둥근 모양이 먼저 보여야 합니다.'];need=['양면 POP 꽂이 1개']}
+  else if(md===6){const mid=n%2?[0]:[],pairs=[];for(let i=mid.length;i<n;i+=2)pairs.push([i,i+1]);if(mid.length)put(0,375,300,5,'가운데 · 5권 높이로, 맨 위 한 권은 세우기',true);
+    pairs.forEach(([a,b],j)=>{const dx=170+j*110,y=mid.length?330+j*150:260+j*170,q=Math.max(1,3-j);put(a,375-dx-(mid.length?0:-60),y,q,`왼쪽 ${j+1}번째 · ${q}권`);if(b<n)put(b,375+dx+(mid.length?0:-60),y,q,`오른쪽 ${j+1}번째 · ${q}권 (왼쪽과 같은 높이)`)});
+    tips=['가운데를 기준으로 좌우를 같은 높이, 같은 간격으로 맞춥니다.','단정하고 격식 있는 주제, 행사 연계 평대에 어울립니다.','모서리와 책등을 반듯하게. 흐트러지면 바로 티가 납니다.'];need=['북엔드 1개','A4 POP 꽂이 1개']}
+  else if(md===7){it.push({k:'face',x:375,y:95,c:DPC[0],n:1});it.push({k:'stack',x:375,y:330,w:bw,d:bd,h:Math.max(6,n+3)*th,c:DPC[0],n:1});rows.push({n:1,b:B[0],place:`가운데 탑 — 모든 책을 한 권씩 섞어 ${Math.max(6,n+3)}권 높이로, 맨 위에 이 책`,qty:4});
+    B.slice(1).forEach((b,j)=>{const i=j+1,m=n-1,f=m>1?j/(m-1):.5;put(i,50+f*670,610+(j%2?40:0),1,`탑 앞에 부채꼴로 ${j+1}번째 · 1권`)});pop=[620,60];
+    tips=['한가운데 탑 하나. 멀리서도 보이는 높이가 간판이 됩니다.','탑은 책등이 사방을 보게 돌려 가며 쌓습니다. 무너지지 않게 큰 판형을 아래로.','앞의 책은 한 권씩만. 탑에서 빼 가도록 두지 않습니다.'];need=['A5 POP 꽂이 1개','미끄럼 방지 매트 1장']}
+  else{const P=Math.ceil(n/2),gx=P<=2?[200,560]:P===3?[80,375,670]:[190,570];for(let p=0;p<P;p++){const a=p*2,b=a+1,x=gx[p%gx.length],y=P<=3?400:(p<2?290:620);put(a,x-40,y,2,`${p+1}번째 짝 · 아래에 2권`);if(b<n){it.push({k:'stack',x:Math.round(Math.max(20,Math.min(730,x+30))),y:Math.round(y-50),w:bw,d:bd,h:th,c:DPC[b%6],n:b+1});rows.push({n:b+1,b:B[b],place:`${p+1}번째 짝 · ${a+1}번 책에 비스듬히 기대어 1권`,qty:1})}}
+    tips=['두 권씩 짝을 지어 놓습니다. 한 권이 다른 한 권을 설명합니다.','짝마다 손글씨 한 줄: 「이 책을 읽었다면 이 책도」.','짝과 짝 사이는 넓게 띄워 따로 읽히게 합니다.'];need=['손글씨 쪽지 '+P+'장','A5 POP 꽂이 1개']}
+  it.push({k:'pop',x:pop[0],y:pop[1]});it.push({k:'card',x:405,y:860});
+  return{title:t.title,br:t.br||S.br,it,rows,tips,need,mini:false,mode:md,total:rows.reduce((a,r)=>a+r.qty,0)}}})();
