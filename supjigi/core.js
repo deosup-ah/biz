@@ -113,7 +113,7 @@ let pin='';
 function lockUI(bad){$('lock').innerHTML=`<div class="lockbox ${bad?'shake':''}"><h1>숲지기</h1><p>${bad?'비밀번호가 맞지 않습니다':'화면 비밀번호 4자리'}</p><div class="dots">${[0,1,2,3].map(i=>`<i class="${i<pin.length?'on':''}"></i>`).join('')}</div>
   <div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-a="pin" data-n="${n}">${n}</button>`).join('')}<span></span><button data-a="pin" data-n="0">0</button><button data-a="pin" data-n="x" aria-label="지우기">←</button></div></div>`}
 async function tryPin(){const h=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('theforest-books:'+pin)))].map(b=>b.toString(16).padStart(2,'0')).join('');
-  if(h===PIN_HASH){S.locked=false;try{sessionStorage.setItem('sj.p',pin)}catch(e){}$('lock').style.display='none';render();loadSeed(pin)}else{pin='';lockUI(true)}}
+  if(h===PIN_HASH){S.locked=false;try{sessionStorage.setItem('sj.p',pin)}catch(e){}$('lock').style.display='none';loadSeed(pin);render()}else{pin='';lockUI(true)}}
 A.pin=d=>{if(d.n==='x')pin=pin.slice(0,-1);else if(pin.length<4)pin+=d.n;lockUI();if(pin.length===4)tryPin()};
 A.lock=()=>{S.locked=true;pin='';try{sessionStorage.removeItem('sj.p')}catch(e){}$('app').innerHTML='';$('lock').style.display='grid';lockUI()};
 document.addEventListener('keydown',e=>{if(!S.locked)return;if(/^\d$/.test(e.key))A.pin({n:e.key});else if(e.key==='Backspace')A.pin({n:'x'})});
