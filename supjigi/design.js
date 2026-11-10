@@ -9,7 +9,7 @@ const ICON={moon:'M17.5 13A7.5 7.5 0 1 1 11 5.2 6 6 0 0 0 17.5 13z',rain:'M7 14.
 const MOTIF=[['moon','달'],['rain','비'],['snow','눈'],['cup','찻잔'],['leaf','잎'],['house','집'],['pencil','연필'],['star','별'],['wave','물결'],['candle','초'],['book','책'],['sun','해'],['drop','새싹'],['walk','걸음'],['none','없음']];
 const LOGOS={plain:3.16,book:2.41},LIMG={};
 ['logo-k','logo-g','logo-w','logob-k','logob-g','logob-w'].forEach(n=>{const i=new Image();i.src=n+'.png';LIMG[n]=i});
-const STY=['기본','포스터','여백','띠'];
+const STY=['기본','포스터','여백','띠','세로'];
 const defD=()=>({kind:'pop',st:0,size:0,pal:0,sym:'none',logo:'plain',lc:'g',hs:1,tag:BRAND[curBr()]||'',badge:'',head:'',body:'',book:'',author:'',price:'',phrases:'',syms:[],pals:[],list:'',foot:'',br:curBr(),books:[]});
 const mctx=document.createElement('canvas').getContext('2d');
 const mw=(t,font,size,weight)=>{mctx.font=`${weight||400} ${size*10}px ${font}`;return mctx.measureText(t).width/10};
@@ -34,9 +34,9 @@ function layout(D){const pr=[],brand=BP(D.br)+(BRAND[D.br]||brN(!D.br||D.br==='a
     const tf=fit(D.head||'이 평대의 책',SERIF,12.5,w-m*2-(ICON[D.sym]?20:0),1,6,700),title=tf.l[0],tw=mw(title,SERIF,tf.s,700);T(m,m+27,title,tf.s,{font:SERIF,fill:fg,weight:700});let y=m+27;if(ICON[D.sym])SYM(D.sym,w-m-8,m+21,7,'#c9935a',fg);
     if(D.body){if(tw+6+mw(D.body,SERIF,4.8,400)<=w-m*2-(ICON[D.sym]?20:0))T(m+tw+6,y,D.body,4.8,{font:SERIF,fill:fg,weight:400});else{y+=8;T(m,y,wrap(D.body,SERIF,4.8,w-m*2,1)[0],4.8,{font:SERIF,fill:fg,weight:400})}}
     y+=11;const rows=(D.list||'').split('\n').map(s=>s.trim()).filter(Boolean);if(!rows.length)rows.push('책 이름 | 저자 · 출판사 | 한 줄 소개');
-    const items=rows.filter(r=>r[0]!=='#').length,secs=rows.length-items,room=h-m-10-y,ih=Math.max(11,Math.min(15.5,(room-secs*10)/Math.max(1,items)));
+    const items=rows.filter(r=>r[0]!=='#').length,secs=rows.length-items,room=h-m-10-y,ih=Math.max(11,Math.min(19,(room-secs*10)/Math.max(1,items)));
     for(const row of rows){if(y>h-m-12)break;if(row[0]==='#'){T(m,y+1,row.replace(/^#+\s*/,''),4,{fill:fg,weight:800,ls:.3});R(m,y+4,w-m*2,.3,fg);y+=10;continue}
-      const [t,ap,why]=row.split('|').map(s=>(s||'').trim());O(m+1.4,y-1.4,.9,.9,fg);const apW=ap?mw(ap,SANS,3.3,500)+4:0;T(m+6,y,wrap(`『${t}』`,SERIF,5,w-m*2-6-apW,1,700)[0],5,{font:SERIF,fill:fg,weight:700});if(ap)T(w-m,y,ap,3.3,{fill:fg,anchor:'end'});
+      let [t,ap,why]=row.split('|').map(s=>(s||'').trim());const nm=t.match(/^(\d{1,2})\.\s*/);if(nm){t=t.slice(nm[0].length);O(m+2,y-1.7,2.5,2.5,'#f4f1e8',{stroke:fg,sw:.3});T(m+2,y-.5,nm[1],3.2,{fill:fg,weight:800,anchor:'middle'})}else O(m+1.4,y-1.4,.9,.9,fg);const apW=ap?mw(ap,SANS,3.3,500)+4:0;T(m+6,y,wrap(`『${t}』`,SERIF,5,w-m*2-6-apW,1,700)[0],5,{font:SERIF,fill:fg,weight:700});if(ap)T(w-m,y,ap,3.3,{fill:fg,anchor:'end'});
       if(why)T(m+6,y+ih*.42,wrap(why,SERIF,3.7,w-m*2-6,1)[0],3.7,{font:SERIF,fill:fg,weight:400});R(m+6,y+ih*.62,w-m*2-6,.15,'#c5c6b8');y+=ih}
     if(D.foot)T(m,h-m,D.foot,3.5,{font:SERIF,fill:fg,weight:400});return{w,h,pr}}
   const P=POPC[D.pal]||POPC[0];R(0,0,w,h,P.bg);
@@ -52,6 +52,12 @@ function layout(D){const pr=[],brand=BP(D.br)+(BRAND[D.br]||brN(!D.br||D.br==='a
       const lw=LOGO(m,m+u*.05,u*.045,P.dark,'start');if(D.tag&&D.logo!=='book')T(m+lw+u*.03,m+u*.045,D.tag,u*.028,{fill:P.fg,weight:800});
       const H=fit(hd,SERIF,u*.088*(D.hs||1),w-m*2.6,nl,u*.045,700),bl=wrap(D.body||'',SERIF,u*.036,Math.min(w-m*3,u*.9),4,400),bh=H.l.length*H.s*1.36+bl.length*u*.062+(bk?u*.1:0);let y=h-m*2.2-bh+H.s;R(m,y-H.s*1.9,u*.1,u*.012,P.ac);
       H.l.forEach(l=>{T(m,y,l,H.s,{font:SERIF,fill:P.fg,weight:700});y+=H.s*1.36});y+=u*.012;bl.forEach(l=>{T(m,y,l,u*.036,{font:SERIF,fill:P.fg,weight:400});y+=u*.062});if(bk){y+=u*.035;T(m,y,wrap(bk,SANS,u*.03,w-m*2,1,800)[0],u*.03,{fill:P.ac,weight:800})}
+      T(m,h-m,brand,u*.026,{fill:P.fg,weight:800,ls:.3});BADGE();return{w,h,pr}}
+    if(st===4){/* 세로: 제목을 세로로 세워 쓰기 */const cols=hd.split('\n').slice(0,3),mx=Math.max(...cols.map(c=>[...c.replace(/\s/g,'')].length),1),top=m+u*.2,cs=Math.min(u*.13*(D.hs||1),(h*(ld?.62:.6))/mx/1.12);let cx=w-m-cs*.6;
+      cols.forEach(c=>{let cy=top+cs;[...c].forEach(ch=>{if(/\s/.test(ch)){cy+=cs*.5;return}if(/[,.，、。]/.test(ch)){T(cx+cs*.42,cy-cs*.62,'、',cs*.7,{font:SERIF,fill:P.ac,weight:700,anchor:'middle'});cy+=cs*.35;return}T(cx,cy,ch,cs,{font:SERIF,fill:P.fg,weight:700,anchor:'middle'});cy+=cs*1.12});cx-=cs*1.35});
+      R(cx+cs*.55,top+cs*.2,u*.004,h*(ld?.5:.46),P.ac);const lw=LOGO(m,m+u*.05,u*.045,P.dark,'start');if(D.tag&&D.logo!=='book')T(m+lw+u*.03,m+u*.045,D.tag,u*.028,{fill:P.fg,weight:800});
+      const r=u*.13,tw=Math.max(u*.3,cx-m-cs*.2),bl=wrap(D.body||'',SERIF,u*.036,Math.min(tw,u*.62),6,400);O(m+r,h*(ld?.42:.4),r*1.25,r*1.25,P.b1,{op:.7});pr.push({k:'p',d:ICON[sym],x:m,y:h*(ld?.42:.4)-r,s:r/12,stroke:P.ac,sw:r*.05});
+      let y=h-m*2.2-bl.length*u*.062-(bk?u*.09:0);bl.forEach(l=>{T(m,y,l,u*.036,{font:SERIF,fill:P.fg,weight:400});y+=u*.062});if(bk){y+=u*.03;T(m,y,wrap(bk,SANS,u*.03,w-m*2,1,800)[0],u*.03,{fill:P.ac,weight:800})}
       T(m,h-m,brand,u*.026,{fill:P.fg,weight:800,ls:.3});BADGE();return{w,h,pr}}
     /* 띠: 색 면과 글 면을 나눔 */const bw=ld?w*.36:w,bh=ld?h:h*.4,x0=ld?bw+m:m,tw=w-x0-m,r=Math.min(bw,bh)*.24,ic=P.dark?P.bg:'#ffffff';R(0,0,bw,bh,P.ac);O(bw/2,bh/2,r*1.5,r*1.5,ic,{op:.14});pr.push({k:'p',d:ICON[sym],x:bw/2-r,y:bh/2-r,s:r/12,stroke:ic,sw:r*.07});
     const H=fit(hd,SANS,u*.105*(D.hs||1),tw,nl,u*.05,800);let y=(ld?h*.2:bh+u*.1)+H.s;if(D.tag&&D.logo!=='book'){T(x0,y-H.s*1.25,D.tag,u*.03,{fill:P.ac,weight:800,ls:.4});y+=u*.03}H.l.forEach(l=>{T(x0,y,l,H.s,{fill:P.fg,weight:800});y+=H.s*1.24});y+=u*.015;
@@ -130,7 +136,7 @@ function dChat(q){const D=S.ui.D,pal=D.kind==='band'?BANDC:POPC,has=re=>re.test(
   const mi=MOTIF.find(([k,n])=>n!=='없음'&&q.includes(n)&&has(/그림|상징|아이콘|심볼/)||new RegExp('그림\\s*'+n).test(q));if(mi){D.sym=mi[0];D.syms=[];did.push(`그림을 「${mi[1]}」로 했습니다`)}else if(has(/그림|상징|아이콘/)){if(has(/빼|없애/)){D.sym=D.kind==='band'?'off':'none';D.syms=[]}else{const i=MOTIF.findIndex(m=>m[0]===D.sym);D.sym=MOTIF[(i+1)%(MOTIF.length-1)][0];D.syms=[]}did.push('그림을 바꿨습니다')}
   if(has(/값|가격/)&&has(/빼|없애|지워/)){D.price='';did.push('값을 뺐습니다')}else if((v=q.match(/(?:값|가격)\D*([\d,]+)\s*원?/))){D.price=v[1]+'원';did.push('값을 넣었습니다')}
   if(has(/딱지|동그라미/)&&has(/빼|없애|지워/)){D.badge='';did.push('딱지를 뺐습니다')}if(has(/책/)&&has(/빼|없애|지워/)&&!has(/목록/)){D.book='';D.author='';did.push('책 상자를 뺐습니다')}
-  if(D.kind==='pop'){const si=has(/포스터/)?1:has(/여백|조용/)?2:has(/띠\s*(느낌|모양|로)|색\s*면/)?3:has(/기본\s*(느낌|으로|모양)/)?0:has(/느낌|스타일|분위기|다르게|다른\s*안/)?((D.st|0)+1)%STY.length:-1;if(si>=0){D.st=si;did.push(`느낌을 「${STY[si]}」로 했습니다`)}}
+  if(D.kind==='pop'){const si=has(/세로\s*(쓰기|글|느낌)|세워/)?4:has(/포스터/)?1:has(/여백|조용/)?2:has(/띠\s*(느낌|모양|로)|색\s*면/)?3:has(/기본\s*(느낌|으로|모양)/)?0:has(/느낌|스타일|분위기|다르게|다른\s*안/)?((D.st|0)+1)%STY.length:-1;if(si>=0){D.st=si;did.push(`느낌을 「${STY[si]}」로 했습니다`)}}
   const sz=q.match(/A([3456])/i);if(sz&&D.kind==='pop'){D.size={4:0,5:1,6:2,3:3}[sz[1]];did.push(`A${sz[1]} 크기로 했습니다`)}if(D.kind==='pop'&&has(/가로/)){D.land=true;did.push('가로로 돌렸습니다')}else if(D.kind==='pop'&&has(/세로/)){D.land=false;did.push('세로로 돌렸습니다')}
   const kd=[['band',/띠지/],['list',/목록/],['shelf',/이름표/],['pop',/POP|팝/i]].find(([k,re])=>re.test(q)&&has(/로|으로|만들|바꿔/));if(kd&&kd[0]!==D.kind){A.dKind({k:kd[0]});did.push(`${KINDS.find(x=>x[0]===kd[0])[1]}(으)로 바꿨습니다`)}
   const b=BR.find(x=>q.includes(x.n)||q.includes(BRAND[x.k]));if(b&&has(/로고|지점|이름/)){A.dBr({k:b.k});did.push(`${b.n}(${BRAND[b.k]})로 바꿨습니다`)}
@@ -138,7 +144,7 @@ function dChat(q){const D=S.ui.D,pal=D.kind==='band'?BANDC:POPC,has=re=>re.test(
   return did.length?did.join(' · '):null}
 A.dChatQ=d=>{$('dchat').value=d.t;A.dChatGo()};
 A.dChatGo=async()=>{const el=$('dchat'),q=(el.value||'').trim();if(!q)return;const log=S.ui.dlog;log.push({me:1,t:q});let r=dChat(q);
-  if(!r&&AI&&!S.ui.busy){const D=S.ui.D,out=await ask('dchat',`서점 POP 편집기의 설정을 사용자의 말에 맞게 고쳐 주세요. 지금 설정(JSON): ${JSON.stringify({kind:D.kind,head:D.head,body:D.body,book:D.book,author:D.author,price:D.price,badge:D.badge,tag:D.tag,phrases:D.phrases,pal:D.pal,sym:D.sym,st:D.st|0,hs:D.hs})}\n고칠 수 있는 값: head(큰 문구, 줄바꿈 \\n), body, book, author, price, badge, tag, phrases(띠지 문구, 줄바꿈으로 4개까지), pal(0~${(D.kind==='band'?BANDC:POPC).length-1}), sym(${MOTIF.map(m=>m[0]).join('|')}), st(느낌 0 기본·1 포스터·2 여백·3 띠), hs(제목 크기 배율 0.6~1.6).\n사용자의 말: ${q}\n바꿀 값만 담은 JSON 과 한 줄 설명으로 답하세요: {"set":{...},"say":"무엇을 바꿨는지"}. 확실하지 않은 사실(줄거리·수상·가격)은 지어내지 마세요.`,{modelTier:'quick'});
+  if(!r&&AI&&!S.ui.busy){const D=S.ui.D,out=await ask('dchat',`서점 POP 편집기의 설정을 사용자의 말에 맞게 고쳐 주세요. 지금 설정(JSON): ${JSON.stringify({kind:D.kind,head:D.head,body:D.body,book:D.book,author:D.author,price:D.price,badge:D.badge,tag:D.tag,phrases:D.phrases,pal:D.pal,sym:D.sym,st:D.st|0,hs:D.hs})}\n고칠 수 있는 값: head(큰 문구, 줄바꿈 \\n), body, book, author, price, badge, tag, phrases(띠지 문구, 줄바꿈으로 4개까지), pal(0~${(D.kind==='band'?BANDC:POPC).length-1}), sym(${MOTIF.map(m=>m[0]).join('|')}), st(느낌 0 기본·1 포스터·2 여백·3 띠·4 세로쓰기), hs(제목 크기 배율 0.6~1.6).\n사용자의 말: ${q}\n바꿀 값만 담은 JSON 과 한 줄 설명으로 답하세요: {"set":{...},"say":"무엇을 바꿨는지"}. 확실하지 않은 사실(줄거리·수상·가격)은 지어내지 마세요.`,{modelTier:'quick'});
     if(out&&out.set){Object.entries(out.set).forEach(([k,v])=>{if(k in D&&['head','body','book','author','price','badge','tag','phrases','pal','sym','hs'].includes(k))D[k]=v});r=String(out.say||'고쳤습니다')}}
   log.push({t:r||'알아듣지 못했습니다. 이렇게 말해 보세요: 「제목을 긴 밤에는, 긴 소설로」 「제목 더 크게」 「색 밤으로」 「그림 달」 「값 빼」 「A4로」 「띠지로」 「초소 로고로」'});render();const n=$('dchat');if(n&&!S.ui.mic)n.focus()};
 C.dChat=()=>{};
