@@ -26,6 +26,11 @@ function loadWx(){if(S.wxTried)return;S.wxTried=true;fetch('https://api.open-met
 const wxText=()=>{const w=S.wx;return w?`지금 수유동 ${Math.round(w.temp)}°C · ${w.snow?'눈':w.rain?'비':w.clear?'맑음':'흐림'}`:''};
 /* 제안 은행: 짧은 문구 · 한 줄 까닭 · 상징 · 색. 책은 지금 팔 수 있는 것 가운데 제목으로 찾는다. */
 const BANK=[
+ {tone:'다른 시선',t:'나는 아니라고 생각했던 것',why:'차별은 나쁜 사람만 하는 일이 아니라는 책들.',sym:'wave',bp:6,pp:4,k:/^$/,sc:c=>3+(c.d%2),fixed:[['선량한 차별주의자','김지혜','창비'],['실격당한 자들을 위한 변론','김원영','사계절'],['사이보그가 되다','김초엽, 김원영','사계절'],['아픔이 길이 되려면','김승섭','동아시아']]},
+ {tone:'다른 시선',t:'먹히는 쪽의 이야기',why:'식탁 건너편에서 본 세계. 동물의 자리에서 읽습니다.',sym:'leaf',bp:3,pp:1,k:/^$/,sc:c=>3+((c.d+1)%2),fixed:[['동물 해방','피터 싱어','연암서가'],['고기로 태어나서','한승태','시대의창'],['아무튼, 비건','김한민','위고'],['사향고양이의 눈물을 마시다','이형주','책공장더불어']]},
+ {tone:'다른 시선',t:'일의 뒷면',why:'명함에 적히지 않는 노동. 일하는 사람이 직접 쓴 기록.',sym:'pencil',bp:7,pp:5,k:/^$/,sc:c=>2+(c.d%3),fixed:[['임계장 이야기','조정진','후마니타스'],['노동의 배신','바버라 에런라이크','부키'],['까대기','이종철','보리'],['일하는 마음','제현주','어크로스']]},
+ {tone:'다른 시선',t:'뜨거워지는 중',why:'날씨가 아니라 기후. 겨울에 읽는 더운 이야기.',sym:'sun',bp:5,pp:3,k:/^$/,sc:c=>2+((c.d+1)%3),fixed:[['침묵의 봄','레이첼 카슨','에코리브르'],['파란하늘 빨간지구','조천호','동아시아'],['2050 거주불능 지구','데이비드 월러스 웰즈','추수밭'],['두 번째 지구는 없다','타일러 라쉬','알에이치코리아']]},
+ {tone:'다른 시선',t:'보는 법을 다시 배우기',why:'그림을 설명하지 않고, 보는 일 자체를 묻는 책.',sym:'star',bp:4,pp:5,k:/^$/,sc:c=>2+((c.d+2)%3),fixed:[['다른 방식으로 보기','존 버거','열화당'],['사진에 관하여','수전 손택','이후'],['예술하는 습관','메이슨 커리','걷는나무']]},
  {tone:'다른 시선',t:'제목에 색이 묻은 책',why:'표지가 아니라 제목의 색으로 골랐습니다. 빨강 옆에 녹색.',sym:'drop',bp:2,pp:6,k:/빨강|녹색|초록|파랑|푸른|붉은|검은|검정|하얀|흰|노랑|보라|회색|색/,sc:c=>2+(c.d%3)},
  {tone:'다른 시선',t:'건물이 제목인 책',why:'성당, 미술관, 영화관. 들어가 본 적 없는 건물로 들어갑니다.',sym:'house',bp:3,pp:5,k:/성당|미술관|영화관|도서관|서점|책방|학교|호텔|집$|의집|방$/,sc:c=>2+((c.d+1)%3)},
  {tone:'다른 시선',t:'잘 안 된 사람들',why:'실격, 모순, 고독. 실패한 쪽의 이야기가 더 오래 갑니다.',sym:'candle',bp:7,pp:5,k:/실격|모순|고독|이방인|가벼움|몰락|패배|은둔|절벽/,sc:c=>2+((c.d+2)%3)},
@@ -49,7 +54,7 @@ function corners(br){const X=recs(br),P=X.P,[g1,g2]=P.order,pl=pool(br),sd=(()=>
   const ctx={m:+TODAY.slice(5,7),d:+TODAY.slice(8),wx:S.wx||null,sn:dayDiff(TODAY,sd),movie:S.db.events.some(e=>e.kind==='영화'&&dayDiff(e.date,TODAY)>=0&&dayDiff(e.date,TODAY)<=7)&&br==='aka'};
   const role=(b,i)=>i===0?'중심':(b.mine||0)>=3?'잘 나가는':(b.here>0||b.src==='재고')?'곁들임':b.from?'다른 지점 인기':'새로 들일',until=o=>{const d=pd(TODAY);d.setDate(d.getDate()+(o.days||14));return dstr(d)};
   const mk=(o,books)=>({tone:o.tone||'제철',title:o.t,hook:o.why,sym:o.sym,bpal:o.bp,ppal:o.pp,until:until(o),place:o.place||(o.sym==='star'?'계산대 옆':'입구 평대'),books:books.filter((b,i,a)=>a.findIndex(z=>nt(z.t)===nt(b.t))===i).slice(0,8).map((b,i)=>({...b,role:role(b,i)})),pop:{head:o.t.replace(/,\s*/,',\n'),body:o.why},band:o.t,br});
-  const L=BANK.map(o=>({o,s:o.sc(ctx)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(({o})=>mk(o,pl.filter(b=>o.k.test(b.t.replace(/\s/g,''))).sort((a,b)=>(b.here>0)-(a.here>0)||(b.mine||0)+b.sold-(a.mine||0)-a.sold).map(b=>({...b,why:bookWhy(b),src:b.here>0?'재고':'들여놓기'})))).filter(c=>c.books.length>=3).slice(0,5);
+  const L=BANK.map(o=>({o,s:o.sc(ctx)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(({o})=>mk(o,o.fixed?FXB(o.fixed,pl):pl.filter(b=>o.k.test(b.t.replace(/\s/g,''))).sort((a,b)=>(b.here>0)-(a.here>0)||(b.mine||0)+b.sold-(a.mine||0)-a.sold).map(b=>({...b,why:bookWhy(b),src:b.here>0?'재고':'들여놓기'})))).filter(c=>c.books.length>=3).slice(0,14);
   if(Math.abs(dayDiff(TODAY,TODAY.slice(0,4)+'-11-11'))<=3)L.unshift(mk({t:'오늘은, 서점의 날',why:'11월 11일. 이 책방에서 가장 많이 집어 간 책들.',sym:'book',bp:4,pp:1},P.tops.filter(x=>x.stock>0&&sellable(x)).map(x=>({t:x.t,a:x.a,p:x.p,isbn:x.isbn,price:x.price,why:`30일 ${x.sold30}권`,src:'재고'}))));
   const own=g=>P.tops.filter(x=>grp(x.cat)===g&&x.stock>0&&sellable(x)).slice(0,3).map(x=>({t:x.t,a:x.a,p:x.p,isbn:x.isbn,price:x.price,why:`매장에서 30일 ${x.sold30}권`,src:'재고'}));
   const D=[mk({t:'지금 막 나온 책',why:`${ctx.m}월의 새 책. ${g1} · ${g2} 쪽으로.`,sym:'drop',bp:6,pp:4,place:'입구 앞 평대'},X.nw),
@@ -88,3 +93,5 @@ A.cMore=()=>{S.ui.cMore=!S.ui.cMore;render()};
 A.curKit=async d=>{const t=S.ui.cor[+d.i],keep=S.ui.D;for(const k of ['pop','band','list','card']){S.ui.D=mkD({...t,br:t.br||S.br},k);await A.dPdf()}S.ui.D=keep;toast('POP · 띠지 · 책 목록 · 쇼카드 PDF 네 장을 받았습니다')};
 
 A.cTone=d=>{S.ui.cTone=d.t;S.ui.cMore=false;render()};
+
+function FXB(L,pl){return L.map(([t,a,p])=>{const h=pl.find(b=>nt(b.t)===nt(t));return h?{...h,why:bookWhy(h),src:h.here>0?'재고':'들여놓기'}:{t,a,p,isbn:'',price:0,here:0,sold:0,why:'판매 상태 확인 전',src:'들여놓기'}})}

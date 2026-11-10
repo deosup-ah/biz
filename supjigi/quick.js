@@ -1,0 +1,98 @@
+/* 더숲 워크룸 — 오늘: 캘린더 자동 + 한 줄 입력 · 사진으로 만들기 · 아카데미 주제 · 굿즈 제안 */
+const GCID='7dffddc55d74289b36e08e3cf6e03ed143131648f770c61de7dcb8e1a9ac30f1@group.calendar.google.com';
+const GC={st:'idle',ev:[],at:0,code:''};
+/* ── 구글 캘린더(단체 예약) 읽기. 읽기만 한다. 손님 개인 이름은 지운다. ── */
+function gcParse(L){return (L||[]).map(e=>{const s=(e.start||{}),en=(e.end||{}),from=(s.date||(s.dateTime||'').slice(0,10)),to=(en.date||(en.dateTime||'').slice(0,10));
+  const m=/^\s*\[(.+?)\]\s*(.+?)\s+[—–-]\s+(.+)$/.exec(e.summary||'');let st=m?m[1]:'',org=m?m[2]:(e.summary||''),sp=m?m[3]:'';
+  if(org.includes(' / '))org=org.split(' / ').slice(1).join(' / ');org=org.split(' · ')[0].replace(/01\d[- ]?\d{3,4}[- ]?\d{4}/g,'').trim();
+  const tm=/(\d{1,2}:\d{2})\s*[–~-]\s*(\d{1,2}:\d{2})/.exec((e.description||'').split('\n')[0]||'');
+  let time=tm?tm[1].padStart(5,'0'):'',end=tm?tm[2].padStart(5,'0'):'';if(!time&&s.dateTime){time=s.dateTime.slice(11,16);end=(en.dateTime||'').slice(11,16)}
+  const rm=/객실\s*(\d+)\s*실/.exec(sp);return{from,to:s.date?to:addDays(to||from,1),org,sp,st,time,end,rooms:rm?+rm[1]:0}}).filter(x=>x.from&&x.org)}
+function gcDay(d){const G={};GC.ev.filter(x=>x.from<=d&&d<x.to).forEach(x=>{const g=G[x.org]=G[x.org]||{org:x.org,rooms:0,sp:[],time:'',st:x.st,in:false};
+  if(x.rooms){g.rooms+=x.rooms;if(x.from===d)g.in=true}else if(x.from===d||!x.time){g.sp.push(x.sp+(x.time?` ${x.time}–${x.end}`:''));if(x.time&&(!g.time||x.time<g.time))g.time=x.time}});
+  return Object.values(G).filter(g=>g.rooms||g.sp.length).sort((a,b)=>(a.time||'99')<(b.time||'99')?-1:1)}
+async function gcLoad(force){if(!(window.claude&&window.claude.use)){GC.st='none';return}if(GC.st==='load')return;GC.st='load';
+  try{const m=await window.claude.use('mcp');if(!m){GC.st='none';render();return}
+    const r=await m.callTool('Google Calendar','list_events',{calendarId:GCID,startTime:TODAY+'T00:00:00',endTime:addDays(TODAY,8)+'T00:00:00',orderBy:'startTime',pageSize:250},{cache:force?{refresh:true,gcTime:36e5}:{staleTime:6e5,gcTime:36e5}});
+    let p=r&&r.payload;if(typeof p==='string'){try{p=JSON.parse(p)}catch(e){p=null}}GC.ev=gcParse((p&&p.events)||[]);GC.st='ok';GC.at=(r&&r.cache&&r.cache.storedAt)||Date.now()}
+  catch(e){GC.st='err';GC.code=(e&&e.code)||'upstream_error';if(/needs_reauth|server_not_connected|not_in_manifest|blocked_by_policy|approval_required|consent_required/.test(GC.code))GC.ev=[]}
+  render()}
+A.gcRe=()=>{GC.st='idle';gcLoad(true);render()};
+const gcMsg=()=>GC.st==='load'?'캘린더 읽는 중…':GC.st==='ok'?`구글 캘린더 자동 · ${new Date(GC.at).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})} 기준`:GC.st==='err'?(/needs_reauth|server_not_connected|selection_required/.test(GC.code)?'claude.ai 설정 → 커넥터에서 Google Calendar 를 연결하면 단체 일정이 자동으로 보입니다.':/not_in_manifest|approval_required|consent_required|not_granted/.test(GC.code)?'캘린더 사용을 허용하면 단체 일정이 자동으로 보입니다.':/blocked_by_policy/.test(GC.code)?'조직 정책으로 캘린더를 읽을 수 없습니다.':'지금은 캘린더를 읽지 못했습니다.'):'';
+
+/* ── 한 줄 입력: "내일 2시 한살림 연수 30명 대화의 집" ── */
+const QPL=['대화의 집','내일을 위한 집','여해의 집','새벽의 집','구름의 집','기도의 집','사유의 숲','본관','루프탑','라운지','카페','다이닝','서점','명상센터','회의실','세미나룸','강당','야외'];
+function qParse(raw){let s=' '+(raw||'').replace(/01\d[- ]?\d{3,4}[- ]?\d{4}/g,' ').replace(/\s+/g,' ').trim()+' ';if(!s.trim())return null;
+  let date=TODAY,time='',end='',booked,place='',m;const Y=+TODAY.slice(0,4),cut=x=>{s=s.replace(x,' ')},p2=n=>String(n).padStart(2,'0'),fix=(mo,d)=>{let t=`${Y}-${p2(mo)}-${p2(d)}`;if(dayDiff(TODAY,t)>60)t=`${Y+1}-${p2(mo)}-${p2(d)}`;return t};
+  if(m=/(\d{1,2})\s*월\s*(\d{1,2})\s*일?/.exec(s)){date=fix(+m[1],+m[2]);cut(m[0])}
+  else if((m=/(?:^|\s)(\d{1,2})[\/.](\d{1,2})(?![\d:시])/.exec(s))&&+m[1]<=12&&+m[2]<=31){date=fix(+m[1],+m[2]);cut(m[0])}
+  else if(m=/\s(오늘|내일|모레|글피)(?=\s)/.exec(s)){date=addDays(TODAY,{오늘:0,내일:1,모레:2,글피:3}[m[1]]);cut(m[0])}
+  else if(m=/(다음\s*주|담주|이번\s*주)?\s*([월화수목금토일])요일/.exec(s)||/(다음\s*주|담주|이번\s*주)\s*([월화수목금토일])(?=\s)/.exec(s)){const w='일월화수목금토'.indexOf(m[2]),now=pd(TODAY).getDay();let n=(w-now+7)%7;if(m[1]&&/다음|담/.test(m[1])){const toMon=((8-now)%7)||7;n=toMon+((w+6)%7)}date=addDays(TODAY,n);cut(m[0])}
+  else if(m=/(?:^|\s)(\d{1,2})일(?=\s)/.exec(s)){const d=+m[1];let mo=+TODAY.slice(5,7),t=`${Y}-${p2(mo)}-${p2(d)}`;if(t<TODAY){mo=mo%12+1;t=`${mo===1?Y+1:Y}-${p2(mo)}-${p2(d)}`}date=t;cut(m[0])}
+  const hh=(ap,h)=>{h=+h;if(/오후|저녁|밤/.test(ap||'')&&h<12)h+=12;else if(!ap&&h>=1&&h<=7)h+=12;return h};
+  if(m=/(오전|오후|아침|낮|저녁|밤)?\s*(\d{1,2})\s*[~\-–]\s*(\d{1,2})\s*시/.exec(s)){const a=hh(m[1],m[2]);let b=hh(m[1],m[3]);if(b<=a)b+=12;time=p2(a)+':00';end=p2(b%24)+':00';cut(m[0])}
+  else if(m=/(오전|오후|아침|낮|저녁|밤)?\s*(\d{1,2})(?::(\d{2})|\s*시\s*(반|(\d{1,2})\s*분)?)/.exec(s)){time=p2(hh(m[1],m[2]))+':'+(m[3]||(m[4]==='반'?'30':m[5]?p2(m[5]):'00'));cut(m[0]);}
+  if(m=/(\d{1,4})\s*(명|인)(?![가-힣])/.exec(s)){booked=+m[1];cut(m[0])}
+  for(const p of QPL){const i=s.replace(/\s/g,'').indexOf(p.replace(/\s/g,''));if(i>=0&&s.includes(p)){place=p;cut(p);break}}
+  const title=s.replace(/\s+/g,' ').replace(/^[\s,·-]+|[\s,·-]+$/g,'').trim();if(!title)return null;
+  const kind=/영화|상영/.test(title)?'영화':/북토크|저자|작가와/.test(title)?'북토크':/책모임|독서|읽기|낭독/.test(title)?'책모임':/강연|클래스|수업|프로그램|요가|명상/.test(title)?'프로그램':'기타';
+  const o={kind,title,date,time,place,memo:end?`~${end}`:''};if(booked!=null)o.booked=booked;return o}
+const qShow=o=>o?`${dday(o.date)} ${mdw(o.date)}${o.time?' · '+o.time:''} · ${o.title}${o.booked!=null?' · '+o.booked+'명':''}${o.place?' · '+o.place:''}`:'';
+const QAL={기후:'뜨거워지는',환경:'뜨거워지는',동물:'먹히는',비건:'먹히는',노동:'일의 뒷면',차별:'나는 아니라고',차이:'나는 아니라고',장애:'나는 아니라고',예술:'보는 법',미술:'보는 법',사진:'보는 법'};
+function qCmd(v){const go=()=>{S.view.aka='design';S.mode='aka';window.scrollTo(0,0)};
+  if(/단체표/.test(v)){A.gcBoard();return true}
+  const sg=/주차/.test(v)?'park':/길\s*안내|화살표/.test(v)?'way':/대관/.test(v)?'rent':/금연|정숙|출입|알림판/.test(v)?'notice':/공간\s*소개/.test(v)?'space':'';
+  if(sg){go();A.akaTpl({t:sg});render();return true}
+  const km=/(POP|pop|팝|띠지|쇼카드|안내문)/.exec(v);if(!km)return false;const k=/띠지/.test(km[1])?'band':/쇼카드/.test(km[1])?'card':'pop',w=v.replace(km[0],'').replace(/만들어\s*줘?|만들기|해\s*줘|주제|으로|로\s/g,' ').trim();
+  const T=akThemes(),al=Object.keys(QAL).find(x=>w.includes(x)),t=T.find(x=>al&&x.title.includes(QAL[al]))||(w.length>1?T.find(x=>(x.title+x.hook+x.books.map(b=>b.t).join('')).includes(w)):null);
+  const H=S.ui.dH=S.ui.dH||[];if(S.ui.D)H.push(JSON.stringify(S.ui.D));go();
+  if(t){S.ui.D=mkD({...t,br:'aka'},k);S.ui.D.tag='아카데미하우스';S.ui.akT=t.title;S.ui.akTn=t.tone}else{S.ui.D=Object.assign(defD(),{kind:k,br:'aka',tag:'아카데미하우스',head:w||'제목',phrases:w||'',body:''})}
+  render();toast(t?`「${t.title}」 주제로 만들었습니다`:'초안을 만들었습니다. 아래에서 고칠 수 있습니다.');return true}
+A.qAdd=()=>{const el=$('qIn');if(!el)return;if(!el.value.includes('\n')&&qCmd(el.value.trim()))return;const L=el.value.split('\n').map(qParse).filter(Boolean);if(!L.length){toast('예: 내일 2시 한살림 연수 30명 본관');return}
+  L.forEach((o,i)=>put('events',nid()+(i||''),{...o,at:new Date().toISOString()},i<L.length-1));toast(L.length>1?`${L.length}건 넣었습니다`:qShow(L[0]));setTimeout(()=>{const e=$('qIn');if(e){e.value='';e.focus()}},60)};
+document.addEventListener('keydown',e=>{if(e.target&&e.target.id==='qIn'&&e.key==='Enter'&&!e.isComposing){e.preventDefault();A.qAdd()}});
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='qIn'){const p=$('qPv');if(p)p.textContent=qShow(qParse(e.target.value.split('\n')[0]))||'일정은 한 줄로. 만들 것을 적어도 됩니다'}});
+
+/* ── 오늘 화면 ── */
+V.aka.today=()=>{if(GC.st==='idle')setTimeout(gcLoad,0);const days=[0,1,2,3,4,5,6].map(n=>addDays(TODAY,n)),mine=d=>S.db.events.filter(e=>e.date===d).sort((a,b)=>(a.time||'')<(b.time||'')?-1:1);
+  const row=(t,b,s,btn)=>`<div class="li"><span class="qt">${t||'종일'}</span><div class="t"><b>${esc(b)}</b>${s?`<small>${esc(s)}</small>`:''}</div>${btn||''}</div>`;
+  const dayHtml=(d,big)=>{const g=gcDay(d),m=mine(d);if(!g.length&&!m.length)return big?`<div class="card"><div class="empty">${dday(d)} 잡힌 일정이 없습니다.</div></div>`:'';
+    return `<div class="card qday"><h3>${dday(d)==='오늘'||dday(d)==='내일'?dday(d)+' ':''}${mdw(d)} <small>${g.length+m.length}건</small></h3><div class="list">${g.map(x=>row(x.time||(x.rooms?(x.in?'입실':'숙박'):''),x.org,[x.rooms?`객실 ${x.rooms}실`:'',...x.sp].filter(Boolean).join(' · '),d===TODAY?`<button class="btn sm" data-a="gcWel" data-o="${esc(x.org)}">환영판</button>`:'')).join('')}${m.map(e=>row(e.time,e.title,[e.place,e.booked!=null?e.booked+'명':'',e.memo].filter(Boolean).join(' · '),`<button class="btn sm" data-a="evEdit" data-id="${e.id}">수정</button>`)).join('')}</div></div>`};
+  const n0=gcDay(TODAY).length+mine(TODAY).length,todo=[];if(gcDay(TODAY).length||mine(TODAY).length)todo.push(['오늘의 단체표',`오늘 ${n0}건을 한 장으로`,'gcBoard','']);
+  akaTodo().filter(x=>!/단체표/.test(x.t)).slice(0,4).forEach(x=>todo.push([x.b[0][0],x.t,'akaDo',`data-t="${x.b[0][1]}" data-id="${x.b[0][2]}"`]));
+  return `<div class="hero"><h2>${mdw(TODAY)} · 오늘 ${n0}건</h2></div>
+  <div class="card qadd"><div class="qrow"><input type="text" id="qIn" enterkeyhint="done" autocomplete="off" placeholder="내일 2시 한살림 연수 30명 본관">${DICT||window.SpeechRecognition||window.webkitSpeechRecognition?`<button class="btn" data-a="dMic" aria-pressed="${!!S.ui.mic}">${S.ui.mic?'듣는 중':'말하기'}</button>`:''}<button class="btn pri" data-a="qAdd">추가</button></div><small id="qPv" class="note">일정은 한 줄로. 「기후 POP」 「오늘 단체표」 「주차 안내」처럼 만들 것을 적어도 됩니다</small></div>
+  ${gcMsg()?`<p class="note qsrc">${gcMsg()} ${GC.st==='load'?'':`<button class="lnk" data-a="gcRe">${GC.st==='ok'?'새로 읽기':'다시 연결'}</button>`}</p>`:''}
+  ${dayHtml(TODAY,true)}${todo.length?`<div class="card todo">${todo.map(([b,t,a,x])=>`<div class="li"><div class="t"><b>${esc(t)}</b></div><button class="btn sm pri" data-a="${a}" ${x}>${b}</button></div>`).join('')}</div>`:''}
+  ${days.slice(1).map(d=>dayHtml(d)).join('')}`};
+A.gcBoard=()=>{const L=[...gcDay(TODAY).map(x=>[x.time||(x.rooms?'숙박':''),x.org,x.sp.map(s=>s.replace(/\s\d{1,2}:\d{2}–\d{1,2}:\d{2}$/,'')).join(', ')||(x.rooms?'객실':'')]),...S.db.events.filter(e=>e.date===TODAY).map(e=>[e.time||'',e.title,e.place||''])].sort((a,b)=>(a[0]||'99')<(b[0]||'99')?-1:1);
+  S.view.aka='design';window.scrollTo(0,0);A.akaTpl({t:'board'});if(S.ui.D){S.ui.D.list=L.map(r=>r.join(' | ')).join('\n');S.ui.D.body=mdw(TODAY)}render()};
+A.gcWel=d=>{const g=gcDay(TODAY).find(x=>x.org===d.o);S.view.aka='design';window.scrollTo(0,0);A.akaTpl({t:'group'});const D=S.ui.D;if(D&&g){D.head=g.org;D.list=[g.sp.length?`장소 | ${g.sp.map(s=>s.replace(/\s\d{1,2}:\d{2}–\d{1,2}:\d{2}$/,'')).join(', ')}`:'',g.time?`시간 | ${mdw(TODAY)} ${g.time}`:`일정 | ${mdw(TODAY)}`,'문의 | 02-904-0206'].filter(Boolean).join('\n')}render()};
+
+/* ── 만들기: 사진으로 시작 · (아카데미) 주제로 시작 ── */
+C.dPhoto=async el=>{const f=[...el.files].slice(0,3);if(!f.length)return;const k=['pop','band','card'].includes((S.ui.D||{}).kind)?S.ui.D.kind:'pop';
+  const out=await ask('photo',`사진을 보고 서점·문화공간 "더숲"의 인쇄물 문안을 씁니다. 사진은 책 표지, 책 묶음, 손글씨 메모, 공간이나 물건 중 하나입니다.\n말투: 조용하고 담백하게. 느낌표·이모지·과장 금지. 사진에 없는 사실(수상, 판매량, 가격)은 지어내지 않습니다. 읽히지 않는 글자는 빈 문자열.\nhead 는 14자 안쪽의 제목(뜻 단위로 \\n 한 번 가능), body 는 45자 안쪽 한두 문장, band 는 띠지에 쓸 18자 안쪽 한 줄, sym 은 ${Object.keys(ICON).join('|')}|none 중 하나.\nJSON 으로만: {"what":"책|묶음|메모|공간","head":"","body":"","band":"","sym":"","books":[{"t":"제목","a":"저자","p":"출판사","why":"12자 안쪽 한마디"}]}`,{images:f});
+  el.value='';if(!out||!out.head){if(out)toast('사진에서 읽은 것이 없습니다. 조금 더 가까이 찍어 주세요.');return}
+  const H=S.ui.dH=S.ui.dH||[];if(S.ui.D)H.push(JSON.stringify(S.ui.D));const bs=(out.books||[]).filter(b=>b&&b.t).slice(0,8),b=bs[0]||{},br=S.mode==='aka'?'aka':curBr();
+  const D=Object.assign(defD(),{kind:k,br,tag:S.mode==='aka'?'아카데미하우스':TAGN(br),sym:ICON[out.sym]?out.sym:'none',head:out.head,body:out.body||'',books:bs});
+  if(k==='band'){D.phrases=out.band||out.head.replace(/\n/g,' ');if(D.sym!=='none')D.syms=[D.sym]}else if(k==='card')D.list=bs.map((x,i)=>`${i+1}. ${x.t} | ${[x.a,x.p].filter(Boolean).join(' · ')} | ${x.why||''}`).join('\n');
+  if(k==='pop'&&b.t){D.book=b.t;D.author=[b.a,b.p].filter(Boolean).join(' · ')}S.ui.D=D;render();toast('사진으로 초안을 만들었습니다. 아래에서 고칠 수 있습니다.')};
+const AKTN=['다른 시선','말놀이','제철'];
+function akThemes(){try{return (corners('aka').all||[]).filter(t=>AKTN.includes(t.tone))}catch(e){return []}}
+A.akThm=d=>{const t=akThemes()[+d.i];if(!t)return;const H=S.ui.dH=S.ui.dH||[];if(S.ui.D)H.push(JSON.stringify(S.ui.D));S.ui.D=mkD({...t,br:'aka'},'pop');S.ui.D.tag='아카데미하우스';S.ui.akT=t.title;render()};
+A.akPlan=()=>{const t=akThemes().find(x=>x.title===S.ui.akT);if(!t)return;S.ui.plK='책모임';S.ui.plT=`「${t.title}」 — ${t.hook} 함께 읽을 책: ${t.books.slice(0,3).map(b=>b.t).join(', ')}`;A.go({v:'plan'})};
+(()=>{const f=V.store.design,g=()=>{const aka=S.mode==='aka',tn=S.ui.akTn||AKTN[0],T=aka?akThemes():[];
+  const bar=`<div class="qbar">${AI?`<label class="btn ${S.ui.busy==='photo'?'':'pri'}">${S.ui.busy==='photo'?'사진 읽는 중…':'사진으로 만들기'}<input type="file" accept="image/*" data-c="dPhoto" hidden ${S.ui.busy?'disabled':''}></label>`:''}${aka&&T.length?`<span class="note">주제</span>${AKTN.map(x=>`<button class="chip" data-a="ui" data-k="akTn" data-v="${x}" aria-pressed="${tn===x}">${x}</button>`).join('')}`:''}</div>
+  ${aka&&T.length?`<div class="qthm">${T.map((t,i)=>t.tone===tn?`<button data-a="akThm" data-i="${i}" aria-pressed="${S.ui.akT===t.title}">${esc(t.title)}</button>`:'').join('')}${S.ui.akT?`<button class="lnk" data-a="akPlan">이 주제로 모임 기획 ›</button>`:''}</div>`:''}${(S.ui.err||{}).photo?`<p class="note">${esc(S.ui.err.photo)}</p>`:''}`;return bar+f()};V.store.design=g;V.aka.design=g})();
+
+/* ── 굿즈 제안: 무엇을 · 어떻게 묶어 · 어디에 ── */
+const GOODS=[
+ {n:'문장 책갈피',w:'책 한 권에 한 장. 계산대에서 가장 부담 없이 따라오는 물건입니다.',set:'주제마다 3종 · 큐레이션 책을 사면 한 장 증정, 낱장 판매',at:'계산대 옆 · 평대 POP 아래',first:'주제당 100장, 2주 뒤 남은 수로 다음 수량 결정',mode:'store'},
+ {n:'블라인드 북',w:'제목을 가리고 한 문장만 보여 줍니다. 「다른 시선」 주제와 잘 맞습니다.',set:'크라프트 포장 + 띠지 한 줄 + 책갈피 · 재고가 넉넉한 책부터',at:'입구 평대 한쪽, 8권 이하로 적게',first:'주제 하나에 8권, 포장은 매장에서',mode:'store'},
+ {n:'읽기 꾸러미',w:'책 한 권에 엽서와 차 한 봉. 선물 수요가 오르는 연말에 맞습니다.',set:'책 1 + 엽서 2 + 티백 1 · 띠지로 묶기',at:'카페 쪽 벽 서가 눈높이 칸',first:'지점당 10세트, 예약 없이 현장 판매로 시험',mode:'store'},
+ {n:'북한산 엽서 세트',w:'공간의 풍경이 곧 기념품입니다. 숙박 · 연수 손님이 가져갈 것이 필요합니다.',set:'계절 4장 한 묶음 · 본관과 여섯 개의 집 그림',at:'본관 프런트 · 카페 계산대',first:'200세트, 단체 환영 꾸러미에 한 장씩 넣어 반응 보기',mode:'aka'},
+ {n:'단체 환영 꾸러미',w:'연수 첫날 책상 위에 놓이는 것. 재방문과 후기에 닿습니다.',set:'공간 안내 한 장 + 엽서 + 추천 책 목록 + 카페 음료권',at:'대관 공간 책상 · 객실',first:'다음 단체 1팀에 먼저 적용, 담당자 의견 받기',mode:'aka'},
+ {n:'사유의 숲 필사 노트',w:'명상 · 낭독 프로그램과 묶으면 프로그램이 물건으로 남습니다.',set:'얇은 중철 노트 + 이달의 문장 1쪽 인쇄',at:'사유의 숲 입구 · 프로그램 접수대',first:'프로그램 참가자 수만큼 먼저, 남으면 판매',mode:'aka'}];
+A.gdMore=async()=>{const aka=S.mode==='aka';const out=await ask('goods',`"더숲"(${aka?'북한산 자락 복합 문화 공간 아카데미하우스: 서점 · 북스테이 · 카페 · 대관 · 프로그램':'서울의 동네 서점 여러 지점: 문학 · 인문 · 예술 · 과학 중심'})에서 소량으로 시험해 볼 굿즈 · 묶음 상품 4가지를 제안하세요. 흔한 에코백 · 머그 말고, 이 공간만 할 수 있는 것. 원가나 판매량 숫자는 지어내지 말고, 과장 없이 담백하게.\nJSON 배열로만: [{"n":"이름","w":"왜 지금 이 공간에 맞는지 한 문장","set":"구성","at":"놓을 자리","first":"처음 시험하는 방법"}]`);if(Array.isArray(out))S.ui.gd=out.filter(x=>x&&x.n).slice(0,4)};
+function goodsCard(){const m=S.mode,L=[...(S.ui.gd||[]),...GOODS.filter(g=>g.mode===m)];return `<div class="sec"><h2>굿즈 제안</h2></div><div class="grid g3">${L.map(g=>`<div class="card gd"><h3>${esc(g.n)}</h3><p>${esc(g.w)}</p><dl><dt>구성</dt><dd>${esc(g.set)}</dd><dt>자리</dt><dd>${esc(g.at)}</dd><dt>시작</dt><dd>${esc(g.first)}</dd></dl></div>`).join('')}</div>${AI?`<div class="btns"><button class="btn" data-a="gdMore" ${S.ui.busy?'disabled':''}>${S.ui.busy==='goods'?'생각하는 중…':'다른 제안 받기'}</button></div>`:''}`}
+(()=>{const f=V.store.trend,g=()=>f()+goodsCard();V.store.trend=g;V.aka.trend=g})();
