@@ -26,12 +26,12 @@ function loadWx(){if(S.wxTried)return;S.wxTried=true;fetch('https://api.open-met
 const wxText=()=>{const w=S.wx;return w?`지금 수유동 ${Math.round(w.temp)}°C · ${w.snow?'눈':w.rain?'비':w.clear?'맑음':'흐림'}`:''};
 /* 제안 은행: 짧은 문구 · 한 줄 까닭 · 상징 · 색. 책은 지금 팔 수 있는 것 가운데 제목으로 찾는다. */
 const BANK=[
- {t:'제목에 색이 묻은 책',why:'표지가 아니라 제목의 색으로 골랐습니다. 빨강 옆에 녹색.',sym:'drop',bp:2,pp:6,k:/빨강|녹색|초록|파랑|푸른|붉은|검은|검정|하얀|흰|노랑|보라|회색|색/,sc:c=>2+(c.d%3)},
- {t:'건물이 제목인 책',why:'성당, 미술관, 영화관. 들어가 본 적 없는 건물로 들어갑니다.',sym:'house',bp:3,pp:5,k:/성당|미술관|영화관|도서관|서점|책방|학교|호텔|집$|의집|방$/,sc:c=>2+((c.d+1)%3)},
- {t:'잘 안 된 사람들',why:'실격, 모순, 고독. 실패한 쪽의 이야기가 더 오래 갑니다.',sym:'candle',bp:7,pp:5,k:/실격|모순|고독|이방인|가벼움|몰락|패배|은둔|절벽/,sc:c=>2+((c.d+2)%3)},
- {t:'혼자서도 시끄러운',why:'조용한 사람들의 머릿속은 대개 소란합니다.',sym:'wave',bp:6,pp:4,k:/혼자|고독|시끄러운|홀로|침묵|조용/,sc:c=>1+(c.d%4)},
- {t:'달리는 사람, 앉은 사람',why:'몸을 쓰는 책과 가만히 있는 책을 한자리에.',sym:'walk',bp:5,pp:0,k:/달리기|걷기|산책|앉|누워|초월|싯다르타|명상|요가/,sc:c=>1+((c.d+1)%4)},
- {t:'ㅅ으로 시작하는 책',why:'까닭은 없습니다. 싯다르타, 사랑, 슬로, 서울. 소리 내어 읽어 보세요.',sym:'star',bp:1,pp:3,k:/^(싯|사랑|슬로|서울|새|생명|세네카|숲|시|소|수|섬)/,sc:c=>1+((c.d+2)%4)},
+ {tone:'다른 시선',t:'제목에 색이 묻은 책',why:'표지가 아니라 제목의 색으로 골랐습니다. 빨강 옆에 녹색.',sym:'drop',bp:2,pp:6,k:/빨강|녹색|초록|파랑|푸른|붉은|검은|검정|하얀|흰|노랑|보라|회색|색/,sc:c=>2+(c.d%3)},
+ {tone:'다른 시선',t:'건물이 제목인 책',why:'성당, 미술관, 영화관. 들어가 본 적 없는 건물로 들어갑니다.',sym:'house',bp:3,pp:5,k:/성당|미술관|영화관|도서관|서점|책방|학교|호텔|집$|의집|방$/,sc:c=>2+((c.d+1)%3)},
+ {tone:'다른 시선',t:'잘 안 된 사람들',why:'실격, 모순, 고독. 실패한 쪽의 이야기가 더 오래 갑니다.',sym:'candle',bp:7,pp:5,k:/실격|모순|고독|이방인|가벼움|몰락|패배|은둔|절벽/,sc:c=>2+((c.d+2)%3)},
+ {tone:'다른 시선',t:'혼자서도 시끄러운',why:'조용한 사람들의 머릿속은 대개 소란합니다.',sym:'wave',bp:6,pp:4,k:/혼자|고독|시끄러운|홀로|침묵|조용/,sc:c=>1+(c.d%4)},
+ {tone:'다른 시선',t:'달리는 사람, 앉은 사람',why:'몸을 쓰는 책과 가만히 있는 책을 한자리에.',sym:'walk',bp:5,pp:0,k:/달리기|걷기|산책|앉|누워|초월|싯다르타|명상|요가/,sc:c=>1+((c.d+1)%4)},
+ {tone:'말놀이',t:'ㅅ으로 시작하는 책',why:'까닭은 없습니다. 싯다르타, 사랑, 슬로, 서울. 소리 내어 읽어 보세요.',sym:'star',bp:1,pp:3,k:/^(싯|사랑|슬로|서울|새|생명|세네카|숲|시|소|수|섬)/,sc:c=>1+((c.d+2)%4)},
  {t:'긴 밤에는, 긴 소설',why:'해가 다섯 시면 집니다. 두꺼운 소설 한 권으로 건너는 밤.',sym:'moon',bp:0,pp:2,k:/가호|프로젝트헤일메리|참을수없는존재|급류|천개의문|너무시끄러운고독|소년이온다|검은사슴|녹색절벽|어두운방에서/,sc:c=>[11,12,1].includes(c.m)?5:0},
  {t:'문제집을 치운 자리에',why:'수능이 끝난 책상에 처음 놓는 책. 얇고, 오래 남는 것으로.',sym:'pencil',bp:1,pp:0,k:/데미안|싯다르타|인간실격|이방인|동물농장|모순|이처럼사소한것들/,sc:c=>c.sn>=-10&&c.sn<=14?7:0},
  {t:'비 오는 날은, 시집이 얇아서',why:'우산을 접고 서서 읽기 좋은 두께.',sym:'rain',bp:5,pp:4,k:/시인선|시선|마음챙김의시|캔버스에유채|슬픔이택배로|당신의이름을지어다가|오래된거리처럼|함께장마를|꽃샘바람|그대가곁에있어도|나도꽃인데/,sc:c=>c.wx&&c.wx.rain?9:[6,7].includes(c.m)?3:1},
@@ -48,7 +48,7 @@ const bookWhy=b=>b.here>0?`매장에 ${b.here}권`:b.from?`${brN(b.from)}에서 
 function corners(br){const X=recs(br),P=X.P,[g1,g2]=P.order,pl=pool(br),sd=(()=>{const d=new Date(+TODAY.slice(0,4),10,1);let th=0;while(th<3){if(d.getDay()===4)th++;if(th<3)d.setDate(d.getDate()+1)}return dstr(d)})();
   const ctx={m:+TODAY.slice(5,7),d:+TODAY.slice(8),wx:S.wx||null,sn:dayDiff(TODAY,sd),movie:S.db.events.some(e=>e.kind==='영화'&&dayDiff(e.date,TODAY)>=0&&dayDiff(e.date,TODAY)<=7)&&br==='aka'};
   const role=(b,i)=>i===0?'중심':(b.mine||0)>=3?'잘 나가는':(b.here>0||b.src==='재고')?'곁들임':b.from?'다른 지점 인기':'새로 들일',until=o=>{const d=pd(TODAY);d.setDate(d.getDate()+(o.days||14));return dstr(d)};
-  const mk=(o,books)=>({title:o.t,hook:o.why,sym:o.sym,bpal:o.bp,ppal:o.pp,until:until(o),place:o.place||(o.sym==='star'?'계산대 옆':'입구 평대'),books:books.filter((b,i,a)=>a.findIndex(z=>nt(z.t)===nt(b.t))===i).slice(0,8).map((b,i)=>({...b,role:role(b,i)})),pop:{head:o.t.replace(/,\s*/,',\n'),body:o.why},band:o.t,br});
+  const mk=(o,books)=>({tone:o.tone||'제철',title:o.t,hook:o.why,sym:o.sym,bpal:o.bp,ppal:o.pp,until:until(o),place:o.place||(o.sym==='star'?'계산대 옆':'입구 평대'),books:books.filter((b,i,a)=>a.findIndex(z=>nt(z.t)===nt(b.t))===i).slice(0,8).map((b,i)=>({...b,role:role(b,i)})),pop:{head:o.t.replace(/,\s*/,',\n'),body:o.why},band:o.t,br});
   const L=BANK.map(o=>({o,s:o.sc(ctx)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(({o})=>mk(o,pl.filter(b=>o.k.test(b.t.replace(/\s/g,''))).sort((a,b)=>(b.here>0)-(a.here>0)||(b.mine||0)+b.sold-(a.mine||0)-a.sold).map(b=>({...b,why:bookWhy(b),src:b.here>0?'재고':'들여놓기'})))).filter(c=>c.books.length>=3).slice(0,5);
   if(Math.abs(dayDiff(TODAY,TODAY.slice(0,4)+'-11-11'))<=3)L.unshift(mk({t:'오늘은, 서점의 날',why:'11월 11일. 이 책방에서 가장 많이 집어 간 책들.',sym:'book',bp:4,pp:1},P.tops.filter(x=>x.stock>0&&sellable(x)).map(x=>({t:x.t,a:x.a,p:x.p,isbn:x.isbn,price:x.price,why:`30일 ${x.sold30}권`,src:'재고'}))));
   const own=g=>P.tops.filter(x=>grp(x.cat)===g&&x.stock>0&&sellable(x)).slice(0,3).map(x=>({t:x.t,a:x.a,p:x.p,isbn:x.isbn,price:x.price,why:`매장에서 30일 ${x.sold30}권`,src:'재고'}));
@@ -61,7 +61,7 @@ const symSVG=(key,pal)=>{const P=BANDC[pal]||BANDC[1];return `<svg viewBox="0 0 
 V.store.cur=()=>{const br=S.br;if(S.solo)loadWx();
   if(br==='all')return `<div class="hero"><p>${hooks(1).season}</p><h2>지점 선택</h2></div>
    <div class="grid g4">${BR.map(b=>{const P=profile(b.k);return `<button class="card pick" data-a="br" data-k="${b.k}" style="border-top:4px solid ${b.c}"><b>${NM(b.k)?'노원문고 ':''}${BRAND[b.k]}</b><small>${b.n} · ${P.amt?`${P.order[0]} ${Math.round(P.sh[P.order[0]]*100)}%`:'자료 없음'}</small></button>`}).join('')}</div>`;
-  const C=corners(br),X=C.X,P=X.P;S.ui.cor=C.all;const hk=hooks(21).list.filter(h=>!h.ev).slice(0,2).map(h=>`${h.label.replace(/\(.*?\)/g,'')} ${dday(h.date)}`);
+  const C=corners(br),X=C.X,P=X.P;C.data.forEach(t=>t.tone='꾸준한');const TN=S.ui.cTone||'전체',pick=t=>TN==='전체'||t.tone===TN;S.ui.cor=C.all;const hk=hooks(21).list.filter(h=>!h.ev).slice(0,2).map(h=>`${h.label.replace(/\(.*?\)/g,'')} ${dday(h.date)}`);
   const lackN=t=>t.books.slice(0,5).filter(b=>b.src!=='재고').length,thumb=(t,i)=>{try{return `<button class="pthumb" data-a="toDesign" data-kind="pop" data-s="c" data-i="${i}" aria-label="POP 미리보기">${toSVG(layout(mkD({...t,br},'pop')))}</button>`}catch(e){return symSVG(t.sym,t.bpal)}};
   const card=(t,i)=>`<div class="card pcard"><div class="phead">${thumb(t,i)}<div><h3>${esc(t.title)}</h3><p>${esc(t.hook)}</p></div></div>
     <p class="cmeta"><span>${esc(t.place||'입구 평대')}</span><span>${t.until?mdw(t.until)+'까지':'2주'}</span><span>${dpPlan(t,0).total}권</span></p>
@@ -71,8 +71,9 @@ V.store.cur=()=>{const br=S.br;if(S.solo)loadWx();
      <details class="menu"><summary>기타</summary><div><button data-a="toDesign" data-kind="band" data-s="c" data-i="${i}">띠지</button><button data-a="toDesign" data-kind="list" data-s="c" data-i="${i}">책 목록 A4</button><button data-a="toDesign" data-kind="card" data-s="c" data-i="${i}">쇼카드 (6장)</button><button data-a="curKit" data-i="${i}">전체 다운로드 (POP · 띠지 · 목록 · 쇼카드)</button><button data-a="curOrder" data-s="c" data-i="${i}">미보유 도서 주문 담기${lackN(t)?` (${lackN(t)}종)`:''}</button><button data-a="go" data-v="club">책모임으로 열기</button><button data-a="corFix" data-i="${i}">공간 매대에 넣기</button></div></details></div></div>`;
   const row=(b,k,i)=>`<div class="li"><div class="t"><b style="font-weight:600">${esc(b.t)}</b><small>${esc([b.a,b.p,b.why].filter(Boolean).join(' · '))}</small></div>${isbnChip(b)}<button class="btn sm" data-a="recAdd" data-k="${k}" data-i="${i}">담기</button></div>`;
   return `<div class="hero"><p>${[brN(br),mdw(TODAY),...hk].filter(Boolean).join(' · ')}</p><h2>이번 주 큐레이션</h2></div>
-  <div class="grid g2" style="align-items:start">${C.time.slice(0,S.ui.cMore?8:4).map((t,i)=>card(t,i)).join('')||'<div class="card empty">지금 때에 맞는 제안이 없습니다.</div>'}</div>
-  ${C.time.length>4?`<div class="btns" style="justify-content:center;margin-top:14px"><button class="btn ghost" data-a="cMore">${S.ui.cMore?'접기':`제안 ${Math.min(8,C.time.length)-4}개 더 보기`}</button></div>`:''}
+  <div class="subnav" role="tablist">${['전체','제철','다른 시선','말놀이','꾸준한'].map(t=>`<button data-a="cTone" data-t="${t}" aria-pressed="${TN===t}">${t}</button>`).join('')}</div>
+  <div class="grid g2" style="align-items:start">${C.all.map((t,i)=>[t,i]).filter(([t])=>pick(t)).slice(0,S.ui.cMore?12:4).map(([t,i])=>card(t,i)).join('')||'<div class="card empty">지금 때에 맞는 제안이 없습니다.</div>'}</div>
+  ${C.all.filter(pick).length>4?`<div class="btns" style="justify-content:center;margin-top:14px"><button class="btn ghost" data-a="cMore">${S.ui.cMore?'접기':`더 보기`}</button></div>`:''}
   <details class="fold" data-o="c1" ${S.ui.o_c1?'open':''}><summary>늘 두는 코너 <small>새 책 · 스테디셀러 · 다른 지점에서 팔리는 책</small></summary><div class="grid g2" style="align-items:start;margin-top:14px">${C.data.map((t,i)=>card(t,C.time.length+i)).join('')}</div></details>
   <details class="fold" data-o="c2" ${S.ui.o_c2?'open':''}><summary>이 지점의 성격 <small>${P.order[0]} ${Math.round(P.sh[P.order[0]]*100)}% · ${P.order[1]} ${Math.round(P.sh[P.order[1]]*100)}%</small></summary><div class="grid g2" style="margin-top:14px"><div class="card"><ul style="margin:0;padding-left:18px;display:grid;gap:6px">${profText(br,P).map(t=>`<li>${t}</li>`).join('')}</ul></div>
    <div class="card"><h3>분야 비중 <small>이 지점 / 다른 지점 평균</small></h3>${GR.map(g=>hbar(g,P.sh[g],Math.max(...GR.map(x=>P.sh[x]),.01),`${Math.round(P.sh[g]*100)}% <small style="color:var(--muted)">/ ${Math.round(P.avg[g]*100)}%</small>`,brC(br),`${g} · 이 지점 ${Math.round(P.sh[g]*100)}% · 다른 지점 평균 ${Math.round(P.avg[g]*100)}%`)).join('')}</div></div></details>
@@ -85,3 +86,5 @@ A.corFix=d=>{const t=S.ui.cor[+d.i];let done='';planMut(p=>{if(p.starter)delete 
 
 A.cMore=()=>{S.ui.cMore=!S.ui.cMore;render()};
 A.curKit=async d=>{const t=S.ui.cor[+d.i],keep=S.ui.D;for(const k of ['pop','band','list','card']){S.ui.D=mkD({...t,br:t.br||S.br},k);await A.dPdf()}S.ui.D=keep;toast('POP · 띠지 · 책 목록 · 쇼카드 PDF 네 장을 받았습니다')};
+
+A.cTone=d=>{S.ui.cTone=d.t;S.ui.cMore=false;render()};
