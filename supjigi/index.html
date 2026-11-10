@@ -406,6 +406,17 @@ body .mrow small{color:var(--muted);font-size:13.5px;text-align:right;white-spac
 body .mrow:hover b{color:var(--pine)}
 @media(max-width:720px){body .mrow>span:first-child{display:block}body .mrow b{font-size:19px}body .mrow b::after{display:none}body .mrow small{display:block;text-align:left;white-space:normal;margin-top:3px}body .kpi b{font-size:28px}body .grid.g4{gap:18px;grid-template-columns:1fr 1fr}}
 body.vm .mrow>span:first-child{display:block}body.vm .mrow b::after{display:none}body.vm .mrow small{display:block;text-align:left;white-space:normal;margin-top:3px}body.vm .grid.g4{grid-template-columns:1fr 1fr;gap:18px}
+
+/* 둘러보기 */
+#guide{position:fixed;inset:0;z-index:80;background:#003128;color:#f2eee3;display:grid;place-items:center;padding:18px;overflow:auto}
+.gdb{width:min(100%,460px);display:grid;gap:8px;justify-items:center;text-align:center}
+.gdx{justify-self:end;border:1px solid rgba(242,238,227,.45);background:none;color:inherit;padding:7px 14px;border-radius:3px;font:600 14px "Pretendard",sans-serif}
+.gdn{font:500 13px "Pretendard",sans-serif;color:#d9b45b;font-variant-numeric:tabular-nums}
+.gdb h2{font:800 clamp(24px,6vw,30px)/1.25 "Pretendard",sans-serif;letter-spacing:-.03em;margin:0}.gdb p{margin:0 0 6px;color:rgba(242,238,227,.75);font-size:15px}
+.gdi{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:6px;width:100%}.gdi img{width:100%;max-height:62vh;object-fit:contain;display:block;background:#f1f0eb}
+.gda{border:0;background:none;color:#f2eee3;font:300 40px/1 "Pretendard",sans-serif;padding:20px 6px}
+.gdd{display:flex;gap:6px;margin-top:8px}.gdd button{width:26px;height:4px;border:0;padding:0;background:rgba(242,238,227,.3)}.gdd button[aria-pressed=true]{background:#d9b45b}
+body.dialon .gdbtn{margin-left:6px}
 </style>
 </head>
 <body>
