@@ -26,6 +26,12 @@ function loadWx(){if(S.wxTried)return;S.wxTried=true;fetch('https://api.open-met
 const wxText=()=>{const w=S.wx;return w?`지금 수유동 ${Math.round(w.temp)}°C · ${w.snow?'눈':w.rain?'비':w.clear?'맑음':'흐림'}`:''};
 /* 제안 은행: 짧은 문구 · 한 줄 까닭 · 상징 · 색. 책은 지금 팔 수 있는 것 가운데 제목으로 찾는다. */
 const BANK=[
+ {t:'제목에 색이 묻은 책',why:'표지가 아니라 제목의 색으로 골랐습니다. 빨강 옆에 녹색.',sym:'drop',bp:2,pp:6,k:/빨강|녹색|초록|파랑|푸른|붉은|검은|검정|하얀|흰|노랑|보라|회색|색/,sc:c=>2+(c.d%3)},
+ {t:'건물이 제목인 책',why:'성당, 미술관, 영화관. 들어가 본 적 없는 건물로 들어갑니다.',sym:'house',bp:3,pp:5,k:/성당|미술관|영화관|도서관|서점|책방|학교|호텔|집$|의집|방$/,sc:c=>2+((c.d+1)%3)},
+ {t:'잘 안 된 사람들',why:'실격, 모순, 고독. 실패한 쪽의 이야기가 더 오래 갑니다.',sym:'candle',bp:7,pp:5,k:/실격|모순|고독|이방인|가벼움|몰락|패배|은둔|절벽/,sc:c=>2+((c.d+2)%3)},
+ {t:'혼자서도 시끄러운',why:'조용한 사람들의 머릿속은 대개 소란합니다.',sym:'wave',bp:6,pp:4,k:/혼자|고독|시끄러운|홀로|침묵|조용/,sc:c=>1+(c.d%4)},
+ {t:'달리는 사람, 앉은 사람',why:'몸을 쓰는 책과 가만히 있는 책을 한자리에.',sym:'walk',bp:5,pp:0,k:/달리기|걷기|산책|앉|누워|초월|싯다르타|명상|요가/,sc:c=>1+((c.d+1)%4)},
+ {t:'ㅅ으로 시작하는 책',why:'까닭은 없습니다. 싯다르타, 사랑, 슬로, 서울. 소리 내어 읽어 보세요.',sym:'star',bp:1,pp:3,k:/^(싯|사랑|슬로|서울|새|생명|세네카|숲|시|소|수|섬)/,sc:c=>1+((c.d+2)%4)},
  {t:'긴 밤에는, 긴 소설',why:'해가 다섯 시면 집니다. 두꺼운 소설 한 권으로 건너는 밤.',sym:'moon',bp:0,pp:2,k:/가호|프로젝트헤일메리|참을수없는존재|급류|천개의문|너무시끄러운고독|소년이온다|검은사슴|녹색절벽|어두운방에서/,sc:c=>[11,12,1].includes(c.m)?5:0},
  {t:'문제집을 치운 자리에',why:'수능이 끝난 책상에 처음 놓는 책. 얇고, 오래 남는 것으로.',sym:'pencil',bp:1,pp:0,k:/데미안|싯다르타|인간실격|이방인|동물농장|모순|이처럼사소한것들/,sc:c=>c.sn>=-10&&c.sn<=14?7:0},
  {t:'비 오는 날은, 시집이 얇아서',why:'우산을 접고 서서 읽기 좋은 두께.',sym:'rain',bp:5,pp:4,k:/시인선|시선|마음챙김의시|캔버스에유채|슬픔이택배로|당신의이름을지어다가|오래된거리처럼|함께장마를|꽃샘바람|그대가곁에있어도|나도꽃인데/,sc:c=>c.wx&&c.wx.rain?9:[6,7].includes(c.m)?3:1},
@@ -42,7 +48,7 @@ const bookWhy=b=>b.here>0?`매장에 ${b.here}권`:b.from?`${brN(b.from)}에서 
 function corners(br){const X=recs(br),P=X.P,[g1,g2]=P.order,pl=pool(br),sd=(()=>{const d=new Date(+TODAY.slice(0,4),10,1);let th=0;while(th<3){if(d.getDay()===4)th++;if(th<3)d.setDate(d.getDate()+1)}return dstr(d)})();
   const ctx={m:+TODAY.slice(5,7),d:+TODAY.slice(8),wx:S.wx||null,sn:dayDiff(TODAY,sd),movie:S.db.events.some(e=>e.kind==='영화'&&dayDiff(e.date,TODAY)>=0&&dayDiff(e.date,TODAY)<=7)&&br==='aka'};
   const role=(b,i)=>i===0?'중심':(b.mine||0)>=3?'잘 나가는':(b.here>0||b.src==='재고')?'곁들임':b.from?'다른 지점 인기':'새로 들일',until=o=>{const d=pd(TODAY);d.setDate(d.getDate()+(o.days||14));return dstr(d)};
-  const mk=(o,books)=>({title:o.t,hook:o.why,sym:o.sym,bpal:o.bp,ppal:o.pp,until:until(o),place:o.place||(o.sym==='star'?'계산대 옆':'입구 평대'),books:books.filter((b,i,a)=>a.findIndex(z=>nt(z.t)===nt(b.t))===i).slice(0,6).map((b,i)=>({...b,role:role(b,i)})),pop:{head:o.t.replace(/,\s*/,',\n'),body:o.why},band:o.t,br});
+  const mk=(o,books)=>({title:o.t,hook:o.why,sym:o.sym,bpal:o.bp,ppal:o.pp,until:until(o),place:o.place||(o.sym==='star'?'계산대 옆':'입구 평대'),books:books.filter((b,i,a)=>a.findIndex(z=>nt(z.t)===nt(b.t))===i).slice(0,8).map((b,i)=>({...b,role:role(b,i)})),pop:{head:o.t.replace(/,\s*/,',\n'),body:o.why},band:o.t,br});
   const L=BANK.map(o=>({o,s:o.sc(ctx)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(({o})=>mk(o,pl.filter(b=>o.k.test(b.t.replace(/\s/g,''))).sort((a,b)=>(b.here>0)-(a.here>0)||(b.mine||0)+b.sold-(a.mine||0)-a.sold).map(b=>({...b,why:bookWhy(b),src:b.here>0?'재고':'들여놓기'})))).filter(c=>c.books.length>=3).slice(0,5);
   if(Math.abs(dayDiff(TODAY,TODAY.slice(0,4)+'-11-11'))<=3)L.unshift(mk({t:'오늘은, 서점의 날',why:'11월 11일. 이 책방에서 가장 많이 집어 간 책들.',sym:'book',bp:4,pp:1},P.tops.filter(x=>x.stock>0&&sellable(x)).map(x=>({t:x.t,a:x.a,p:x.p,isbn:x.isbn,price:x.price,why:`30일 ${x.sold30}권`,src:'재고'}))));
   const own=g=>P.tops.filter(x=>grp(x.cat)===g&&x.stock>0&&sellable(x)).slice(0,3).map(x=>({t:x.t,a:x.a,p:x.p,isbn:x.isbn,price:x.price,why:`매장에서 30일 ${x.sold30}권`,src:'재고'}));
