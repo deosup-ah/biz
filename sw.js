@@ -1,5 +1,5 @@
-/* 더숲 단체 일정 — 오프라인 대비. 데이터는 항상 네트워크 먼저, 안 되면 마지막 저장본. */
-const CACHE = "ds-v2";
+/* 더숲 아카이브 — 오프라인 대비. 데이터는 항상 네트워크 먼저, 안 되면 마지막 저장본. */
+const CACHE = "ds-v3";
 const CORE = ["./", "index.html", "data.js", "sales.js", "logo.png", "icon-192.png", "manifest.webmanifest"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
