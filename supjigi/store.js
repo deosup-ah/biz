@@ -192,3 +192,7 @@ A.impSave=async()=>{const I=S.ui.imp,br=S.br,g=(r,k)=>I.map[k]>=0?r[I.map[k]]:''
     if(!its.length){toast('책 이름을 읽지 못했습니다');return}const n=Math.ceil(its.length/1000);for(let i=0;i<n;i++)await put('stock',br+'-'+i,{br,part:i,asOf:TODAY,items:its.slice(i*1000,(i+1)*1000)},true);
     for(const d of S.db.stock.filter(d=>d.br===br&&d.part>=n))await del('stock',d.id);toast(`재고 ${its.length}종을 저장했습니다`)}
   S.ui.imp=null;S.demoPref=null;render()};
+
+V.store.more=()=>{const an=anomalies('all').length,row=(v,t,d,b)=>`<button class="mrow" data-a="go" data-v="${v}"><span><b>${t}</b><small>${d}</small></span>${b?`<span class="pill p-low">${b}</span>`:''}<span aria-hidden="true">›</span></button>`;
+  return `<div class="sec"><h2>더보기</h2></div><div class="card" style="padding:4px 16px">${row('today','오늘','어제 매출 · 살펴볼 것 · 다가오는 때',an?an+'건':'')}${row('rank','순위','예스24 · 알라딘과 매장 재고 견주기')}${row('space','공간','지점 배치도 · 매대 주제 · 행사 좌석')}${row('ret','반품','반품 목록 만들고 기록')}${row('data','자료 · 설정','엑셀 올리기 · 북센 여신잔액 · 연결 상태')}</div>
+  <div class="btns"><button class="btn" data-a="big">${document.body.classList.contains('big')?'글자 보통으로':'글자 크게'}</button><button class="btn" data-a="lock">화면 잠그기</button></div>`};

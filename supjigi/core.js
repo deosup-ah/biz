@@ -6,13 +6,13 @@ const brN=k=>k==='all'?'전체':(BR.find(b=>b.k===k)||{}).n||k;
 const brC=k=>(BR.find(b=>b.k===k)||{}).c||'var(--pine)';
 const GR=['문학','인문','예술','과학','기타'];
 function grp(c){c=String(c||'');if(/문학|소설|에세이|산문|희곡|^시$|시집/.test(c))return'문학';if(/인문|철학|역사|사회|심리|종교|정치|교양/.test(c))return'인문';if(/예술|미술|음악|사진|디자인|건축|영화|만화/.test(c))return'예술';if(/과학|자연|수학|기술|공학|의학|환경/.test(c))return'과학';return'기타'}
-const TABS={store:[['today','오늘'],['cur','큐레이션'],['design','POP · 띠지'],['space','공간'],['ana','매출 분석'],['stock','재고 · 주문'],['rank','순위'],['ret','반품'],['data','자료 · 설정']],
-  aka:[['today','오늘'],['cal','일정'],['plan','행사 기획'],['insta','인스타'],['naver','네이버'],['space','공간'],['design','POP · 디자인']]};
+const TABS={store:[['cur','큐레이션'],['design','POP'],['ana','매출'],['stock','주문'],['more','더보기']],
+  aka:[['today','오늘'],['cal','일정'],['plan','기획'],['insta','인스타'],['design','POP']]};
 const COLS=['credit','sales','stock','carts','orders','returns','events','plans','insta','curations','ideas'];
-const S={locked:true,mode:'store',br:'all',view:{store:'today',aka:'today'},loaded:false,demoPref:null,db:{},ui:{per:3},got:{}};
+const S={locked:true,mode:'store',br:'all',view:{store:'cur',aka:'today'},loaded:false,demoPref:null,db:{},ui:{per:3},got:{}};
 COLS.forEach(c=>S.db[c]=[]);
 const V={store:{},aka:{}},A={},C={},AFTER={};
-let DB=null,USER=null,AI=null,DL=null;
+let DB=null,USER=null,AI=null,DL=null,DICT=null;
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -119,15 +119,15 @@ A.lock=()=>{S.locked=true;pin='';try{sessionStorage.removeItem('sj.p')}catch(e){
 document.addEventListener('keydown',e=>{if(!S.locked)return;if(/^\d$/.test(e.key))A.pin({n:e.key});else if(e.key==='Backspace')A.pin({n:'x'})});
 
 /* 머리줄 · 그리기 */
-function render(){if(S.locked)return;const m=S.mode,v=V[m][S.view[m]]?S.view[m]:'today';const al=m==='store'?anomalies('all').length:0,cn=BR.reduce((a,b)=>a+cart(b.k).items.length,0);
+function render(){if(S.locked)return;if(S.view.store==='today'&&!S.ui.seenToday){}const m=S.mode,v=V[m][S.view[m]]?S.view[m]:TABS[m][0][0],tv=TABS[m].some(t=>t[0]===v)?v:'more';const al=m==='store'?anomalies('all').length:0,cn=BR.reduce((a,b)=>a+cart(b.k).items.length,0);
   const sx=window.scrollX,sy=window.scrollY;
-  $('app').innerHTML=`<header class="top"><div class="bar"><div class="brand">숲지기 <small>더숲 책과 공간을 돌보는 앱</small></div>
+  $('app').innerHTML=`<header class="top"><div class="bar"><div class="brand"><img class="blogo" src="logo-g.png" alt="deosup" height="20"><span>숲지기</span></div>
     <div class="mode" role="group" aria-label="일 고르기"><button data-a="mode" data-m="store" aria-pressed="${m==='store'}">서점</button><button data-a="mode" data-m="aka" aria-pressed="${m==='aka'}">아카데미</button></div>
-    <button class="icon" data-a="big">${document.body.classList.contains('big')?'글자 보통':'글자 크게'}</button><button class="icon" data-a="lock">잠그기</button></div>
+    </div>
    ${m==='store'?`<div class="row2" role="group" aria-label="지점 고르기">${[{k:'all',n:'전체'},...BR].map(b=>`<button class="brchip" data-a="br" data-k="${b.k}" aria-pressed="${S.br===b.k}">${b.c?`<i style="background:${b.c}"></i>`:''}${b.n}</button>`).join('')}</div>`:''}
-   <nav class="tabs">${TABS[m].map(([k,l])=>`<button data-a="go" data-v="${k}" ${v===k?'aria-current="page"':''}>${l}${k==='today'&&al?`<span class="b">${al}</span>`:''}${k==='stock'&&cn?`<span class="b" style="background:var(--pine)">${cn}</span>`:''}</button>`).join('')}</nav></header>
+   <nav class="tabs">${TABS[m].map(([k,l])=>`<button data-a="go" data-v="${k}" ${tv===k?'aria-current="page"':''}>${l}${k==='more'&&al?`<span class="b">${al}</span>`:''}${k==='stock'&&cn?`<span class="b" style="background:var(--pine)">${cn}</span>`:''}</button>`).join('')}</nav></header>
    <main>${!S.loaded?`<div class="card empty">자료를 불러오는 중입니다…</div>`:''}${S.slow?`<div class="al">저장된 자료에 아직 닿지 못했습니다. 보이는 내용이 최신이 아닐 수 있습니다.</div>`:''}
-   ${S.solo?`<p class="note">담은 주문 · 일정 · 배치도는 이 기기에 저장됩니다.</p>`:''}
+   
    ${m==='store'&&!isDemo()&&!realStock().length&&v==='stock'?`<div class="al">재고 자료가 아직 없어 주문 필요 계산은 비어 있습니다. 매출은 실제 숫자입니다.</div>`:''}
    ${m==='store'&&isDemo()&&['today','ana','stock'].includes(v)?`<div class="demo"><span><b>예시 자료입니다.</b> 실제 매출 · 재고가 아닙니다. 이지정보에서 내보낸 엑셀을 「자료 · 설정」에 올리면 진짜 숫자로 바뀝니다.</span><button class="btn sm" data-a="go" data-v="data">자료 올리러 가기</button></div>`:''}
    ${V[m][v]()}</main>`;
@@ -138,11 +138,12 @@ A.go=d=>{if(d.m)S.mode=d.m;S.view[S.mode]=d.v;ls.set('view',S.view);window.scrol
 A.big=()=>{const b=document.body.classList.toggle('big');ls.set('big',b);render()};
 A.ui=d=>{S.ui[d.k]=isNaN(+d.v)||d.v===''?d.v:+d.v;if(d.k==='per'){S.ui.pf=S.ui.pt=null}render()};
 document.addEventListener('click',e=>{if(e.target.id==='sheet'){closeSheet();return}const el=e.target.closest('[data-a]');if(el&&A[el.dataset.a])A[el.dataset.a](el.dataset,el,e)});
+document.addEventListener('toggle',e=>{const k=e.target&&e.target.dataset&&e.target.dataset.o;if(k)S.ui['o_'+k]=e.target.open},true);
 document.addEventListener('change',e=>{const el=e.target.closest('[data-c]');if(el&&C[el.dataset.c])C[el.dataset.c](el,el.dataset)});
 document.addEventListener('mousemove',e=>{const el=e.target.closest&&e.target.closest('[data-tip]'),t=$('tip');if(!el){t.style.display='none';return}t.textContent=el.dataset.tip;t.style.display='block';t.style.left=Math.min(e.clientX+12,innerWidth-250)+'px';t.style.top=e.clientY+14+'px'});
 
 function boot(){S.mode=ls.get('mode','store');S.br=ls.get('br','all');S.view=Object.assign(S.view,ls.get('view',{}));if(ls.get('big',false))document.body.classList.add('big');
   let sp='';try{sp=sessionStorage.getItem('sj.p')||''}catch(e){}if(/^\d{4}$/.test(sp)){pin=sp;lockUI();tryPin()}else lockUI();
   if(!(window.claude&&window.claude.use)){S.solo=true;const o=ls.get('db',null);if(o)COLS.forEach(c=>{if(Array.isArray(o[c]))S.db[c]=o[c]});S.loaded=true;render();return}
-  render();Promise.all(['db','user','sample','downloads'].map(n=>window.claude.use(n).catch(()=>null))).then(([d,u,a,l])=>{DB=d;USER=u;AI=a;DL=l;if(DB)subscribe();else{S.solo=true;S.loaded=true}render()});
+  render();Promise.all(['db','user','sample','downloads','dictation'].map(n=>window.claude.use(n).catch(()=>null))).then(([d,u,a,l,dc])=>{DB=d;USER=u;AI=a;DL=l;DICT=dc;if(DICT){try{DICT.onFinal(({text})=>{micHeard(text);DICT.stop().catch(()=>{})});DICT.onState(({state})=>{const on=state==='listening';if(S.ui.mic!==on){S.ui.mic=on;render()}})}catch(e){DICT=null}}if(DB)subscribe();else{S.solo=true;S.loaded=true}render()});
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>softRender())}
