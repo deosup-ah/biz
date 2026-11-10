@@ -1,0 +1,18 @@
+/* 더숲 워크룸 — 주문: 지점에 없는 책 가운데 들여놓을 책을 분야별로 10종씩, 까닭과 함께 */
+function lackBooks(br){const have=new Set(items(br).filter(x=>(x.stock||0)>0).flatMap(x=>[x.isbn,nt(x.t)].filter(Boolean))),inCart=new Set(cart(br).items.flatMap(i=>[i.isbn,nt(i.t)].filter(Boolean))),seen=new Set(),out=[],add=(b,g,why,pr)=>{if(!b||!b.t)return;const k=b.isbn||nt(b.t);if(seen.has(k)||have.has(b.isbn)||have.has(nt(b.t))||(b.isbn&&(window.SOLD||{})[b.isbn]))return;seen.add(k);out.push({t:b.t,a:b.a||'',p:b.p||'',isbn:b.isbn||'',price:b.price||0,g:GR.includes(g)?g:'문학',why,pr,inCart:inCart.has(b.isbn)||inCart.has(nt(b.t))})};
+  try{corners(br).all.forEach(c=>c.books.filter(b=>b.src!=='재고').forEach(b=>add(b,grp(b.cat||''),`큐레이션 「${c.title}」에 필요`,0)))}catch(e){}
+  BR.filter(b=>b.k!==br).forEach(o=>items(o.k).filter(x=>(x.sold30||0)>=2).sort((a,b)=>b.sold30-a.sold30).forEach(x=>add(x,grp(x.cat||''),`${o.n}에서 30일 ${x.sold30}권 판매`,1)));
+  const R=window.RECS||{};Object.entries(R.new||{}).forEach(([c,a])=>a.forEach(b=>add(b,grp(c),'예스24 새로 나온 책',2)));Object.entries(R.steady||{}).forEach(([c,a])=>a.forEach(b=>add(b,grp(c),'예스24 스테디셀러',3)));
+  ['yes24','aladin'].forEach(s=>((window.BOOKS||{})[s]||[]).forEach((b,i)=>add(b,grp(b.cat||''),`${s==='yes24'?'예스24':'알라딘'} 종합 ${i+1}위`,4)));return out.sort((a,b)=>a.pr-b.pr)}
+function lackCard(br){if(br==='all')return '';const L=lackBooks(br),cur=L.filter(x=>x.pr===0&&!x.inCart);if(!L.length)return '';
+  return `<div class="card"><h3>들여놓을 책 <small>${brN(br)}에 없는 책 · 분야별 10종씩</small>${cur.length?`<button class="btn sm pri" style="margin-left:auto" data-a="lkCur">큐레이션 도서 ${cur.length}종 담기</button>`:''}</h3>
+   <div class="lkgrid">${GR.filter(g=>L.some(x=>x.g===g)).map(g=>{const A_=L.filter(x=>x.g===g),n=S.ui['lk_'+g]||10,V_=A_.slice(0,n);return `<div class="lkcol"><div class="lkhead"><b>${g}</b><small>${A_.length}종</small><button class="btn sm" style="margin-left:auto" data-a="lkAll" data-g="${g}">보이는 ${V_.filter(x=>!x.inCart).length}종 담기</button></div>
+     ${V_.map(x=>`<div class="lkrow"><div><b>${esc(x.t)}</b><small>${esc([x.a,x.p].filter(Boolean).join(' · '))}</small><em>${esc(x.why)}</em></div>${x.inCart?'<span class="pill p-ok">담음</span>':`<button class="btn sm" data-a="lkAdd" data-k="${esc(x.isbn||nt(x.t))}">담기</button>`}</div>`).join('')}
+     ${A_.length>n?`<button class="lnk" data-a="lkMore" data-g="${g}">10종 더 보기</button>`:''}</div>`}).join('')}</div>
+   <p class="note" style="margin-top:10px">매장 재고는 많이 팔린 30종만 알고 있어, 이미 있는 책이 섞일 수 있습니다. 품절 · 절판은 뺐습니다.</p></div>`}
+const lkFind=k=>lackBooks(S.br).find(x=>(x.isbn||nt(x.t))===k);
+A.lkAdd=d=>{const x=lkFind(d.k);if(x&&addCart(S.br,x,2,x.why))toast('주문에 담았습니다')};
+A.lkAll=d=>{const n=S.ui['lk_'+d.g]||10,L=lackBooks(S.br).filter(x=>x.g===d.g).slice(0,n).filter(x=>!x.inCart);cartMut(S.br,c=>{L.forEach(x=>c.items.push({t:x.t,a:x.a,p:x.p,isbn:x.isbn,price:x.price,qty:2,why:x.why}));c.status='담음'});toast(`${d.g} ${L.length}종을 담았습니다`)};
+A.lkCur=()=>{const L=lackBooks(S.br).filter(x=>x.pr===0&&!x.inCart);cartMut(S.br,c=>{L.forEach(x=>c.items.push({t:x.t,a:x.a,p:x.p,isbn:x.isbn,price:x.price,qty:2,why:x.why}));c.status='담음'});toast(`큐레이션 도서 ${L.length}종을 담았습니다`)};
+A.lkMore=d=>{S.ui['lk_'+d.g]=(S.ui['lk_'+d.g]||10)+10;render()};
+(()=>{const f=V.store.stock;V.store.stock=()=>{let h=f(),c='';try{c=lackCard(S.br)}catch(e){}const m='<div class="card" style="border-top:4px solid';const i=h.indexOf(m);h=i>0?h.slice(0,i)+c+h.slice(i):h+c;return h.replace(/<div class="list">(<div class="li"><div class="t"><b>)/g,'<div class="list cartgrid">$1')}})();
