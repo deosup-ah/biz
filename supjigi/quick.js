@@ -61,7 +61,7 @@ V.aka.today=()=>{if(GC.st==='idle')setTimeout(gcLoad,0);const days=[0,1,2,3,4,5,
   const n0=gcDay(TODAY).length+mine(TODAY).length,todo=[];if(gcDay(TODAY).length||mine(TODAY).length)todo.push(['오늘의 단체표',`오늘 ${n0}건을 한 장으로`,'gcBoard','']);
   akaTodo().filter(x=>!/단체표/.test(x.t)).slice(0,4).forEach(x=>todo.push([x.b[0][0],x.t,'akaDo',`data-t="${x.b[0][1]}" data-id="${x.b[0][2]}"`]));
   return `<div class="hero"><h2>${mdw(TODAY)} · 오늘 ${n0}건</h2></div>
-  <div class="card qadd"><div class="qrow"><input type="text" id="qIn" enterkeyhint="done" autocomplete="off" placeholder="내일 2시 한살림 연수 30명 본관">${DICT||window.SpeechRecognition||window.webkitSpeechRecognition?`<button class="btn" data-a="dMic" aria-pressed="${!!S.ui.mic}">${S.ui.mic?'듣는 중':'말하기'}</button>`:''}<button class="btn pri" data-a="qAdd">추가</button></div><small id="qPv" class="note">날짜나 시간이 있으면 일정으로, 없으면 아이디어로 보고 바로 디자인을 만듭니다</small></div>
+  <div class="card qadd"><div class="qrow"><input type="text" id="qIn" enterkeyhint="done" autocomplete="off" placeholder="내일 2시 한살림 연수 30명 본관">${micBtn('qIn')}<button class="btn pri" data-a="qAdd">추가</button></div><small id="qPv" class="note">날짜나 시간이 있으면 일정으로, 없으면 아이디어로 보고 바로 디자인을 만듭니다</small></div>
   ${gcMsg()?`<p class="note qsrc">${gcMsg()} ${GC.st==='load'?'':`<button class="lnk" data-a="gcRe">${GC.st==='ok'?'새로 읽기':'다시 연결'}</button>`}</p>`:''}
   ${dayHtml(TODAY,true)}${todo.length?`<div class="card todo">${todo.map(([b,t,a,x])=>`<div class="li"><div class="t"><b>${esc(t)}</b></div><button class="btn sm pri" data-a="${a}" ${x}>${b}</button></div>`).join('')}</div>`:''}
   ${days.slice(1).map(d=>dayHtml(d)).join('')}`};
@@ -164,7 +164,7 @@ A.ideaGo=async d=>{const el=$('ideaIn')||$('qIn'),v=((d&&d.v)||(el&&el.value)||'
   const snap=JSON.stringify(D0),out=await ask('idea',`서점·문화공간 "더숲"의 ${S.mode==='aka'?'아카데미하우스(북한산 자락 복합 문화 공간)':'서점'} 인쇄물을 만듭니다. 직원이 적은 아이디어 한 줄을 바로 붙일 수 있는 문안으로 다듬어 주세요.\n아이디어: "${v.replace(/"/g,"'")}"\n말투: 조용하고 담백하게. 느낌표·이모지·과장 금지. 없는 사실(날짜, 가격, 수상)은 지어내지 않습니다. 뻔한 표현 대신 한 번 비튼 낱말 하나.\nhead 는 14자 안쪽 제목(뜻 단위로 \\n 한 번 가능), body 는 45자 안쪽 한두 문장, band 는 띠지용 18자 안쪽 한 줄, sym 은 ${Object.keys(ICON).filter(x=>!x.startsWith('ph')).join('|')}|none, look 은 0(밝고 조용하게)|1(짙은 바탕)|2(세로 제목) 중 하나.\nJSON 으로만: {"head":"","body":"","band":"","sym":"","look":0}`,{modelTier:'quick'});
   if(!out||!out.head||JSON.stringify(S.ui.D)!==snap)return;const D=S.ui.D;D.head=out.head;D.body=out.body||D.body;if(ICON[out.sym])D.sym=out.sym;if([0,1,2].includes(+out.look))D.st=+out.look;if(D.kind==='band'){D.phrases=out.band||out.head.replace(/\n/g,' ');D.syms=D.sym!=='none'?[D.sym]:[]}render()};
 document.addEventListener('keydown',e=>{if(e.target&&e.target.id==='ideaIn'&&e.key==='Enter'&&!e.isComposing){e.preventDefault();A.ideaGo({})}});
-(()=>{const f=V.store.design,g=()=>`<div class="card qadd"><div class="qrow"><input type="text" id="ideaIn" autocomplete="off" enterkeyhint="go" value="${esc(S.ui.idea||'')}" placeholder="아이디어 한 줄 — 비 오는 날 혼자 읽기 좋은 얇은 책"><button class="btn pri" data-a="ideaGo">${S.ui.busy==='idea'?'다듬는 중…':'만들기'}</button></div></div>`+f();V.store.design=g;V.aka.design=g})();
+(()=>{const f=V.store.design,g=()=>`<div class="card qadd"><div class="qrow"><input type="text" id="ideaIn" autocomplete="off" enterkeyhint="go" value="${esc(S.ui.idea||'')}" placeholder="생각 한 줄 — 비 오는 날 혼자 읽기 좋은 얇은 책 / 오늘은 6시에 닫습니다">${micBtn('ideaIn')}<button class="btn pri" data-a="ideaGo">${S.ui.busy==='idea'?'다듬는 중…':'만들기'}</button></div></div>`+f();V.store.design=g;V.aka.design=g})();
 (()=>{const f=A.qAdd;A.qAdd=()=>{const el=$('qIn'),v=el?el.value.trim():'';if(v&&!v.includes('\n')&&!/(오늘|내일|모레|글피|\d\s*시|\d{1,2}:\d{2}|\d+\s*(명|인)|\d+\s*월|\d+\s*일|요일|\d{1,2}[\/.]\d{1,2})/.test(v)&&!/단체표|주차|길\s*안내|화살표|대관|금연|정숙|출입|알림판|공간\s*소개/.test(v)&&!(/(POP|pop|팝|띠지|쇼카드|안내문)/.test(v)&&Object.keys(QAL).some(x=>v.includes(x)))){A.ideaGo({v});return}f()}})();
 
 /* ── 떠오른 생각 한 줄 → 한 벌 완성 (주제 · 책 · POP · 띠지 · 목록 · 쇼카드 · 진열 · 오브제) ── */
@@ -184,8 +184,22 @@ A.myDel=d=>{S.ui.myT=(S.ui.myT||[]).filter(t=>t.id!==d.id);ls.set('myT',S.ui.myT
   const m=(S.ui.myT||[]).find(x=>x.id===id);if(!out||!out.title||!m)return;m.title=out.title;m.hook=out.hook||m.hook;m.band=out.band||m.band;m.pop={head:out.title,body:out.hook||''};if(ICON[out.sym])m.sym=out.sym;m.pick=(Array.isArray(out.books)?out.books:[]).filter(x=>cand.includes(x)).slice(0,6);ls.set('myT',S.ui.myT);render()}})();
 (()=>{const f=V.store.cur;V.store.cur=()=>{let h=f();if(S.br==='all')return h;const has=(S.ui.myT||[]).length;
   if(has)h=h.replace(`aria-pressed="${(S.ui.cTone||'전체')==='전체'}">전체</button>`,m=>m+`<button data-a="cTone" data-t="내 생각" aria-pressed="${S.ui.cTone==='내 생각'}">내 생각</button>`);
-  const bar=`<div class="card qadd"><div class="qrow"><input type="text" id="cIdea" autocomplete="off" enterkeyhint="go" placeholder="떠오른 생각 한 줄 — 비 오는 날엔 얇은 책"><button class="btn pri" data-a="ideaGo">${S.ui.busy==='idea'?'고르는 중…':'완성하기'}</button></div><small class="note">주제 · 책 · POP · 띠지 · 진열 · 오브제까지 한 벌로 만듭니다${has&&S.ui.cTone==='내 생각'?` <button class="lnk" data-a="myClear">내 생각 모두 지우기</button>`:''}</small></div>`;
+  const bar=`<div class="card qadd"><div class="qrow"><input type="text" id="cIdea" autocomplete="off" enterkeyhint="go" placeholder="떠오른 생각 한 줄 — 비 오는 날엔 얇은 책">${micBtn('cIdea')}<button class="btn pri" data-a="ideaGo">${S.ui.busy==='idea'?'고르는 중…':'완성하기'}</button></div><small class="note">주제 · 책 · POP · 띠지 · 진열 · 오브제까지 한 벌로. 「오늘은 6시에 닫습니다」처럼 적으면 안내문이 됩니다${has&&S.ui.cTone==='내 생각'?` <button class="lnk" data-a="myClear">내 생각 모두 지우기</button>`:''}</small></div>`;
   const i=h.indexOf('<div class="subnav"');return i>0?h.slice(0,i)+bar+h.slice(i):bar+h}})();
 document.addEventListener('keydown',e=>{if(e.target&&e.target.id==='cIdea'&&e.key==='Enter'&&!e.isComposing){e.preventDefault();A.ideaGo({v:e.target.value})}});
 
 A.myClear=()=>{S.ui.myT=[];ls.set('myT',[]);S.ui.cTone='전체';render()};
+
+/* ── 말로 넣기 · 안내문도 생각 한 줄로 (아카 · 서점 모두) ── */
+if(!KSHOW.store.includes('sign'))KSHOW.store.push('sign');
+A.micTo=d=>{S.ui.micT=d.id;A.dMic()};
+const micBtn=id=>(DICT||window.SpeechRecognition||window.webkitSpeechRecognition)?`<button class="btn" data-a="micTo" data-id="${id}" aria-pressed="${!!S.ui.mic}">${S.ui.mic?'듣는 중':'말하기'}</button>`:'';
+const NOTR=/안내문|안내판|공지|알림|휴무|쉽니다|쉬어요|닫습니다|닫아요|엽니다|영업|금연|조용|정숙|출입|화장실|주차|마감|품절|매진|공사|점검|반납|금지|삼가|부탁|주세요|마세요|됩니다|입니다|합니다|있습니다|없습니다/;
+function noticeLocal(v){const w=v.replace(/(안내문|안내판|공지|알림)(으로|로|을|를)?\s*(만들어\s*줘?|써\s*줘?|작성)?/g,' ').replace(/\s+/g,' ').trim()||v,aka=S.mode==='aka',br=aka?'aka':curBr(),ps=w.split(/(?<=[.!?])\s+|,\s+/),head=(ps[0]||w).replace(/[.!]+$/,''),body=ps.slice(1).join(' ');
+  const sym=/금연|담배/.test(w)?'drop':/조용|정숙/.test(w)?'leaf':/우산|비가|비 오|장마/.test(w)?'rain':/화장실|이쪽|방향|층/.test(w)?'walk':/행사|촬영|모임/.test(w)?'candle':/휴무|닫|쉽|마감/.test(w)?'moon':/출입|관계자/.test(w)?'house':'none';
+  return Object.assign(defD(),SIGN.notice.d,{kind:'sign',sg:'notice',cv:0,br,tag:aka?'아카데미하우스':TAGN(br),head,body,list:'',sym})}
+(()=>{const f=A.ideaGo;A.ideaGo=async d=>{const el=$('ideaIn')||$('cIdea')||$('qIn'),v=((d&&d.v)||(el&&el.value)||'').trim();if(!v||!NOTR.test(v)||/(POP|pop|팝|띠지|쇼카드)/.test(v))return f(d);
+  const H=S.ui.dH=S.ui.dH||[];if(S.ui.D)H.push(JSON.stringify(S.ui.D));const D0=noticeLocal(v);S.ui.D=D0;S.ui.idea=v;S.view[S.mode]='design';window.scrollTo(0,0);render();if(!AI)return;
+  const snap=JSON.stringify(D0),out=await ask('idea',`"더숲" ${S.mode==='aka'?'아카데미하우스(복합 문화 공간)':'서점'}에 붙일 안내문입니다. 직원이 말한 내용을 손님이 한눈에 읽는 안내문으로 다듬어 주세요.\n내용: "${v.replace(/"/g,"'")}"\n정중하지만 짧게. 명령조·느낌표·이모지 금지. 말한 내용에 없는 날짜·시간·장소는 지어내지 않습니다.\nhead 는 16자 안쪽 한 줄(가장 중요한 말), body 는 40자 안쪽 덧붙임(없으면 빈 문자열), sym 은 ${Object.keys(ICON).filter(x=>!x.startsWith('ph')).join('|')}|none.\nJSON 으로만: {"head":"","body":"","sym":""}`,{modelTier:'quick'});
+  if(!out||!out.head||JSON.stringify(S.ui.D)!==snap)return;S.ui.D.head=out.head;S.ui.D.body=out.body||'';if(ICON[out.sym])S.ui.D.sym=out.sym;render()}})();
+(()=>{const f=A.qAdd;A.qAdd=()=>{const el=$('qIn'),v=el?el.value.trim():'';if(v&&!v.includes('\n')&&/(습니다|주세요|마세요|안내문|안내판|공지)/.test(v)){A.ideaGo({v});return}f()}})();
