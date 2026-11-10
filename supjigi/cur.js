@@ -2,6 +2,7 @@
 /* 큐레이션: 때 · 계절 · 날씨에 맞춘 코너 제안 → 지점 성격 → 들여놓을 책. 계산으로만 돌아가서 어디서 열어도 같다.
    품절 · 절판으로 표시된 책(window.SOLD)은 어디에도 내지 않는다. */
 const BRAND={aka:'사유의숲',choso:'초소책방',sojeon:'소전미술관',nowon:'노원',nmain:'본점',njung:'중계점'};
+const TAGN=br=>NM(br)?'':(BRAND[br]||''),BRN=br=>NM(br)?'노원문고':'더숲 '+(BRAND[br]||'');
 const RC={문학:'문학',에세이:'문학',인문:'인문',예술:'예술',과학:'과학'};
 const TLAB=['오전(12시 이전)','점심 뒤(12~15시)','오후(15~18시)','저녁(18시 이후)'];
 const sellable=b=>!(b&&b.isbn&&(window.SOLD||{})[b.isbn]);

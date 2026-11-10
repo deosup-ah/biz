@@ -25,7 +25,7 @@ V.store.trend=()=>{let fc='';try{const br=S.mode==='aka'?'aka':(S.br==='all'?'ak
   <p class="note" style="margin-top:12px">「오늘의 소식」은 매일 아침 새로 찾아 바꿉니다. 그 아래 통계와 사례는 2026-11-10 에 찾아 읽은 것입니다. 해외 사례는 미국 독립서점 기사에서 가져왔고 우리 사정과 다를 수 있습니다.</p>`};
 V.aka.trend=V.store.trend;TABS.aka.push(['trend','트렌드']);
 A.trDo=d=>{const t=TREND[+d.i],a=t.a;if(a[0]==='go'){S.mode='store';A.go({v:a[2]});return}if(a[0]==='club'){S.mode='store';if(S.br==='all')S.br='aka';A.go({v:'club'});return}
-  const br=S.mode==='aka'?'aka':(S.br==='all'?'aka':S.br),D=Object.assign(defD(),{kind:a[0]==='band'?'band':'pop',br,tag:BRAND[br]||'',st:2,pal:1},a[2]||{});if(a[0]==='band'){D.phrases='이 책방에서만 두르는 띠';D.pal=1}S.ui.D=D;S.ui.dlog=[];S.view[S.mode]='design';window.scrollTo(0,0);render()};
+  const br=S.mode==='aka'?'aka':(S.br==='all'?'aka':S.br),D=Object.assign(defD(),{kind:a[0]==='band'?'band':'pop',br,tag:TAGN(br),st:2,pal:1},a[2]||{});if(a[0]==='band'){D.phrases='이 책방에서만 두르는 띠';D.pal=1}S.ui.D=D;S.ui.dlog=[];S.view[S.mode]='design';window.scrollTo(0,0);render()};
 
 /* ── 지원사업: 기획안과 제출 서류 ── */
 const BDOC=[['사업자등록증 사본','증명'],['단체 소개서(연혁 · 주요 실적)','작성'],['사업 신청서(공고 양식)','양식'],['사업 계획서(기획안)','작성'],['예산 계획서','작성'],['개인정보 수집 · 이용 동의서','양식'],['국세 완납증명서','증명'],['지방세 완납증명서','증명'],['통장 사본','증명'],['공간 사진 · 배치도','자료'],['지난 프로그램 실적 자료(사진 · 참가 인원)','자료']];

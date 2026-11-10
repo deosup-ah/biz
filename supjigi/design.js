@@ -14,14 +14,14 @@ const MOTIF=[['moon','달'],['rain','비'],['snow','눈'],['cup','찻잔'],['lea
 const LOGOS={plain:3.16,book:2.41},LIMG={};
 ['logo-k','logo-g','logo-w','logob-k','logob-g','logob-w'].forEach(n=>{const i=new Image();i.src=n+'.png';LIMG[n]=i});
 const STY=['기본','포스터','여백','띠','세로'];
-const defD=()=>({kind:'pop',st:0,size:0,pal:0,sym:'none',logo:'plain',lc:'g',hs:1,tag:BRAND[curBr()]||'',badge:'',head:'',body:'',book:'',author:'',price:'',phrases:'',syms:[],pals:[],list:'',foot:'',br:curBr(),books:[]});
+const defD=()=>({kind:'pop',st:0,size:0,pal:0,sym:'none',logo:'plain',lc:'g',hs:1,tag:TAGN(curBr()),badge:'',head:'',body:'',book:'',author:'',price:'',phrases:'',syms:[],pals:[],list:'',foot:'',br:curBr(),books:[]});
 const mctx=document.createElement('canvas').getContext('2d');
 const mw=(t,font,size,weight)=>{mctx.font=`${weight||400} ${size*10}px ${font}`;return mctx.measureText(t).width/10};
 function wrap(text,font,size,maxW,maxLines,weight){const out=[];String(text||'').split('\n').forEach(par=>{let line='';for(const tok of par.split(/(\s+)/)){if(mw(line+tok,font,size,weight)<=maxW){line+=tok;continue}
       if(line.trim()){out.push(line.trim());line=''}let w=tok.trim();while(w.length>1&&mw(w,font,size,weight)>maxW){let i=w.length;while(i>1&&mw(w.slice(0,i),font,size,weight)>maxW)i--;out.push(w.slice(0,i));w=w.slice(i)}line=w}
     if(line.trim())out.push(line.trim())});return maxLines&&out.length>maxLines?out.slice(0,maxLines-1).concat(out[maxLines-1]+'…'):out}
 function fit(text,font,size,maxW,maxLines,min,weight){let s=size,l=wrap(text,font,s,maxW,0,weight);while(l.length>maxLines&&s>min){s*=.93;l=wrap(text,font,s,maxW,0,weight)}return{s,l:l.slice(0,maxLines)}}
-function layout(D){const pr=[],brand=BP(D.br)+(BRAND[D.br]||brN(!D.br||D.br==='all'?'aka':D.br));
+function layout(D){const pr=[],brand=BRN(!D.br||D.br==='all'?'aka':D.br);
   const T=(x,y,txt,size,o={})=>pr.push({k:'t',x,y,txt:String(txt),size,font:o.font||SANS,fill:o.fill||'#111',anchor:o.anchor||'start',weight:o.weight||500,ls:o.ls||0});
   const R=(x,y,w,h,fill,o={})=>pr.push({k:'r',x,y,w,h,fill,...o});
   const O=(x,y,rx,ry,fill,o={})=>pr.push({k:'o',x,y,rx,ry,fill,...o});
@@ -167,7 +167,7 @@ document.addEventListener('input',e=>{const el=e.target.closest&&e.target.closes
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='dchat'){e.preventDefault();A.dChatGo()}});
 A.dKind=d=>{const D=S.ui.D;if(d.k==='rent'&&!D.tel){const keep={br:D.br};Object.assign(D,defD(),RENT0,keep);render();return}D.kind=d.k;D.size=0;D.pal=0;if(d.k==='band'&&!D.phrases)D.phrases=(D.head||'').replace(/\n/g,' ');if(d.k==='list'&&!D.list&&(D.books||[]).length)D.list=D.books.map(b=>`${b.t} | ${[b.a,b.p].filter(Boolean).join(' · ')} | ${b.why||''}`).join('\n');render()};
 A.dPick=d=>{S.ui.D[d.k]=+d.v;if(d.k==='pal')S.ui.D.pals=[];render()};A.dStr=d=>{S.ui.D[d.k]=d.v;render()};A.dSym=d=>{S.ui.D.sym=d.k;S.ui.D.syms=[];render()};
-A.dBr=d=>{const D=S.ui.D;if(!D.tag||Object.values(BRAND).includes(D.tag)||/^(더숲|노원문고) /.test(D.tag))D.tag=D.kind==='list'?BP(d.k)+BRAND[d.k]:BRAND[d.k];D.br=d.k;render()};
+A.dBr=d=>{const D=S.ui.D;if(!D.tag||Object.values(BRAND).includes(D.tag)||/^(더숲|노원문고) /.test(D.tag))D.tag=D.kind==='list'?BRN(d.k):TAGN(d.k);D.br=d.k;render()};
 A.dSt=d=>{S.ui.D.st=+d.v;render()};
 A.dLand=d=>{S.ui.D.land=d.v==='1';render()};
 A.dNew=()=>{S.ui.D=defD();S.ui.dlog=[];render()};
