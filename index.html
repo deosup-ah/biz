@@ -318,6 +318,10 @@ body.hascart .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 80px)}
 .wm{white-space:nowrap}.wm i{font-style:normal;color:#ffb84d;margin:0 1px}
 .wm em{font-family:"Nanum Pen Script","Gaegu",cursive;font-style:normal;font-weight:400;color:#ffd28a;font-size:1.45em;line-height:.8;display:inline-block;transform:rotate(-5deg) translateY(1px);margin-left:1px}
 .wm.big{font-size:26px}
+.arow{display:grid;grid-template-columns:44px 1fr;gap:2px 10px;padding:11px 14px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.arow:last-child{border-bottom:0}.arow:active{background:var(--sunk)}
+.arow .d{font-size:12.5px;color:var(--mute);font-variant-numeric:tabular-nums;grid-row:1/3;padding-top:2px}
+.arow .t{font-weight:600;font-size:14.5px;word-break:keep-all}.arow .c{font-size:11.5px;color:var(--pine);font-weight:600}
 .kv2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .kv2 span{display:block;font-size:12.5px;color:var(--mute)}.kv2 b{font:700 17px var(--f-disp)}
 .up{color:var(--ok)}.dn{color:var(--hi)}
@@ -443,7 +447,7 @@ textarea.msg{width:100%;min-height:240px;border:1px solid var(--line);border-rad
   <button class="tab" data-tab="plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="3"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg><b>일정</b></button>
   <button class="tab" data-tab="money"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="13" rx="2.5"/><circle cx="12" cy="12.5" r="2.6"/><path d="M6 9.5h.01M18 15.5h.01"/></svg><b>돈</b></button>
   <button class="tab" data-tab="book"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><b>아카</b></button>
-  <button class="tab" data-tab="info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5h.01"/></svg><b>안내</b></button>
+  <button class="tab" data-tab="info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5h.01"/></svg><b>자료</b></button>
 </div></nav></header>
 
 <main class="wrap"><div id="view" class="view"></div></main>
@@ -465,6 +469,7 @@ textarea.msg{width:100%;min-height:240px;border:1px solid var(--line);border-rad
 <script src="reports.js" onerror="void 0"></script>
 <script src="books.js" onerror="void 0"></script>
 <script src="ext.js" onerror="void 0"></script>
+<script src="archive.js" onerror="void 0"></script>
 <script>
 "use strict";
 /* ===== settings ===== */
@@ -610,8 +615,8 @@ function renderToday(){
     ${X.groups.length?`<div class="card">${X.groups.map(c=>todayCard(c,ds)).join("")}</div>${timeline(X.groups,ds)}`:`<div class="card empty">${lab} 이용하는 단체가 없습니다.</div>`}</div>
   ${(()=>{const L=EVS.filter(e=>e.date===ds).sort((a,b)=>(a.time||"").localeCompare(b.time||""));return L.length?`<div class="sec"><div class="sec-h"><h2>아카 영화 · 프로그램</h2><span class="cnt">${L.length}건</span></div><div class="card">${L.map(e=>`<button class="mrow" data-go="book"><span><span class="n">${esc(e.title)}</span><span class="s">${esc([e.kind,e.place,e.cap?(e.booked||0)+" / "+e.cap+"명":""].filter(Boolean).join(" · "))}</span></span><span class="a">${esc(e.time||"")}</span></button>`).join("")}</div></div>`:""})()}
   ${(()=>{const N=EXT().naver;if(!N)return "";const L=(N.items||[]).filter(x=>x.date===ds).sort((a,b)=>(a.time||"").localeCompare(b.time||""));return `<div class="sec"><div class="sec-h"><h2>네이버 예약</h2><span class="cnt">${L.length}건</span></div><div class="card">${L.length?L.map(x=>`<div class="mrow"><span><span class="n">${esc(x.item||"예약")}</span><span class="s">${esc([x.name,x.pax?x.pax+"명":"",x.status].filter(Boolean).join(" · "))}</span></span><span class="a">${esc(x.time||"")}</span></div>`).join(""):`<div class="empty">${lab} 네이버 예약이 없습니다.</div>`}</div></div>`})()}
-  <div class="sec" id="s-meal"><div class="sec-h"><h2>식사 인원</h2><span class="cnt">${mealStr(X.mt)||"없음"}</span></div>
-    <div class="card">${X.meals.length?X.meals.map(({c,m})=>`<button class="mrow" data-id="${esc(c.id)}"><span><span class="n">${esc(c.name)}</span><span class="s">${c.pax?c.pax+"명 단체":""}</span></span><span class="a">${mealStr(m)}</span></button>`).join(""):`<div class="empty">${lab} 잡힌 단체 식사가 없습니다.</div>`}</div></div>
+  ${X.meals.length?`<div class="sec" id="s-meal"><div class="sec-h"><h2>식사 인원</h2><span class="cnt">${mealStr(X.mt)}</span></div>
+    <div class="card">${X.meals.map(({c,m})=>`<button class="mrow" data-id="${esc(c.id)}"><span><span class="n">${esc(c.name)}</span><span class="s">${c.pax?c.pax+"명 단체":""}</span></span><span class="a">${mealStr(m)}</span></button>`).join("")}</div></div>`:""}
   ${X.ins.length||X.outs.length?`<div class="sec"><div class="sec-h"><h2>연수객실 입실 · 퇴실</h2></div><div class="card">${X.outs.map(x=>`<button class="mrow" data-id="${esc(x.c.id)}"><span><span class="n">${esc(x.c.name)}</span><span class="s">${esc(x.r[2].join(" "))}</span></span><span class="a">퇴실 11:00<small>${x.r[2].length}실</small></span></button>`).join("")}${X.ins.map(x=>`<button class="mrow" data-id="${esc(x.c.id)}"><span><span class="n">${esc(x.c.name)}</span><span class="s">${esc(x.r[2].join(" "))}</span></span><span class="a">입실 16:00<small>${x.r[2].length}실</small></span></button>`).join("")}</div></div>`:""}
   ${X.pays.length?`<div class="sec"><div class="sec-h"><h2>${lab} 받을 돈</h2><span class="cnt">${X.pays.length}건</span></div><div class="card">${X.pays.map(x=>`<button class="mrow" data-id="${esc(x.c.id)}" data-pane="amt"><span><span class="n">${esc(x.c.name)}</span><span class="s">${esc(x.p[0])}${x.p[3]?" · "+esc(x.p[3]):""}</span></span><span class="a">${esc(x.p[2])}</span></button>`).join("")}</div></div>`:""}
   <div class="sec" id="s-act"><div class="sec-h"><h2>챙길 일</h2><span class="cnt">${A.length}건</span>${A.length>5?`<button class="more" data-allact>모두 보기 ›</button>`:""}</div>
@@ -844,8 +849,9 @@ function akEvents(kind){const L=EVS.filter(e=>e.kind===kind&&(e.date||"")>=TODAY
   return `${DB?`<button class="btn pri block" data-evadd="${kind}">+ ${kind} 일정 넣기</button>`:`<div class="banner"><span><b>${kind} 일정은 Claude 앱 링크에서 넣고 봅니다.</b> 아카에서 여는 ${kind==="영화"?"상영":"프로그램"} 일정을 넣으면 여기와 「오늘」 화면에 나옵니다.</span><a class="btn" href="${ART_URL}" target="_blank" rel="noopener">${kind} 일정 보러 가기 ›</a></div>`}
   ${L.length?`<div class="card">${L.map(e=>{const d=pd(e.date);return `<button class="g" data-evedit="${esc(e.id)}"><div class="dt ${e.date===TODAY_S?"now":""}"><span class="m">${d.getMonth()+1}월</span><span class="d">${d.getDate()}</span><span class="w">${WD[d.getDay()]}</span></div><div class="body"><div class="nm">${esc(e.title)}</div><div class="sub">${esc([e.time,e.place].filter(Boolean).join(" · "))||"시간 · 장소 미정"}</div>${e.memo?`<div class="sub">${esc(e.memo)}</div>`:""}</div><div class="side">${e.cap?`<span class="pax">${e.booked||0} / ${e.cap}명</span>`:""}<span class="dd ${e.date===TODAY_S?"now":""}">${diff(e.date)===0?"오늘":diff(e.date)===1?"내일":"D-"+diff(e.date)}</span></div></button>`}).join("")}</div>`:(DB?`<div class="card empty">다가오는 ${kind} 일정이 없습니다.<br>위 버튼으로 첫 일정을 넣으세요.</div>`:"")}
   ${L.length&&SAMPLE?`<button class="btn block" data-igfrom="${kind}">다음 ${kind} 인스타 초안 만들기 ›</button>`:""}
+  ${kind==="영화"?`<a class="btn block" href="https://claude.ai/artifact/1TB8beg3dWzqrZoNfJYPBJ" target="_blank" rel="noopener">진진 영화 예약 현황 자세히 ›</a>`:""}
   ${past?`<p class="note">지난 ${kind} ${past}건은 목록에서 숨겼습니다.</p>`:""}`}
-function akLib(){return waitCard("인물도서관",["운영 현황을 이 자리에 모읍니다","무엇을 보여 드릴지 정해지면 바로 넣습니다 (예: 소장 목록, 방문 · 이용 수, 운영 시간, 공지)"],"인물도서관 자료를 어디서 관리하는지(엑셀 · 노션 · 이지정보 등) 알려 주세요.")}
+function akLib(){const L=((window.ARCHIVE||{}).items||[]).filter(x=>x.c==="인물도서관");if(L.length)return `<div class="sec"><div class="sec-h"><h2>인물도서관 자료</h2><span class="cnt">${L.length}개</span></div><div class="card">${L.map(arcRow).join("")}</div><p class="note">기획안 · 후보 목록 · 안내물을 모았습니다. 전시 도서 목록(11/9 메일 첨부 엑셀)은 아직 넣지 않았습니다.</p></div>`;return waitCard("인물도서관",["운영 현황을 이 자리에 모읍니다","무엇을 보여 드릴지 정해지면 바로 넣습니다 (예: 소장 목록, 방문 · 이용 수, 운영 시간, 공지)"],"인물도서관 자료를 어디서 관리하는지(엑셀 · 노션 · 이지정보 등) 알려 주세요.")}
 function evFormHTML(){const f=evForm;return `<div class="sh-top"><div class="sh-bar"><h2 id="shTitle">${f.kind} 일정 ${f.id?"고치기":"넣기"}</h2><button class="xbtn" data-close aria-label="닫기">✕</button></div></div>
   <form class="form" id="ef" novalidate>
    <div class="fld"><label for="efTitle">제목</label><input id="efTitle" value="${esc(f.title)}" placeholder="${f.kind==="영화"?"예: 숲속 영화관 — 영화 제목":"예: 저자와의 만남, 숲 산책"}"></div>
@@ -861,7 +867,7 @@ async function saveEv(){const f=readEv();if(!f.title){$("efErr").textContent="�
   const b=$("efSave");b.disabled=true;b.textContent="저장 중…";const doc={kind:f.kind,title:f.title,date:f.date,time:f.time,place:f.place,cap:f.cap,booked:f.booked,memo:f.memo,at:new Date().toISOString()};
   try{if(f.id)await DB.collection("events").doc(f.id).set(doc);else await DB.collection("events").add(doc);closeSheet();toast("저장했습니다")}catch(e){b.disabled=false;b.textContent="저장";$("efErr").textContent=e&&(e.code==="not_granted"||e.code==="revoked")?"이 링크에서는 입력 권한이 없습니다.":"저장하지 못했습니다. 잠시 뒤 다시 눌러 주세요."}}
 function bkStore(){const S=EXT().store;
-  if(!S)return waitCard("아카 서점 매출 (이지정보)",["오늘 · 이번 달 서점 매출과 날짜별 흐름","많이 팔린 책과 남은 재고","2주 안에 떨어질 책 → 북센 주문 목록 자동 작성","교보 · 예스24 · 알라딘 순위권인데 매장에 없는 책"],"이지정보 판매 · 재고 화면을 읽을 수 있게 되면 이 자리에 바로 나옵니다. 그 전에도 「순위 비교」와 「주문 · 반품」은 쓸 수 있습니다.");
+  if(!S)return waitCard("아카 서점 매출 (이지정보)",["오늘 · 이번 달 서점 매출과 날짜별 흐름","많이 팔린 책과 남은 재고","2주 안에 떨어질 책 → 북센 주문 목록 자동 작성","교보 · 예스24 · 알라딘 순위권인데 매장에 없는 책"],"이지정보 판매 · 재고 화면을 읽을 수 있게 되면 이 자리에 바로 나옵니다. 그 전에도 「순위 비교」와 「주문 · 반품」은 쓸 수 있습니다.")+`<a class="btn block" href="https://claude.ai/artifact/SWiXVHUA18AaksNwjyFueQ" target="_blank" rel="noopener">더숲 도서 매출 현황 (8~10월) 보기 ›</a>`;
   const days=Object.entries(S.days||{}).sort(),cur=TODAY_S.slice(0,7),mt=days.filter(([d])=>d.startsWith(cur)).reduce((a,[,v])=>a+v,0),td=(S.days||{})[TODAY_S]||0,last=days.slice(-14),mx=Math.max(1,...last.map(x=>x[1]));
   const top=(S.items||[]).slice().sort((a,b)=>(b.sold7||0)-(a.sold7||0)).filter(x=>x.sold7>0).slice(0,10),sg=sugg();
   return `<div class="card mhero"><div><span>${+cur.slice(5)}월 서점 매출</span><b class="num">${won(mt)}원</b></div><div><span>오늘</span><b class="num">${won(td)}원</b></div></div>
@@ -945,7 +951,20 @@ function renderFree(){const ds=freeDay||TODAY_S,pax=+freePax||0;
   ${body}
   <div class="grp"><span>연수객실 (${mdw(ds)} 숙박)</span><span>${free.length}실 비어 있음</span></div><div class="card" style="padding:12px 14px"><div class="rooms-g">${TRAIN.map(x=>`<span class="${used.has(x)?"used":""}">${x}</span>`).join("")}</div><p class="note">줄 그어진 방은 사용 중입니다. 2인실 N201~N210 · 3인실 N101~N104 · 4인실 N106~N109</p></div>
   <p class="note">${esc(D.asOf||"")}. 북스테이 객실은 WINGS에서 확인하세요. 예약을 잡기 전에 <a href="https://academyhouse.deosup.com/space-board" target="_blank" rel="noopener">공간 보드</a>에서 다시 확인하세요.</p>`}
-function renderInfo(){
+let infoView=LS.get("ds-info","arc"), arcCat="전체", arcQ="";
+const ARC_CATS=["전체","책 · 사유의숲","인물도서관","씨앗숲 · 4층","영화 · 프로그램","회의 · 보고","운영 · 안내물","기타"];
+const arcRow=x=>`<a class="arow" href="https://claude.ai/artifact/${esc(x.id)}" target="_blank" rel="noopener"><span class="d">${+x.d.slice(0,2)}/${+x.d.slice(3)}</span><span class="t">${esc(x.t)}</span><span class="c">${esc(x.c)}</span></a>`;
+function renderArchive(){const A=window.ARCHIVE;if(!A)return `<div class="card empty">자료 목록이 아직 없습니다.</div>`;
+  const q=arcQ.toLowerCase(),L=A.items.filter(x=>(arcCat==="전체"||x.c===arcCat)&&(!q||x.t.toLowerCase().includes(q)));
+  const cnt=c=>c==="전체"?A.items.length:A.items.filter(x=>x.c===c).length;
+  return `<div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="aq" type="search" placeholder="만든 자료 찾기 (예: 장일순, 주간회의, 포스터)" value="${esc(arcQ)}" autocomplete="off"></div>
+  <div class="chips">${ARC_CATS.filter(c=>cnt(c)).map(c=>`<button class="chip" data-arcc="${esc(c)}" aria-pressed="${arcCat===c}">${esc(c)}<b>${cnt(c)}</b></button>`).join("")}</div>
+  ${L.length?`<div class="card">${L.map(arcRow).join("")}</div>`:`<div class="card empty">찾는 자료가 없습니다.</div>`}
+  <p class="note">${esc(A.asOf||"")} · Claude로 만든 자료 ${A.items.length}개를 일(업무)별로 모았습니다. 누르면 그 자료가 열립니다. 자료는 biz 계정으로 로그인했거나 공유받은 사람만 열 수 있습니다.</p>`}
+function renderInfo(){const P=infoAll().split('<div class="sec">').slice(1).map(x=>'<div class="sec">'+x);
+  if(!["arc","fac","set"].includes(infoView))infoView="arc";
+  return `<div class="seg">${[["arc","자료실"],["fac","시설 · 요금"],["set","설정 · 연결"]].map(([k,l])=>`<button data-iv="${k}" aria-pressed="${infoView===k}">${l}</button>`).join("")}</div>`+(infoView==="arc"?renderArchive():infoView==="fac"?P.slice(5).join(""):P.slice(0,5).join(""))}
+function infoAll(){
   const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
   const inClaude=!!(window.claude&&window.claude.use)&&!/github\.io$/.test(location.hostname);
   return `
@@ -1100,6 +1119,8 @@ document.addEventListener("click",async e=>{const t=e.target;
   const cq=t.closest("[data-cq]");if(cq){const [i,dv]=cq.dataset.cq.split("|").map(Number);CART[i].qty+=dv;if(CART[i].qty<=0)CART.splice(i,1);saveCart();$("sheetIn").innerHTML=cartHTML();return}
   if(t.closest("[data-cartcopy]")){if(!await copyText(cartText()))toast("복사가 막혀 있습니다");return}
   if(t.closest("[data-cartclear]")){CART=[];saveCart();closeSheet();return}
+  const iv=t.closest("[data-iv]");if(iv){infoView=iv.dataset.iv;LS.set("ds-info",infoView);render();return}
+  const ac=t.closest("[data-arcc]");if(ac){arcCat=ac.dataset.arcc;render();return}
   const pin=t.closest("[data-pin]");if(pin){const id=pin.dataset.pin;PINS=PINS.includes(id)?PINS.filter(x=>x!==id):[id,...PINS].slice(0,12);LS.set("ds-pins",JSON.stringify(PINS));$("sheetIn").innerHTML=detailHTML();drawPane();render();toast(PINS.includes(id)?"오늘 화면에 고정했습니다":"고정을 풀었습니다");return}
   if(t.closest("[data-big]")){BIG=!BIG;LS.set("ds-big",BIG?"1":"");applyBig();render();return}
   const fd=t.closest("[data-fd]");if(fd){const x=pd(freeDay||TODAY_S);x.setDate(x.getDate()+ +fd.dataset.fd);freeDay=ymd(x);render();return}
@@ -1143,7 +1164,7 @@ document.addEventListener("click",async e=>{const t=e.target;
   const card=t.closest("[data-id]");if(card){openDetail(card.dataset.id,card.dataset.pane);return}
 });
 document.addEventListener("submit",e=>{if(e.target.id==="sf"){e.preventDefault();saveSales()}if(e.target.id==="ef"){e.preventDefault();saveEv()}});
-document.addEventListener("input",e=>{if(e.target.id==="q"){q=e.target.value.trim().toLowerCase();const pos=e.target.selectionStart;render();const n=$("q");if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(x){}}}
+document.addEventListener("input",e=>{if(e.target.id==="aq"){arcQ=e.target.value.trim();const pos=e.target.selectionStart;render();const n=$("aq");if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(x){}}return}if(e.target.id==="q"){q=e.target.value.trim().toLowerCase();const pos=e.target.selectionStart;render();const n=$("q");if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(x){}}}
   if(e.target.id==="sfAmt"){const v=e.target.value.replace(/[^\d]/g,"");e.target.value=v?won(+v):""}});
 document.addEventListener("change",e=>{const id=e.target.id;if(id==="retFile"){const fs=[...e.target.files];e.target.value="";scanReturn(fs);return}if(e.target.dataset&&e.target.dataset.rett!=null){RET[+e.target.dataset.rett].t=e.target.value;return}if(id==="freeDate"){freeDay=e.target.value||TODAY_S;render();return}if(id==="freePax"){freePax=e.target.value.replace(/[^\d]/g,"");render();return}if(id==="oAmt"||id==="oPark"){msgOpt[id==="oAmt"?"amt":"park"]=e.target.checked;$("msg").value=buildMsg(cur)}});
 document.addEventListener("keydown",e=>{if(!UNLOCKED){if(/^\d$/.test(e.key))pinKey(e.key);else if(e.key==="Backspace")pinKey("del");return}if(e.key==="Escape"&&sheetKind)closeSheet()});
