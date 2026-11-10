@@ -100,7 +100,7 @@ function layout(D){const pr=[],brand=BRN(!D.br||D.br==='all'?'aka':D.br);
     let y=h*(ld?.3:.34);O(M+u*.008,y-u*.008,u*.008,u*.008,AC);if(tagOn)T(M+u*.03,y,D.tag,u*.022,{fill:FG,weight:600,ls:u*.0025});y+=u*.085;
     let ts=u*.064*hs,TL=BAL(hd,SANS,ts,tw,0,600);while(TL.length>3&&ts>u*.04){ts*=.94;TL=BAL(hd,SANS,ts,tw,0,600)}TL.slice(0,3).forEach(l=>{T(M,y,l,ts,{fill:FG,weight:600,ls:-ts*.018});y+=ts*1.42});
     y+=u*.03;BAL(D.body||'',SANS,u*.032,Math.min(tw,u*.6),ld?3:6,400).forEach(l=>{if(y<h-M-u*.16){T(M,y,l,u*.032,{fill:FG,weight:400});y+=u*.032*1.95}});
-    const by=h-M-u*.05;R(M,by-u*.045,w-M*2,u*.001,FG,{op:.45});if(ICON[D.sym]&&D.sym!=='none')pr.push({k:'p',d:ICON[D.sym],x:M,y:by-u*.135,s:u*.028/12*1.6,stroke:FG,sw:u*.0022});
+    const by=h-M-u*.05;R(M,by-u*.045,w-M*2,u*.001,FG,{op:.45});const bg=D.symBig&&ICON[D.sym]?Math.min(u*.36,by-u*.1-y):0;if(bg>u*.13)pr.push({k:'p',d:ICON[D.sym],x:w-M-bg,y:by-u*.085-bg,s:bg/24,stroke:D.symBig===2?FG:AC,sw:u*(D.symBig===2?.0022:.0034)});else if(ICON[D.sym]&&D.sym!=='none')pr.push({k:'p',d:ICON[D.sym],x:M,y:by-u*.135,s:u*.028/12*1.6,stroke:FG,sw:u*.0022});
     if(D.book)T(M,by,wrap(`『${D.book}』${D.author?'  '+D.author:''}`,SANS,u*.024,w-M*2-u*.3,1,500)[0],u*.024,{fill:FG,weight:500});T(w-M,by,brand,u*.021,{fill:FG,weight:600,anchor:'end',ls:u*.001});BADGE();return{w,h,pr}}
   const ST=st===2?4:st;
   if(ST===91){/* (쓰지 않음) 포스터 */const B=P.dark?P.bg:P.fg,F=P.dark?P.fg:P.bg,G=P.dark?P.ac:P.hl,cx=w/2,r=u*(ld?.082:.118),cy=h*(ld?.2:.2);R(0,0,w,h,B);R(m*.5,m*.5,w-m,h-m,B,{stroke:G,sw:u*.0018,op:.9});
