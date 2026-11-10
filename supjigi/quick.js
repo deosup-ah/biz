@@ -51,7 +51,7 @@ function qCmd(v){const go=()=>{S.view.aka='design';S.mode='aka';window.scrollTo(
 A.qAdd=()=>{const el=$('qIn');if(!el)return;if(!el.value.includes('\n')&&qCmd(el.value.trim()))return;const L=el.value.split('\n').map(qParse).filter(Boolean);if(!L.length){toast('예: 내일 2시 한살림 연수 30명 본관');return}
   L.forEach((o,i)=>put('events',nid()+(i||''),{...o,at:new Date().toISOString()},i<L.length-1));toast(L.length>1?`${L.length}건 넣었습니다`:qShow(L[0]));setTimeout(()=>{const e=$('qIn');if(e){e.value='';e.focus()}},60)};
 document.addEventListener('keydown',e=>{if(e.target&&e.target.id==='qIn'&&e.key==='Enter'&&!e.isComposing){e.preventDefault();A.qAdd()}});
-document.addEventListener('input',e=>{if(e.target&&e.target.id==='qIn'){const p=$('qPv');if(p)p.textContent=qShow(qParse(e.target.value.split('\n')[0]))||'일정은 한 줄로. 만들 것을 적어도 됩니다'}});
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='qIn'){const p=$('qPv');if(p)p.textContent=qShow(qParse(e.target.value.split('\n')[0]))||'날짜·시간이 없으면 아이디어로 보고 디자인을 만듭니다'}});
 
 /* ── 오늘 화면 ── */
 V.aka.today=()=>{if(GC.st==='idle')setTimeout(gcLoad,0);const days=[0,1,2,3,4,5,6].map(n=>addDays(TODAY,n)),mine=d=>S.db.events.filter(e=>e.date===d).sort((a,b)=>(a.time||'')<(b.time||'')?-1:1);
@@ -61,7 +61,7 @@ V.aka.today=()=>{if(GC.st==='idle')setTimeout(gcLoad,0);const days=[0,1,2,3,4,5,
   const n0=gcDay(TODAY).length+mine(TODAY).length,todo=[];if(gcDay(TODAY).length||mine(TODAY).length)todo.push(['오늘의 단체표',`오늘 ${n0}건을 한 장으로`,'gcBoard','']);
   akaTodo().filter(x=>!/단체표/.test(x.t)).slice(0,4).forEach(x=>todo.push([x.b[0][0],x.t,'akaDo',`data-t="${x.b[0][1]}" data-id="${x.b[0][2]}"`]));
   return `<div class="hero"><h2>${mdw(TODAY)} · 오늘 ${n0}건</h2></div>
-  <div class="card qadd"><div class="qrow"><input type="text" id="qIn" enterkeyhint="done" autocomplete="off" placeholder="내일 2시 한살림 연수 30명 본관">${DICT||window.SpeechRecognition||window.webkitSpeechRecognition?`<button class="btn" data-a="dMic" aria-pressed="${!!S.ui.mic}">${S.ui.mic?'듣는 중':'말하기'}</button>`:''}<button class="btn pri" data-a="qAdd">추가</button></div><small id="qPv" class="note">일정은 한 줄로. 「기후 POP」 「오늘 단체표」 「주차 안내」처럼 만들 것을 적어도 됩니다</small></div>
+  <div class="card qadd"><div class="qrow"><input type="text" id="qIn" enterkeyhint="done" autocomplete="off" placeholder="내일 2시 한살림 연수 30명 본관">${DICT||window.SpeechRecognition||window.webkitSpeechRecognition?`<button class="btn" data-a="dMic" aria-pressed="${!!S.ui.mic}">${S.ui.mic?'듣는 중':'말하기'}</button>`:''}<button class="btn pri" data-a="qAdd">추가</button></div><small id="qPv" class="note">날짜나 시간이 있으면 일정으로, 없으면 아이디어로 보고 바로 디자인을 만듭니다</small></div>
   ${gcMsg()?`<p class="note qsrc">${gcMsg()} ${GC.st==='load'?'':`<button class="lnk" data-a="gcRe">${GC.st==='ok'?'새로 읽기':'다시 연결'}</button>`}</p>`:''}
   ${dayHtml(TODAY,true)}${todo.length?`<div class="card todo">${todo.map(([b,t,a,x])=>`<div class="li"><div class="t"><b>${esc(t)}</b></div><button class="btn sm pri" data-a="${a}" ${x}>${b}</button></div>`).join('')}</div>`:''}
   ${days.slice(1).map(d=>dayHtml(d)).join('')}`};
@@ -85,7 +85,7 @@ A.akPlan=()=>{const t=akThemes().find(x=>x.title===S.ui.akT);if(!t)return;S.ui.p
 (()=>{const f=V.store.design,g=()=>{const aka=S.mode==='aka',tn=S.ui.akTn||AKTN[0],T=aka?akThemes():[];
   if(S.ui.D&&S.ui.D.symD&&!ICON[S.ui.D.sym])ICON[S.ui.D.sym]=S.ui.D.symD;
   const bar=`<div class="qbar">${AI?`<label class="btn ${S.ui.busy==='photo'?'':'pri'}">${S.ui.busy==='photo'?'사진 읽는 중…':'사진으로 만들기'}<input type="file" accept="image/*" data-c="dPhoto" hidden ${S.ui.busy?'disabled':''}></label>`:''}${AI?['문안만','상징도','스케치도'].map((x,i)=>`<button class="chip" data-a="ui" data-k="phM" data-v="${i}" aria-pressed="${(S.ui.phM|0)===i}">${x}</button>`).join(''):''}${aka&&T.length?`<span class="note">주제</span>${AKTN.map(x=>`<button class="chip" data-a="ui" data-k="akTn" data-v="${x}" aria-pressed="${tn===x}">${x}</button>`).join('')}`:''}</div>
-  ${aka&&T.length?`<div class="qthm">${T.map((t,i)=>t.tone===tn?`<button data-a="akThm" data-i="${i}" aria-pressed="${S.ui.akT===t.title}">${esc(t.title)}</button>`:'').join('')}${S.ui.akT?`<button class="lnk" data-a="akPlan">이 주제로 모임 기획 ›</button>`:''}</div>`:''}${(S.ui.err||{}).photo?`<p class="note">${esc(S.ui.err.photo)}</p>`:''}`;return bar+f()};V.store.design=g;V.aka.design=g})();
+  ${aka&&T.length?`<div class="qthm">${T.map((t,i)=>[t,i]).filter(([t])=>t.tone===tn).slice(0,S.ui.akAll?99:8).map(([t,i])=>true?`<button data-a="akThm" data-i="${i}" aria-pressed="${S.ui.akT===t.title}">${esc(t.title)}</button>`:'').join('')}${!S.ui.akAll&&T.filter(t=>t.tone===tn).length>8?`<button class="lnk" data-a="ui" data-k="akAll" data-v="1">더 보기</button>`:''}${S.ui.akT?`<button class="lnk" data-a="akPlan">이 주제로 모임 기획 ›</button>`:''}</div>`:''}${(S.ui.err||{}).photo?`<p class="note">${esc(S.ui.err.photo)}</p>`:''}`;return bar+f()};V.store.design=g;V.aka.design=g})();
 
 /* ── 굿즈 제안: 무엇을 · 어떻게 묶어 · 어디에 ── */
 const GOODS=[
@@ -152,3 +152,17 @@ C.dpPhoto=async el=>{const f=[...el.files].slice(0,2);if(!f.length)return;const 
   const out=await ask('dpsp','서점의 진열 자리 사진입니다. 평대(책을 눕혀 쌓는 탁자)인지 벽 서가(선반)인지 보고, 크기와 놓을 수 있는 양을 어림합니다. 사진 속 책(보통 가로 15cm, 세로 21cm)을 자 삼아 재세요. 보이지 않는 것은 지어내지 않습니다. 말투는 담백하게.\nJSON 으로만: {"fixture":"평대|벽 서가","w":가로cm,"d":깊이cm(벽 서가는 선반 깊이),"tiers":단 수(평대는 1),"titles":표지가 서로 가리지 않게 놓을 수 있는 종 수,"copies":그때 전체 권수,"now":"지금 놓인 상태 한 문장","issues":["고칠 점, 3개 이하"],"mood":"무심하게|사랑스럽게|돋보이게","why":"그 방식이 이 자리에 맞는 까닭 한 문장"}',{images:f});
   if(out&&out.fixture){S.ui.dpRd=out;S.ui.dpF=/서가|선반/.test(out.fixture)?1:0;S.ui.dpCap=Math.max(2,Math.min(8,+out.titles||6));const m=DMOOD.indexOf(out.mood);if(m>=0)S.ui.dpM=m;S.ui.dpSz=out.w&&out.d?{w:out.w,d:out.d}:null}else if(out)toast('자리를 읽지 못했습니다. 평대나 서가 전체가 보이게 찍어 주세요.');
   if(S.ui.dp)A.dpOpen({i:S.ui.dp.i})};
+
+/* ── 아이디어 한 줄 → 바로 디자인 ── */
+const IDS=[[/눈|겨울|첫눈/,'snow'],[/비\s|비가|장마|우산/,'rain'],[/밤|달|잠|새벽/,'moon'],[/커피|차 한|카페|찻/,'cup'],[/숲|나무|식물|산|풀/,'leaf'],[/집|방|동네/,'house'],[/필사|쓰기|글|편지|문장|메모/,'pencil'],[/별|선물|연말|크리스마스/,'star'],[/바다|물|파도|여름휴가/,'wave'],[/촛|위로|쉼|고요/,'candle'],[/햇|여름|아침|봄/,'sun'],[/걷|산책|여행|길/,'walk'],[/책|읽/,'book']];
+function ideaLocal(v){const k=/띠지/.test(v)?'band':/쇼카드/.test(v)?'card':'pop',w=v.replace(/(POP|pop|팝|띠지|쇼카드|안내문)(으로|로)?|만들어\s*줘?|만들기|해\s*줘/g,' ').replace(/\s+/g,' ').trim()||v,aka=S.mode==='aka',br=aka?'aka':curBr(),sym=(IDS.find(([r])=>r.test(w+' '))||[0,'none'])[1];
+  const cut=w.length>16?(()=>{const i=w.slice(0,18).search(/[,.—]|\s(?=\S*$)/);return i>5?i+1:Math.min(w.length,14)})():w.length,head=w.slice(0,cut).replace(/[,.\s]+$/,''),rest=w.slice(cut).trim();
+  const dark=/밤|달|겨울|고요|죽|끝|어둠/.test(w),D=Object.assign(defD(),{kind:k,br,tag:aka?'아카데미하우스':TAGN(br),sym,head,body:rest,st:dark?1:0,pal:dark?2:/숲|나무|식물|산/.test(w)?1:/따뜻|커피|가을|편지/.test(w)?3:0});
+  if(k==='band'){D.phrases=w;if(sym!=='none')D.syms=[sym]}return D}
+A.ideaGo=async d=>{const el=$('ideaIn')||$('qIn'),v=((d&&d.v)||(el&&el.value)||'').trim();if(!v){toast('아이디어를 한 줄 적어 주세요');return}
+  const H=S.ui.dH=S.ui.dH||[];if(S.ui.D)H.push(JSON.stringify(S.ui.D));const D0=ideaLocal(v);S.ui.D=D0;S.ui.idea=v;S.view[S.mode]='design';window.scrollTo(0,0);render();if(!AI)return;
+  const snap=JSON.stringify(D0),out=await ask('idea',`서점·문화공간 "더숲"의 ${S.mode==='aka'?'아카데미하우스(북한산 자락 복합 문화 공간)':'서점'} 인쇄물을 만듭니다. 직원이 적은 아이디어 한 줄을 바로 붙일 수 있는 문안으로 다듬어 주세요.\n아이디어: "${v.replace(/"/g,"'")}"\n말투: 조용하고 담백하게. 느낌표·이모지·과장 금지. 없는 사실(날짜, 가격, 수상)은 지어내지 않습니다. 뻔한 표현 대신 한 번 비튼 낱말 하나.\nhead 는 14자 안쪽 제목(뜻 단위로 \\n 한 번 가능), body 는 45자 안쪽 한두 문장, band 는 띠지용 18자 안쪽 한 줄, sym 은 ${Object.keys(ICON).filter(x=>!x.startsWith('ph')).join('|')}|none, look 은 0(밝고 조용하게)|1(짙은 바탕)|2(세로 제목) 중 하나.\nJSON 으로만: {"head":"","body":"","band":"","sym":"","look":0}`,{modelTier:'quick'});
+  if(!out||!out.head||JSON.stringify(S.ui.D)!==snap)return;const D=S.ui.D;D.head=out.head;D.body=out.body||D.body;if(ICON[out.sym])D.sym=out.sym;if([0,1,2].includes(+out.look))D.st=+out.look;if(D.kind==='band'){D.phrases=out.band||out.head.replace(/\n/g,' ');D.syms=D.sym!=='none'?[D.sym]:[]}render()};
+document.addEventListener('keydown',e=>{if(e.target&&e.target.id==='ideaIn'&&e.key==='Enter'&&!e.isComposing){e.preventDefault();A.ideaGo({})}});
+(()=>{const f=V.store.design,g=()=>`<div class="card qadd"><div class="qrow"><input type="text" id="ideaIn" autocomplete="off" enterkeyhint="go" value="${esc(S.ui.idea||'')}" placeholder="아이디어 한 줄 — 비 오는 날 혼자 읽기 좋은 얇은 책"><button class="btn pri" data-a="ideaGo">${S.ui.busy==='idea'?'다듬는 중…':'만들기'}</button></div></div>`+f();V.store.design=g;V.aka.design=g})();
+(()=>{const f=A.qAdd;A.qAdd=()=>{const el=$('qIn'),v=el?el.value.trim():'';if(v&&!v.includes('\n')&&!/(오늘|내일|모레|글피|\d\s*시|\d{1,2}:\d{2}|\d+\s*(명|인)|\d+\s*월|\d+\s*일|요일|\d{1,2}[\/.]\d{1,2})/.test(v)&&!/단체표|주차|길\s*안내|화살표|대관|금연|정숙|출입|알림판|공간\s*소개/.test(v)&&!(/(POP|pop|팝|띠지|쇼카드|안내문)/.test(v)&&Object.keys(QAL).some(x=>v.includes(x)))){A.ideaGo({v});return}f()}})();
