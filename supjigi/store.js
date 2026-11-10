@@ -40,7 +40,7 @@ function custCard(P){const br=S.br,C=agg(br,P.cur).cu;if(!C.has)return '';const 
   if(wsum)ins.push(`주말 매출이 ${pct(C.wke,wsum)}%입니다 — 주말 이틀이 평일 닷새${C.wke>C.wkd?'보다 큽니다':'의 '+pct(C.wke,C.wkd)+'% 수준입니다'}.`);
   if(tsum){const i=C.t.indexOf(Math.max(...C.t));ins.push(`가장 붐비는 때는 ${TL[i]}(${pct(C.t[i],tsum)}%)입니다.`)}if(bsum)ins.push(`한 번에 3권 이상 사는 거래가 ${pct(C.bk[2],bsum)}%, 1권만 사는 거래가 ${pct(C.bk[0],bsum)}%입니다.`);
   const brs=br==='all'?BR:BR.filter(b=>b.k===br),labs=P.cur.map(y=>(y.slice(5)==='01'||y===P.cur[0]?y.slice(2,4)+'.':'')+(+y.slice(5))+'월');
-  return `<div class="sec"><h2 style="font-size:19px">손님 특성</h2><p>${brN(br)} · 영수증 단위로 본 사는 모습 · 이름 같은 개인정보는 쓰지 않습니다${br==='all'||br==='aka'||br==='nowon'?' · 거래 수는 초소 · 소전만 (아카 · 노원더숲은 확인 중)':''}</p></div>
+  return `<div class="sec"><h2 style="font-size:19px">손님 특성</h2><p>${brN(br)} · 영수증 단위로 본 사는 모습 · 이름 같은 개인정보는 쓰지 않습니다${br!=='nowon'?' · 거래 수 · 권수별 거래는 지금 노원더숲만 (나머지 세 지점은 다시 세는 중)':''}</p></div>
   <div class="grid g4"><div class="card kpi"><span>거래(영수증) 수</span><b class="num">${won(C.rc)}건</b><small>한 달 평균 ${won(C.rc/Math.max(1,rows.length))}건</small></div>
    <div class="card kpi"><span>한 번에 쓰는 돈</span><b class="num">${C.rc?won(C.amt/C.rc):'—'}원</b><small>매출 ÷ 거래 수</small></div>
    <div class="card kpi"><span>한 번에 사는 권수</span><b class="num">${C.rc&&C.qty?(C.qty/C.rc).toFixed(2):'—'}권</b><small>권수 ÷ 거래 수</small></div>
