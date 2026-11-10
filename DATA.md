@@ -143,3 +143,13 @@ Gmail(비즈 계정)에서 읽어 `ext.js` 에 넣는다. `ext.js` 는 Claude �
 
 ## 아침 브리핑 메일 (11/10)
 - `node tools/brief.js data.js` → `{subject, body, asOf, stale}`. 화면의 「브리핑 복사」와 같은 규칙(오늘 · 내일 · 챙길 일 · 다음 7일). 글을 손으로 고치지 않는다. 지시문은 `tools/brief-task.md`.
+
+## 앱(공개 주소)에서 바로 넣기 · 보기
+
+- 입력(매출 · 영화/프로그램 일정 · 준비 체크 · 인수인계 메모): Claude 링크 밖에서는 기기 안 저장소(localStorage `ds-db-*`)에 저장한다.
+  `index.html` 의 `SYNC_URL` · `SYNC_TOKEN` 을 채우면(구글 시트 + `tools/sync.gs`) 모든 기기가 같은 기록을 쓰고 본다.
+- 비공개 자료(`rev.js` · `reports.js` · `ext.js`)를 앱에서 보려면 `priv.enc`(잠근 묶음)가 공개 주소에 있어야 한다.
+  만들기: `node tools/enc.js <키> priv.enc rev.js reports.js ext.js`. 키는 접속 비밀번호에서 나온다(`--key`). 키·비밀번호는 저장소·문서에 적지 않는다.
+  **`priv.enc` 를 공개 저장소에 올리는 것은 사용자 승인 뒤에만 한다.** 없으면 앱은 그 화면만 비워 둔다.
+- `ext.js` 의 `events` = 영화/프로그램 기본 일정(Artifact DB `events` 의 사본).
+- 사진 인식(반품) · 인스타 초안은 Claude 링크에서만 된다.

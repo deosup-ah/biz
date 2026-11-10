@@ -551,7 +551,7 @@ function parseAsOf(s){const m=(s||"").match(/(\d{1,2})\/(\d{1,2})\s+(\d{1,2}):(\
 function ago(d){const m=Math.round((now-d)/6e4);if(m<1)return "방금";if(m<60)return m+"분 전";const h=Math.round(m/60);if(h<24)return h+"시간 전";return Math.round(h/24)+"일 전"}
 
 /* ===== sales ===== */
-let SALES=[], salesMode="snapshot", salesAsOf="", DB=null, USER=null, MCP=null, salesErr="";
+let LOCAL=false, SALES=[], salesMode="snapshot", salesAsOf="", DB=null, USER=null, MCP=null, salesErr="";
 function loadSnapshot(){const S=window.SALES_DATA||{rows:[],asOf:""};salesAsOf=S.asOf||"";if(salesMode==="snapshot")SALES=(S.rows||[]).slice()}
 
 /* ===== state ===== */
@@ -733,7 +733,7 @@ function revMonth(ym){const r=window.REV_DATA;const z=()=>((r&&r.parts)||[]).map
   for(const[d,v]of Object.entries(r.pipe||{}))if(d.startsWith(ym)){v.c.forEach((x,i)=>o.p[i]+=x);o.pn+=v.n}
   o.ct=o.c.reduce((a,b)=>a+b,0);o.pt=o.p.reduce((a,b)=>a+b,0);return o}
 function renderRev(){const r=window.REV_DATA;
-  if(!r)return `<div class="banner"><span><b>매출 현황은 Claude 앱 링크에서만 보입니다.</b> 공개 주소에는 매출 금액을 올리지 않습니다.</span><a class="btn" href="${ART_URL}" target="_blank" rel="noopener">매출 현황 보러 가기 ›</a></div>`;
+  if(!r)return `<div class="banner"><span><b>매출 현황을 아직 불러오지 못했습니다.</b> 인터넷 연결을 확인하고 「업데이트」를 눌러 주세요.</span><a class="btn" href="${ART_URL}" target="_blank" rel="noopener">매출 현황 보러 가기 ›</a></div>`;
   const A=revMonth(sMonth),P=revMonth(shiftMonth(sMonth,-1));const max=Math.max(1,...A.c.map((x,i)=>x+A.p[i]));
   const d=P.ct?Math.round((A.ct-P.ct)/P.ct*100):null;
   const months=[];for(let m=(r.from||TODAY_S).slice(0,7);m<=shiftMonth(TODAY_S.slice(0,7),3);m=shiftMonth(m,1))months.push(m);
@@ -769,7 +769,7 @@ let repKind="weekly",repIdx=0;
 const repList=()=>((window.REPORTS||{})[repKind]||[]);
 function repText(r){return `[더숲 아카데미하우스 ${r.title}]\n`+r.sections.map(s=>`\n■ ${s.h}\n`+(s.lines||[]).map(l=>"· "+l).join("\n")+((s.lines&&s.table)?"\n":"")+(s.table||[]).slice(1).map(row=>"· "+row.join(" | ")).join("\n")).join("\n")+`\n\n${r.basis||""}`}
 function renderReports(){const R=window.REPORTS;
-  if(!R)return `<div class="banner"><span><b>보고서는 Claude 앱 링크에서 봅니다.</b> 매주 수요일 아침 주간 보고서, 매월 첫째 수요일 월간 보고서가 올라옵니다.</span><a class="btn" href="${ART_URL}" target="_blank" rel="noopener">보고서 보러 가기 ›</a></div>`;
+  if(!R)return `<div class="banner"><span><b>보고서를 아직 불러오지 못했습니다.</b> 「업데이트」를 눌러 주세요. 매주 수요일 아침 주간 보고서, 매월 첫째 수요일 월간 보고서가 올라옵니다.</span><a class="btn" href="${ART_URL}" target="_blank" rel="noopener">보고서 보러 가기 ›</a></div>`;
   const L=repList(),r=L[Math.min(repIdx,L.length-1)];
   return `<div class="seg">${[["weekly","주간"],["monthly","월간"]].map(([k,l])=>`<button data-repk="${k}" aria-pressed="${repKind===k}">${l} ${(R[k]||[]).length?`(${R[k].length})`:""}</button>`).join("")}</div>
   ${L.length>1?`<div class="chips">${L.map((x,i)=>`<button class="chip" data-repi="${i}" aria-pressed="${i===Math.min(repIdx,L.length-1)}">${esc(x.title.replace(/^.*?· /,""))}</button>`).join("")}</div>`:""}
@@ -783,7 +783,7 @@ function renderSales(){
   const tot=rows.reduce((a,r)=>a+(Number(r.amt)||0),0);const byDiv=Object.fromEntries(DIVS.map(d=>[d,0]));rows.forEach(r=>{byDiv[DIVS.includes(r.div)?r.div:"기타"]+=Number(r.amt)||0});
   const max=Math.max(1,...Object.values(byDiv));
   const canWrite=salesMode==="live";
-  const top=canWrite?`<button class="btn pri block" data-salesadd>+ 매출 입력</button>`
+  const top=canWrite?`<button class="btn pri block" data-salesadd>+ 매출 입력</button>${LOCAL?`<p class="note">${SYNC_URL?"넣은 기록은 모든 기기에 함께 보입니다.":"지금은 넣은 기록이 이 기기에만 저장됩니다."}</p>`:""}`
    :`<div class="banner"><span><b>매출 입력은 Claude 앱 링크에서 합니다.</b> 여기서는 ${salesAsOf?esc(salesAsOf)+" ":""}모아 둔 기록을 봅니다.</span><a class="btn" href="${ART_URL}" target="_blank" rel="noopener">입력하러 가기 ›</a></div>`;
   const dayGroups={};rows.forEach(r=>(dayGroups[r.date]=dayGroups[r.date]||[]).push(r));
   return `${top}${salesErr?`<div class="banner warn">${esc(salesErr)}</div>`:""}
@@ -1126,17 +1126,40 @@ function render(){
 }
 
 /* ===== update buttons ===== */
+
+/* ── 잠긴 자료(priv.enc) 열기 · 앱 안 저장소 ── */
+const HAS_PLAIN=!!window.REV_DATA, SYNC_URL="", SYNC_TOKEN="";
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function deriveKey(pin){try{const te=new TextEncoder(),k=await crypto.subtle.importKey("raw",te.encode(pin),"PBKDF2",false,["deriveBits"]);
+  const bits=await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",salt:te.encode("deosup-akaeven-v1"),iterations:310000},k,256);
+  LS.set("ds-k",btoa(String.fromCharCode(...new Uint8Array(bits))))}catch(e){}}
+let privAt="",LEV=[];const mergeEv=()=>{if(!LOCAL)return;const ids=new Set(LEV.map(x=>x.id));EVS=[...((EXT().events)||[]).filter(x=>!ids.has(x.id)),...LEV]};
+async function loadPriv(){if(HAS_PLAIN)return false;const kb=LS.get("ds-k","");if(!kb)return false;
+  try{const r=await fetch("priv.enc?t="+Date.now(),{cache:"no-store"});if(!r.ok)return false;const j=await r.json();if(j.at===privAt)return true;
+    const key=await crypto.subtle.importKey("raw",b64(kb),"AES-GCM",false,["decrypt"]);
+    const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64(j.iv)},key,b64(j.d));
+    window.EXT=undefined;(0,eval)(new TextDecoder().decode(pt));privAt=j.at;mergeEv();if(UNLOCKED&&!sheetKind)render();return true}
+  catch(e){return false}}
+function localDB(){const subs={},get=c=>jget("ds-db-"+c)||[],put=(c,L)=>{LS.set("ds-db-"+c,JSON.stringify(L));fire(c)};
+  const snap=c=>({docs:get(c).map(x=>({id:x.id,data:()=>{const{id,...o}=x;return o}}))}),fire=c=>(subs[c]||[]).forEach(f=>{try{f(snap(c))}catch(e){}});
+  const push=(op,c,id,doc)=>{if(!SYNC_URL)return;fetch(SYNC_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({k:SYNC_TOKEN,op,c,id,doc})}).catch(()=>toast("공유 저장소에 올리지 못했습니다. 이 기기에는 저장됐습니다"))};
+  const pull=()=>{if(!SYNC_URL)return;fetch(SYNC_URL+"?k="+encodeURIComponent(SYNC_TOKEN)+"&t="+Date.now()).then(r=>r.json()).then(j=>{if(j.err)return;Object.keys(j).forEach(c=>put(c,j[c]))}).catch(()=>{})};
+  const setDoc=(c,id,doc)=>{const L=get(c).filter(x=>x.id!==id);L.push({id,...doc});put(c,L);push("set",c,id,doc)};
+  pull();if(SYNC_URL)setInterval(pull,120000);
+  return {pull,collection:c=>({add:async doc=>{const id="l"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);setDoc(c,id,doc);return{id}},
+    doc:id=>({set:async doc=>setDoc(c,id,doc),update:async patch=>{const o=get(c).find(x=>x.id===id)||{};const{id:_i,...d}={...o,...patch};setDoc(c,id,d)},delete:async()=>{put(c,get(c).filter(x=>x.id!==id));push("delete",c,id)}}),
+    onSnapshot:(f)=>{(subs[c]=subs[c]||[]).push(f);f(snap(c))}})}}
 let UNLOCKED=false,pinBuf="";
 const PIN_H=1106894297;
 const pinHash=s=>{let x=5381;for(const ch of "deosup-biz:"+s)x=(((x*33)>>>0)^ch.charCodeAt(0))>>>0;return x};
 function paintPin(msg){$("pinDots").innerHTML=[0,1,2,3].map(i=>`<i class="${i<pinBuf.length?"on":""}"></i>`).join("");$("pinMsg").textContent=msg||""}
 function pinKey(k){if(UNLOCKED)return;if(k==="del")pinBuf=pinBuf.slice(0,-1);else if(pinBuf.length<4)pinBuf+=k;paintPin();
-  if(pinBuf.length===4){if(pinHash(pinBuf)===PIN_H){LS.set("ds-ok",PIN_H+"|"+Date.now());pinBuf="";start()}else{pinBuf="";paintPin("비밀번호가 다릅니다. 다시 눌러 주세요.")}}}
+  if(pinBuf.length===4){if(pinHash(pinBuf)===PIN_H){const p=pinBuf;LS.set("ds-ok",PIN_H+"|"+Date.now());pinBuf="";start();deriveKey(p).then(loadPriv)}else{pinBuf="";paintPin("비밀번호가 다릅니다. 다시 눌러 주세요.")}}}
 let busy=false;
 function loadScript(src){return new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.onload=()=>{s.remove();ok()};s.onerror=()=>{s.remove();no()};document.head.appendChild(s)})}
 async function pullLatest(silent){
   const before=D.asOf;
-  try{await loadScript("data.js?t="+Date.now());prep();try{await loadScript("sales.js?t="+Date.now())}catch(e){}loadSnapshot();render();if(cur){const c=CASES.find(x=>x.id===cur.id);if(c){cur=c;$("sheetIn").innerHTML=detailHTML();drawPane()}}
+  try{await loadScript("data.js?t="+Date.now());prep();try{await loadScript("sales.js?t="+Date.now())}catch(e){}loadSnapshot();await loadPriv();if(DB&&DB.pull)DB.pull();render();if(cur){const c=CASES.find(x=>x.id===cur.id);if(c){cur=c;$("sheetIn").innerHTML=detailHTML();drawPane()}}
     if(!silent)toast(D.asOf!==before?"새 데이터로 바꿨습니다":"이미 최신 데이터입니다 · "+(parseAsOf(D.asOf)?ago(parseAsOf(D.asOf)):""));return true}
   catch(e){if(!silent)toast("불러오지 못했습니다. 인터넷 연결을 확인해 주세요");return false}}
 async function runUpdate(){
@@ -1180,7 +1203,7 @@ function chkProg(c){const L=chkItems(c),dn=(CHK[c.id]||{}).done||{};return {n:L.
 async function saveChk(id){const st=CHK[id];if(!st)return;st.at=new Date().toISOString();
   if(DB){try{await DB.collection("checks").doc(id).set({done:st.done||{},extra:st.extra||[],at:st.at})}catch(e){toast("저장하지 못했습니다. 다시 눌러 주세요")}}
   else LS.set("ds-chk",JSON.stringify(CHK))}
-const shareNote=()=>DB?"함께 보는 기록입니다 · 누가 눌러도 모두에게 바뀝니다":"이 기기에만 저장됩니다 · 함께 쓰려면 Claude 앱 링크에서 여세요";
+const shareNote=()=>DB&&!(LOCAL&&!SYNC_URL)?"함께 보는 기록입니다 · 누가 눌러도 모두에게 바뀝니다":"이 기기에만 저장됩니다 · 공유 저장소를 연결하면 함께 씁니다";
 function chkPane(c){const L=chkItems(c),dn=(CHK[c.id]||{}).done||{},n=L.filter(x=>dn[x.k]).length;
   return `<div class="box" style="padding:12px 14px;display:grid;gap:8px"><div style="display:flex;justify-content:space-between;align-items:baseline"><b>행사 준비 ${n} / ${L.length}</b><span class="note">${c.s?dday(c):""}</span></div><div class="pbar"><i style="width:${L.length?Math.round(n/L.length*100):0}%"></i></div></div>
    <div class="box">${L.map(x=>`<div class="ck ${dn[x.k]?"on":""}"><button data-ck="${esc(x.k)}" aria-pressed="${!!dn[x.k]}"><i>✓</i><span><b>${esc(x.t)}</b><small>${dn[x.k]?esc(dn[x.k])+" 확인":esc(x.w)}</small></span></button>${x.x?`<button class="del" data-ckdel="${esc(x.k)}" aria-label="항목 지우기">지우기</button>`:""}</div>`).join("")}</div>
@@ -1320,10 +1343,15 @@ document.addEventListener("visibilitychange",()=>{if(document.visibilityState===
 /* ===== boot ===== */
 function start(){UNLOCKED=true;$("gate").hidden=true;render();paintCart();loadWeather();const h=(location.hash||"").slice(1);if(h&&CASES.some(c=>c.id===h))openDetail(h)}
 prep();loadSnapshot();applyBig();
-{const ok=LS.get("ds-ok","").split("|");if(+ok[0]===PIN_H&&Date.now()-(+ok[1]||0)<30*864e5)start();else{$("gate").hidden=false;paintPin()}}
+{const ok=LS.get("ds-ok","").split("|");if(+ok[0]===PIN_H&&Date.now()-(+ok[1]||0)<30*864e5&&(HAS_PLAIN||LS.get("ds-k","")))  {start();loadPriv()}else{$("gate").hidden=false;paintPin()}}
 if("serviceWorker" in navigator&&/github\.io$/.test(location.hostname)){navigator.serviceWorker.register("sw.js").catch(()=>{})}
 (async()=>{
-  const cl=window.claude;if(!cl||typeof cl.use!=="function")return;
+  const cl=window.claude;if(!cl||typeof cl.use!=="function"){DB=localDB();LOCAL=true;salesMode="live";
+    DB.collection("sales").onSnapshot(s=>{SALES=[...((window.SALES_DATA||{}).rows||[]),...s.docs.map(d=>({id:d.id,...d.data()}))];setTimeout(()=>{if(tab==="money"&&sheetKind!=="sales")render()},60)});
+    DB.collection("events").onSnapshot(s=>{LEV=s.docs.map(d=>({id:d.id,...d.data()}));mergeEv();setTimeout(()=>{if((tab==="book"||tab==="today")&&!sheetKind)render()},60)});
+    if(!jget("ds-db-notes").length&&NOTES.length)LS.set("ds-db-notes",JSON.stringify(NOTES));if(!jget("ds-db-checks").length&&Object.keys(CHK).length)LS.set("ds-db-checks",JSON.stringify(Object.entries(CHK).map(([id,v])=>({id,...v}))));
+    DB.collection("checks").onSnapshot(s=>{const m={};s.docs.forEach(d=>{m[d.id]=d.data()||{}});CHK=m;setTimeout(()=>paintShared(true),60)});
+    DB.collection("notes").onSnapshot(s=>{NOTES=s.docs.map(d=>({...d.data(),id:d.id}));setTimeout(()=>paintShared(true),60)});return}
   try{
     const [db,user,mcp,smp]=await Promise.all([cl.use("db").catch(()=>null),cl.use("user").catch(()=>null),cl.use("mcp").catch(()=>null),cl.use("sample").catch(()=>null)]);
     USER=user;MCP=mcp;SAMPLE=smp;if(smp){try{SLIM=await smp.limits()}catch(e){SLIM=null}}if(tab==="info"||tab==="book")render();
