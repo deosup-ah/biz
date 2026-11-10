@@ -38,7 +38,7 @@ A.clSave=d=>{const c=clGet(d),br=S.br;if(S.db.events.some(e=>e.title===c.title&&
 A.clCopy=d=>copyText(clNotice(S.br,clGet(d)));
 A.clSheet=d=>{const c=clGet(d);copyText(`${c.title}\n${mdw(c.date)} ${c.time} · ${c.N}명\n\n[진행 순서]\n${CLFLOW.map(([m,t])=>`${m}분  ${t}`).join('\n')}\n\n[질문]\n${CLQ.map((q,i)=>`${i+1}. ${q}`).join('\n')}\n\n[준비]\n책 ${c.N}권 (재고 ${c.stock}권) · 이름표 · 따뜻한 차 · 다음 모임 안내`)};
 A.clOrder=d=>{const c=clGet(d);if(addCart(S.br,{t:c.b.t,a:c.b.a,p:c.b.p,isbn:c.it.isbn||c.b.isbn,price:c.it.price||c.b.price},c.lack,'책모임 '+mdw(c.date)))toast(`${c.lack}권을 북센 주문에 담았습니다`)};
-A.clPop=d=>{const c=clGet(d),D=mkD({...c.t,br:S.br,books:[c.b]},'pop');D.head='함께 읽어요\n'+c.t.title.replace(/[,.]\s*$/,'');D.body=`${mdw(c.date)} ${c.time} · ${BP(S.br)}${BRAND[S.br]} · 90분. 다 읽지 않아도 괜찮습니다.`;D.badge=`선착순 ${c.N}명`;D.st=3;S.ui.D=D;S.ui.dT=null;S.ui.dlog=[];S.view.store='design';window.scrollTo(0,0);render()};
+A.clPop=d=>{const c=clGet(d),D=mkD({...c.t,br:S.br,books:[c.b]},'pop');D.head='함께 읽어요\n'+c.t.title.replace(/[,.]\s*$/,'');D.body=`${mdw(c.date)} ${c.time} · ${BP(S.br)}${BRAND[S.br]} · 90분. 다 읽지 않아도 괜찮습니다.`;D.badge=`선착순 ${c.N}명`;D.st=0;S.ui.D=D;S.ui.dT=null;S.ui.dlog=[];S.view.store='design';window.scrollTo(0,0);render()};
 A.del=d=>del(d.col||d.c,d.id);
 
 /* ── 지원사업 (2026년 공고를 기준으로 한 달력. 내년 날짜는 공고로 확인) ── */

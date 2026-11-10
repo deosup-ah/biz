@@ -62,7 +62,7 @@ function mkD(t,k){const b=(t.books||[])[0]||{},D=Object.assign(defD(),{kind:k,br
   else if(k==='list'){D.head=t.title||'이 평대의 책';D.body=t.hook||'';D.tag=BRN(D.br);const bs=(t.books||[]);D.list=bs.map((x,i)=>`${i+1}. ${x.t} | ${[x.a,x.p,x.price?won(x.price)+'원':''].filter(Boolean).join(' · ')} | ${x.role==='중심'?'이 평대의 중심 책':x.role==='잘 나가는'?'이 책방에서 요즘 가장 많이 집어 가는 책':x.role==='다른 지점 인기'?'다른 더숲 책방에서 사랑받는 책':''}`).join('\n');D.foot=D.foot||'번호는 평대 위 자리와 같습니다.'}
   else if(k==='shelf'){D.head=t.title||'';D.body=t.hook||'';if(t.ppal!=null)D.pal=t.ppal}
   else{D.head=(t.pop||{}).head||t.title||'';D.body=(t.pop||{}).body||'';if(t.ppal!=null)D.pal=t.ppal}
-  if(k==='pop'){D.st=FEEL[t.sym]??(D.pal===2?1:0);if(b.t&&!D.book){D.book=b.t;D.author=[b.a,b.p].filter(Boolean).join(' · ')}}return D}
+  if(k==='pop'){D.st=D.pal===2?1:0;if(b.t&&!D.book){D.book=b.t;D.author=[b.a,b.p].filter(Boolean).join(' · ')}}return D}
 const FEEL={moon:1,star:1,candle:1,snow:2,rain:2,leaf:2,wave:2,cup:3,pencil:3,house:3,sun:3,walk:3,book:0,drop:2};
 A.toDesign=d=>{S.ui.D=mkD(getTheme(d)||{},d.kind);S.ui.dlog=[];S.view[S.mode]='design';window.scrollTo(0,0);render()};
 
