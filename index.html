@@ -234,6 +234,7 @@ main{padding-top:14px}
 .mhero .late b{color:var(--hi)}
 .mrow{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 14px;width:100%;border-bottom:1px solid var(--line);align-items:center}
 .mrow:last-child{border-bottom:0}
+a.mrow{color:inherit;text-decoration:none}
 .mrow .n{font-weight:700;display:block}
 .mrow .s{font-size:12.5px;color:var(--mute);display:block}
 .mrow .a{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
@@ -588,6 +589,7 @@ function briefText(ds){const X=dayData(ds);const L=[`[더숲 ${mdw(ds)} 단체 �
   if(Object.keys(X.mt).length)L.push("",`식사 합계: ${mealStr(X.mt)}`);
   if(X.ins.length)L.push(`입실(16:00): ${X.ins.map(x=>`${x.c.name} ${x.r[2].length}실`).join(", ")}`);
   if(X.outs.length)L.push(`퇴실(11:00): ${X.outs.map(x=>`${x.c.name} ${x.r[2].length}실`).join(", ")}`);
+  if(EXT().stay){const i=stayIn(ds).length,o=stayOut(ds).length;if(i||o)L.push(`북스테이(온라인 예약): 입실 ${i}실 · 퇴실 ${o}실`)}
   if(X.pays.length)L.push(`받을 돈: ${X.pays.map(x=>`${x.c.name} ${x.p[0]} ${x.p[2]}원`).join(", ")}`);
   if(!X.groups.length)L.push("","이용 단체 없음");
   L.push("",D.asOf||"");return L.join("\n")}
@@ -606,7 +608,7 @@ function renderToday(){
   <div class="stats">
     <button class="stat" data-scroll="s-today"><span>${lab} 단체</span><b class="num">${X.groups.length}건</b><small>${X.pax?X.pax+"명":"—"}</small></button>
     <button class="stat" data-scroll="s-meal"><span>${lab} 식사</span><b class="num">${Object.values(X.mt).reduce((a,b)=>a+b,0)||0}식</b><small>${mealStr(X.mt)||"—"}</small></button>
-    <button class="stat ${hiN?"alert":""}" data-scroll="s-act"><span>급한 일</span><b class="num">${hiN}건</b><small>챙길 일 ${A.length}</small></button>
+    <button class="stat ${hiN||(isT&&mailAlerts().length)?"alert":""}" data-scroll="s-act"><span>급한 일</span><b class="num">${hiN+(isT?mailAlerts().length:0)}건</b><small>챙길 일 ${A.length}</small></button>
   </div>
   ${isT?revCard():""}
   ${isT&&window.REPORTS&&(window.REPORTS.weekly||[])[0]?`<button class="card revc" data-go="money:rep"><span class="l">목요일 회의용</span><b style="font-size:17px">${esc(window.REPORTS.weekly[0].title)}</b><span class="go">보기 ›</span><span class="s">${esc(window.REPORTS.weekly[0].made||"")}</span></button>`:""}
@@ -614,6 +616,7 @@ function renderToday(){
   <div class="sec" id="s-today"><div class="sec-h"><h2>${lab} 이용</h2><span class="cnt">${X.groups.length}건 · ${X.pax}명</span></div>
     ${X.groups.length?`<div class="card">${X.groups.map(c=>todayCard(c,ds)).join("")}</div>${timeline(X.groups,ds)}`:`<div class="card empty">${lab} 이용하는 단체가 없습니다.</div>`}</div>
   ${(()=>{const L=EVS.filter(e=>e.date===ds).sort((a,b)=>(a.time||"").localeCompare(b.time||""));return L.length?`<div class="sec"><div class="sec-h"><h2>아카 영화 · 프로그램</h2><span class="cnt">${L.length}건</span></div><div class="card">${L.map(e=>`<button class="mrow" data-go="book"><span><span class="n">${esc(e.title)}</span><span class="s">${esc([e.kind,e.place,e.cap?(e.booked||0)+" / "+e.cap+"명":""].filter(Boolean).join(" · "))}</span></span><span class="a">${esc(e.time||"")}</span></button>`).join("")}</div></div>`:""})()}
+  ${mailToday(ds,isT,lab)}
   ${(()=>{const N=EXT().naver;if(!N)return "";const L=(N.items||[]).filter(x=>x.date===ds).sort((a,b)=>(a.time||"").localeCompare(b.time||""));return `<div class="sec"><div class="sec-h"><h2>네이버 예약</h2><span class="cnt">${L.length}건</span></div><div class="card">${L.length?L.map(x=>`<div class="mrow"><span><span class="n">${esc(x.item||"예약")}</span><span class="s">${esc([x.name,x.pax?x.pax+"명":"",x.status].filter(Boolean).join(" · "))}</span></span><span class="a">${esc(x.time||"")}</span></div>`).join(""):`<div class="empty">${lab} 네이버 예약이 없습니다.</div>`}</div></div>`})()}
   ${X.meals.length?`<div class="sec" id="s-meal"><div class="sec-h"><h2>식사 인원</h2><span class="cnt">${mealStr(X.mt)}</span></div>
     <div class="card">${X.meals.map(({c,m})=>`<button class="mrow" data-id="${esc(c.id)}"><span><span class="n">${esc(c.name)}</span><span class="s">${c.pax?c.pax+"명 단체":""}</span></span><span class="a">${mealStr(m)}</span></button>`).join("")}</div></div>`:""}
@@ -693,13 +696,13 @@ function renderMoney(){
   const L=CASES.filter(c=>c.due>0||c.late);const total=L.reduce((a,c)=>a+c.due,0),late=L.filter(c=>c.late),lateSum=late.reduce((a,c)=>a+c.due,0);
   const head=`<div class="seg">${[["rev","매출 현황"],["due","받을 돈"],["sales","매출 입력"],["rep","보고서"]].map(([k,l])=>`<button data-mv="${k}" aria-pressed="${moneyView===k}">${l}</button>`).join("")}</div>`;
   if(moneyView==="sales")return head+renderSales();
-  if(moneyView==="rev")return head+renderRev();
+  if(moneyView==="rev")return head+renderRev()+stayInsight();
   if(moneyView==="rep")return head+renderReports();
   L.sort((a,b)=>(b.late-a.late)||((a.s||"9999").localeCompare(b.s||"9999")));
   const nextPay=c=>{const p=(c.amt.pay||[]).find(p=>!/확인|입금/.test(p[4]||""));return p?`${p[0]} ${p[1]?md(p[1]):""}`:""};
   return head+`<div class="card mhero"><div><span>받을 돈 합계 · ${L.length}건</span><b class="num">${won(total)}원</b></div><div class="late"><span>입금 지연 · ${late.length}건</span><b class="num">${won(lateSum)}원</b></div></div>
   <div class="card">${L.map(c=>`<button class="mrow ${c.late?"late":""}" data-id="${esc(c.id)}" data-pane="amt"><span><span class="n">${esc(c.name)}</span><span class="s">${c.s?mdw(c.s):"날짜 미정"}${nextPay(c)?" · 다음 "+esc(nextPay(c)):""}${c.late?" · 입금 지연":""}${c.own?" · 담당 "+esc(c.own):""}</span></span><span class="a">${won(c.due)}<small>청구 ${manwon(c.final)}</small></span></button>`).join("")||`<div class="okline">받을 돈이 없습니다.</div>`}</div>
-  <p class="note">건 대장 기준입니다. 입금 확인과 금액 수정은 건 대장에서 합니다.</p>`;
+  <p class="note">건 대장 기준입니다. 입금 확인과 금액 수정은 건 대장에서 합니다.</p>${settleCard()}`;
 }
 function revMonth(ym){const r=window.REV_DATA;const z=()=>((r&&r.parts)||[]).map(()=>0);const o={c:z(),p:z(),n:0,pn:0};if(!r)return o;
   for(const[d,v]of Object.entries(r.conf||{}))if(d.startsWith(ym)){v.c.forEach((x,i)=>o.c[i]+=x);o.n+=v.n}
@@ -824,6 +827,41 @@ const applyBig=()=>{document.body.style.zoom=BIG?"1.15":""};
 /* ===== 서점 ===== */
 let bookView=LS.get("ds-ak","naver"), bookSub=LS.get("ds-aksub","store"), EVS=[], evForm=null, evDel=false, bkSrc="yes24", ORD=jget("ds-ord"), RET=[], retBusy=false, retMsg="", igKind="책", igOut=[], igBusy=false, igMsg="", SAMPLE=null, SLIM=null;
 const EXT=()=>window.EXT||{};
+/* ── 메일 연동 (ext.js: stay · settle · mail) — 이름·전화·이메일은 담지 않는다 ── */
+const stayOk=()=>((EXT().stay||{}).items||[]).filter(x=>x.st==="ok");
+const stayIn=ds=>stayOk().filter(x=>x.in===ds),stayOut=ds=>stayOk().filter(x=>x.out===ds);
+const mailAlerts=()=>{const E=EXT(),A=[];
+  ((E.stay||{}).alerts||[]).filter(a=>a.out>=TODAY_S).forEach(a=>A.push({n:"취소한 객실이 PMS에 남아 있음",s:`${a.room} · ${mdw(a.in)} 숙박 · 예약 ${a.id} — 환불은 끝났는데 객실이 막혀 있습니다. WINGS에서 취소 확인`,a:"확인"}));
+  const hd=((E.settle||{}).items||[]).filter(x=>x.held&&diff(x.pay)>=-7);
+  if(hd.length)A.push({n:`카드 정산 입금보류 ${hd.length}건`,s:`매출일 ${[...new Set(hd.map(x=>md(x.sale)))].sort().join(" · ")} — 사유는 토스페이먼츠(1544-7772) 문의`,a:"확인"});
+  return A};
+function mailToday(ds,isT,lab){const E=EXT(),S=E.stay,T=E.settle,M=E.mail;if(!S&&!T&&!M)return "";let h="";
+  if(isT){const A=mailAlerts();if(A.length)h+=`<div class="sec"><div class="sec-h"><h2>메일에서 온 급한 일</h2><span class="cnt">${A.length}건</span></div><div class="card">${A.map(a=>`<div class="mrow late"><span><span class="n">${esc(a.n)}</span><span class="s">${esc(a.s)}</span></span><span class="a">${esc(a.a)}</span></div>`).join("")}</div></div>`}
+  if(S){const I=stayIn(ds),O=stayOut(ds);const row=(x,k)=>`<div class="mrow"><span><span class="n">${esc(x.room)}</span><span class="s">${esc([x.pax?x.pax+"명":"",x.n>1?x.n+"박":"",x.bf?"조식 "+x.bf:"","예약 "+x.id].filter(Boolean).join(" · "))}</span></span><span class="a">${k}</span></div>`;
+    h+=`<div class="sec"><div class="sec-h"><h2>북스테이 온라인 예약</h2><span class="cnt">입실 ${I.length}실 · 퇴실 ${O.length}실</span></div><div class="card">${I.length||O.length?O.map(x=>row(x,"퇴실 12:00")).join("")+I.map(x=>row(x,"입실 16:00")).join(""):`<div class="empty">${lab} 온라인 예약 입실 · 퇴실이 없습니다.</div>`}</div><p class="note">예약 알림 메일 기준 (${md(S.frm)} 이후 접수분 · ${esc(S.asOf)}). 그 전 예약과 전화 · 다른 채널 예약은 WINGS에서 확인하세요.</p></div>`}
+  if(isT&&T){const P=(T.items||[]).filter(x=>!x.held&&x.amt>0),sum=d=>P.filter(x=>x.pay===d).reduce((a,x)=>a+x.amt,0);const days=[...new Set(P.map(x=>x.pay))].filter(d=>d>=TODAY_S).sort();
+    if(days.length)h+=`<div class="sec"><div class="sec-h"><h2>카드 정산 입금</h2><button class="more" data-go="money:due">모두 보기 ›</button></div><div class="card">${days.slice(0,3).map(d=>`<div class="mrow"><span><span class="n">${d===TODAY_S?"오늘":mdw(d)} 입금</span><span class="s">토스페이먼츠 · 매출일 ${P.filter(x=>x.pay===d).map(x=>md(x.sale)).sort().join(" · ")}</span></span><span class="a">${won(sum(d))}</span></div>`).join("")}</div></div>`}
+  if(isT&&M&&(M.items||[]).length)h+=`<div class="sec"><div class="sec-h"><h2>답할 메일</h2><span class="cnt">${M.items.length}건 · ${esc(M.asOf||"")}</span></div><div class="card">${M.items.map(x=>`<a class="mrow ${diff(x.date)<=-3?"late":""}" href="${esc(x.url)}" target="_blank" rel="noopener"><span><span class="n">${esc(x.frm)}${x.case?` <small style="font-weight:500;color:var(--mute)">${esc(x.case)}</small>`:""}</span><span class="s">${esc(x.todo)}</span></span><span class="a">${md(x.date)}<small>열기 ›</small></span></a>`).join("")}</div></div>`;
+  return h}
+function settleCard(){const T=EXT().settle;if(!T)return "";const P=(T.items||[]).filter(x=>x.pay>=TODAY_S);const days=[...new Set(P.map(x=>x.pay))].sort();const tot=P.reduce((a,x)=>a+x.amt,0);const A=mailAlerts().filter(a=>/정산/.test(a.n));
+  return `<div class="sec"><div class="sec-h"><h2>카드 정산 입금 예정</h2><span class="cnt">${won(tot)}원 · ${esc(T.asOf||"")}</span></div><div class="card">${days.map(d=>{const L=P.filter(x=>x.pay===d);const hd=L.filter(x=>x.held).length;return `<div class="mrow ${hd?"late":""}"><span><span class="n">${d===TODAY_S?"오늘":mdw(d)}</span><span class="s">매출일 ${L.map(x=>md(x.sale)).sort().join(" · ")}${hd?` · 입금보류 ${hd}건`:""}</span></span><span class="a">${won(L.reduce((a,x)=>a+x.amt,0))}</span></div>`}).join("")||`<div class="empty">안내된 입금 예정이 없습니다.</div>`}</div>${A.length?`<p class="note" style="color:var(--hi)">${esc(A[0].n)} — ${esc(A[0].s)}</p>`:""}<p class="note">토스페이먼츠 정산 안내 메일 기준입니다.</p></div>`}
+function stayInsight(){const S=EXT().stay;if(!S||!(S.items||[]).length)return "";const all=S.items,ok=stayOk();const dd=x=>Math.round((pd(TODAY_S)-pd(x.at.slice(0,10)))/864e5);
+  const w=(a,b)=>all.filter(x=>dd(x)>=a&&dd(x)<=b).length,w1=w(0,6),w0=w(7,13);const cz=all.length-ok.length+(S.oldCancels||[]).length;
+  const cw=[...all.filter(x=>x.st==="cancel"),...(S.oldCancels||[])];
+  const by=(f,L=ok)=>{const m={};L.forEach(x=>{const k=f(x);m[k]=(m[k]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1])};
+  const mon=by(x=>x.in.slice(0,7)).sort((a,b)=>a[0].localeCompare(b[0])),room=by(x=>x.room),mx=Math.max(1,...room.map(r=>r[1]));
+  const lead=ok.map(x=>Math.round((pd(x.in)-pd(x.at.slice(0,10)))/864e5)).sort((a,b)=>a-b),medL=lead[Math.floor(lead.length/2)]||0;
+  const bf=ok.filter(x=>x.bf).length,known=ok.filter(x=>x.amt),avg=known.length?Math.round(known.reduce((a,x)=>a+x.amt/x.n,0)/known.length):0;
+  const wkd=by(x=>{const g=pd(x.in).getDay();return g===5||g===6?"금 · 토":"평일 · 일"});
+  const notes=[];if(w0)notes.push(`최근 7일 접수 ${w1}건 — 그 전 7일(${w0}건)보다 ${w1>=w0?"+"+(w1-w0):"−"+(w0-w1)}건`);
+  notes.push(`취소 ${cz}건 (접수 대비 ${Math.round(cz/Math.max(1,all.length)*100)}%)`);notes.push(`예약에서 입실까지 중간값 ${medL}일`);notes.push(`조식 포함 ${Math.round(bf/Math.max(1,ok.length)*100)}%`);
+  return `<div class="sec"><div class="sec-h"><h2>북스테이 온라인 예약 흐름</h2><span class="cnt">${md(S.frm)} ~ · 메일 기준</span></div>
+   <div class="stats"><div class="stat"><span>접수</span><b class="num">${all.length}건</b><small>유효 ${ok.length}건</small></div><div class="stat"><span>최근 7일</span><b class="num">${w1}건</b><small>그 전 7일 ${w0}건</small></div><div class="stat"><span>1박 평균</span><b class="num">${manwon(avg)}</b><small>금액 확인 ${known.length}건</small></div></div>
+   <div class="card" style="padding:12px 14px"><div class="s" style="font-size:12.5px;color:var(--mute);margin-bottom:6px">숙박 월 · ${mon.map(([k,v])=>`${Number(k.slice(5))}월 ${v}건`).join(" · ")} · ${wkd.map(([k,v])=>`${k} ${v}건`).join(" · ")}</div>
+   ${room.map(([k,v])=>`<div style="display:grid;grid-template-columns:8.5em 1fr auto;gap:8px;align-items:center;padding:3px 0;font-size:13.5px"><span>${esc(k)}</span><span style="height:8px;border-radius:4px;background:var(--line)"><span style="display:block;height:8px;border-radius:4px;background:var(--pine-2);width:${Math.round(v/mx*100)}%"></span></span><b class="num">${v}</b></div>`).join("")}</div>
+   <div class="card" style="padding:12px 14px;font-size:13.5px;line-height:1.7">${notes.map(n=>`· ${esc(n)}`).join("<br>")}</div>
+   <p class="note">온라인 예약 알림 메일만 센 것입니다. 금액은 메일 미리보기에 보인 건만 계산했습니다.</p></div>`}
+
 const SRC=[["yes24","예스24"],["aladin","알라딘"],["kyobo","교보문고"]];
 const nt=s=>String(s||"").replace(/\(.*?\)|\[.*?\]/g,"").replace(/[^0-9a-z가-힣]/gi,"").toLowerCase();
 const storeItem=t=>{const S=EXT().store;if(!S||!S.items)return null;const k=nt(t);return S.items.find(x=>nt(x.t)===k)||null};

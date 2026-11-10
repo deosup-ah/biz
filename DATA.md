@@ -115,3 +115,18 @@
 ## 자료실 (11/10)
 archive.js (저장소 + Artifact) — `window.ARCHIVE = {asOf, items:[{id:Artifact 주소 끝 글자, d:"MM-DD", t:제목, c:분류}]}`. biz 계정에서 Claude 로 만든 자료(Artifact) 목록을 **사람별이 아니라 일(업무)별**로 묶는다: 책 · 사유의숲 / 인물도서관 / 씨앗숲 · 4층 / 영화 · 프로그램 / 회의 · 보고 / 운영 · 안내물 / 기타. 같은 제목이 둘이면 최신 하나만. 제목만 공개되고 자료 자체는 권한 있는 사람만 열린다.
 - 영화 일정(`events`, kind "영화")의 출처: 「더숲 아카데미하우스 X 진진 영화 예약 현황」 Artifact 의 회차별 집계(네이버 예약 엑셀 다운로드 기준, 정원 40석).
+
+## 메일 연동 (ext.js 의 stay · settle · mail)
+
+Gmail(비즈 계정)에서 읽어 `ext.js` 에 넣는다. `ext.js` 는 Claude 앱 링크에만 올리고 공개 주소에는 올리지 않는다.
+예약자 이름·전화·이메일, 보낸 사람 개인 이름·주소는 넣지 않는다(기관명만).
+
+- `stay` — 보낸이 `notify@deosup-academyhouse-booking.com`, 제목 `[신규예약|예약취소|부분환불|조치필요] 번호 · 객실 · 입실~퇴실`. `(테스트)` 제목은 뺀다.
+  `{asOf, frm, items:[{id,room,in,out,n,pax,bf,amt,at,st:"ok"|"cancel"}], oldCancels:[…], alerts:[{type:"pms",id,room,in,out,amt,at}]}`
+  같은 번호의 취소 메일이 있으면 `st:"cancel"`. `bf` 는 조식 옵션 수량 합. 금액은 메일에 보인 것만.
+- `settle` — 보낸이 `no-reply@settlement.tosspayments.com`. `{asOf, items:[{pay,sale,amt,held}]}` (`held` = 본문에 "입금보류").
+- `mail` — 받은편지함의 안 읽은 외부 메일(최근 10일, 알림·광고 제외). `{asOf, items:[{frm(기관명), case(GS-번호), date, todo(한 줄), url}]}`
+  `url` 은 `https://mail.google.com/mail/u/0/#all/<스레드 id>`.
+
+화면: 「오늘」의 메일에서 온 급한 일 · 북스테이 온라인 예약 · 카드 정산 입금 · 답할 메일, 「돈 › 매출 현황」의 북스테이 온라인 예약 흐름, 「돈 › 받을 돈」의 카드 정산 입금 예정.
+메일은 읽기만 한다. 답장·라벨·삭제는 하지 않는다.
