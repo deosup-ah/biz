@@ -21,7 +21,7 @@ A.gcRe=()=>{GC.st='idle';gcLoad(true);render()};
 const gcMsg=()=>GC.st==='load'?'캘린더 읽는 중…':GC.st==='ok'?`구글 캘린더 자동 · ${new Date(GC.at).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})} 기준`:GC.st==='err'?(/needs_reauth|server_not_connected|selection_required/.test(GC.code)?'claude.ai 설정 → 커넥터에서 Google Calendar 를 연결하면 단체 일정이 자동으로 보입니다.':/not_in_manifest|approval_required|consent_required|not_granted/.test(GC.code)?'캘린더 사용을 허용하면 단체 일정이 자동으로 보입니다.':/blocked_by_policy/.test(GC.code)?'조직 정책으로 캘린더를 읽을 수 없습니다.':'지금은 캘린더를 읽지 못했습니다.'):'';
 
 /* ── 한 줄 입력: "내일 2시 한살림 연수 30명 대화의 집" ── */
-const QPL=['대화의 집','내일을 위한 집','여해의 집','새벽의 집','구름의 집','기도의 집','사유의 숲','본관','루프탑','라운지','카페','다이닝','서점','명상센터','회의실','세미나룸','강당','야외'];
+
 function qParse(raw){let s=' '+(raw||'').replace(/01\d[- ]?\d{3,4}[- ]?\d{4}/g,' ').replace(/\s+/g,' ').trim()+' ';if(!s.trim())return null;
   let date=TODAY,time='',end='',booked,place='',m;const Y=+TODAY.slice(0,4),cut=x=>{s=s.replace(x,' ')},p2=n=>String(n).padStart(2,'0'),fix=(mo,d)=>{let t=`${Y}-${p2(mo)}-${p2(d)}`;if(dayDiff(TODAY,t)>60)t=`${Y+1}-${p2(mo)}-${p2(d)}`;return t};
   if(m=/(\d{1,2})\s*월\s*(\d{1,2})\s*일?/.exec(s)){date=fix(+m[1],+m[2]);cut(m[0])}
@@ -38,7 +38,7 @@ function qParse(raw){let s=' '+(raw||'').replace(/01\d[- ]?\d{3,4}[- ]?\d{4}/g,'
   const kind=/영화|상영/.test(title)?'영화':/북토크|저자|작가와/.test(title)?'북토크':/책모임|독서|읽기|낭독/.test(title)?'책모임':/강연|클래스|수업|프로그램|요가|명상/.test(title)?'프로그램':'기타';
   const o={kind,title,date,time,place,memo:end?`~${end}`:''};if(booked!=null)o.booked=booked;return o}
 const qShow=o=>o?`${dday(o.date)} ${mdw(o.date)}${o.time?' · '+o.time:''} · ${o.title}${o.booked!=null?' · '+o.booked+'명':''}${o.place?' · '+o.place:''}`:'';
-const QAL={기후:'뜨거워지는',환경:'뜨거워지는',동물:'먹히는',비건:'먹히는',노동:'일의 뒷면',차별:'나는 아니라고',차이:'나는 아니라고',장애:'나는 아니라고',예술:'보는 법',미술:'보는 법',사진:'보는 법'};
+
 function qCmd(v){const go=()=>{S.view.aka='design';S.mode='aka';window.scrollTo(0,0)};
   if(/단체표/.test(v)){A.gcBoard();return true}
   const sg=/주차/.test(v)?'park':/길\s*안내|화살표/.test(v)?'way':/대관/.test(v)?'rent':/금연|정숙|출입|알림판/.test(v)?'notice':/공간\s*소개/.test(v)?'space':'';
@@ -88,25 +88,13 @@ A.akPlan=()=>{const t=akThemes().find(x=>x.title===S.ui.akT);if(!t)return;S.ui.p
   ${aka&&T.length?`<div class="qthm">${T.map((t,i)=>[t,i]).filter(([t])=>t.tone===tn).slice(0,S.ui.akAll?99:8).map(([t,i])=>true?`<button data-a="akThm" data-i="${i}" aria-pressed="${S.ui.akT===t.title}">${esc(t.title)}</button>`:'').join('')}${!S.ui.akAll&&T.filter(t=>t.tone===tn).length>8?`<button class="lnk" data-a="ui" data-k="akAll" data-v="1">더 보기</button>`:''}</div>${S.ui.akT&&T.find(t=>t.title===S.ui.akT)?`<div class="akx"><button class="btn" data-a="akDp">진열 보기</button><button class="btn" data-a="akPlan">모임 기획</button><span class="note">함께 놓을 것 · ${stnFor(T.find(t=>t.title===S.ui.akT)).map(x=>x.b).join(' · ')}</span></div>`:''}`:''}${(S.ui.err||{}).photo?`<p class="note">${esc(S.ui.err.photo)}</p>`:''}`;return bar+f()};V.store.design=g;V.aka.design=g})();
 
 /* ── 굿즈 제안: 무엇을 · 어떻게 묶어 · 어디에 ── */
-const GOODS=[
- {n:'문장 책갈피',w:'책 한 권에 한 장. 계산대에서 가장 부담 없이 따라오는 물건입니다.',set:'주제마다 3종 · 큐레이션 책을 사면 한 장 증정, 낱장 판매',at:'계산대 옆 · 평대 POP 아래',first:'주제당 100장, 2주 뒤 남은 수로 다음 수량 결정',mode:'store'},
- {n:'블라인드 북',w:'제목을 가리고 한 문장만 보여 줍니다. 「다른 시선」 주제와 잘 맞습니다.',set:'크라프트 포장 + 띠지 한 줄 + 책갈피 · 재고가 넉넉한 책부터',at:'입구 평대 한쪽, 8권 이하로 적게',first:'주제 하나에 8권, 포장은 매장에서',mode:'store'},
- {n:'읽기 꾸러미',w:'책 한 권에 엽서와 차 한 봉. 선물 수요가 오르는 연말에 맞습니다.',set:'책 1 + 엽서 2 + 티백 1 · 띠지로 묶기',at:'카페 쪽 벽 서가 눈높이 칸',first:'지점당 10세트, 예약 없이 현장 판매로 시험',mode:'store'},
- {n:'북한산 엽서 세트',w:'공간의 풍경이 곧 기념품입니다. 숙박 · 연수 손님이 가져갈 것이 필요합니다.',set:'계절 4장 한 묶음 · 본관과 여섯 개의 집 그림',at:'본관 프런트 · 카페 계산대',first:'200세트, 단체 환영 꾸러미에 한 장씩 넣어 반응 보기',mode:'aka'},
- {n:'단체 환영 꾸러미',w:'연수 첫날 책상 위에 놓이는 것. 재방문과 후기에 닿습니다.',set:'공간 안내 한 장 + 엽서 + 추천 책 목록 + 카페 음료권',at:'대관 공간 책상 · 객실',first:'다음 단체 1팀에 먼저 적용, 담당자 의견 받기',mode:'aka'},
- {n:'사유의 숲 필사 노트',w:'명상 · 낭독 프로그램과 묶으면 프로그램이 물건으로 남습니다.',set:'얇은 중철 노트 + 이달의 문장 1쪽 인쇄',at:'사유의 숲 입구 · 프로그램 접수대',first:'프로그램 참가자 수만큼 먼저, 남으면 판매',mode:'aka'}];
+
 A.gdMore=async()=>{const aka=S.mode==='aka';const out=await ask('goods',`"더숲"(${aka?'북한산 자락 복합 문화 공간 아카데미하우스: 서점 · 북스테이 · 카페 · 대관 · 프로그램':'서울의 동네 서점 여러 지점: 문학 · 인문 · 예술 · 과학 중심'})에서 소량으로 시험해 볼 굿즈 · 묶음 상품 4가지를 제안하세요. 흔한 에코백 · 머그 말고, 이 공간만 할 수 있는 것. 원가나 판매량 숫자는 지어내지 말고, 과장 없이 담백하게.\nJSON 배열로만: [{"n":"이름","w":"왜 지금 이 공간에 맞는지 한 문장","set":"구성","at":"놓을 자리","first":"처음 시험하는 방법"}]`);if(Array.isArray(out))S.ui.gd=out.filter(x=>x&&x.n).slice(0,4)};
 function goodsCard(){const m=S.mode,L=[...(S.ui.gd||[]),...GOODS.filter(g=>g.mode===m)];return `<div class="sec"><h2>굿즈 제안</h2></div><div class="grid g3">${L.map(g=>`<div class="card gd"><h3>${esc(g.n)}</h3><p>${esc(g.w)}</p><dl><dt>구성</dt><dd>${esc(g.set)}</dd><dt>자리</dt><dd>${esc(g.at)}</dd><dt>시작</dt><dd>${esc(g.first)}</dd></dl></div>`).join('')}</div>${AI?`<div class="btns"><button class="btn" data-a="gdMore" ${S.ui.busy?'disabled':''}>${S.ui.busy==='goods'?'생각하는 중…':'다른 제안 받기'}</button></div>`:''}`}
 (()=>{const f=V.store.trend,g=()=>f()+goodsCard();V.store.trend=g;V.aka.trend=g})();
 
 /* ── 다른 공간 읽기: 잘하는 것 · 약한 것 · 더숲은 언제 따르고 언제 달리할지 ── */
-const SPACES=[
- {n:'던트 북스 (런던)',good:'책을 분야가 아니라 나라별로 놓습니다. 소설을 찾다가 옆의 역사·요리책을 집게 됩니다.',weak:'찾는 책이 분명한 손님에게는 돌아가는 길입니다.',keep:'기본 서가는 분야별 그대로.',diff:'여행·번역 문학처럼 「장소」가 주제인 평대 한 곳에서만.',u:'https://qz.com/1651414/barnes-nobles-new-ceo-wants-the-chain-to-be-more-like-an-indie'},
- {n:'워터스톤스 (영국)',good:'본사 일괄 매입과 출판사 광고 진열을 줄이고, 지점이 팔 책을 직접 고르게 했습니다. 반품이 줄었습니다.',weak:'지점마다 달라 물류와 교육이 복잡해집니다.',keep:'북센 주문과 재고 기준은 공통으로.',diff:'평대 주제와 수량은 지점이 정합니다. 워크룸의 지점별 「들여놓을 책」이 이 역할.',u:'https://www.newstatesman.com/spotlight/2017/07/how-new-attitude-work-saved-britain-s-bookshops'},
- {n:'분키츠 (도쿄)',good:'입장료를 받고 한 종에 한 권만 둡니다. 머무는 시간이 길고 책도 삽니다.',weak:'입장료가 문턱입니다. 지나가다 들르는 손님을 잃습니다.',keep:'서점은 무료 입장 그대로.',diff:'아카데미 「사유의 숲」처럼 이미 머무는 공간에서는 시간제 이용과 한 권씩 진열을 시험할 만합니다.',u:'https://www.mt.co.kr/culture/2019/06/16/2019061518293179177'},
- {n:'모리오카 서점 (도쿄)',good:'한 주에 책 한 권만 팔고, 방 전체를 그 책의 전시로 씁니다. 저자가 와 있습니다.',weak:'고를 것이 없습니다. 매출이 그 한 권에 달려 있습니다.',keep:'매장 전체를 한 권으로 채우지는 않습니다.',diff:'북토크가 있는 주에 평대 하나를 「이 주의 한 권」으로.',u:'https://weekly.khan.co.kr/article/202007171553121'},
- {n:'츠타야 (일본)',good:'책 옆에 그 책의 생활을 놓습니다. 분야 담당이 직접 제안합니다.',weak:'겉모습만 따라 한 곳은 오래가지 못했다는 평이 있습니다. 책이 소품이 되기 쉽습니다.',keep:'책이 먼저, 물건은 곁에.',diff:'주제가 분명한 평대에만 구하기 쉬운 오브제 두세 가지. 큐레이션의 「오브제와 함께」가 이 방식.',u:'https://letter.wepick.kr/post/3716'},
- {n:'별마당 도서관 · 아크앤북 (서울)',good:'압도적인 서가와 책 터널. 사람을 불러 모읍니다.',weak:'사진만 찍고 가는 손님이 많다는 지적이 처음부터 있었습니다.',keep:'사진 찍힐 자리 하나는 필요합니다.',diff:'그 자리 바로 옆에 살 수 있는 책과 가격을 둡니다. 보는 서가와 사는 평대를 떼어 놓지 않습니다.',u:'https://www.mt.co.kr/culture/2019/06/11/2019061014283497147'}];
+
 function spaceCard(){return `<div class="sec"><h2>다른 공간 읽기</h2></div>
  <div class="card rule"><b>달리하는 것은 목적이 아닙니다.</b><ol><li>손님이 책을 찾는 데 방해가 되면 하지 않습니다. 기본 서가는 그대로 둡니다.</li><li>평대 하나, 2주 단위로 되돌릴 수 있을 때만 시험합니다.</li><li>시작 전에 볼 숫자를 정합니다. 그 평대의 판매 권수와, 없던 문의가 생겼는지.</li></ol></div>
  <div class="grid g2">${SPACES.map(s=>`<div class="card gd"><h3>${s.n}</h3><dl><dt>강점</dt><dd>${s.good}</dd><dt>약점</dt><dd>${s.weak}</dd><dt>그대로</dt><dd>${s.keep}</dd><dt>달리</dt><dd>${s.diff}</dd></dl><a class="lnk" href="${s.u}" target="_blank" rel="noopener">출처</a></div>`).join('')}</div>`}
@@ -154,7 +142,7 @@ C.dpPhoto=async el=>{const f=[...el.files].slice(0,2);if(!f.length)return;const 
   if(S.ui.dp)A.dpOpen({i:S.ui.dp.i})};
 
 /* ── 아이디어 한 줄 → 바로 디자인 ── */
-const IDS=[[/눈|겨울|첫눈/,'snow'],[/비\s|비가|장마|우산/,'rain'],[/밤|달|잠|새벽/,'moon'],[/커피|차 한|카페|찻/,'cup'],[/숲|나무|식물|산|풀/,'leaf'],[/집|방|동네/,'house'],[/필사|쓰기|글|편지|문장|메모/,'pencil'],[/별|선물|연말|크리스마스/,'star'],[/바다|물|파도|여름휴가/,'wave'],[/촛|위로|쉼|고요/,'candle'],[/햇|여름|아침|봄/,'sun'],[/걷|산책|여행|길/,'walk'],[/책|읽/,'book']];
+
 function ideaLocal(v){const k=/띠지/.test(v)?'band':/쇼카드/.test(v)?'card':'pop',w=v.replace(/(POP|pop|팝|띠지|쇼카드|안내문)(으로|로)?|만들어\s*줘?|만들기|해\s*줘/g,' ').replace(/\s+/g,' ').trim()||v,aka=S.mode==='aka',br=aka?'aka':curBr(),sym=(IDS.find(([r])=>r.test(w+' '))||[0,'none'])[1];
   const cut=w.length>16?(()=>{const i=w.slice(0,18).search(/[,.—]|\s(?=\S*$)/);return i>5?i+1:Math.min(w.length,14)})():w.length,head=w.slice(0,cut).replace(/[,.\s]+$/,''),rest=w.slice(cut).trim();
   const dark=/밤|달|겨울|고요|죽|끝|어둠/.test(w),D=Object.assign(defD(),{kind:k,br,tag:aka?'아카데미하우스':TAGN(br),sym,head,body:rest,st:dark?1:0,pal:dark?2:/숲|나무|식물|산/.test(w)?1:/따뜻|커피|가을|편지/.test(w)?3:0});
@@ -194,7 +182,7 @@ A.myClear=()=>{S.ui.myT=[];ls.set('myT',[]);S.ui.cTone='전체';render()};
 if(!KSHOW.store.includes('sign'))KSHOW.store.push('sign');
 A.micTo=d=>{S.ui.micT=d.id;A.dMic()};
 const micBtn=id=>(DICT||window.SpeechRecognition||window.webkitSpeechRecognition)?`<button class="btn" data-a="micTo" data-id="${id}" aria-pressed="${!!S.ui.mic}">${S.ui.mic?'듣는 중':'말하기'}</button>`:'';
-const NOTR=/안내문|안내판|공지|알림|휴무|쉽니다|쉬어요|닫습니다|닫아요|엽니다|영업|금연|조용|정숙|출입|화장실|주차|마감|품절|매진|공사|점검|반납|금지|삼가|부탁|주세요|마세요|됩니다|입니다|합니다|있습니다|없습니다/;
+
 function noticeLocal(v){const w=v.replace(/(안내문|안내판|공지|알림)(으로|로|을|를)?\s*(만들어\s*줘?|써\s*줘?|작성)?/g,' ').replace(/\s+/g,' ').trim()||v,aka=S.mode==='aka',br=aka?'aka':curBr(),ps=w.split(/(?<=[.!?])\s+|,\s+/),head=(ps[0]||w).replace(/[.!]+$/,''),body=ps.slice(1).join(' ');
   const sym=/금연|담배/.test(w)?'drop':/조용|정숙/.test(w)?'leaf':/우산|비가|비 오|장마/.test(w)?'rain':/화장실|이쪽|방향|층/.test(w)?'walk':/행사|촬영|모임/.test(w)?'candle':/휴무|닫|쉽|마감/.test(w)?'moon':/출입|관계자/.test(w)?'house':'none';
   return Object.assign(defD(),SIGN.notice.d,{kind:'sign',sg:'notice',cv:0,br,tag:aka?'아카데미하우스':TAGN(br),head,body,list:'',sym})}
@@ -205,27 +193,7 @@ function noticeLocal(v){const w=v.replace(/(안내문|안내판|공지|알림)(�
 (()=>{const f=A.qAdd;A.qAdd=()=>{const el=$('qIn'),v=el?el.value.trim():'';if(v&&!v.includes('\n')&&/(습니다|주세요|마세요|안내문|안내판|공지)/.test(v)){A.ideaGo({v});return}f()}})();
 
 /* ── 공개 주소에서도 되는 책 고르기 · 다듬기 (Claude 없이, 낱말 사전으로) ── */
-const TOPIC=[
- {k:/밤|새벽|잠|불면|달/,w:['밤','어두운','달','꿈','고독'],c:['문학'],h:'불을 하나만 켜고 읽는 책들.'},
- {k:/비 오|비가|장마|우울|흐린|눈물|슬픔|슬플/,w:['장마','슬픔','슬픈','눈물','울고'],c:['문학'],h:'젖은 날에는 젖은 문장이 잘 읽힙니다.'},
- {k:/위로|지친|지칠|힘들|쉬고|괜찮|다정/,w:['마음','어루만지','위로','오래 곁에','사랑'],c:['문학','인문'],h:'힘내라는 말 없이 곁에 있어 주는 책.'},
- {k:/미술|그림|전시|화가|갤러리/,w:['미술관','그림','캔버스','보기','예술','루킹'],c:['예술'],h:'보러 가기 전에 먼저 읽어 두는 눈.'},
- {k:/영화|극장|상영|감독/,w:['영화','영화관','키아로스타미'],c:['예술','문학'],h:'불이 켜진 뒤에도 남는 이야기.'},
- {k:/철학|생각|삶|인생|어떻게 살|고민/,w:['철학','니체','쇼펜하우어','세네카','인생','삶','존재','군주론'],c:['인문'],h:'답보다 질문이 오래 남는 책.'},
- {k:/사랑|연애|이별|헤어/,w:['사랑','연애','에로스','헤어졌다','너를'],c:['문학'],h:'사랑을 설명하지 않고 보여 주는 책.'},
- {k:/혼자|고독|외로|조용|은둔/,w:['혼자','고독','은둔','실격','이방인'],c:['문학'],h:'혼자인 시간이 모자란 사람에게.'},
- {k:/걷|산책|달리|운동|몸/,w:['걷기','달리기','기행','거리'],c:['문학'],h:'읽고 나면 신발끈을 묶게 됩니다.'},
- {k:/숲|나무|새|꽃|식물|자연|계절|산/,w:['나무','새','숲','꽃','섬','생명','계절','녹색'],c:['자연과학','문학'],h:'사람이 주인공이 아닌 이야기.'},
- {k:/과학|우주|별|기계|AI|인공지능|미래/,w:['우주','궤도','헤일메리','기계','AI','항구'],c:['자연과학','문학','인문'],h:'멀리 보면 가까운 것이 달라 보입니다.'},
- {k:/말|언어|단어|글쓰|쓰기|필사|문장|낱말/,w:['어휘력','낱말','언어','말','쓰다','필사','적었다'],c:['문학','인문'],h:'낱말 하나를 오래 들여다보는 사람들.'},
- {k:/죽음|끝|이별|상실|애도|떠나/,w:['죽음','해방일지','소년이','떠난','증명','주마등'],c:['문학'],h:'끝을 다룬 책은 대개 삶에 관한 책입니다.'},
- {k:/겨울|눈 오|눈이|첫눈|추운|연말/,w:['눈 내리는','겨울','긴긴밤','계절','밤'],c:['문학'],h:'해가 짧은 달에 어울리는 긴 이야기.'},
- {k:/선물|작은 책|가벼운|들고 다니/,w:['미니북','키링','에디션','리커버','한정판'],c:['문학'],h:'주머니에 들어가는 책, 건네기 좋은 책.'},
- {k:/고전|오래된|다시 읽/,w:['데미안','이방인','싯다르타','오만과','이성과','동물농장','인간 실격','참을 수 없는'],c:['문학'],h:'제목은 아는데 끝까지 읽은 적은 없는 책.'},
- {k:/시집|시 한|시를|시인/,w:['시','노래','꽃','응답'],c:['문학'],h:'한 쪽이면 충분한 날을 위해.'},
- {k:/먹|술|밥|커피|음식|요리/,w:['국수','위스키','라면','빵','먹었다','밥'],c:['문학','취미'],h:'요리책 말고, 먹는 일을 생각하는 책.'},
- {k:/짧은|얇은|금방|한 시간|출퇴근/,w:['짧은','사소한','미니','쇼츠','1분'],c:['문학'],h:'한 번 앉은 자리에서 끝나는 책.'},
- {k:/일|직장|노동|회사|퇴근/,w:['노동자','노동','일하는'],c:['인문','문학'],h:'명함에 적히지 않는 일에 관하여.'}];
+
 function topicsOf(s){return TOPIC.filter(x=>x.k.test(s+' '))}
 function ideaPolish(D,w){const T=topicsOf(w)[0],full=w.replace(/\s+/g,' ').trim(),st=full.replace(/[\s,]*(에|때|에는|엔)?\s*(읽는|읽을|읽기 좋은|읽으면 좋은|어울리는|보는|좋은|위한|권하는)?\s*(얇은|짧은|작은|조용한)?\s*책들?\.?$/,'').trim();
   if(st.length>=4&&st.length<=22&&st!==full){D.head=st;D.body=T?T.h:''}else if(full.length<=20){D.head=full;D.body=T?T.h:''}else if(!D.body&&T)D.body=T.h;
@@ -259,20 +227,8 @@ DMOOD.push('계단처럼','한 줄로','둥글게','대칭으로','탑 하나','
   return{title:t.title,br:t.br||S.br,it,rows,tips,need,mini:false,mode:md,total:rows.reduce((a,r)=>a+r.qty,0)}}})();
 
 /* ── 장르 POP: 용도 읽기 (서가 안내 · 추천 · 새로 들어온 · 많이 나간) ── */
-const GEN=[
- {n:'문학',k:/^문학$/,c:['문학'],t:/./,h:'이야기와 문장이 있는 서가.',sym:'book'},
- {n:'소설',k:/^(소설|장편|단편)$/,c:['문학'],t:/^(?!.*(시$|의 시|시집|수필|산문|에세이|낱말|어휘|필사)).*$/,h:'남의 삶을 잠시 빌려 사는 일.',sym:'moon'},
- {n:'시',k:/^(시|시집)$/,c:['문학'],t:/시$|의 시|시집|노래|꽃/,h:'한 쪽이면 충분한 날을 위해.',sym:'leaf'},
- {n:'수필',k:/^(수필|에세이|산문)$/,c:['문학'],t:/^(?!.*(시$|시집)).*(수필|산문|낱말|어휘|하루|적었다|마음|말할 때|말$|일지|무서록)/,h:'누군가의 보통날을 읽습니다.',sym:'cup'},
- {n:'인문',k:/^인문(학)?$/,c:['인문'],t:/./,h:'사람이 사람을 생각한 기록.',sym:'pencil'},
- {n:'철학',k:/^철학$/,c:['인문'],t:/철학|니체|쇼펜하우어|세네카|존재|사유|군주론/,h:'답보다 질문이 오래 남는 서가.',sym:'candle'},
- {n:'역사',k:/^(역사|한국사|세계사)$/,c:['인문','역사'],t:/역사|세계사|조선|전쟁|자서전|시대|기행|문명/,h:'지나간 일로 지금을 읽습니다.',sym:'house'},
- {n:'사회',k:/^(사회|사회과학|정치)$/,c:['인문','사회'],t:/사회|노동|차별|도시|세계|정치|불평등/,h:'함께 사는 일에 관한 책.',sym:'wave'},
- {n:'예술',k:/^(예술|미술|음악|사진|영화|건축|디자인)$/,c:['예술'],t:/./,h:'보는 법, 듣는 법을 다시 배웁니다.',sym:'star'},
- {n:'자연과학',k:/^(자연과학|과학|우주|생물|수학)$/,c:['자연과학','과학'],t:/./,h:'세계가 움직이는 방식을 묻는 서가.',sym:'sun'},
- {n:'종교',k:/^(종교|명상|불교|기독교)$/,c:['종교'],t:/./,h:'고요히 머무는 책.',sym:'candle'},
- {n:'여행',k:/^(여행|기행)$/,c:['문학','인문'],t:/여행|기행|도시|섬|거리|걷/,h:'떠나지 않고도 멀리 가는 법.',sym:'walk'}];
-const GUSE=[['sign','서가 안내'],['pick','추천'],['new','새로 들어온'],['best','많이 나간']];
+
+
 function genreOf(v){const ws=v.replace(/[.,!?]/g,' ').split(/\s+/).filter(Boolean);for(const w of ws){const b=w.replace(/(은|는|이|가|을|를|의|에|도|만)$/,''),g=GEN.find(x=>x.k.test(w)||x.k.test(b));if(g)return{g,word:(g.k.test(w)?w:b)}}return null}
 function genreUse(v,g){if(/신간|새로|새 책|들어온|입고|갓 나온/.test(v))return'new';if(/베스트|많이|잘 나가|인기|순위|팔리/.test(v))return'best';if(/추천|읽을|고른|권하|권합|좋은|오늘의|이달의|요즘/.test(v))return'pick';if(/코너|서가|분야|여기|안내|표지|이름표|자리|칸|쪽/.test(v))return'sign';const m=ls.get('gUse',{})[g.n];return m||(v.replace(/\s/g,'').length<=g.n.length+2?'sign':'pick')}
 function genreBooks(g,use,br){let P=[];try{P=pool(br)}catch(e){}let L=P.filter(b=>g.c.includes(b.cat)&&g.t.test(b.t||'')&&!/미니북|키링|필사책|리커버/.test(b.t||''));
@@ -293,7 +249,7 @@ A.gUse=d=>{const G=S.ui.gen;if(!G)return;G.use=d.u;const m=ls.get('gUse',{});m[G
   const i=h.indexOf('<div class="sec">');return i>0?h.slice(0,i)+bar+h.slice(i):bar+h};V.store.design=g;V.aka.design=g})();
 
 /* ── 로그인 없이: 바코드 스캔 · 자리 크기 고르기 ── */
-const DPSZ=[{n:'작은 평대 60×60',f:0,w:60,d:60},{n:'보통 평대 90×90',f:0,w:90,d:90},{n:'긴 평대 120×60',f:0,w:120,d:60},{n:'큰 평대 150×90',f:0,w:150,d:90},{n:'서가 60 · 4단',f:1,w:60,d:25,t:4},{n:'서가 90 · 4단',f:1,w:90,d:25,t:4},{n:'서가 90 · 5단',f:1,w:90,d:25,t:5}];
+
 A.dpSize=d=>{const i=+d.i,z=DPSZ[i];if(S.ui.dpRd&&S.ui.dpRd.zi===i){A.dpFree();return}const titles=z.f?Math.min(8,Math.floor(z.w/17)*Math.min(2,z.t-2)+2):Math.min(8,Math.floor(z.w/22)*Math.floor(z.d/30)),copies=z.f?Math.floor(z.w/17)*2+Math.floor(z.w/3)*(z.t-2):titles*3;
   S.ui.dpRd={zi:i,fixture:z.f?'벽 서가':'평대',w:z.w,d:z.d,tiers:z.t||1,titles,copies,why:z.f?`표지가 보이게 한 단에 ${Math.floor(z.w/17)}권까지 놓을 수 있습니다. 눈높이 두 단은 표지로, 나머지는 책등으로.`:`책 사이를 손 하나 들어갈 만큼 띄우면 ${titles}종이 알맞습니다. 더 놓으면 표지가 서로 가립니다.`};S.ui.dpF=z.f;S.ui.dpCap=titles;S.ui.dpSz={w:z.w,d:z.d};A.dpOpen({i:S.ui.dp.i})};
 let _zx=null;const zxLoad=()=>_zx||(_zx=new Promise((ok,no)=>{if(window.ZXing)return ok(window.ZXing);const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js';s.onload=()=>ok(window.ZXing);s.onerror=()=>{_zx=null;no(new Error('zx'))};document.head.appendChild(s)}));
