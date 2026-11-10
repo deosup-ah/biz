@@ -273,3 +273,9 @@ A.scanClose=()=>{if(_sc){_sc.stop();_sc=null}const b=$('scan');if(b)b.remove();r
 C.dpSelM=el=>A.dpMode({v:el.value});C.dpSelZ=el=>{if(el.value==='')A.dpFree();else A.dpSize({i:el.value})};
 (()=>{const f=A.dpOpen;A.dpOpen=d=>{f(d);const box=$('sheetBox');if(!box)return;const ch=box.querySelector('.chips'),bar=box.querySelector('.dpx .qbar');if(!ch)return;const fx=S.ui.dpF||0,md=S.ui.dpM||0,zi=S.ui.dpRd&&S.ui.dpRd.zi;
   ch.className='dpsel';ch.innerHTML=`${DFIX.map((n,i)=>`<button class="chip" data-a="dpFix" data-v="${i}" aria-pressed="${fx===i}">${n}</button>`).join('')}<select data-c="dpSelM" aria-label="놓는 법">${DMOOD.map((n,i)=>fx&&i>2?'':`<option value="${i}" ${md===i?'selected':''}>${n}</option>`).join('')}</select><select data-c="dpSelZ" aria-label="자리 크기"><option value="">자리 크기</option>${DPSZ.map((z,i)=>z.f===fx?`<option value="${i}" ${zi===i?'selected':''}>${z.n}</option>`:'').join('')}</select>${fx===0?`<button class="chip" data-a="dp3" aria-pressed="${!!S.ui.dp3}">3D</button>`:''}`;if(bar)bar.remove()}})();
+
+/* ── 모바일 / 데스크탑 보기 전환 ── */
+const vwGet=()=>ls.get('vw',null),vwMob=()=>{const v=vwGet();return v==='m'||(v!=='d'&&(window.screen&&Math.min(screen.width,window.innerWidth||9999)<700))};
+function vwApply(){const v=vwGet();document.body.classList.toggle('vm',v==='m');const m=document.querySelector('meta[name="viewport"]');if(m)m.setAttribute('content',v==='d'?'width=1100':'width=device-width, initial-scale=1')}
+A.vw=()=>{ls.set('vw',vwMob()?'d':'m');vwApply();render();window.scrollTo(0,0)};
+(()=>{const r=render;render=function(){r.apply(this,arguments);const h=document.querySelector('.homeb');if(h&&!document.querySelector('.vwb')){const b=document.createElement('button');b.className='homeb vwb';b.dataset.a='vw';const mob=vwMob();b.title=mob?'데스크탑 화면으로 보기':'모바일 화면으로 보기';b.textContent=mob?'데스크탑':'모바일';h.after(b)}};vwApply()})();

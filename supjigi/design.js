@@ -13,7 +13,7 @@ const ICON={moon:'M17.5 13A7.5 7.5 0 1 1 11 5.2 6 6 0 0 0 17.5 13z',rain:'M7 14.
 const MOTIF=[['moon','달'],['rain','비'],['snow','눈'],['cup','찻잔'],['leaf','잎'],['house','집'],['pencil','연필'],['star','별'],['wave','물결'],['candle','초'],['book','책'],['sun','해'],['drop','새싹'],['walk','걸음'],['none','없음']];
 const LOGOS={plain:3.16,book:2.41},LIMG={};
 ['logo-k','logo-g','logo-w','logob-k','logob-g','logob-w'].forEach(n=>{const i=new Image();i.src=n+'.png';LIMG[n]=i});
-const STY=['기본','짙은 바탕','세로'];
+const STY=['기본','짙은 바탕','세로','수식'];
 const defD=()=>({kind:'pop',st:0,size:0,pal:0,sym:'none',logo:'plain',lc:'g',hs:1,tag:TAGN(curBr()),badge:'',head:'',body:'',book:'',author:'',price:'',phrases:'',syms:[],pals:[],list:'',foot:'',br:curBr(),books:[]});
 const mctx=document.createElement('canvas').getContext('2d');
 const mw=(t,font,size,weight)=>{mctx.font=`${weight||400} ${size*10}px ${font}`;return mctx.measureText(t).width/10};
@@ -95,6 +95,18 @@ function layout(D){const pr=[],brand=BRN(!D.br||D.br==='all'?'aka':D.br);
   const FOOT=(fg,logo,dark)=>{R(m,h-m-u*.058,w-m*2,u*.0012,fg,{op:.3});if(logo){LOGO(m,h-m,u*.04,dark,'start');T(w-m,h-m,brand,u*.024,{fill:fg,weight:800,anchor:'end',ls:u*.001})}else{T(m,h-m,brand,u*.024,{fill:fg,weight:800,ls:u*.001});OVER(w-m,h-m,TODAY.slice(0,4)+'. '+(+TODAY.slice(5,7)),fg,'end')}};
   const CREDIT=(x,y,fg,ac,anchor,maxW)=>{if(!D.book||y+u*.11>h-m-u*.07)return y;const a=anchor||'start';OVER(x,y,'함께 놓은 책',ac,a);T(x,y+u*.064,wrap(`『${D.book}』`,SANS,u*.044,maxW,1,800)[0],u*.044,{fill:fg,weight:800,anchor:a});const sub=[D.author,D.price].filter(Boolean).join('  ·  ');if(sub)T(x,y+u*.106,wrap(sub,SANS,u*.027,maxW,1,500)[0],u*.027,{fill:fg,weight:500,anchor:a});return y+u*.12};
   const BODY=(x,y,font,weight,size,maxW,maxLines,fill,anchor)=>{BAL(D.body||'',font,size,maxW,maxLines,weight).forEach(l=>{T(x,y,l,size,{font,fill,weight,anchor:anchor||'start'});y+=size*1.82});return y};
+  if(st===3){/* 수식: 모눈 · 좌표 · 집합 기호로 짠 큐레이션 식 */const dk=!!P.dark,BG=P.bg,FG=P.fg,AC=P.ac,M=u*.1,g=u*.1,x0=M,x1=w-M,y0=M,y1=h-M;pr.length=0;R(0,0,w,h,BG);
+    for(let x=x0;x<=x1+.01;x+=g)R(x,y0,u*.0009,y1-y0,FG,{op:.13});for(let y=y0;y<=y1+.01;y+=g)R(x0,y,x1-x0,u*.0009,FG,{op:.13});
+    [[x0,y0],[x1,y0],[x0,y1],[x1,y1]].forEach(([x,y])=>{R(x-u*.018,y-u*.0011,u*.036,u*.0022,FG);R(x-u*.0011,y-u*.018,u*.0022,u*.036,FG)});
+    const bs=(D.books&&D.books.length?D.books:(D.book?[{t:D.book,a:D.author}]:[])).slice(0,6),n=bs.length,key=(D.mkey||String(hd).replace(/\n/g,' ').split(/[\s,]+/)[0]||'책').replace(/(은|는|이|가|을|를|의|에|에는|엔|에서|으로|로)$/,'').slice(0,6)||'책';
+    LOGO(x0+u*.03,y0+u*.07,u*.038,dk,'start');T(x1-u*.03,y0+u*.065,'Nº '+TODAY.replace(/-/g,''),u*.02,{fill:FG,weight:500,anchor:'end',ls:u*.003});
+    let y=y0+g*(ld?2:3)-u*.012;T(x0+u*.03,y,`f ( ${key} )  =`,u*.036,{fill:AC,weight:600,ls:u*.002});y+=u*.1;
+    let ts=u*.072*hs,TL=BAL(hd,SANS,ts,x1-x0-u*.06,0,800);while(TL.length>3&&ts>u*.042){ts*=.94;TL=BAL(hd,SANS,ts,x1-x0-u*.06,0,800)}TL.slice(0,3).forEach(l=>{T(x0+u*.03,y,l,ts,{fill:FG,weight:800,ls:-ts*.02});y+=ts*1.3});
+    y+=u*.012;T(x0+u*.03,y,`{ 책 ∈ 서가  |  ${key} ⊂ 책 }${n?'    n = '+n:''}`,u*.024,{fill:FG,weight:500,ls:u*.0015});
+    const ay=Math.max(y+u*.11,h*(ld?.6:.6));if(n){R(x0,ay,x1-x0,u*.002,FG);bs.forEach((b,i)=>{const tx=x0+(x1-x0)*((i+.5)/n);R(tx-u*.001,ay-u*.014,u*.002,u*.028,FG);O(tx,ay,u*.007,u*.007,i===0?AC:BG,{stroke:FG,sw:u*.0018});T(tx,ay-u*.026,String(i+1).padStart(2,'0'),u*.018,{fill:FG,weight:600,anchor:'middle'})});
+      let ly=ay+u*.062;bs.slice(0,ld?3:6).forEach((b,i)=>{if(ly<y1-u*.12){T(x0+u*.03,ly,String(i+1).padStart(2,'0'),u*.02,{fill:AC,weight:700});T(x0+u*.085,ly,wrap(`${b.t}${b.a?'  ·  '+b.a:''}`,SANS,u*.023,x1-x0-u*.12,1,500)[0],u*.023,{fill:FG,weight:500});ly+=u*.043}})}
+    const fy=y1-u*.035;if(D.body)T(x0+u*.03,fy-u*.05,wrap('∴  '+D.body.replace(/\n/g,' '),SANS,u*.026,x1-x0-u*.06,1,500)[0],u*.026,{fill:FG,weight:500});
+    T(x0+u*.03,fy,(D.br==='aka'?'N 37.64  E 127.01':'CURATION  ·  '+stamp),u*.017,{fill:FG,weight:500,ls:u*.003});T(x1-u*.03,fy,brand,u*.021,{fill:FG,weight:600,anchor:'end'});BADGE();return{w,h,pr}}
   if(st===0||st===1){/* 조용한 안내문: 작은 제목, 넓은 여백, 글 한 문단. 장식은 점 하나와 가는 선 */const dk=st===1||!!P.dark,BG=st===1?(P.dark?P.bg:P.fg):P.bg,FG=st===1?(P.dark?P.fg:P.bg):P.fg,AC=st===1?P.hl:P.ac,M=u*.115,tw=Math.min(w-M*2,u*(ld?1.1:.72));pr.length=0;R(0,0,w,h,BG);
     LOGO(M,M+u*.035,u*.04,dk,'start');T(w-M,M+u*.03,stamp,u*.02,{fill:FG,weight:500,anchor:'end',ls:u*.003});
     let y=h*(ld?.3:.34);O(M+u*.008,y-u*.008,u*.008,u*.008,AC);if(tagOn)T(M+u*.03,y,D.tag,u*.022,{fill:FG,weight:600,ls:u*.0025});y+=u*.085;
