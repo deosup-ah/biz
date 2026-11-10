@@ -1,6 +1,6 @@
 'use strict';
 /* POP · 띠지 · 평대 책 목록 · 선반 이름표 — 더숲 디자인 기준(Pretendard 800/500, 로고는 받은 그림 그대로) */
-const SANS='"Pretendard","IBM Plex Sans KR",sans-serif',SERIF='"Gowun Batang",serif';
+const SANS='"Pretendard",sans-serif',SERIF='"Gowun Batang",serif';
 const KINDS=[['pop','POP'],['band','띠지'],['list','평대 책 목록'],['shelf','선반 이름표']];
 const SIZES={pop:[['A4',210,297],['A5',148,210],['A6',105,148],['A3',297,420]],band:[['A3 가로 · 8줄',420,297]],list:[['A4 세로',210,297]],shelf:[['선반 이름표',90,55],['긴 이름표',180,50]]};
 const POPC=[{n:'크림',bg:'#f3efe6',fg:'#1f2a44',ac:'#e07b45',hl:'#f2c230',b1:'#c9d6c2',b2:'#d9d5d8',box:'#ffffff'},{n:'숲',bg:'#eef1e8',fg:'#003128',ac:'#2f6b4a',hl:'#e9c46a',b1:'#cfdcc6',b2:'#e3ddcf',box:'#ffffff'},{n:'밤',bg:'#232a45',fg:'#f3efe6',ac:'#f2c230',hl:'#e07b45',b1:'#303a5e',b2:'#3a3350',box:'#303a5e',dark:1},{n:'살구',bg:'#f8ebe1',fg:'#4a2a22',ac:'#c8553d',hl:'#f5c9a8',b1:'#f1d6c4',b2:'#e6dccf',box:'#ffffff'},{n:'하늘',bg:'#e4ebf1',fg:'#1f3350',ac:'#3f7fb5',hl:'#bcd6ea',b1:'#cfdde9',b2:'#dfe3ea',box:'#ffffff'}];

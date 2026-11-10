@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>숲지기</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
 <style>
 /* 레이아웃: 위 머리줄(이름 · 서점/아카데미 전환) → 지점 고르기 → 화면 탭 → 본문 1단(넓으면 2단 카드) */
 :root{
@@ -13,7 +13,7 @@
   --pine:#1d6a49; --pine-ink:#ffffff; --pine-soft:#e1efe7;
   --warn:#b97400; --warn-soft:#fbf0d9; --crit:#b23a2b; --crit-soft:#f9e4e0; --ok:#1d7a4f; --info:#2a5f8f; --info-soft:#e3edf6;
   --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#8a5fd0; --s6:#cf4f8d;
-  --display:"Gowun Batang","Noto Serif KR",serif; --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --display:"Gowun Batang","Noto Serif KR",serif; --body:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   --r:12px; --shadow:0 1px 2px rgba(20,34,27,.06),0 6px 18px rgba(20,34,27,.05);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark;
@@ -27,6 +27,8 @@
   --warn:#e2a53a; --warn-soft:#3a2f17; --crit:#ec7c6c; --crit-soft:#40211c; --ok:#58c08f; --info:#7fb2e0; --info-soft:#1c2c3b;
   --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#9a78e0; --s6:#d9649c; --shadow:none;}
 @font-face{font-family:"Pretendard";font-weight:800;font-display:swap;src:url(pretendard-800.woff) format("woff")}
+@font-face{font-family:"Pretendard";font-weight:400;font-display:swap;src:url(pretendard-400.woff) format("woff")}
+@font-face{font-family:"Pretendard";font-weight:600;font-display:swap;src:url(pretendard-600.woff) format("woff")}
 @font-face{font-family:"Pretendard";font-weight:500;font-display:swap;src:url(pretendard-500.woff) format("woff")}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
@@ -162,6 +164,8 @@ details.menu{position:relative;margin-left:auto}details.menu>summary{list-style:
 .cmeta{display:flex;gap:6px;flex-wrap:wrap;margin:0}.cmeta span{font-size:12.5px;padding:3px 10px;border-radius:999px;background:var(--surface2);color:var(--muted);font-weight:600}
 .blist i.no{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1px solid var(--line);font-style:normal;font-size:11.5px;font-weight:700;margin-right:8px;color:var(--muted)}.blist small.role{color:var(--pine);font-weight:700}
 details.cnote{margin:0;border:0;padding:0}details.cnote>summary{font-size:14px;color:var(--muted);padding:2px 0}details.cnote ul{margin:10px 0 0;padding-left:18px;display:grid;gap:6px;font-size:14px}
+.brand span,.lockbox h1,.pick b,.card h3,.chip{font-family:"Pretendard",sans-serif!important;font-weight:800!important;letter-spacing:-.01em}
+.pick b,.card h3{font-weight:800!important}.chip{font-weight:600!important;letter-spacing:0}
 </style>
 </head>
 <body>
