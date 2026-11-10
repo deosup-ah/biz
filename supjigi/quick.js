@@ -117,7 +117,7 @@ const isbnOk=s=>{s=String(s||'').replace(/[^0-9]/g,'');if(!/^97[89]\d{10}$/.test
 C.oPhoto=async el=>{const f=[...el.files].slice(0,4),br=S.br;if(!f.length||br==='all')return;
   const out=await ask('ophoto','사진 속 책을 모두 읽어 주세요. 서점에서 도매상에 주문할 책입니다. 책등·표지·뒷면 바코드 어느 쪽이든 보이는 대로 읽습니다.\n책마다 제목, 저자, 출판사, 같은 책 권수(겹쳐 보이면 세어서, 아니면 1)를 적습니다. ISBN 은 사진에 숫자가 실제로 보일 때만 13자리로 적고, 보이지 않으면 빈 문자열로 둡니다. 기억으로 채우지 마세요. 읽히지 않는 책은 넣지 않습니다.\nJSON 배열로만: [{"title":"","author":"","publisher":"","isbn":"","qty":1}]',{images:f});el.value='';
   if(!Array.isArray(out)||!out.length){if(out)toast('사진에서 읽은 책이 없습니다. 글자가 보이게 다시 찍어 주세요.');return}
-  let P=[];try{P=pool(br)}catch(e){}const cat=[...P,...((window.BOOKS||[]))];
+  let P=[];try{P=pool(br)}catch(e){}const BK=window.BOOKS||{},cat=[...P,...(BK.yes24||[]),...(BK.aladin||[]),...(BK.kyobo||[])];
   S.ui.oPh=(S.ui.oPh||[]).concat(out.filter(x=>x&&x.title).map(x=>{const seen=isbnOk(x.isbn),h=cat.find(b=>seen&&b.isbn===seen)||cat.find(b=>nt(b.t)===nt(x.title));
     return{t:h?h.t:x.title,a:(h&&h.a)||x.author||'',p:(h&&h.p)||x.publisher||'',isbn:seen||(h&&h.isbn)||'',price:(h&&h.price)||0,qty:Math.max(1,Math.min(99,+x.qty||1)),src:seen?'사진에서 읽음':h&&h.isbn?'목록에서 찾음':''}}));render()};
 A.oPhDel=d=>{(S.ui.oPh||[]).splice(+d.i,1);render()};A.oPhClear=()=>{S.ui.oPh=null;render()};
@@ -158,7 +158,7 @@ const IDS=[[/눈|겨울|첫눈/,'snow'],[/비\s|비가|장마|우산/,'rain'],[/
 function ideaLocal(v){const k=/띠지/.test(v)?'band':/쇼카드/.test(v)?'card':'pop',w=v.replace(/(POP|pop|팝|띠지|쇼카드|안내문)(으로|로)?|만들어\s*줘?|만들기|해\s*줘/g,' ').replace(/\s+/g,' ').trim()||v,aka=S.mode==='aka',br=aka?'aka':curBr(),sym=(IDS.find(([r])=>r.test(w+' '))||[0,'none'])[1];
   const cut=w.length>16?(()=>{const i=w.slice(0,18).search(/[,.—]|\s(?=\S*$)/);return i>5?i+1:Math.min(w.length,14)})():w.length,head=w.slice(0,cut).replace(/[,.\s]+$/,''),rest=w.slice(cut).trim();
   const dark=/밤|달|겨울|고요|죽|끝|어둠/.test(w),D=Object.assign(defD(),{kind:k,br,tag:aka?'아카데미하우스':TAGN(br),sym,head,body:rest,st:dark?1:0,pal:dark?2:/숲|나무|식물|산/.test(w)?1:/따뜻|커피|가을|편지/.test(w)?3:0});
-  if(k==='band'){D.phrases=w;if(sym!=='none')D.syms=[sym]}return D}
+  ideaPolish(D,w);if(k==='band'){D.phrases=D.head.replace(/\n/g,' ');if(sym!=='none')D.syms=[sym]}return D}
 A.ideaGo=async d=>{const el=$('ideaIn')||$('qIn'),v=((d&&d.v)||(el&&el.value)||'').trim();if(!v){toast('아이디어를 한 줄 적어 주세요');return}
   const H=S.ui.dH=S.ui.dH||[];if(S.ui.D)H.push(JSON.stringify(S.ui.D));const D0=ideaLocal(v);S.ui.D=D0;S.ui.idea=v;S.view[S.mode]='design';window.scrollTo(0,0);render();if(!AI)return;
   const snap=JSON.stringify(D0),out=await ask('idea',`서점·문화공간 "더숲"의 ${S.mode==='aka'?'아카데미하우스(북한산 자락 복합 문화 공간)':'서점'} 인쇄물을 만듭니다. 직원이 적은 아이디어 한 줄을 바로 붙일 수 있는 문안으로 다듬어 주세요.\n아이디어: "${v.replace(/"/g,"'")}"\n말투: 조용하고 담백하게. 느낌표·이모지·과장 금지. 없는 사실(날짜, 가격, 수상)은 지어내지 않습니다. 뻔한 표현 대신 한 번 비튼 낱말 하나.\nhead 는 14자 안쪽 제목(뜻 단위로 \\n 한 번 가능), body 는 45자 안쪽 한두 문장, band 는 띠지용 18자 안쪽 한 줄, sym 은 ${Object.keys(ICON).filter(x=>!x.startsWith('ph')).join('|')}|none, look 은 0(밝고 조용하게)|1(짙은 바탕)|2(세로 제목) 중 하나.\nJSON 으로만: {"head":"","body":"","band":"","sym":"","look":0}`,{modelTier:'quick'});
@@ -171,13 +171,13 @@ document.addEventListener('keydown',e=>{if(e.target&&e.target.id==='ideaIn'&&e.k
 S.ui.myT=ls.get('myT',[]);
 (()=>{const g=corners;corners=function(br){const C=g(br),my=(S.ui.myT||[]).map(t=>({...t,br,books:myBooks(t,br)}));C.time=[...my,...C.time];C.all=[...C.time,...C.data];return C}})();
 function myBooks(t,br){let P=[];try{P=pool(br)}catch(e){}const pick=(t.pick||[]).map(x=>P.find(b=>nt(b.t)===nt(x))).filter(Boolean),W=(t.src||'').split(/[\s,.·]+/).filter(w=>w.length>1).map(w=>w.replace(/(은|는|이|가|을|를|의|에|에서|으로|로|과|와|도|들)$/,'')).filter(w=>w.length>1);
-  const sc=b=>W.reduce((a,w)=>a+((b.t||'').includes(w)?3:0)+((b.cat||'').includes(w)?2:0)+((b.a||'').includes(w)?1:0),0),rest=P.filter(b=>!pick.includes(b)).map(b=>[sc(b),b]).filter(x=>x[0]>0).sort((a,b)=>b[0]-a[0]||(b[1].here||0)-(a[1].here||0)).map(x=>x[1]);
-  let L=[...pick,...rest];if(L.length<4)L=[...L,...P.filter(b=>b.here>0&&!L.includes(b)).sort((a,b)=>(b.mine||0)-(a.mine||0))].slice(0,5);
+  const TP=topicsOf(t.src||''),TW=TP.flatMap(x=>x.w),TC=TP.flatMap(x=>x.c||[]),hasW=(s,w)=>w.length>1?s.includes(w):new RegExp('(^|[\\s,])'+w+'($|[\\s,])').test(s),W2=W.filter(w=>!/^(이야기|사람|읽는|읽기|좋은|오는|싶은|건네고|전날|그냥|아는데|가기|한테|에서)$/.test(w)),sc=b=>(/취미|아동|경제|수험|참고/.test(b.cat||'')&&!TC.includes(b.cat))||/배우는|기초|완성|돈이 되는|문제집|자격증|수험/.test(b.t||'')?0:W2.reduce((a,w)=>a+(hasW(b.t||'',w)?4:0)+((b.a||'').includes(w)&&w.length>1?1:0),0)+TW.reduce((a,w)=>a+(hasW(b.t||'',w)?3:0),0)+(TW.some(w=>(b.t||'').includes(w))&&TC.includes(b.cat)?1:0)+((b.here||0)>0?.5:0),rest=P.filter(b=>!pick.includes(b)).map(b=>[sc(b),b]).filter(x=>x[0]>0).sort((a,b)=>b[0]-a[0]||(b[1].here||0)-(a[1].here||0)).map(x=>x[1]);
+  let L=[...pick,...rest].filter((b,i,A)=>A.findIndex(z=>nt(z.t).slice(0,5)===nt(b.t).slice(0,5))===i);if(L.length<4)L=[...L,...P.filter(b=>b.here>0&&!L.includes(b)).sort((a,b)=>(b.mine||0)-(a.mine||0))].slice(0,5);
   return L.slice(0,6).map((b,i)=>({...b,why:bookWhy(b),src:b.here>0?'재고':'들여놓기',role:i===0?'중심':'곁들임'}))}
 A.myDel=d=>{S.ui.myT=(S.ui.myT||[]).filter(t=>t.id!==d.id);ls.set('myT',S.ui.myT);render()};
 (()=>{const f=A.ideaGo;A.ideaGo=async d=>{if(S.mode!=='store'||S.br==='all'){if(S.mode==='store'){toast('위에서 지점을 먼저 고르세요');return}return f(d)}
   const el=$('ideaIn')||$('cIdea'),v=((d&&d.v)||(el&&el.value)||'').trim();if(!v){toast('떠오른 생각을 한 줄 적어 주세요');return}
-  const D=ideaLocal(v),id='m'+Date.now().toString(36),un=addDays(TODAY,14),sh=v.length<=22,t={id,tone:'내 생각',src:v,title:sh?v:D.head.replace(/\n/g,' '),hook:sh?'':(D.body||''),sym:D.sym,bpal:D.pal,ppal:D.pal,until:un,place:'입구 평대',pop:{head:sh?v:D.head,body:sh?'':(D.body||'')},band:v.length<=20?v:D.head,pick:[]};
+  const D=ideaLocal(v),id='m'+Date.now().toString(36),un=addDays(TODAY,14),sh=false,t={id,tone:'내 생각',src:v,title:D.head.replace(/\n/g,' '),hook:D.body||'',sym:D.sym,bpal:D.pal,ppal:D.pal,until:un,place:'입구 평대',pop:{head:D.head,body:D.body||''},band:v.length<=20?v:D.head,pick:[]};
   S.ui.myT=[t,...(S.ui.myT||[])].slice(0,6);ls.set('myT',S.ui.myT);S.ui.cTone='내 생각';S.view.store='cur';window.scrollTo(0,0);render();if(!AI)return;
   let P=[];try{P=pool(S.br)}catch(e){}const cand=P.filter(b=>b.here>0||b.sold>0).slice(0,150).map(b=>b.t);
   const out=await ask('idea',`서점 "더숲"의 평대 기획입니다. 직원이 떠올린 생각 한 줄로 평대 하나를 완성해 주세요.\n생각: "${v.replace(/"/g,"'")}"\n말투: 조용하고 담백하게. 느낌표·이모지·과장 금지. 뻔한 표현 대신 한 번 비튼 낱말 하나. 없는 사실은 지어내지 않습니다.\ntitle 은 14자 안쪽 평대 이름, hook 은 45자 안쪽 한두 문장, band 는 띠지용 18자 안쪽 한 줄, sym 은 ${Object.keys(ICON).filter(x=>!x.startsWith('ph')).join('|')}|none.\nbooks 는 아래 [이 지점에서 다루는 책] 목록에 있는 제목만, 생각에 맞는 순서로 4~6권. 목록에 맞는 책이 없으면 빈 배열. 목록에 없는 책은 넣지 않습니다.\n[이 지점에서 다루는 책]\n${cand.join(' / ')}\nJSON 으로만: {"title":"","hook":"","band":"","sym":"","books":["제목"]}`,{modelTier:'quick'});
@@ -203,3 +203,31 @@ function noticeLocal(v){const w=v.replace(/(안내문|안내판|공지|알림)(�
   const snap=JSON.stringify(D0),out=await ask('idea',`"더숲" ${S.mode==='aka'?'아카데미하우스(복합 문화 공간)':'서점'}에 붙일 안내문입니다. 직원이 말한 내용을 손님이 한눈에 읽는 안내문으로 다듬어 주세요.\n내용: "${v.replace(/"/g,"'")}"\n정중하지만 짧게. 명령조·느낌표·이모지 금지. 말한 내용에 없는 날짜·시간·장소는 지어내지 않습니다.\nhead 는 16자 안쪽 한 줄(가장 중요한 말), body 는 40자 안쪽 덧붙임(없으면 빈 문자열), sym 은 ${Object.keys(ICON).filter(x=>!x.startsWith('ph')).join('|')}|none.\nJSON 으로만: {"head":"","body":"","sym":""}`,{modelTier:'quick'});
   if(!out||!out.head||JSON.stringify(S.ui.D)!==snap)return;S.ui.D.head=out.head;S.ui.D.body=out.body||'';if(ICON[out.sym])S.ui.D.sym=out.sym;render()}})();
 (()=>{const f=A.qAdd;A.qAdd=()=>{const el=$('qIn'),v=el?el.value.trim():'';if(v&&!v.includes('\n')&&/(습니다|주세요|마세요|안내문|안내판|공지)/.test(v)){A.ideaGo({v});return}f()}})();
+
+/* ── 공개 주소에서도 되는 책 고르기 · 다듬기 (Claude 없이, 낱말 사전으로) ── */
+const TOPIC=[
+ {k:/밤|새벽|잠|불면|달/,w:['밤','어두운','달','꿈','고독'],c:['문학'],h:'불을 하나만 켜고 읽는 책들.'},
+ {k:/비 오|비가|장마|우울|흐린|눈물|슬픔|슬플/,w:['장마','슬픔','슬픈','눈물','울고'],c:['문학'],h:'젖은 날에는 젖은 문장이 잘 읽힙니다.'},
+ {k:/위로|지친|지칠|힘들|쉬고|괜찮|다정/,w:['마음','어루만지','위로','오래 곁에','사랑'],c:['문학','인문'],h:'힘내라는 말 없이 곁에 있어 주는 책.'},
+ {k:/미술|그림|전시|화가|갤러리/,w:['미술관','그림','캔버스','보기','예술','루킹'],c:['예술'],h:'보러 가기 전에 먼저 읽어 두는 눈.'},
+ {k:/영화|극장|상영|감독/,w:['영화','영화관','키아로스타미'],c:['예술','문학'],h:'불이 켜진 뒤에도 남는 이야기.'},
+ {k:/철학|생각|삶|인생|어떻게 살|고민/,w:['철학','니체','쇼펜하우어','세네카','인생','삶','존재','군주론'],c:['인문'],h:'답보다 질문이 오래 남는 책.'},
+ {k:/사랑|연애|이별|헤어/,w:['사랑','연애','에로스','헤어졌다','너를'],c:['문학'],h:'사랑을 설명하지 않고 보여 주는 책.'},
+ {k:/혼자|고독|외로|조용|은둔/,w:['혼자','고독','은둔','실격','이방인'],c:['문학'],h:'혼자인 시간이 모자란 사람에게.'},
+ {k:/걷|산책|달리|운동|몸/,w:['걷기','달리기','기행','거리'],c:['문학'],h:'읽고 나면 신발끈을 묶게 됩니다.'},
+ {k:/숲|나무|새|꽃|식물|자연|계절|산/,w:['나무','새','숲','꽃','섬','생명','계절','녹색'],c:['자연과학','문학'],h:'사람이 주인공이 아닌 이야기.'},
+ {k:/과학|우주|별|기계|AI|인공지능|미래/,w:['우주','궤도','헤일메리','기계','AI','항구'],c:['자연과학','문학','인문'],h:'멀리 보면 가까운 것이 달라 보입니다.'},
+ {k:/말|언어|단어|글쓰|쓰기|필사|문장|낱말/,w:['어휘력','낱말','언어','말','쓰다','필사','적었다'],c:['문학','인문'],h:'낱말 하나를 오래 들여다보는 사람들.'},
+ {k:/죽음|끝|이별|상실|애도|떠나/,w:['죽음','해방일지','소년이','떠난','증명','주마등'],c:['문학'],h:'끝을 다룬 책은 대개 삶에 관한 책입니다.'},
+ {k:/겨울|눈 오|눈이|첫눈|추운|연말/,w:['눈 내리는','겨울','긴긴밤','계절','밤'],c:['문학'],h:'해가 짧은 달에 어울리는 긴 이야기.'},
+ {k:/선물|작은 책|가벼운|들고 다니/,w:['미니북','키링','에디션','리커버','한정판'],c:['문학'],h:'주머니에 들어가는 책, 건네기 좋은 책.'},
+ {k:/고전|오래된|다시 읽/,w:['데미안','이방인','싯다르타','오만과','이성과','동물농장','인간 실격','참을 수 없는'],c:['문학'],h:'제목은 아는데 끝까지 읽은 적은 없는 책.'},
+ {k:/시집|시 한|시를|시인/,w:['시','노래','꽃','응답'],c:['문학'],h:'한 쪽이면 충분한 날을 위해.'},
+ {k:/먹|술|밥|커피|음식|요리/,w:['국수','위스키','라면','빵','먹었다','밥'],c:['문학','취미'],h:'요리책 말고, 먹는 일을 생각하는 책.'},
+ {k:/짧은|얇은|금방|한 시간|출퇴근/,w:['짧은','사소한','미니','쇼츠','1분'],c:['문학'],h:'한 번 앉은 자리에서 끝나는 책.'},
+ {k:/일|직장|노동|회사|퇴근/,w:['노동자','노동','일하는'],c:['인문','문학'],h:'명함에 적히지 않는 일에 관하여.'}];
+function topicsOf(s){return TOPIC.filter(x=>x.k.test(s+' '))}
+function ideaPolish(D,w){const T=topicsOf(w)[0],full=w.replace(/\s+/g,' ').trim(),st=full.replace(/[\s,]*(에|때|에는|엔)?\s*(읽는|읽을|읽기 좋은|읽으면 좋은|어울리는|보는|좋은|위한|권하는)?\s*(얇은|짧은|작은|조용한)?\s*책들?\.?$/,'').trim();
+  if(st.length>=4&&st.length<=22&&st!==full){D.head=st;D.body=T?T.h:''}else if(full.length<=20){D.head=full;D.body=T?T.h:''}else if(!D.body&&T)D.body=T.h;
+  D.head=D.head.replace(/^(그냥|뭔가|약간|음+|어+)\s+/,'');return D}
+(()=>{const f=noticeLocal;noticeLocal=function(v){const D=f(v),po=s=>s.replace(/닫아요|닫음/g,'닫습니다').replace(/쉬어요|쉼(?=$|[.\s])/g,'쉽니다').replace(/열어요|엶/g,'엽니다').replace(/해요(?=$|[.\s])/g,'합니다').replace(/돼요|되요/g,'됩니다').replace(/있어요/g,'있습니다').replace(/없어요/g,'없습니다').replace(/이에요|예요/g,'입니다').replace(/하지\s*마(세요)?(?=$|[.\s])/g,'삼가 주세요').replace(/금지(?=$|[.\s])/g,'삼가 주세요').trim();D.head=po(D.head);D.body=po(D.body);return D}})();
