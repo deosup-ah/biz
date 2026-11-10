@@ -381,6 +381,16 @@ tbody tr:hover td{background:color-mix(in srgb,var(--pine) 5%,transparent)}
 #toast{border-radius:2px;box-shadow:none}
 ::selection{background:#c9a24a;color:#1c1c1a}
 :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* 메뉴는 늘 위에: 컴퓨터는 책 쌓기를 로고 바로 아래로, 휴대폰은 다이얼을 화면 맨 위로 */
+@media(min-width:900px){body:not(.dialon) nav.tabs{order:2;margin:22px 0 0;padding:0}body:not(.dialon) header.top .row2{order:3;padding-top:22px}}
+.dialw{bottom:auto;top:0;padding-bottom:0;padding-top:env(safe-area-inset-top);border-top:0;border-bottom:1px solid var(--ink);background:var(--bg)}
+.dial{height:64px;padding-top:12px;background-position:0 100%}.dialm{top:auto;bottom:0;height:18px;width:3px;margin-left:-1.5px}
+.dial button{font-size:20px;padding:6px 16px}
+body.dialon #app{padding-top:calc(65px + env(safe-area-inset-top))}body.dialon main{padding-bottom:48px}body.dialon #toast{bottom:24px}
+body.dialon header.top{position:static}
+body.dialon::after{top:auto;bottom:8px;right:12px}
+.row2{scrollbar-width:none}.row2::-webkit-scrollbar{display:none}
 </style>
 </head>
 <body>
