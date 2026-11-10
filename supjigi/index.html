@@ -427,6 +427,12 @@ body.vm .tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))){display:blo
 /* 휴대폰: 「이번 주 할 일」은 글 먼저, 버튼은 아랫줄 */
 @media(max-width:720px){.sact .li{flex-wrap:wrap;gap:6px 10px}.sact .li .t{flex:1 1 calc(100% - 64px);min-width:0}.sact .li .btn{margin-left:auto}}
 body.vm .sact .li{flex-wrap:wrap;gap:6px 10px}body.vm .sact .li .t{flex:1 1 calc(100% - 64px);min-width:0}body.vm .sact .li .btn{margin-left:auto}
+
+/* 화면 설명 물음표 */
+.hpq{display:inline-grid;place-items:center;width:22px;height:22px;margin-left:10px;padding:0;border:1px solid var(--muted);border-radius:50%;background:none;color:var(--muted);font:600 13px/1 "Pretendard",sans-serif;vertical-align:middle;cursor:pointer;letter-spacing:0}
+.hpq:hover,.hpq[aria-expanded="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.hpw{display:flex;justify-content:flex-end;margin-bottom:8px}.hpw .hpq{margin-left:0}
+.hpd{margin:0 0 18px;padding:10px 14px;border-left:3px solid var(--gold);background:var(--surface);font-size:14.5px;line-height:1.6;color:var(--ink)}
 </style>
 </head>
 <body>
