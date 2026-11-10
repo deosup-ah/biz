@@ -434,6 +434,28 @@ textarea.msg{width:100%;min-height:240px;border:1px solid var(--line);border-rad
 .toast.on{opacity:1;transform:translate(-50%,0)}
 @media (min-width:700px){.g .nm{font-size:16.5px}.dayline h1{font-size:30px}}
 @media (max-width:380px){.slot{grid-template-columns:84px 1fr}.stats .stat b{font-size:19px}.dbar{grid-template-columns:60px 1fr 80px}}
+
+/* 준비 체크 · 인수인계 메모 · 캘린더 */
+.qa{grid-template-columns:repeat(2,1fr)}.qa .btn:first-child:nth-last-child(3){grid-column:1/-1}
+.ck{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;border-bottom:1px solid var(--line)}
+.ck:last-child{border-bottom:0}
+.ck>button:first-child{display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:center;text-align:left;padding:11px 0;width:100%;min-width:0}
+.ck i{width:22px;height:22px;border-radius:7px;border:2px solid var(--line-2);display:grid;place-items:center;font-style:normal;font-size:14px;line-height:1;color:transparent}
+.ck.on i{background:var(--pine);border-color:var(--pine);color:var(--on-pine)}
+.ck b{font-weight:600;font-size:14.5px;display:block}.ck small{color:var(--mute);font-size:12px;display:block}
+.ck.on b{color:var(--mute);text-decoration:line-through;font-weight:500}
+.ck .del{color:var(--mute);font-size:13px;padding:8px 4px}
+.pbar{height:6px;border-radius:99px;background:var(--sunk);overflow:hidden;min-width:64px}.pbar i{display:block;height:100%;background:var(--pine);border-radius:99px}
+.addrow{display:grid;grid-template-columns:1fr auto;gap:8px}
+.addrow input,.nt-f input,.nt-f textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;width:100%;min-width:0}
+.nt-f{display:grid;gap:8px}.nt-f textarea{resize:vertical}.nt-f .r{display:grid;grid-template-columns:120px 1fr;gap:8px}
+.nt{padding:11px 14px;border-bottom:1px solid var(--line)}.nt:last-child{border-bottom:0}.box .nt{padding:11px 0}
+.nt .tx{font-size:14.5px;white-space:pre-wrap;overflow-wrap:anywhere}
+.nt .mt{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12.5px;color:var(--mute);margin-top:4px}
+.nt .mt button{font-size:13px;font-weight:700;color:var(--pine);padding:4px 6px}.nt .mt .lnk{padding:0;text-decoration:underline}
+.nt.done .tx{color:var(--mute);text-decoration:line-through}
+.seg.six button{font-size:13px;padding:8px 2px}
+.calurl{font:13px/1.5 ui-monospace,monospace;background:var(--sunk);border-radius:8px;padding:8px 10px;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -610,6 +632,7 @@ function renderToday(){
     <button class="stat" data-scroll="s-meal"><span>${lab} 식사</span><b class="num">${Object.values(X.mt).reduce((a,b)=>a+b,0)||0}식</b><small>${mealStr(X.mt)||"—"}</small></button>
     <button class="stat ${hiN||(isT&&mailAlerts().length)?"alert":""}" data-scroll="s-act"><span>급한 일</span><b class="num">${hiN+(isT?mailAlerts().length:0)}건</b><small>챙길 일 ${A.length}</small></button>
   </div>
+  ${isT?noteSec():""}
   ${isT?revCard():""}
   ${isT&&window.REPORTS&&(window.REPORTS.weekly||[])[0]?`<button class="card revc" data-go="money:rep"><span class="l">목요일 회의용</span><b style="font-size:17px">${esc(window.REPORTS.weekly[0].title)}</b><span class="go">보기 ›</span><span class="s">${esc(window.REPORTS.weekly[0].made||"")}</span></button>`:""}
   ${PINS.some(id=>CASES.some(c=>c.id===id))?`<div class="sec"><div class="sec-h"><h2>고정한 단체</h2><span class="cnt">단체 화면의 ☆로 고정 · 해제</span></div><div class="card">${PINS.map(id=>CASES.find(c=>c.id===id)).filter(Boolean).map(gCard).join("")}</div></div>`:""}
@@ -622,6 +645,7 @@ function renderToday(){
     <div class="card">${X.meals.map(({c,m})=>`<button class="mrow" data-id="${esc(c.id)}"><span><span class="n">${esc(c.name)}</span><span class="s">${c.pax?c.pax+"명 단체":""}</span></span><span class="a">${mealStr(m)}</span></button>`).join("")}</div></div>`:""}
   ${X.ins.length||X.outs.length?`<div class="sec"><div class="sec-h"><h2>연수객실 입실 · 퇴실</h2></div><div class="card">${X.outs.map(x=>`<button class="mrow" data-id="${esc(x.c.id)}"><span><span class="n">${esc(x.c.name)}</span><span class="s">${esc(x.r[2].join(" "))}</span></span><span class="a">퇴실 11:00<small>${x.r[2].length}실</small></span></button>`).join("")}${X.ins.map(x=>`<button class="mrow" data-id="${esc(x.c.id)}"><span><span class="n">${esc(x.c.name)}</span><span class="s">${esc(x.r[2].join(" "))}</span></span><span class="a">입실 16:00<small>${x.r[2].length}실</small></span></button>`).join("")}</div></div>`:""}
   ${X.pays.length?`<div class="sec"><div class="sec-h"><h2>${lab} 받을 돈</h2><span class="cnt">${X.pays.length}건</span></div><div class="card">${X.pays.map(x=>`<button class="mrow" data-id="${esc(x.c.id)}" data-pane="amt"><span><span class="n">${esc(x.c.name)}</span><span class="s">${esc(x.p[0])}${x.p[3]?" · "+esc(x.p[3]):""}</span></span><span class="a">${esc(x.p[2])}</span></button>`).join("")}</div></div>`:""}
+  ${isT?prepSec():""}
   <div class="sec" id="s-act"><div class="sec-h"><h2>챙길 일</h2><span class="cnt">${A.length}건</span>${A.length>5?`<button class="more" data-allact>모두 보기 ›</button>`:""}</div>
     <div class="card" id="actList">${A.length?A.slice(0,5).map(actRow).join(""):`<div class="okline">지금 급한 일이 없습니다.</div>`}</div></div>
   <div class="sec"><div class="sec-h"><h2>다음 7일</h2><span class="cnt">${wk.length}건</span><button class="more" data-go="plan:week">일정에서 보기 ›</button></div>
@@ -1001,7 +1025,7 @@ function renderArchive(){const A=window.ARCHIVE;if(!A)return `<div class="card e
   <p class="note">${esc(A.asOf||"")} · Claude로 만든 자료 ${A.items.length}개를 일(업무)별로 모았습니다. 누르면 그 자료가 열립니다. 자료는 biz 계정으로 로그인했거나 공유받은 사람만 열 수 있습니다.</p>`}
 function renderInfo(){const P=infoAll().split('<div class="sec">').slice(1).map(x=>'<div class="sec">'+x);
   if(!["arc","fac","set"].includes(infoView))infoView="arc";
-  return `<div class="seg">${[["arc","자료실"],["fac","시설 · 요금"],["set","설정 · 연결"]].map(([k,l])=>`<button data-iv="${k}" aria-pressed="${infoView===k}">${l}</button>`).join("")}</div>`+(infoView==="arc"?renderArchive():infoView==="fac"?P.slice(5).join(""):P.slice(0,5).join(""))}
+  return `<div class="seg">${[["arc","자료실"],["fac","시설 · 요금"],["set","설정 · 연결"]].map(([k,l])=>`<button data-iv="${k}" aria-pressed="${infoView===k}">${l}</button>`).join("")}</div>`+(infoView==="arc"?renderArchive():infoView==="fac"?P.slice(6).join(""):P.slice(0,6).join(""))}
 function infoAll(){
   const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
   const inClaude=!!(window.claude&&window.claude.use)&&!/github\.io$/.test(location.hostname);
@@ -1015,6 +1039,12 @@ function infoAll(){
    <div style="font-size:14px">매일 <b>오전 8시</b>에 공간 보드와 건 대장을 읽어 자동으로 바뀝니다. 지금 바로 맞추려면 위쪽 <b>업데이트</b> 버튼을 누르세요.</div>
    <div style="font-size:13px;color:var(--mute)">${inClaude?"Claude 앱에서는 업데이트 버튼이 업데이트 작업을 바로 실행합니다. 10~15분 뒤 화면이 저절로 바뀝니다. 사무실 컴퓨터의 Claude 데스크톱 앱이 켜져 있어야 합니다.":"이 주소의 업데이트 버튼은 가장 최근에 올라온 데이터를 다시 받습니다. 보드에서 새로 읽어 오는 실시간 업데이트는 Claude 앱 링크에서 실행합니다."}</div>
    ${inClaude?"":`<a class="btn" href="${ART_URL}" target="_blank" rel="noopener">실시간 업데이트 실행하러 가기 ›</a>`}</div></div>
+  <div class="sec"><div class="sec-h"><h2>구글 캘린더</h2></div><div class="card" style="padding:14px;display:grid;gap:10px">
+   <div style="font-size:14px">단체 일정을 <b>내 구글 캘린더</b>에서 함께 봅니다. 아래 주소를 한 번만 추가하면 일정이 바뀔 때마다 저절로 따라옵니다(구글이 하루 몇 번 다시 읽습니다).</div>
+   <div class="calurl">${esc(CAL_URL)}</div>
+   <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" data-copycal style="flex:1">구독 주소 복사</button><a class="btn" style="flex:1" href="https://calendar.google.com/calendar/u/0/r/settings/addbyurl" target="_blank" rel="noopener">구글 캘린더 열기 ›</a></div>
+   <ol class="steps" style="padding-top:0"><li>컴퓨터에서 구글 캘린더 → 왼쪽 「다른 캘린더 ＋」 → <b>URL로 추가</b></li><li>복사한 주소를 붙여 넣고 「캘린더 추가」</li><li>휴대폰 구글 캘린더 앱에도 같은 계정이면 자동으로 보입니다.</li></ol>
+   <p class="note">단체명 · 공간 · 시간 · 인원 · 담당만 들어갑니다. 금액은 넣지 않습니다. 한 건만 넣으려면 단체 화면의 「구글 캘린더에 넣기」를 누르세요.</p></div></div>
   <div class="sec"><div class="sec-h"><h2>보기 설정</h2></div><div class="card" style="padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px"><span><b>글자 크게</b><br><span class="note">화면 전체를 15% 키웁니다</span></span><button class="btn ${BIG?"pri":""}" data-big>${BIG?"켜짐":"꺼짐"}</button></div></div>
   <div class="sec"><div class="sec-h"><h2>연결 준비 상태</h2></div><div class="card">
    ${[["보드 · 건 대장","ok","연결됨. 매일 08시에 읽습니다. 컴퓨터가 꺼져 있었으면 09:17 · 13:17 · 17:17에 자동으로 다시 시도하고, 위쪽 「업데이트」 버튼으로 바로 실행할 수도 있습니다."],["이지정보 (서점 판매 · 재고 · 매입 · 반품)","wait","컴퓨터 연결 후 화면 확인 필요. 화면은 「아카 → 책」에 준비됨"],["북센 (주문)","wait","주문 사이트 주소 · 로그인 필요. 지금은 주문 목록 복사까지"],["네이버 예약","wait","예약 관리 로그인 필요. 연결되면 「오늘」 화면에 표시"],["인스타그램 현황","wait","계정 로그인 필요. 게시물 초안 만들기는 지금 가능"],["WINGS (객실 매출)","wait","접속 주소 필요 → 사무실 컴퓨터 Claude 앱 브라우저에서 로그인"],["OKPOS (다이닝 · 카페 매출)","wait","접속 주소 필요 → 같은 브라우저에서 로그인"],["주차 (아마노 무인정산)","wait","관리자 페이지 주소 필요"],["견적안내 가이드 사진","wait","가이드 파일 첨부 필요 (지금 사진은 예전 앱 것)"]].map(([a,s,b])=>`<div class="al ${s==="ok"?"":"mid"}" style="padding:10px 14px"><i ${s==="ok"?'style="background:var(--ok)"':""}></i><div><b>${a} · ${s==="ok"?"사용 중":"대기"}</b><small>${b}</small></div></div>`).join("")}</div></div>
@@ -1036,8 +1066,8 @@ function openDetail(id,p){const c=CASES.find(x=>x.id===id);if(!c)return;RECENT=[
 function detailHTML(){const c=cur,si=stageIdx(c);const when=c.s?(c.s===c.e||!c.e?mdw(c.s):`${mdw(c.s)} ~ ${mdw(c.e)}`):"날짜 미정";
   return `<div class="sh-top"><div class="sh-bar"><h2 id="shTitle">${esc(c.name)}${c.tag?` <small style="font-size:14px;color:var(--mute)">${esc(c.tag)}</small>`:""}</h2><button class="xbtn" data-close aria-label="닫기">✕</button></div>
    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-bottom:10px"><span class="num" style="font-weight:700">${when}</span>${paxTag(c)}${ownTag(c)}${stPill(c)}<span class="pill">${dday(c)}</span><button class="pill" data-copyno="${esc(c.no)}" title="건 번호 복사">${esc(c.no)} 복사</button><button class="pill pin ${PINS.includes(c.id)?"on":""}" data-pin="${esc(c.id)}">${PINS.includes(c.id)?"★ 고정됨":"☆ 고정"}</button></div>
-   <div class="qa"><a class="btn" href="https://academyhouse.deosup.com/admin-cases?case=${encodeURIComponent(c.no)}" target="_blank" rel="noopener">건 대장에서 열기</a><button class="btn" data-quickmsg="guest">고객 안내문 복사</button><button class="btn" data-quickmsg="front">현장 전달 복사</button></div>
-   <div class="seg" role="tablist">${[["sum","요약"],["amt","금액"],["hist","이력"],["msg","안내문"]].map(([k,l])=>`<button role="tab" data-pane="${k}" aria-selected="${pane===k}">${l}</button>`).join("")}</div><div style="height:10px"></div></div>
+   <div class="qa"><a class="btn" href="https://academyhouse.deosup.com/admin-cases?case=${encodeURIComponent(c.no)}" target="_blank" rel="noopener">건 대장에서 열기</a><button class="btn" data-quickmsg="guest">고객 안내문 복사</button><button class="btn" data-quickmsg="front">현장 전달 복사</button>${c.s?`<a class="btn" href="${esc(gcalUrl(c))}" target="_blank" rel="noopener">구글 캘린더에 넣기</a>`:""}</div>
+   <div class="seg six" role="tablist">${[["sum","요약"],["chk","준비 "+chkProg(c).n+"/"+chkProg(c).t],["note","메모"+(notesOf(c.id).filter(n=>!n.done).length?" "+notesOf(c.id).filter(n=>!n.done).length:"")],["amt","금액"],["hist","이력"],["msg","안내문"]].map(([k,l])=>`<button role="tab" data-pane="${k}" aria-selected="${pane===k}">${l}</button>`).join("")}</div><div style="height:10px"></div></div>
    <div style="display:grid;gap:10px">
    <div class="stages" aria-label="진행 단계 ${STAGES[si]}">${STAGES.map((s,i)=>`<i class="${i<si?"on":i===si?"cur":""}"></i>`).join("")}</div>
    <div class="stg-l"><span>문의</span><b style="color:var(--pine)">${STAGES[si]} 단계${c.stage&&c.stage!==STAGES[si]?" · "+esc(c.stage):""}</b><span>매출</span></div>
@@ -1054,6 +1084,8 @@ function drawPane(){const c=cur,el=$("pane");if(!el)return;
      ${c.rooms.length?`<div class="h4">연수객실 · 입실 16:00 / 퇴실 11:00</div><div class="box">${c.rooms.map(r=>`<div class="li"><span><b>${r[2].length}실</b><small>${esc(r[1])}</small></span></div><div class="rooms-g">${r[2].map(n=>`<span>${esc(n)}</span>`).join("")}</div>`).join("")}</div>`:""}
      ${prog?`<div class="h4">진행</div><div class="box"><div class="prog">${prog}</div></div>`:""}
      ${c.memo?`<div class="h4">메모</div><div class="box"><p style="margin:10px 0">${esc(c.memo)}</p></div>`:""}`;
+  }else if(pane==="chk"){el.innerHTML=chkPane(c);
+  }else if(pane==="note"){el.innerHTML=notePane(c);
   }else if(pane==="amt"){const a=c.amt,items=a.items||[],chg=a.chg||[],pay=a.pay||[];const pct=c.final?Math.min(100,Math.round(c.paid/c.final*100)):0;
     el.innerHTML=c.final||items.length?`<div class="box mtop"><span style="font-size:12.5px;color:var(--mute)">최종 청구액 (부가세 포함)</span><span class="big num">${won(c.final)}원</span><div class="mbar"><i style="width:${pct}%"></i></div><div class="mleg num"><span class="p">받은 돈 ${won(c.paid)}</span><span class="d">받을 돈 ${won(c.due)}</span></div></div>
      ${pay.length?`<div class="h4">결제 단계</div><div class="box">${pay.map(p=>{const ok=/확인|입금/.test(p[4]||"");return `<div class="li"><span><b>${esc(p[0])}</b> <span class="pill ${ok?"p-conf":"p-hold"}">${ok?"받음":"예정"}</span><small>${esc(p[1]||"")}${p[3]?" · "+esc(p[3]):""}</small></span><span class="a">${esc(p[2])}</span></div>`}).join("")}</div>`:""}
@@ -1125,6 +1157,74 @@ async function runUpdate(){
   }finally{busy=false;b.classList.remove("spin")}
 }
 
+/* ===== 준비 체크 · 인수인계 메모 · 구글 캘린더 ===== */
+const jobj=k=>{try{const v=JSON.parse(LS.get(k,"{}"));return v&&typeof v==="object"&&!Array.isArray(v)?v:{}}catch(e){return {}}};
+let CHK=jobj("ds-chk"), NOTES=jget("ds-notes"), ME=LS.get("ds-me","");
+const z2=n=>String(n).padStart(2,"0");
+const stamp=d=>{d=d||new Date();return `${d.getMonth()+1}/${d.getDate()} ${z2(d.getHours())}:${z2(d.getMinutes())}`};
+const EQ=/기자재|빔|프로젝터|마이크|모니터|LED|음향|스피커|노트북/;
+function chkItems(c){const it=[],A=(k,t,w)=>it.push({k,t,w});
+  const names=[...(c.amt.items||[]),...(c.amt.chg||[])].map(r=>r[0]||"").join(" ")+" "+c.sch.map(s=>s[2]).join(" ");
+  A("pax","최종 인원 확인","3일 전");
+  if(c.sch.length)A("set","공간 세팅 확인 (좌석 배치 · 현수막 · 명패)","3일 전");
+  if(EQ.test(names))A("eq","기자재 점검 (빔 · 마이크 · 모니터)","전날");
+  if(MEAL.test(names))A("meal","식사 인원 · 메뉴 F&B 전달","3일 전");
+  if(c.rooms.length)A("room","연수객실 배정 · 정비 확인","전날");
+  A("park","주차 대수 확인","전날");
+  A("guide","고객 안내문 발송 (오시는 길 · 주차)","3일 전");
+  if(c.due>0)A("pay","잔금 · 결제 방법 확인","당일까지");
+  A("front","현장 전달 공유 (프론트 · 시설)","전날");
+  A("after","행사 뒤 정산 · 세금계산서","끝난 뒤");
+  ((CHK[c.id]||{}).extra||[]).forEach(x=>it.push({k:x.k,t:x.t,w:"",x:1}));return it}
+function chkProg(c){const L=chkItems(c),dn=(CHK[c.id]||{}).done||{};return {n:L.filter(x=>dn[x.k]).length,t:L.length}}
+async function saveChk(id){const st=CHK[id];if(!st)return;st.at=new Date().toISOString();
+  if(DB){try{await DB.collection("checks").doc(id).set({done:st.done||{},extra:st.extra||[],at:st.at})}catch(e){toast("저장하지 못했습니다. 다시 눌러 주세요")}}
+  else LS.set("ds-chk",JSON.stringify(CHK))}
+const shareNote=()=>DB?"함께 보는 기록입니다 · 누가 눌러도 모두에게 바뀝니다":"이 기기에만 저장됩니다 · 함께 쓰려면 Claude 앱 링크에서 여세요";
+function chkPane(c){const L=chkItems(c),dn=(CHK[c.id]||{}).done||{},n=L.filter(x=>dn[x.k]).length;
+  return `<div class="box" style="padding:12px 14px;display:grid;gap:8px"><div style="display:flex;justify-content:space-between;align-items:baseline"><b>행사 준비 ${n} / ${L.length}</b><span class="note">${c.s?dday(c):""}</span></div><div class="pbar"><i style="width:${L.length?Math.round(n/L.length*100):0}%"></i></div></div>
+   <div class="box">${L.map(x=>`<div class="ck ${dn[x.k]?"on":""}"><button data-ck="${esc(x.k)}" aria-pressed="${!!dn[x.k]}"><i>✓</i><span><b>${esc(x.t)}</b><small>${dn[x.k]?esc(dn[x.k])+" 확인":esc(x.w)}</small></span></button>${x.x?`<button class="del" data-ckdel="${esc(x.k)}" aria-label="항목 지우기">지우기</button>`:""}</div>`).join("")}</div>
+   <div class="addrow"><input id="ckNew" maxlength="60" placeholder="이 단체만의 준비 항목 추가" aria-label="준비 항목 추가"><button class="btn" data-ckadd>추가</button></div>
+   <p class="note">항목은 이 단체의 공간 · 식사 · 객실 · 잔금에 맞춰 자동으로 만들어집니다. ${shareNote()}</p>`}
+const noteWhen=n=>{const d=new Date(n.at);return isNaN(d)?"":stamp(d)};
+const notesOpen=()=>NOTES.filter(n=>!n.done).sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+const notesOf=no=>NOTES.filter(n=>n.no===no).sort((a,b)=>(a.done?1:0)-(b.done?1:0)||String(b.at).localeCompare(String(a.at)));
+function noteRow(n,showCase){const c=n.no?CASES.find(x=>x.id===n.no):null;
+  return `<div class="nt ${n.done?"done":""}"><div class="tx">${esc(n.text)}</div><div class="mt"><span>${showCase&&n.no?(c?`<button class="lnk" data-id="${esc(c.id)}" data-pane="note">${esc(c.name)}</button>`:esc(n.no))+" · ":""}${n.who?esc(n.who)+" · ":""}${noteWhen(n)}</span><span>${n.done?`<button data-ntdel="${esc(n.id)}">지우기</button>`:""}<button data-ntdone="${esc(n.id)}">${n.done?"되돌리기":"확인함"}</button></span></div></div>`}
+function noteForm(no){return `<div class="nt-f"><textarea id="ntText" rows="2" maxlength="500" placeholder="${no?"이 단체에 대해 다음 사람이 알아야 할 것":"다음 근무자에게 전할 말"}" aria-label="인수인계 메모"></textarea><div class="r"><input id="ntWho" maxlength="12" placeholder="쓴 사람" value="${esc(ME)}" aria-label="쓴 사람"><button class="btn pri" data-ntadd="${esc(no||"")}">메모 남기기</button></div><div class="err" id="ntErr" role="alert"></div></div>`}
+function notePane(c){const L=notesOf(c.id);return noteForm(c.id)+(L.length?`<div class="box">${L.map(n=>noteRow(n,false)).join("")}</div>`:`<div class="box"><p class="note" style="padding:12px 0">이 단체에 남긴 메모가 없습니다.</p></div>`)+`<p class="note">${shareNote()}</p>`}
+function noteSheetHTML(){const O=notesOpen(),Dn=NOTES.filter(n=>n.done).sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,10);
+  return `<div class="sh-top"><div class="sh-bar"><h2 id="shTitle">인수인계 메모</h2><button class="xbtn" data-close aria-label="닫기">✕</button></div></div><div style="display:grid;gap:10px">${noteForm("")}
+   <div class="h4">확인 안 한 메모 · ${O.length}</div><div class="box">${O.length?O.map(n=>noteRow(n,true)).join(""):`<div class="okline">남은 메모가 없습니다</div>`}</div>
+   ${Dn.length?`<div class="h4">확인한 메모</div><div class="box">${Dn.map(n=>noteRow(n,true)).join("")}</div>`:""}<p class="note">단체에 대한 메모는 그 단체 화면의 「메모」에서 남기면 함께 묶입니다. ${shareNote()}</p></div>`}
+const saveNotesLocal=()=>LS.set("ds-notes",JSON.stringify(NOTES));
+async function addNote(no){const tx=($("ntText").value||"").trim(),who=($("ntWho").value||"").trim();if(!tx){$("ntErr").textContent="내용을 적어 주세요.";$("ntText").focus();return}
+  ME=who;LS.set("ds-me",ME);const doc={no:no||"",text:tx.slice(0,500),who:who.slice(0,12),at:new Date().toISOString(),done:false};
+  if(DB){try{await DB.collection("notes").add(doc)}catch(e){$("ntErr").textContent="저장하지 못했습니다. 다시 눌러 주세요.";return}}
+  else{NOTES.push({id:"L"+Date.now(),...doc});saveNotesLocal()}
+  $("ntText").value="";toast("메모를 남겼습니다");paintShared(true)}
+async function setNote(id,patch){const n=NOTES.find(x=>x.id===id);if(!n)return;
+  if(DB){try{if(patch)await DB.collection("notes").doc(id).update(patch);else await DB.collection("notes").doc(id).delete()}catch(e){toast("저장하지 못했습니다. 다시 눌러 주세요");return}}
+  else{if(patch)Object.assign(n,patch);else NOTES=NOTES.filter(x=>x.id!==id);saveNotesLocal()}
+  if(!DB)paintShared(true)}
+function paintShared(force){const a=document.activeElement,typing=!force&&a&&/INPUT|TEXTAREA/.test(a.tagName)&&a.value&&$("sheetIn").contains(a);
+  if(sheetKind==="detail"&&cur&&!typing&&(pane==="chk"||pane==="note")){$("sheetIn").innerHTML=detailHTML();drawPane()}
+  else if(sheetKind==="note"&&!typing)$("sheetIn").innerHTML=noteSheetHTML();
+  if(tab==="today"&&(!sheetKind||sheetKind==="detail"||sheetKind==="note"))render()}
+function prepSec(){const L=CASES.filter(c=>c.s&&!c.past&&c.st!=="quote"&&diff(c.s)<=7).sort(byDate);if(!L.length)return "";
+  return `<div class="sec"><div class="sec-h"><h2>행사 준비</h2><span class="cnt">7일 안 ${L.length}건</span></div><div class="card">${L.map(c=>{const p=chkProg(c);return `<button class="mrow" data-id="${esc(c.id)}" data-pane="chk"><span><span class="n">${esc(c.name)}</span><span class="s">${mdw(c.s)} · ${dday(c)}${c.own?" · 담당 "+esc(c.own):""}</span></span><span class="a">${p.n} / ${p.t}<div class="pbar" style="margin-top:5px"><i style="width:${p.t?Math.round(p.n/p.t*100):0}%"></i></div></span></button>`}).join("")}</div></div>`}
+function noteSec(){const O=notesOpen();
+  return `<div class="sec"><div class="sec-h"><h2>인수인계 메모</h2><span class="cnt">${O.length?"확인 안 한 메모 "+O.length+"건":""}</span><button class="more" data-notes>${O.length>3?"모두 보기 · ":""}메모 쓰기 ›</button></div><div class="card">${O.length?O.slice(0,3).map(n=>noteRow(n,true)).join(""):`<div class="empty">남긴 메모가 없습니다. 다음 근무자에게 전할 말을 남겨 보세요.</div>`}</div></div>`}
+const CAL_URL=PUB_URL+"cal.ics";
+function gcalUrl(c){if(!c.s)return "";const e0=c.e||c.s,cd=c.s.replace(/-/g,"");let dates;
+  const tm=c.sch.filter(s=>s[0]===c.s&&t0(s[1])!=null&&t1(s[1])!=null);
+  if(c.s===e0&&tm.length){const a=Math.min(...tm.map(s=>t0(s[1])));let b=Math.max(...tm.map(s=>t1(s[1])));if(b<=a)b=Math.min(a+60,1439);const f=v=>cd+"T"+z2(Math.floor(v/60))+z2(v%60)+"00";dates=f(a)+"/"+f(b)}
+  else{const e=pd(e0);e.setDate(e.getDate()+1);dates=cd+"/"+ymd(e).replace(/-/g,"")}
+  const L=c.sch.map(s=>`${md(s[0])} ${s[1]} ${s[2]}${s[3]==="hold"?" (가예약)":""}`);c.rooms.forEach(r=>L.push(`연수객실 ${r[2].length}실 (${r[1]})`));
+  if(c.own)L.push("담당 "+c.own);L.push("건 번호 "+c.no,PUB_URL+"#"+c.id);
+  const st=c.st==="conf"?"":"("+(ST[c.st]||ST.quote)[0]+") ";
+  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(`[더숲] ${st}${c.name}${c.pax?" "+c.pax+"명":""}`)+"&dates="+dates+"&ctz=Asia%2FSeoul&details="+encodeURIComponent(L.join("\n"))+"&location="+encodeURIComponent("더숲 아카데미하우스"+(c.spaces.length?" · "+c.spaces.join(", "):""))}
+
 /* ===== events ===== */
 document.addEventListener("click",async e=>{const t=e.target;
   const pk=t.closest("[data-pin-key]");if(pk){pinKey(pk.dataset.pinKey);return}
@@ -1165,6 +1265,14 @@ document.addEventListener("click",async e=>{const t=e.target;
   if(t.closest("#btnSearch")){tab="plan";planView="list";filter="up";dayPick=null;LS.set("ds-tab",tab);render();window.scrollTo(0,0);$("q")?.focus();return}
   const dof=t.closest("[data-dayoff]");if(dof){dayOff=+dof.dataset.dayoff;render();return}
   const br=t.closest("[data-brief]");if(br){const tx=briefText(br.dataset.brief);if(await copyText(tx))toast("브리핑을 복사했습니다 · 카톡에 붙여 넣으세요");else openSheet(`<div class="sh-top"><div class="sh-bar"><h2 id="shTitle">브리핑</h2><button class="xbtn" data-close aria-label="닫기">✕</button></div></div><textarea class="msg" id="msg">${esc(tx)}</textarea><p class="note">글을 길게 눌러 전체 선택 후 복사하세요.</p>`,"brief");return}
+  if(t.closest("[data-notes]")){openSheet(noteSheetHTML(),"note");return}
+  const na=t.closest("[data-ntadd]");if(na){addNote(na.dataset.ntadd);return}
+  const nd=t.closest("[data-ntdone]");if(nd){const n=NOTES.find(x=>x.id===nd.dataset.ntdone);if(n)setNote(n.id,n.done?{done:false,doneAt:""}:{done:true,doneAt:stamp()+(ME?" "+ME:"")});return}
+  const nx=t.closest("[data-ntdel]");if(nx){setNote(nx.dataset.ntdel,null);return}
+  const ck=t.closest("[data-ck]");if(ck&&cur){const st=CHK[cur.id]||(CHK[cur.id]={done:{},extra:[]});st.done=st.done||{};const k=ck.dataset.ck;if(st.done[k])delete st.done[k];else st.done[k]=stamp()+(ME?" "+ME:"");paintShared(true);saveChk(cur.id);return}
+  if(t.closest("[data-ckadd]")&&cur){const v=($("ckNew").value||"").trim();if(!v){$("ckNew").focus();return}const st=CHK[cur.id]||(CHK[cur.id]={done:{},extra:[]});st.extra=st.extra||[];st.extra.push({k:"x"+Date.now(),t:v.slice(0,60)});paintShared(true);saveChk(cur.id);return}
+  const cx=t.closest("[data-ckdel]");if(cx&&cur){const st=CHK[cur.id];if(st){st.extra=(st.extra||[]).filter(x=>x.k!==cx.dataset.ckdel);if(st.done)delete st.done[cx.dataset.ckdel];paintShared(true);saveChk(cur.id)}return}
+  if(t.closest("[data-copycal]")){if(!await copyText(CAL_URL))toast(CAL_URL);return}
   if(t.closest("[data-close]")||t===$("scrim")){closeSheet();return}
   const tb=t.closest("[data-tab]");if(tb){tab=tb.dataset.tab;dayPick=null;LS.set("ds-tab",tab);render();window.scrollTo(0,0);return}
   const go=t.closest("[data-go]");if(go){const [tb2,f]=go.dataset.go.split(":");tab=tb2;if(tab==="money"){moneyView=f||moneyView;sMonth=TODAY_S.slice(0,7)}else{planView="list";if(f){filter=f;dayPick=null}}LS.set("ds-tab",tab);render();window.scrollTo(0,0);return}
@@ -1205,7 +1313,7 @@ document.addEventListener("submit",e=>{if(e.target.id==="sf"){e.preventDefault()
 document.addEventListener("input",e=>{if(e.target.id==="aq"){arcQ=e.target.value.trim();const pos=e.target.selectionStart;render();const n=$("aq");if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(x){}}return}if(e.target.id==="q"){q=e.target.value.trim().toLowerCase();const pos=e.target.selectionStart;render();const n=$("q");if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(x){}}}
   if(e.target.id==="sfAmt"){const v=e.target.value.replace(/[^\d]/g,"");e.target.value=v?won(+v):""}});
 document.addEventListener("change",e=>{const id=e.target.id;if(id==="retFile"){const fs=[...e.target.files];e.target.value="";scanReturn(fs);return}if(e.target.dataset&&e.target.dataset.rett!=null){RET[+e.target.dataset.rett].t=e.target.value;return}if(id==="freeDate"){freeDay=e.target.value||TODAY_S;render();return}if(id==="freePax"){freePax=e.target.value.replace(/[^\d]/g,"");render();return}if(id==="oAmt"||id==="oPark"){msgOpt[id==="oAmt"?"amt":"park"]=e.target.checked;$("msg").value=buildMsg(cur)}});
-document.addEventListener("keydown",e=>{if(!UNLOCKED){if(/^\d$/.test(e.key))pinKey(e.key);else if(e.key==="Backspace")pinKey("del");return}if(e.key==="Escape"&&sheetKind)closeSheet()});
+document.addEventListener("keydown",e=>{if(!UNLOCKED){if(/^\d$/.test(e.key))pinKey(e.key);else if(e.key==="Backspace")pinKey("del");return}if(e.key==="Escape"&&sheetKind)closeSheet();if(e.key==="Enter"&&e.target.id==="ckNew"){e.preventDefault();document.querySelector("[data-ckadd]")?.click()}});
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;if(tab==="info")render()});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&/^https?:/.test(location.protocol)&&!window.claude){const d=parseAsOf(D.asOf);if(!d||Date.now()-d>3*36e5)pullLatest(true)}});
 
@@ -1223,6 +1331,8 @@ if("serviceWorker" in navigator&&/github\.io$/.test(location.hostname)){navigato
       db.collection("sales").onSnapshot(snap=>{got=true;clearTimeout(timer);salesErr="";SALES=snap.docs.map(d=>({id:d.id,...d.data()}));if(tab==="money"&&sheetKind!=="sales")render()},
         err=>{got=true;clearTimeout(timer);salesErr="매출 기록을 불러오지 못했습니다. 페이지를 다시 열어 주세요.";if(tab==="money")render()});
       db.collection("events").onSnapshot(snap=>{EVS=snap.docs.map(d=>({id:d.id,...d.data()}));if((tab==="book"||tab==="today")&&!sheetKind)render()},()=>{});
+      db.collection("checks").onSnapshot(snap=>{const m={};snap.docs.forEach(d=>{m[d.id]=d.data()||{}});CHK=m;paintShared()},()=>{});
+      db.collection("notes").onSnapshot(snap=>{NOTES=snap.docs.map(d=>({...d.data(),id:d.id}));paintShared()},()=>{});
       if(tab==="money")render();}
   }catch(e){}
 })();

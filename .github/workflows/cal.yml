@@ -1,0 +1,28 @@
+name: 캘린더 구독 파일 만들기
+on:
+  push:
+    branches: [main]
+    paths: [data.js, tools/ics.js]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: cal
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node tools/ics.js data.js > cal.ics
+      - run: |
+          if git diff --quiet -- cal.ics; then echo "바뀐 것 없음"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add cal.ics
+          git commit -m "캘린더 구독 파일 갱신"
+          git pull --rebase origin main
+          git push origin HEAD:main

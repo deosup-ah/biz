@@ -130,3 +130,16 @@ Gmail(비즈 계정)에서 읽어 `ext.js` 에 넣는다. `ext.js` 는 Claude �
 
 화면: 「오늘」의 메일에서 온 급한 일 · 북스테이 온라인 예약 · 카드 정산 입금 · 답할 메일, 「돈 › 매출 현황」의 북스테이 온라인 예약 흐름, 「돈 › 받을 돈」의 카드 정산 입금 예정.
 메일은 읽기만 한다. 답장·라벨·삭제는 하지 않는다.
+
+## 준비 체크 · 인수인계 메모 (11/10)
+- 단체 상세 「준비」: 그 단체의 공간 · 기자재 · 식사 · 객실 · 잔금에 맞춰 화면이 항목을 만든다(index.html `chkItems`). 누른 기록은 Artifact DB 컬렉션 `checks` — 문서 id = 건 번호, `{done:{항목키:"M/D HH:MM 이름"}, extra:[{k,t}], at}`.
+- 인수인계 메모: Artifact DB 컬렉션 `notes` — `{no:건 번호 또는 "", text(500자), who, at, done, doneAt}`. 「오늘」 화면에 확인 안 한 메모가 뜬다.
+- 공개 주소에는 DB 가 없어 그 기기에만 저장된다(함께 쓰는 것은 Claude 앱 링크). 업데이트 작업은 이 두 컬렉션을 건드리지 않는다.
+
+## 구글 캘린더 (11/10)
+- 구독 파일 `cal.ics` (저장소, 공개): `node tools/ics.js data.js > cal.ics`. data.js 가 main 에 올라오면 GitHub Actions(`.github/workflows/cal.yml`)가 자동으로 다시 만든다. 손으로 고치지 않는다. 구독 주소 https://deosup-ah.github.io/biz/cal.ics
+- 단체 · 날짜마다 일정 하나(시간이 있으면 그날 첫 시작~마지막 끝, 없으면 종일). 단체명 · 공간 · 시간 · 인원 · 담당 · 단계 · 건 번호만. 금액 · 연락처 금지. 끝난 지 14일 넘은 것은 뺀다.
+- biz 구글 캘린더 직접 기록: `node tools/ics.js data.js --json` (오늘부터 60일, 설명 마지막 줄 `deosupsync 건번호_날짜` 가 맞춤 키). 지시문은 `tools/cal-task.md`.
+
+## 아침 브리핑 메일 (11/10)
+- `node tools/brief.js data.js` → `{subject, body, asOf, stale}`. 화면의 「브리핑 복사」와 같은 규칙(오늘 · 내일 · 챙길 일 · 다음 7일). 글을 손으로 고치지 않는다. 지시문은 `tools/brief-task.md`.
