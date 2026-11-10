@@ -11,6 +11,7 @@ const delta=(a,b)=>!b?'':`<span class="${a>=b?'up':'down'}">${a>=b?'▲':'▼'} 
 const ymL=ym=>+ym.slice(5)+'월';
 const stPill=(it)=>!it||!(it.stock>0)?'<span class="pill p-none">없음</span>':need(it)>0||it.stock<=1?`<span class="pill p-low">부족 ${it.stock}</span>`:`<span class="pill p-ok">있음 ${it.stock}</span>`;
 
+const soldPill=b=>b.isbn&&(window.SOLD||{})[b.isbn]?`<span class="pill p-none">${SOLD[b.isbn]}</span>`:'';
 V.store.today=()=>{const brs=S.br==='all'?BR:BR.filter(b=>b.k===S.br),cm=TODAY.slice(0,7),yd=addDays(TODAY,-1),an=anomalies(S.br),hk=hooks(30);
   return `<div class="sec"><h2>${mdw(TODAY)} 오늘</h2><p>${brN(S.br)} · 어제까지의 판매와 오늘 할 일</p></div>
   <div class="grid g4">${brs.map(b=>{const d=sales().find(x=>x.br===b.k&&x.ym===cm),ydv=sales().find(x=>x.br===b.k&&x.ym===yd.slice(0,7)),mt=d?(Object.values(d.days||{}).reduce((a,v)=>a+v,0)||d.amt||0):null,yv=ydv?(ydv.days||{})[yd.slice(8)]:null,nd=needs(b.k).length,c=cart(b.k);
@@ -40,7 +41,7 @@ function custCard(P){const br=S.br,C=agg(br,P.cur).cu;if(!C.has)return '';const 
   if(wsum)ins.push(`주말 매출이 ${pct(C.wke,wsum)}%입니다 — 주말 이틀이 평일 닷새${C.wke>C.wkd?'보다 큽니다':'의 '+pct(C.wke,C.wkd)+'% 수준입니다'}.`);
   if(tsum){const i=C.t.indexOf(Math.max(...C.t));ins.push(`가장 붐비는 때는 ${TL[i]}(${pct(C.t[i],tsum)}%)입니다.`)}if(bsum)ins.push(`한 번에 3권 이상 사는 거래가 ${pct(C.bk[2],bsum)}%, 1권만 사는 거래가 ${pct(C.bk[0],bsum)}%입니다.`);
   const brs=br==='all'?BR:BR.filter(b=>b.k===br),labs=P.cur.map(y=>(y.slice(5)==='01'||y===P.cur[0]?y.slice(2,4)+'.':'')+(+y.slice(5))+'월');
-  return `<div class="sec"><h2 style="font-size:19px">손님 특성</h2><p>${brN(br)} · 영수증 단위로 본 사는 모습 · 이름 같은 개인정보는 쓰지 않습니다${br!=='nowon'?' · 거래 수 · 권수별 거래는 지금 노원더숲만 (나머지 세 지점은 다시 세는 중)':''}</p></div>
+  return `<div class="sec"><h2 style="font-size:19px">손님 특성</h2><p>${brN(br)} · 영수증 단위로 본 사는 모습 · 이름 같은 개인정보는 쓰지 않습니다${br==='all'||br==='aka'?' · 아카의 거래 수는 다시 세는 중':''}</p></div>
   <div class="grid g4"><div class="card kpi"><span>거래(영수증) 수</span><b class="num">${won(C.rc)}건</b><small>한 달 평균 ${won(C.rc/Math.max(1,rows.length))}건</small></div>
    <div class="card kpi"><span>한 번에 쓰는 돈</span><b class="num">${C.rc?won(C.amt/C.rc):'—'}원</b><small>매출 ÷ 거래 수</small></div>
    <div class="card kpi"><span>한 번에 사는 권수</span><b class="num">${C.rc&&C.qty?(C.qty/C.rc).toFixed(2):'—'}권</b><small>권수 ÷ 거래 수</small></div>
@@ -89,9 +90,9 @@ V.store.stock=()=>{const br=S.br,nd=needs(br),q=(S.ui.q||'').trim(),its=items(br
   const carts=(br==='all'?BR.map(b=>b.k):[br]).map(k=>({k,c:cart(k)}));
   const found=q?its.filter(x=>nt(x.t).includes(nt(q))||String(x.isbn||'').includes(q)||nt(x.a).includes(nt(q))).slice(0,40):[];
   return `<div class="sec"><h2>재고 · 주문</h2><p>${brN(br)} · 주문 필요 → 담기 → 엑셀 → 북센에서 직접 주문</p></div>
-  <div class="card"><h3>주문 필요 <small>(30일 판매 ÷ 30 × 14일) − 재고가 0보다 큰 책 · ${nd.length}종</small></h3>${nd.length?`<div class="btns" style="margin-bottom:10px">${br!=='all'?`<button class="btn sm pri" data-a="needXlsx">북센 주문 엑셀로 내보내기 (${nd.length}종)</button><button class="btn sm" data-a="needAll">모두 담기</button>`:''}<button class="btn sm" data-a="needCopy">ISBN · 수량 모두 복사</button><span class="note">ISBN 을 누르면 그 번호만 복사됩니다${br==='all'?' · 엑셀은 지점을 고르면 나옵니다':''}</span></div>`:''}
+  <div class="card"><h3>주문 필요 <small>(30일 판매 ÷ 30 × 14일) − 재고가 0보다 큰 책 · ${nd.length}종</small></h3>${nd.length?`<div class="btns" style="margin-bottom:10px">${br!=='all'?`<button class="btn sm pri" data-a="needXlsx">북센 주문 엑셀로 내보내기 (${nd.length}종)</button><button class="btn sm" data-a="needAll">모두 담기</button>`:''}<button class="btn sm" data-a="needCopy">ISBN · 수량 모두 복사</button><span class="note">ISBN 을 누르면 그 번호만 복사됩니다 · 품절 · 절판은 엑셀과 복사에서 빠집니다${br==='all'?' · 엑셀은 지점을 고르면 나옵니다':''}</span></div>`:''}
    ${nd.length?`<div class="tw"><table><tr>${br==='all'?'<th>지점</th>':''}<th>책</th><th>ISBN</th><th class="r">30일 판매</th><th class="r">재고</th><th class="r">필요</th><th></th></tr>
-   ${nd.slice(0,40).map(x=>`<tr>${br==='all'?`<td><span class="pill p-mute">${brN(x.br)}</span></td>`:''}<td>${esc(x.t)}<small>${esc([x.a,x.p].filter(Boolean).join(' · '))}</small></td><td>${x.isbn?`<button class="chip num" data-a="cp" data-t="${x.isbn}" data-tip="누르면 ISBN 이 복사됩니다">${x.isbn}</button>`:'<span class="pill p-low">ISBN 없음</span>'}</td><td class="r">${x.sold30}${x.est?'<small>추정</small>':''}</td><td class="r">${x.stock||0}</td><td class="r"><b>${x.need}</b></td><td class="r"><button class="btn sm" data-a="needAdd" data-br="${x.br}" data-k="${esc(x.isbn||nt(x.t))}">담기</button></td></tr>`).join('')}</table></div>`:`<div class="empty">2주 안에 떨어질 책이 없습니다.</div>`}</div>
+   ${nd.slice(0,40).map(x=>`<tr>${br==='all'?`<td><span class="pill p-mute">${brN(x.br)}</span></td>`:''}<td>${esc(x.t)} ${soldPill(x)}<small>${esc([x.a,x.p].filter(Boolean).join(' · '))}</small></td><td>${x.isbn?`<button class="chip num" data-a="cp" data-t="${x.isbn}" data-tip="누르면 ISBN 이 복사됩니다">${x.isbn}</button>`:'<span class="pill p-low">ISBN 없음</span>'}</td><td class="r">${x.sold30}${x.est?'<small>추정</small>':''}</td><td class="r">${x.stock||0}</td><td class="r"><b>${x.need}</b></td><td class="r"><button class="btn sm" data-a="needAdd" data-br="${x.br}" data-k="${esc(x.isbn||nt(x.t))}">담기</button></td></tr>`).join('')}</table></div>`:`<div class="empty">2주 안에 떨어질 책이 없습니다.</div>`}</div>
   ${carts.map(({k,c})=>`<div class="card" style="border-top:4px solid ${brC(k)}"><h3>북센 주문 · ${brN(k)} <small>${c.items.length}종 ${c.items.reduce((a,i)=>a+i.qty,0)}권 · 정가 합 ${won(c.items.reduce((a,i)=>a+i.qty*(i.price||0),0))}원</small><span class="pill ${c.status==='확인'?'p-ok':'p-info'}" style="margin-left:auto">${esc(c.items.length?c.status||'담음':'비어 있음')}</span></h3>
    ${c.items.length?`<div class="list">${c.items.map((i,n)=>`<div class="li"><div class="t"><b>${esc(i.t)}</b><small>${esc([i.a,i.p,i.why].filter(Boolean).join(' · '))}</small></div>${i.isbn?`<button class="chip num" data-a="cp" data-t="${i.isbn}" data-tip="누르면 ISBN 이 복사됩니다">${i.isbn}</button>`:'<span class="pill p-low">ISBN 없음</span>'}<div class="qty"><button data-a="cq" data-br="${k}" data-i="${n}" data-d="-1" aria-label="줄이기">−</button><b class="num">${i.qty}</b><button data-a="cq" data-br="${k}" data-i="${n}" data-d="1" aria-label="늘리기">＋</button></div></div>`).join('')}</div>
    ${(cr=>{const sum=c.items.reduce((a,i)=>a+i.qty*(i.price||0),0);return cr?`<p class="note" style="${sum>cr.bal?'color:var(--crit)':''}">북센 여신잔액 ${won(cr.bal)}원 / 한도 ${won(cr.limit)}원 (${esc(cr.asOf||'')})${sum>cr.bal?' — 담은 정가 합이 잔액보다 큽니다. 주문 전에 확인하세요.':''}</p>`:''})(credit(k))}
@@ -104,16 +105,17 @@ V.store.stock=()=>{const br=S.br,nd=needs(br),q=(S.ui.q||'').trim(),its=items(br
 C.q=el=>{S.ui.q=el.value;render();const i=$('q');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}};
 C.per=(el,d)=>{const P=period();S.ui.pf=d.k==='pf'?el.value:(S.ui.pf||P.cur[0]);S.ui.pt=d.k==='pt'?el.value:(S.ui.pt||P.cur[P.cur.length-1]);render()};
 A.needAdd=d=>{const x=needs(d.br).find(i=>(i.isbn||nt(i.t))===d.k);if(x&&addCart(d.br,x,x.need,`30일 ${x.sold30}권 · 재고 ${x.stock||0}`))toast('북센 주문에 담았습니다')};
-A.needAll=()=>{const br=S.br,c=clone(cart(br));needs(br).forEach(x=>{const k=x.isbn||nt(x.t);if(!c.items.some(i=>(i.isbn||nt(i.t))===k))c.items.push({t:x.t,a:x.a||'',p:x.p||'',isbn:x.isbn||'',price:x.price||0,qty:x.need,why:`30일 ${x.sold30}권 · 재고 ${x.stock||0}`})});const {id,...o}=c;o.status='담음';o.at=new Date().toISOString();put('carts',br,o);toast('모두 담았습니다')};
+A.needAll=()=>{const br=S.br,c=clone(cart(br));needOk(br).forEach(x=>{const k=x.isbn||nt(x.t);if(!c.items.some(i=>(i.isbn||nt(i.t))===k))c.items.push({t:x.t,a:x.a||'',p:x.p||'',isbn:x.isbn||'',price:x.price||0,qty:x.need,why:`30일 ${x.sold30}권 · 재고 ${x.stock||0}`})});const {id,...o}=c;o.status='담음';o.at=new Date().toISOString();put('carts',br,o);toast('모두 담았습니다')};
 function cartMut(br,f){const c=clone(cart(br));f(c);const {id,...o}=c;o.at=new Date().toISOString();put('carts',br,o)}
 A.cq=d=>cartMut(d.br,c=>{const i=c.items[+d.i];i.qty+=+d.d;if(i.qty<=0)c.items.splice(+d.i,1);c.status='담음'});
 A.cConfirm=d=>cartMut(d.br,c=>c.status='확인');A.cBack=d=>cartMut(d.br,c=>c.status='담음');A.cClear=d=>cartMut(d.br,c=>{c.items=[];c.status='담음'});
 A.cAlert=d=>{const c=cart(d.br);copyText(`[숲지기] ${brN(d.br)} 북센 주문 확정 전 확인\n${c.items.length}종 ${c.items.reduce((a,i)=>a+i.qty,0)}권\n`+c.items.map(i=>`- ${i.t} ${i.qty}권${i.why?' ('+i.why+')':''}`).join('\n')+'\n앱에서 수량을 확인하고 「이 목록으로 확정」을 눌러 주세요.')};
 A.cp=d=>{copyText(d.t)};
 const isbnLines=L=>L.map(i=>`${i.isbn||'(ISBN 없음)'}\t${i.qty}\t${i.t}`).join('\n');
-A.needCopy=()=>copyText(isbnLines(needs(S.br).map(x=>({...x,qty:x.need}))));
+const needOk=br=>needs(br).filter(x=>!(x.isbn&&(window.SOLD||{})[x.isbn]));
+A.needCopy=()=>copyText(isbnLines(needOk(S.br).map(x=>({...x,qty:x.need}))));
 A.cCopy=d=>copyText(isbnLines(cart(d.br).items));
-A.needXlsx=()=>booxenXlsx(S.br,needs(S.br).map(x=>({...x,qty:x.need})));
+A.needXlsx=()=>booxenXlsx(S.br,needOk(S.br).map(x=>({...x,qty:x.need})));
 A.cXlsx=d=>booxenXlsx(d.br,cart(d.br).items);
 async function booxenXlsx(br,L){const c={items:L},d={br};if(!L.length){toast('내보낼 책이 없습니다');return}if(!window.XLSX){toast('엑셀 도구를 불러오지 못했습니다');return}const no=L.filter(i=>!i.isbn).length;const aoa=[['ISBN','주문수량','도서명','출판사','저자','정가'],...c.items.map(i=>[String(i.isbn||''),i.qty,i.t,i.p||'',i.a||'',i.price||0])];
   const ws=XLSX.utils.aoa_to_sheet(aoa);c.items.forEach((i,n)=>{ws['A'+(n+2)]={t:'s',v:String(i.isbn||''),z:'@'}});ws['!cols']=[{wch:16},{wch:9},{wch:40},{wch:16},{wch:18},{wch:10}];const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Sheet1');
@@ -122,7 +124,7 @@ A.cDone=async d=>{const c=cart(d.br);if(!c.items.length)return;const doc={br:d.b
 
 /* ── 순위 ── */
 const SRC=[['yes24','예스24'],['aladin','알라딘'],['kyobo','교보문고']];
-V.store.rank=()=>{const B=window.BOOKS||{},src=S.ui.src&&(B[S.ui.src]||[]).length?S.ui.src:'yes24',L=B[src]||[],br=S.br,its=items(br);const find=(b,k)=>its.find(x=>(k==null||x.br===k)&&nt(x.t)===nt(b.t));
+V.store.rank=()=>{const B=window.BOOKS||{},src=S.ui.src&&(B[S.ui.src]||[]).length?S.ui.src:'yes24',L=(B[src]||[]).filter(b=>!(b.isbn&&(window.SOLD||{})[b.isbn])),br=S.br,its=items(br);const find=(b,k)=>its.find(x=>(k==null||x.br===k)&&nt(x.t)===nt(b.t));
   const miss=br==='all'?[]:L.filter(b=>{const it=find(b);return !it||!(it.stock>0)});
   return `<div class="sec"><h2>순위 비교</h2><p>${esc(B.week||'')} · 매장 재고와 견줌 (${brN(br)})</p></div>
   <div class="btns"><div class="chips">${SRC.map(([k,l])=>`<button class="chip" data-a="ui" data-k="src" data-v="${k}" aria-pressed="${src===k}" ${(B[k]||[]).length?'':'disabled'}>${l}${(B[k]||[]).length?'':' · 미연결'}</button>`).join('')}</div>
@@ -131,20 +133,21 @@ V.store.rank=()=>{const B=window.BOOKS||{},src=S.ui.src&&(B[S.ui.src]||[]).lengt
   ${L.map((b,i)=>`<tr><td class="r"><b>${b.r}</b></td><td>${esc(b.t)}<small>${esc([b.a,b.p].filter(Boolean).join(' · '))}</small>${b.isbn?`<button class="chip num" style="margin-top:4px" data-a="cp" data-t="${b.isbn}" data-tip="누르면 ISBN 이 복사됩니다">${b.isbn}</button>`:''}</td><td>${br==='all'?`<div class="chips">${BR.map(x=>{const it=find(b,x.k);return `<span class="pill ${it&&it.stock>0?'p-ok':'p-none'}">${x.n} ${it&&it.stock>0?it.stock:'없음'}</span>`}).join('')}</div>`:stPill(find(b))}</td>
    <td class="r">${br==='all'?'':`<button class="btn sm" data-a="rankAdd" data-src="${src}" data-i="${i}">담기</button>`}</td></tr>`).join('')||'<tr><td colspan="4" class="empty">순위 자료가 없습니다.</td></tr>'}</table></div>
   <p class="note" style="margin-top:10px">${esc(B.asOf||'')} · 지금은 종합 20위까지입니다. 분야별 100위 · 교보문고 · 신간은 매주 갱신 작업에 붙이는 중입니다.${br==='all'?' 담으려면 위에서 지점을 고르세요.':''}${isDemo()?' 재고 표시는 예시 자료 기준입니다.':''}</p></div>`};
-A.rankAdd=d=>{const b=(window.BOOKS[d.src]||[])[+d.i];if(b&&addCart(S.br,b,2,(SRC.find(s=>s[0]===d.src)||[])[1]+' '+b.r+'위'))toast('북센 주문에 담았습니다')};
+A.rankAdd=d=>{const b=(window.BOOKS[d.src]||[]).filter(b=>!(b.isbn&&(window.SOLD||{})[b.isbn]))[+d.i];if(b&&addCart(S.br,b,2,(SRC.find(s=>s[0]===d.src)||[])[1]+' '+b.r+'위'))toast('북센 주문에 담았습니다')};
 A.rankAll=d=>{const its=items(S.br);let n=0;(window.BOOKS[d.src]||[]).forEach(b=>{const it=its.find(x=>nt(x.t)===nt(b.t));if((!it||!(it.stock>0))&&!cart(S.br).items.some(i=>nt(i.t)===nt(b.t))){addCart(S.br,b,2,'순위권 · 재고 없음');n++}});toast(n+'종을 담았습니다')};
 
 /* ── 반품 ── */
 V.store.ret=()=>{const br=S.br,R=S.ui.ret||[];
-  return `<div class="sec"><h2>반품</h2><p>${brN(br)} · 반품할 책 사진을 올리면 목록으로 만들어 줍니다</p></div>
-  ${br==='all'?`<div class="card empty">위에서 지점을 먼저 고르세요.</div>`:`<div class="card form"><h3>사진으로 목록 만들기</h3>
-   <ol class="steps"><li><span>책등이나 표지가 보이게 밝은 곳에서 찍습니다. 한 번에 4장까지.</span></li><li><span>읽은 결과에서 틀린 곳과 권수를 고칩니다.</span></li><li><span>저장하면 기록에 남고, 이지정보 반품 입력은 직접 합니다.</span></li></ol>
-   <input type="file" id="retFile" accept="image/*" multiple data-c="retFile" ${S.ui.busy?'disabled':''}>${S.ui.busy==='ret'?'<p class="note">사진을 읽는 중입니다…</p>':''}${S.ui.err&&S.ui.err.ret?`<p class="note" style="color:var(--crit)">${esc(S.ui.err.ret)}</p>`:''}
+  return `<div class="sec"><h2>반품</h2><p>${brN(br)} · 반품할 책을 적어 목록으로 만들고 기록합니다</p></div>
+  ${br==='all'?`<div class="card empty">위에서 지점을 먼저 고르세요.</div>`:`<div class="card form"><h3>반품 목록 만들기</h3>
+   <ol class="steps"><li><span>책 이름이나 ISBN(바코드 숫자)을 적어 넣습니다. 매장 자료에 있는 책이면 나머지는 채워집니다.</span></li><li><span>권수를 고칩니다.</span></li><li><span>저장하면 기록에 남고, 이지정보 반품 입력은 직접 합니다.</span></li></ol>
+   ${AI?`<input type="file" id="retFile" accept="image/*" multiple data-c="retFile" ${S.ui.busy?'disabled':''}>`:''}<div class="f2"><div class="fld"><label for="rtT">책 이름 또는 ISBN</label><input type="text" id="rtT" placeholder="예: 9791141691370 또는 가호"></div><div class="btns" style="align-items:end"><button class="btn" data-a="retAdd">목록에 넣기</button></div></div>${S.ui.busy==='ret'?'<p class="note">사진을 읽는 중입니다…</p>':''}${S.ui.err&&S.ui.err.ret?`<p class="note" style="color:var(--crit)">${esc(S.ui.err.ret)}</p>`:''}
    ${R.length?`<div class="list">${R.map((i,n)=>`<div class="li"><div class="t"><b>${esc(i.t)}</b><small>${esc([i.a,i.p,i.isbn].filter(Boolean).join(' · '))}</small></div><div class="qty"><button data-a="rq" data-i="${n}" data-d="-1">−</button><b>${i.qty}</b><button data-a="rq" data-i="${n}" data-d="1">＋</button></div></div>`).join('')}</div>
    <div class="btns"><button class="btn pri" data-a="retSave">반품 목록 저장 (${R.length}종)</button><button class="btn" data-a="retCopy">목록 복사</button><button class="btn ghost" data-a="retClear">지우기</button></div>`:''}</div>`}
   <div class="card"><h3>지난 반품 기록</h3>${S.db.returns.filter(r=>br==='all'||r.br===br).length?`<div class="list">${S.db.returns.filter(r=>br==='all'||r.br===br).sort((a,b)=>(a.at||'')<(b.at||'')?1:-1).slice(0,10).map(r=>`<div class="li"><span class="pill p-mute">${brN(r.br||'aka')}</span><div class="t"><b>${mdw(r.date)} · ${(r.items||[]).length}종 ${(r.items||[]).reduce((a,i)=>a+(i.qty||1),0)}권</b><small>${esc((r.items||[]).slice(0,4).map(i=>i.t).join(', '))}</small></div></div>`).join('')}</div>`:`<div class="empty">저장한 반품 기록이 없습니다.</div>`}</div>`};
 C.retFile=async el=>{const files=[...el.files].slice(0,4);if(!files.length)return;const out=await ask('ret','사진 속 책들을 읽어 주세요. 서점에서 출판 도매상에 반품할 책 묶음입니다. 보이는 책마다 제목, 저자, 출판사, ISBN(보이면), 같은 책 권수를 적습니다. 보이지 않는 정보는 빈 문자열로 두고 지어내지 마세요.\nJSON 배열로만 답하세요: [{"title":"","author":"","publisher":"","isbn":"","qty":1}]',{images:files});
   if(out){const arr=Array.isArray(out)?out:out.books||[];S.ui.ret=(S.ui.ret||[]).concat(arr.filter(b=>b&&b.title).map(b=>({t:String(b.title),a:String(b.author||''),p:String(b.publisher||''),isbn:String(b.isbn||'').replace(/\D/g,''),qty:Math.max(1,+b.qty||1)})));if(!arr.length)S.ui.err={ret:'책을 찾지 못했습니다. 더 가까이, 밝게 찍어 보세요.'}}};
+A.retAdd=()=>{const v=($('rtT').value||'').trim();if(!v)return;const d=v.replace(/\D/g,''),all=items('all'),b=all.find(x=>d.length>=10&&x.isbn===d)||all.find(x=>nt(x.t)===nt(v))||all.find(x=>nt(x.t).includes(nt(v)));S.ui.ret=(S.ui.ret||[]).concat([b?{t:b.t,a:b.a||'',p:b.p||'',isbn:b.isbn||'',qty:1}:{t:d.length>=10?'(이름 미확인)':v,a:'',p:'',isbn:d.length>=10?d:'',qty:1}]);render();const e=$('rtT');if(e)e.focus()};
 A.rq=d=>{const R=S.ui.ret;R[+d.i].qty+=+d.d;if(R[+d.i].qty<=0)R.splice(+d.i,1);render()};
 A.retClear=()=>{S.ui.ret=[];render()};
 A.retCopy=()=>copyText(`${brN(S.br)} 반품 ${TODAY}\n`+(S.ui.ret||[]).map(i=>`${i.t}\t${i.p}\t${i.isbn}\t${i.qty}`).join('\n'));

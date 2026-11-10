@@ -6,7 +6,7 @@ const brN=k=>k==='all'?'전체':(BR.find(b=>b.k===k)||{}).n||k;
 const brC=k=>(BR.find(b=>b.k===k)||{}).c||'var(--pine)';
 const GR=['문학','인문','예술','과학','기타'];
 function grp(c){c=String(c||'');if(/문학|소설|에세이|산문|희곡|^시$|시집/.test(c))return'문학';if(/인문|철학|역사|사회|심리|종교|정치|교양/.test(c))return'인문';if(/예술|미술|음악|사진|디자인|건축|영화|만화/.test(c))return'예술';if(/과학|자연|수학|기술|공학|의학|환경/.test(c))return'과학';return'기타'}
-const TABS={store:[['today','오늘'],['ana','매출 분석'],['stock','재고 · 주문'],['rank','순위'],['cur','큐레이션'],['space','공간'],['design','POP · 띠지'],['ret','반품'],['data','자료 · 설정']],
+const TABS={store:[['today','오늘'],['cur','큐레이션'],['design','POP · 띠지'],['space','공간'],['ana','매출 분석'],['stock','재고 · 주문'],['rank','순위'],['ret','반품'],['data','자료 · 설정']],
   aka:[['today','오늘'],['cal','일정'],['plan','행사 기획'],['insta','인스타'],['naver','네이버'],['space','공간'],['design','POP · 디자인']]};
 const COLS=['credit','sales','stock','carts','orders','returns','events','plans','insta','curations','ideas'];
 const S={locked:true,mode:'store',br:'all',view:{store:'today',aka:'today'},loaded:false,demoPref:null,db:{},ui:{per:3},got:{}};
@@ -59,7 +59,7 @@ document.addEventListener('focusout',()=>{if(S.stale){S.stale=false;setTimeout(s
 const aiErr=e=>({none:'Claude 앱 안에서 열어야 쓸 수 있습니다.',not_granted:'Claude 사용을 허용해야 쓸 수 있습니다.',rate_limited:'요청이 많습니다. 잠시 뒤 다시 눌러 주세요.',invalid_json:'답을 읽지 못했습니다. 다시 눌러 주세요.',refused:'이 내용으로는 만들 수 없습니다. 내용을 바꿔 주세요.',image_rejected:'사진을 읽지 못했습니다. 다른 사진으로 해 보세요.',images_unavailable:'이 화면에서는 사진을 보낼 수 없습니다.'}[e&&e.code]||'만들지 못했습니다. 잠시 뒤 다시 눌러 주세요.');
 async function ask(key,prompt,opts){if(S.ui.busy)return null;if(!AI){S.ui.err={[key]:aiErr({code:'none'})};render();return null}
   S.ui.busy=key;S.ui.err={};render();try{return await AI.json(prompt,{cache:false,...opts})}catch(e){S.ui.err={[key]:aiErr(e)};return null}finally{S.ui.busy=null;setTimeout(render,0)}}
-const busyBtn=(key,label,act,extra='')=>`<button class="btn pri" data-a="${act}" ${extra} ${S.ui.busy?'disabled':''}>${S.ui.busy===key?'만드는 중… (1분쯤 걸릴 수 있습니다)':label}</button>${S.ui.err&&S.ui.err[key]?`<p class="note" style="color:var(--crit)">${esc(S.ui.err[key])}</p>`:''}`;
+const busyBtn=(key,label,act,extra='')=>!AI?'':`<button class="btn pri" data-a="${act}" ${extra} ${S.ui.busy?'disabled':''}>${S.ui.busy===key?'만드는 중… (1분쯤 걸릴 수 있습니다)':label}</button>${S.ui.err&&S.ui.err[key]?`<p class="note" style="color:var(--crit)">${esc(S.ui.err[key])}</p>`:''}`;
 
 /* 예시 자료 (실제 자료가 들어오기 전 화면 확인용) */
 const DT=[['가호','무라카미 하루키','문학동네','소설',16800],['모순','양귀자','쓰다','소설',13000],['싯다르타','헤르만 헤세','민음사','소설',9000],['빨강의 자서전','앤 카슨','한겨레출판','시집',15000],['태풍의 이름을 잊은 것처럼','정세랑','문학동네','소설',16000],['일일 반출록','성해나','무제','에세이',17000],['자연의 것들은 그저 자란다','이윤 리','다산책방','에세이',17500],['체스 이야기·낯선 여인의 편지','슈테판 츠바이크','문학동네','소설',12000],
@@ -127,7 +127,7 @@ function render(){if(S.locked)return;const m=S.mode,v=V[m][S.view[m]]?S.view[m]:
    ${m==='store'?`<div class="row2" role="group" aria-label="지점 고르기">${[{k:'all',n:'전체'},...BR].map(b=>`<button class="brchip" data-a="br" data-k="${b.k}" aria-pressed="${S.br===b.k}">${b.c?`<i style="background:${b.c}"></i>`:''}${b.n}</button>`).join('')}</div>`:''}
    <nav class="tabs">${TABS[m].map(([k,l])=>`<button data-a="go" data-v="${k}" ${v===k?'aria-current="page"':''}>${l}${k==='today'&&al?`<span class="b">${al}</span>`:''}${k==='stock'&&cn?`<span class="b" style="background:var(--pine)">${cn}</span>`:''}</button>`).join('')}</nav></header>
    <main>${!S.loaded?`<div class="card empty">자료를 불러오는 중입니다…</div>`:''}${S.slow?`<div class="al">저장된 자료에 아직 닿지 못했습니다. 보이는 내용이 최신이 아닐 수 있습니다.</div>`:''}
-   ${S.solo?`<div class="al" style="border-color:var(--info);background:var(--info-soft)">공개 주소로 여셨습니다. 담은 주문 · 일정 · 배치도는 <b>이 기기에만</b> 저장되고, 추천 기능(큐레이션 · 문구 · 기획 · 사진 읽기)은 Claude 안의 숲지기에서만 됩니다.</div>`:''}
+   ${S.solo?`<p class="note">담은 주문 · 일정 · 배치도는 이 기기에 저장됩니다.</p>`:''}
    ${m==='store'&&!isDemo()&&!realStock().length&&v==='stock'?`<div class="al">재고 자료가 아직 없어 주문 필요 계산은 비어 있습니다. 매출은 실제 숫자입니다.</div>`:''}
    ${m==='store'&&isDemo()&&['today','ana','stock'].includes(v)?`<div class="demo"><span><b>예시 자료입니다.</b> 실제 매출 · 재고가 아닙니다. 이지정보에서 내보낸 엑셀을 「자료 · 설정」에 올리면 진짜 숫자로 바뀝니다.</span><button class="btn sm" data-a="go" data-v="data">자료 올리러 가기</button></div>`:''}
    ${V[m][v]()}</main>`;

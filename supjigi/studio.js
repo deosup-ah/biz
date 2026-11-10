@@ -23,7 +23,7 @@ function themeCard(t,i,saved){const its=items(t.br||S.br);const inStock=b=>its.f
    <div class="btns" style="margin-top:12px"><button class="btn pri" data-a="toDesign" data-kind="pop" data-s="${saved?1:0}" data-i="${i}">POP 만들기</button><button class="btn" data-a="toDesign" data-kind="band" data-s="${saved?1:0}" data-i="${i}">띠지 만들기</button><button class="btn" data-a="toDesign" data-kind="list" data-s="${saved?1:0}" data-i="${i}">평대 책 목록 (A4)</button><button class="btn" data-a="toDesign" data-kind="shelf" data-s="${saved?1:0}" data-i="${i}">선반 이름표</button>
     <button class="btn" data-a="curOrder" data-s="${saved?1:0}" data-i="${i}">없는 책 주문에 담기</button>${saved?`<button class="btn ghost" data-a="curDel" data-i="${i}">지우기</button>`:`<button class="btn" data-a="curSave" data-i="${i}">저장</button>`}</div></div>`}
 C.uiv=(el,d)=>{S.ui[d.k]=el.value};
-const getTheme=d=>d.s==='1'?S.db.curations.find(c=>c.id===d.i):(S.ui.cur||[])[+d.i];
+const getTheme=d=>d.s==='c'?(S.ui.cor||[])[+d.i]:d.s==='1'?S.db.curations.find(c=>c.id===d.i):(S.ui.cur||[])[+d.i];
 A.curFrom=d=>{S.mode='store';S.view.store='cur';S.ui.cuM=d.memo;S.ui.purp=/행사|영화|북토크|프로그램/.test(d.memo)?'행사 연계':'기념일 · 이슈';window.scrollTo(0,0);render()};
 A.curGen=async()=>{const br=S.br,U=S.ui,hk=hooks(60),B=window.BOOKS||{},n=+U.cuN||8;
   const st=items(br).sort((a,b)=>(b.sold30||0)-(a.sold30||0)).slice(0,70).map(x=>`${x.t} | ${x.a||''} | ${grp(x.cat)} | 재고 ${x.stock||0} | 30일 ${x.sold30||0}권`).join('\n');
@@ -56,12 +56,12 @@ JSON 배열로만 답하세요:
 A.curSave=async d=>{const t=S.ui.cur[+d.i];await put('curations',nid(),{...clone(t),at:new Date().toISOString()},true);S.ui.cur.splice(+d.i,1);toast('주제를 저장했습니다');render()};
 A.curDel=d=>del('curations',d.i);
 A.curOrder=d=>{const t=getTheme(d),br=t.br||S.br;if(br==='all'){toast('지점을 먼저 고르세요');return}const its=items(br);let n=0;(t.books||[]).forEach(b=>{const it=its.find(x=>nt(x.t)===nt(b.t));if(!it||!(it.stock>0)){addCart(br,{t:b.t,a:b.a,p:b.p,isbn:(it||{}).isbn,price:(it||{}).price},2,'큐레이션: '+t.title);n++}});toast(n?`${n}종을 ${brN(br)} 북센 주문에 담았습니다`:'모두 매장에 있습니다')};
-A.toDesign=d=>{const t=getTheme(d)||{},b=(t.books||[])[0]||{},k=d.kind,D=Object.assign(defD(),{kind:k,br:t.br||curBr(),books:(t.books||[]).map(x=>({t:x.t,a:x.a,p:x.p,why:x.why}))});
-  if(k==='band')D.phrases=t.band||(t.pop||{}).head||t.title||'';
-  else if(k==='list'){D.head='이 평대의 책';D.body=t.title||'';D.tag='더숲 '+brN(D.br==='all'?'aka':D.br);D.list=D.books.map(x=>`${x.t} | ${[x.a,x.p].filter(Boolean).join(' · ')} | ${x.why||''}`).join('\n')}
-  else if(k==='shelf'){D.head=t.title||'';D.body=t.hook||''}
-  else{D.head=(t.pop||{}).head||'';D.body=(t.pop||{}).body||'';D.book=b.t||'';D.author=[b.a,b.p].filter(Boolean).join(' · ')}
-  S.ui.D=D;S.ui.copies=[];S.view[S.mode]='design';window.scrollTo(0,0);render()};
+A.toDesign=d=>{const t=getTheme(d)||{},b=(t.books||[])[0]||{},k=d.kind,D=Object.assign(defD(),{kind:k,br:t.br||curBr(),sym:t.sym||'none',books:(t.books||[]).map(x=>({t:x.t,a:x.a,p:x.p,why:x.why}))});D.tag=BRAND[D.br]||D.tag;
+  if(k==='band'){D.phrases=t.band||(t.pop||{}).head||t.title||'';if(t.bpal!=null){D.pal=t.bpal;D.pals=[t.bpal]}if(t.sym)D.syms=[t.sym]}
+  else if(k==='list'){D.head=t.title||'이 평대의 책';D.body=t.hook||'';D.tag='더숲 '+(BRAND[D.br]||'');D.list=D.books.map(x=>`${x.t} | ${[x.a,x.p].filter(Boolean).join(' · ')} | `).join('\n')}
+  else if(k==='shelf'){D.head=t.title||'';D.body=t.hook||'';if(t.ppal!=null)D.pal=t.ppal}
+  else{D.head=(t.pop||{}).head||t.title||'';D.body=(t.pop||{}).body||'';if(t.ppal!=null)D.pal=t.ppal}
+  S.ui.D=D;S.ui.dlog=[];S.view[S.mode]='design';window.scrollTo(0,0);render()};
 
 /* ── 공간 배치 ── */
 const FX={shelf:{n:'서가',w:1.8,h:.4,f:'#8a6b4a'},table:{n:'평대',w:1.2,h:.8,f:'#c9a36a'},face:{n:'면진열대',w:.9,h:.4,f:'#b08a5a'},counter:{n:'계산대',w:1.5,h:.7,f:'#6b7a71'},door:{n:'입구',w:1,h:.2,f:'#b23a2b'},sofa:{n:'읽는 자리',w:1.4,h:.7,f:'#1baf7a'},stage:{n:'무대 · 스크린',w:2.4,h:.5,f:'#6250d6'},seat:{n:'좌석',w:.45,h:.45,f:'#2a78d6'},wall:{n:'벽 · 기둥',w:.4,h:.4,f:'#444c48'}};
@@ -99,7 +99,7 @@ A.fxSel=d=>{S.ui.fx=d.id;render()};
 A.fxRot=()=>planMut(p=>{const f=p.fx.find(x=>x.id===S.ui.fx);if(f)[f.w,f.h]=[f.h,f.w]});
 A.fxDup=()=>{const id=nid();planMut(p=>{const f=p.fx.find(x=>x.id===S.ui.fx);if(f)p.fx.push({...f,id,x:snap(Math.min(p.w-f.w,f.x+.3)),y:snap(Math.min(p.h-f.h,f.y+.3))})});S.ui.fx=id};
 A.fxDel=()=>{const id=S.ui.fx;S.ui.fx=null;planMut(p=>p.fx=p.fx.filter(x=>x.id!==id))};
-A.fxPop=d=>{const f=plan(curBr()).fx.find(x=>x.id===d.id);S.ui.D=Object.assign(defD(),{kind:'shelf',head:f.theme,body:'',tag:f.label||'',br:curBr()});S.ui.copies=[];S.view[S.mode]='design';window.scrollTo(0,0);render()};
+A.fxPop=d=>{const f=plan(curBr()).fx.find(x=>x.id===d.id);S.ui.D=Object.assign(defD(),{kind:'shelf',head:f.theme,body:'',tag:f.label||'',br:curBr()});S.ui.dlog=[];S.view[S.mode]='design';window.scrollTo(0,0);render()};
 C.fxSet=(el,d)=>planMut(p=>{const f=p.fx.find(x=>x.id===S.ui.fx);if(!f)return;f[d.k]=d.k==='w'||d.k==='h'?Math.max(.2,+el.value||.2):el.value},true).then(()=>{S.stale=true});
 C.plSet=(el,d)=>planMut(p=>{p[d.k]=Math.min(40,Math.max(3,+el.value||3))});
 A.seats=d=>planMut(p=>{p.fx=p.fx.filter(f=>f.type!=='seat');const n=+d.n;if(!n)return;const st=p.fx.find(f=>f.type==='stage'),gap=.6,cols=Math.max(4,Math.min(10,Math.floor((p.w-1.6)/gap))),half=Math.ceil(cols/2),x0=(p.w-(cols*gap+.6))/2,y0=(st?st.y+st.h:.6)+1.2;
