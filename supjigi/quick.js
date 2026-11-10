@@ -257,3 +257,37 @@ DMOOD.push('계단처럼','한 줄로','둥글게','대칭으로','탑 하나','
     tips=['두 권씩 짝을 지어 놓습니다. 한 권이 다른 한 권을 설명합니다.','짝마다 손글씨 한 줄: 「이 책을 읽었다면 이 책도」.','짝과 짝 사이는 넓게 띄워 따로 읽히게 합니다.'];need=['손글씨 쪽지 '+P+'장','A5 POP 꽂이 1개']}
   it.push({k:'pop',x:pop[0],y:pop[1]});it.push({k:'card',x:405,y:860});
   return{title:t.title,br:t.br||S.br,it,rows,tips,need,mini:false,mode:md,total:rows.reduce((a,r)=>a+r.qty,0)}}})();
+
+/* ── 장르 POP: 용도 읽기 (서가 안내 · 추천 · 새로 들어온 · 많이 나간) ── */
+const GEN=[
+ {n:'문학',k:/^문학$/,c:['문학'],t:/./,h:'이야기와 문장이 있는 서가.',sym:'book'},
+ {n:'소설',k:/^(소설|장편|단편)$/,c:['문학'],t:/^(?!.*(시$|의 시|시집|수필|산문|에세이|낱말|어휘|필사)).*$/,h:'남의 삶을 잠시 빌려 사는 일.',sym:'moon'},
+ {n:'시',k:/^(시|시집)$/,c:['문학'],t:/시$|의 시|시집|노래|꽃/,h:'한 쪽이면 충분한 날을 위해.',sym:'leaf'},
+ {n:'수필',k:/^(수필|에세이|산문)$/,c:['문학'],t:/^(?!.*(시$|시집)).*(수필|산문|낱말|어휘|하루|적었다|마음|말할 때|말$|일지|무서록)/,h:'누군가의 보통날을 읽습니다.',sym:'cup'},
+ {n:'인문',k:/^인문(학)?$/,c:['인문'],t:/./,h:'사람이 사람을 생각한 기록.',sym:'pencil'},
+ {n:'철학',k:/^철학$/,c:['인문'],t:/철학|니체|쇼펜하우어|세네카|존재|사유|군주론/,h:'답보다 질문이 오래 남는 서가.',sym:'candle'},
+ {n:'역사',k:/^(역사|한국사|세계사)$/,c:['인문','역사'],t:/역사|세계사|조선|전쟁|자서전|시대|기행|문명/,h:'지나간 일로 지금을 읽습니다.',sym:'house'},
+ {n:'사회',k:/^(사회|사회과학|정치)$/,c:['인문','사회'],t:/사회|노동|차별|도시|세계|정치|불평등/,h:'함께 사는 일에 관한 책.',sym:'wave'},
+ {n:'예술',k:/^(예술|미술|음악|사진|영화|건축|디자인)$/,c:['예술'],t:/./,h:'보는 법, 듣는 법을 다시 배웁니다.',sym:'star'},
+ {n:'자연과학',k:/^(자연과학|과학|우주|생물|수학)$/,c:['자연과학','과학'],t:/./,h:'세계가 움직이는 방식을 묻는 서가.',sym:'sun'},
+ {n:'종교',k:/^(종교|명상|불교|기독교)$/,c:['종교'],t:/./,h:'고요히 머무는 책.',sym:'candle'},
+ {n:'여행',k:/^(여행|기행)$/,c:['문학','인문'],t:/여행|기행|도시|섬|거리|걷/,h:'떠나지 않고도 멀리 가는 법.',sym:'walk'}];
+const GUSE=[['sign','서가 안내'],['pick','추천'],['new','새로 들어온'],['best','많이 나간']];
+function genreOf(v){const ws=v.replace(/[.,!?]/g,' ').split(/\s+/).filter(Boolean);for(const w of ws){const b=w.replace(/(은|는|이|가|을|를|의|에|도|만)$/,''),g=GEN.find(x=>x.k.test(w)||x.k.test(b));if(g)return{g,word:(g.k.test(w)?w:b)}}return null}
+function genreUse(v,g){if(/신간|새로|새 책|들어온|입고|갓 나온/.test(v))return'new';if(/베스트|많이|잘 나가|인기|순위|팔리/.test(v))return'best';if(/추천|읽을|고른|권하|권합|좋은|오늘의|이달의|요즘/.test(v))return'pick';if(/코너|서가|분야|여기|안내|표지|이름표|자리|칸|쪽/.test(v))return'sign';const m=ls.get('gUse',{})[g.n];return m||(v.replace(/\s/g,'').length<=g.n.length+2?'sign':'pick')}
+function genreBooks(g,use,br){let P=[];try{P=pool(br)}catch(e){}let L=P.filter(b=>g.c.includes(b.cat)&&g.t.test(b.t||'')&&!/미니북|키링|필사책|리커버/.test(b.t||''));
+  if(use==='new'){let N=[];try{N=recs(br).nw||[]}catch(e){}const nn=N.filter(b=>g.t.test(b.t||'')&&g.c.includes(b.cat));L=[...nn,...L.filter(b=>!(b.here>0))]}
+  else if(use==='best')L=L.slice().sort((a,b)=>((b.mine||0)+(b.sold||0))-((a.mine||0)+(a.sold||0)));else L=L.slice().sort((a,b)=>(b.here>0)-(a.here>0)||(b.mine||0)-(a.mine||0));
+  return L.filter((b,i,A)=>A.findIndex(z=>nt(z.t).slice(0,5)===nt(b.t).slice(0,5))===i).slice(0,6)}
+function genreMake(word,g,use){const aka=S.mode==='aka',br=aka?'aka':curBr(),tag=aka?'아카데미하우스':TAGN(br);
+  if(use==='sign')return Object.assign(defD(),{kind:'shelf',br,tag,head:word,body:g.h,sym:g.sym,pal:1});
+  const B=genreBooks(g,use,br),b=B[0]||{},head=use==='new'?`새로 들어온\n${word}`:use==='best'?`요즘 많이 집는\n${word}`:`오늘의 ${word}`;
+  const D=Object.assign(defD(),{kind:'pop',br,tag,head,body:g.h,sym:g.sym,st:use==='best'?1:0,pal:use==='new'?3:use==='best'?2:0,books:B.map(x=>({t:x.t,a:x.a,p:x.p,why:''}))});
+  if(b.t){D.book=b.t;D.author=[b.a,b.p].filter(Boolean).join(' · ')}return D}
+A.gUse=d=>{const G=S.ui.gen;if(!G)return;G.use=d.u;const m=ls.get('gUse',{});m[G.g.n]=d.u;ls.set('gUse',m);const H=S.ui.dH=S.ui.dH||[];if(S.ui.D)H.push(JSON.stringify(S.ui.D));S.ui.D=genreMake(G.word,G.g,d.u);render()};
+(()=>{const f=A.ideaGo;A.ideaGo=async d=>{const el=$('ideaIn')||$('cIdea')||$('qIn'),v=((d&&d.v)||(el&&el.value)||'').trim(),G=v&&v.length<=18?genreOf(v):null;
+  if(!G||(S.mode==='store'&&S.br==='all')){S.ui.gen=null;return f(d)}
+  const use=genreUse(v,G.g),H=S.ui.dH=S.ui.dH||[];if(S.ui.D)H.push(JSON.stringify(S.ui.D));S.ui.gen={g:G.g,word:G.word,use};S.ui.idea=v;S.ui.D=genreMake(G.word,G.g,use);S.view[S.mode]='design';window.scrollTo(0,0);render()}})();
+(()=>{const f=V.store.design,g=()=>{const G=S.ui.gen,h=f();if(!G)return h;const B=G.use==='sign'?[]:genreBooks(G.g,G.use,S.mode==='aka'?'aka':curBr());
+  const bar=`<div class="card gbar"><div class="qbar" style="margin:0"><span class="note"><b>${esc(G.word)}</b> · 용도를 「${GUSE.find(x=>x[0]===G.use)[1]}」로 읽었습니다</span>${GUSE.map(([u,n])=>`<button class="chip" data-a="gUse" data-u="${u}" aria-pressed="${G.use===u}">${n}</button>`).join('')}</div>${B.length?`<p class="note" style="margin:8px 0 0">고른 책 · ${B.map(b=>esc(b.t)).join(' · ')}</p>`:G.use!=='sign'?'<p class="note" style="margin:8px 0 0">이 지점 자료에서 이 분야 책을 찾지 못했습니다. 책 이름은 아래에서 직접 적어 주세요.</p>':''}</div>`;
+  const i=h.indexOf('<div class="sec">');return i>0?h.slice(0,i)+bar+h.slice(i):bar+h};V.store.design=g;V.aka.design=g})();
