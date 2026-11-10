@@ -126,7 +126,7 @@ function render(){if(S.locked)return;try{sessionStorage.setItem('sj.view',JSON.s
     <div class="mode" role="group" aria-label="일 고르기"><button data-a="mode" data-m="aka" aria-pressed="${m==='aka'}">아카데미</button><button data-a="mode" data-m="store" aria-pressed="${m==='store'}">서점</button></div>
     </div>
    ${m==='store'?`<div class="row2" role="group" aria-label="지점 고르기">${[{k:'all',n:'전체'},...BR].map(b=>`<button class="brchip" data-a="br" data-k="${b.k}" aria-pressed="${S.br===b.k}">${b.c?`<i style="background:${b.c}"></i>`:''}${b.n}</button>`).join('')}</div>`:''}
-   <nav class="tabs">${TABS[m].map(([k,l])=>`<button data-a="go" data-v="${k}" ${tv===k?'aria-current="page"':''}>${l}${k==='more'&&al?`<span class="b">${al}</span>`:''}${k==='stock'&&cn?`<span class="b" style="background:var(--pine)">${cn}</span>`:''}</button>`).join('')}</nav></header>
+   <nav class="tabs">${TABS[m].map(([k,l])=>`${typeof TG!=='undefined'&&TG[m]&&TG[m][k]?`<span class="tg">${TG[m][k]}</span>`:''}<button data-a="go" data-v="${k}" ${tv===k?'aria-current="page"':''}>${l}${k==='more'&&al?`<span class="b">${al}</span>`:''}${k==='stock'&&cn?`<span class="b" style="background:var(--pine)">${cn}</span>`:''}</button>`).join('')}</nav></header>
    <main>${!S.loaded?`<div class="card empty">자료를 불러오는 중입니다…</div>`:''}${S.slow?`<div class="al">저장된 자료에 아직 닿지 못했습니다. 보이는 내용이 최신이 아닐 수 있습니다.</div>`:''}
    
    ${m==='store'&&!isDemo()&&!realStock().length&&v==='stock'?`<div class="al">재고 자료가 아직 없어 주문 필요 계산은 비어 있습니다. 매출은 실제 숫자입니다.</div>`:''}
