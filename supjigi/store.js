@@ -111,7 +111,7 @@ A.needAll=()=>{const br=S.br,c=clone(cart(br));needOk(br).forEach(x=>{const k=x.
 function cartMut(br,f){const c=clone(cart(br));f(c);const {id,...o}=c;o.at=new Date().toISOString();put('carts',br,o)}
 A.cq=d=>cartMut(d.br,c=>{const i=c.items[+d.i];i.qty+=+d.d;if(i.qty<=0)c.items.splice(+d.i,1);c.status='담음'});
 A.cConfirm=d=>cartMut(d.br,c=>c.status='확인');A.cBack=d=>cartMut(d.br,c=>c.status='담음');A.cClear=d=>cartMut(d.br,c=>{c.items=[];c.status='담음'});
-A.cAlert=d=>{const c=cart(d.br);copyText(`[숲지기] ${brN(d.br)} 북센 주문 확정 전 확인\n${c.items.length}종 ${c.items.reduce((a,i)=>a+i.qty,0)}권\n`+c.items.map(i=>`- ${i.t} ${i.qty}권${i.why?' ('+i.why+')':''}`).join('\n')+'\n앱에서 수량을 확인하고 「이 목록으로 확정」을 눌러 주세요.')};
+A.cAlert=d=>{const c=cart(d.br);copyText(`[더숲 워크룸] ${brN(d.br)} 북센 주문 확정 전 확인\n${c.items.length}종 ${c.items.reduce((a,i)=>a+i.qty,0)}권\n`+c.items.map(i=>`- ${i.t} ${i.qty}권${i.why?' ('+i.why+')':''}`).join('\n')+'\n앱에서 수량을 확인하고 「이 목록으로 확정」을 눌러 주세요.')};
 A.cp=d=>{copyText(d.t)};A.ndAll=()=>{S.ui.ndAll=!S.ui.ndAll;render()};
 const isbnLines=L=>L.map(i=>`${i.isbn||'(ISBN 없음)'}\t${i.qty}\t${i.t}`).join('\n');
 const needOk=br=>needs(br).filter(x=>!(x.isbn&&(window.SOLD||{})[x.isbn]));

@@ -10,7 +10,7 @@ function grp(c){c=String(c||'');if(/문학|소설|에세이|산문|희곡|^시$|
 const TABS={store:[['cur','큐레이션'],['design','POP'],['ana','매출'],['stock','주문'],['more','더보기']],
   aka:[['today','오늘'],['cal','일정'],['plan','기획'],['insta','인스타'],['design','POP']]};
 const COLS=['credit','sales','stock','carts','orders','returns','events','plans','insta','curations','ideas'];
-const S={locked:true,mode:'store',br:'all',view:{store:'cur',aka:'today'},loaded:false,demoPref:null,db:{},ui:{per:3},got:{}};
+const S={locked:true,mode:'aka',br:'all',view:{store:'cur',aka:'today'},loaded:false,demoPref:null,db:{},ui:{per:3},got:{}};
 COLS.forEach(c=>S.db[c]=[]);
 const V={store:{},aka:{}},A={},C={},AFTER={};
 let DB=null,USER=null,AI=null,DL=null,DICT=null;
@@ -111,7 +111,7 @@ function hooks(range=60){const y=+TODAY.slice(0,4),out=[];const fix=[['01-01','�
 
 /* 잠금 */
 let pin='';
-function lockUI(bad){$('lock').innerHTML=`<div class="lockbox ${bad?'shake':''}"><h1>숲지기</h1><p>${bad?'비밀번호가 맞지 않습니다':'화면 비밀번호 4자리'}</p><div class="dots">${[0,1,2,3].map(i=>`<i class="${i<pin.length?'on':''}"></i>`).join('')}</div>
+function lockUI(bad){$('lock').innerHTML=`<div class="lockbox ${bad?'shake':''}"><h1>더숲 워크룸</h1><p>${bad?'비밀번호가 맞지 않습니다':'화면 비밀번호 4자리'}</p><div class="dots">${[0,1,2,3].map(i=>`<i class="${i<pin.length?'on':''}"></i>`).join('')}</div>
   <div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-a="pin" data-n="${n}">${n}</button>`).join('')}<span></span><button data-a="pin" data-n="0">0</button><button data-a="pin" data-n="x" aria-label="지우기">←</button></div></div>`}
 async function tryPin(){const h=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('theforest-books:'+pin)))].map(b=>b.toString(16).padStart(2,'0')).join('');
   if(h===PIN_HASH){S.locked=false;try{sessionStorage.setItem('sj.p',pin)}catch(e){}$('lock').style.display='none';loadSeed(pin);render()}else{pin='';lockUI(true)}}
@@ -122,8 +122,8 @@ document.addEventListener('keydown',e=>{if(!S.locked)return;if(/^\d$/.test(e.key
 /* 머리줄 · 그리기 */
 function render(){if(S.locked)return;if(S.view.store==='today'&&!S.ui.seenToday){}const m=S.mode,v=V[m][S.view[m]]?S.view[m]:TABS[m][0][0],tv=TABS[m].some(t=>t[0]===v)?v:'more';const al=m==='store'?anomalies('all').length:0,cn=BR.reduce((a,b)=>a+cart(b.k).items.length,0);
   const sx=window.scrollX,sy=window.scrollY;
-  $('app').innerHTML=`<header class="top"><div class="bar"><div class="brand"><img class="blogo" src="logo-g.png" alt="deosup" height="20"><span>숲지기</span></div>
-    <div class="mode" role="group" aria-label="일 고르기"><button data-a="mode" data-m="store" aria-pressed="${m==='store'}">서점</button><button data-a="mode" data-m="aka" aria-pressed="${m==='aka'}">아카데미</button></div>
+  $('app').innerHTML=`<header class="top"><div class="bar"><div class="brand"><img class="blogo" src="logo-g.png" alt="deosup" height="20"><span>워크룸</span></div>
+    <div class="mode" role="group" aria-label="일 고르기"><button data-a="mode" data-m="aka" aria-pressed="${m==='aka'}">아카데미</button><button data-a="mode" data-m="store" aria-pressed="${m==='store'}">서점</button></div>
     </div>
    ${m==='store'?`<div class="row2" role="group" aria-label="지점 고르기">${[{k:'all',n:'전체'},...BR].map(b=>`<button class="brchip" data-a="br" data-k="${b.k}" aria-pressed="${S.br===b.k}">${b.c?`<i style="background:${b.c}"></i>`:''}${b.n}</button>`).join('')}</div>`:''}
    <nav class="tabs">${TABS[m].map(([k,l])=>`<button data-a="go" data-v="${k}" ${tv===k?'aria-current="page"':''}>${l}${k==='more'&&al?`<span class="b">${al}</span>`:''}${k==='stock'&&cn?`<span class="b" style="background:var(--pine)">${cn}</span>`:''}</button>`).join('')}</nav></header>
@@ -133,7 +133,7 @@ function render(){if(S.locked)return;if(S.view.store==='today'&&!S.ui.seenToday)
    ${m==='store'&&isDemo()&&['today','ana','stock'].includes(v)?`<div class="demo"><span><b>예시 자료입니다.</b> 실제 매출 · 재고가 아닙니다. 이지정보에서 내보낸 엑셀을 「자료 · 설정」에 올리면 진짜 숫자로 바뀝니다.</span><button class="btn sm" data-a="go" data-v="data">자료 올리러 가기</button></div>`:''}
    ${V[m][v]()}</main>`;
   window.scrollTo(sx,sy);if(AFTER[v])AFTER[v]()}
-A.mode=d=>{S.mode=d.m;ls.set('mode',d.m);window.scrollTo(0,0);render()};
+A.mode=d=>{if(d.m!==S.mode){S.ui['D_'+S.mode]=S.ui.D;S.ui.D=S.ui['D_'+d.m]||null;S.ui.dH=[];S.ui.dlog=[]}S.mode=d.m;ls.set('mode2',d.m);window.scrollTo(0,0);render()};
 A.br=d=>{S.br=d.k;ls.set('br',d.k);render()};
 A.go=d=>{if(d.m)S.mode=d.m;S.view[S.mode]=d.v;ls.set('view',S.view);window.scrollTo(0,0);render()};
 A.big=()=>{const b=document.body.classList.toggle('big');ls.set('big',b);render()};
@@ -143,7 +143,7 @@ document.addEventListener('toggle',e=>{const k=e.target&&e.target.dataset&&e.tar
 document.addEventListener('change',e=>{const el=e.target.closest('[data-c]');if(el&&C[el.dataset.c])C[el.dataset.c](el,el.dataset)});
 document.addEventListener('mousemove',e=>{const el=e.target.closest&&e.target.closest('[data-tip]'),t=$('tip');if(!el){t.style.display='none';return}t.textContent=el.dataset.tip;t.style.display='block';t.style.left=Math.min(e.clientX+12,innerWidth-250)+'px';t.style.top=e.clientY+14+'px'});
 
-function boot(){S.mode=ls.get('mode','store');S.br=ls.get('br','all');S.view=Object.assign(S.view,ls.get('view',{}));if(ls.get('big',false))document.body.classList.add('big');
+function boot(){S.mode=ls.get('mode2','aka');S.br=ls.get('br','all');S.view=Object.assign(S.view,ls.get('view',{}));if(ls.get('big',false))document.body.classList.add('big');
   let sp='';try{sp=sessionStorage.getItem('sj.p')||''}catch(e){}if(/^\d{4}$/.test(sp)){pin=sp;lockUI();tryPin()}else lockUI();
   if(!(window.claude&&window.claude.use)){S.solo=true;const o=ls.get('db',null);if(o)COLS.forEach(c=>{if(Array.isArray(o[c]))S.db[c]=o[c]});S.loaded=true;render();return}
   render();Promise.all(['db','user','sample','downloads','dictation'].map(n=>window.claude.use(n).catch(()=>null))).then(([d,u,a,l,dc])=>{DB=d;USER=u;AI=a;DL=l;DICT=dc;if(DICT){try{DICT.onFinal(({text})=>{micHeard(text);DICT.stop().catch(()=>{})});DICT.onState(({state})=>{const on=state==='listening';if(S.ui.mic!==on){S.ui.mic=on;render()}})}catch(e){DICT=null}}if(DB)subscribe();else{S.solo=true;S.loaded=true}render()});
