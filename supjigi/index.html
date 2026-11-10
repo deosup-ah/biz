@@ -227,6 +227,76 @@ button.brand{border:0;background:none;padding:0;cursor:pointer;display:flex;alig
 .plf{margin-bottom:12px}.plf label{display:block;margin-bottom:5px}.plf input{width:100%;font:inherit;font-size:15.5px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
 .pr2{grid-template-columns:1fr 1fr 2fr auto}.pr2 select{min-width:0;font:inherit;font-size:15px;padding:11px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}@media(max-width:720px){.pr2{grid-template-columns:1fr 1fr}}body.vm .pr2{grid-template-columns:1fr 1fr}
 .sact .li small{display:block!important}.sact .pill{flex:0 0 auto}
+
+/* ══ 잠금 화면 v2 ══ */
+#lock{position:fixed;inset:0;z-index:50;padding:0;display:block;background:#003128;color:#f2eee3;overflow:hidden;transition:opacity .5s ease,transform .5s ease}
+#lock.out{opacity:0;transform:translateY(-14px);pointer-events:none}
+#lock::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 18% 0%,rgba(46,128,100,.42),transparent 60%),linear-gradient(180deg,transparent 55%,rgba(0,20,15,.5))}
+.lkf{position:absolute;left:0;right:0;bottom:0;width:100%;height:min(52vh,460px);display:block}
+.lkf .sp{transform-box:fill-box;transform-origin:50% 100%;animation:lkrise 1.1s cubic-bezier(.16,.8,.24,1) both}
+@keyframes lkrise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){.lkf .sp{animation:none}#lock{transition:none}}
+.lk{position:relative;height:100%;max-width:1120px;margin:0 auto;padding:clamp(28px,6vh,64px) clamp(22px,5vw,56px);display:grid;grid-template-columns:1fr auto;gap:40px;align-items:start}
+.lkl img{display:block;height:26px;width:auto}
+.lkd{margin:clamp(28px,7vh,72px) 0 0;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.lkd b{font:800 clamp(46px,8.4vw,104px)/1 "Pretendard",sans-serif;letter-spacing:-.035em}
+.lkd span{font:500 clamp(16px,1.8vw,22px) "Pretendard",sans-serif;color:#d9b45b}
+.lkt{margin:14px 0 0;font:500 clamp(15px,1.5vw,18px) "Pretendard",sans-serif;color:rgba(242,238,227,.72)}
+.lkr{width:264px;padding-top:6px;justify-self:end}
+#lkMsg{margin:0 0 16px;font:500 14.5px "Pretendard",sans-serif;color:rgba(242,238,227,.8)}
+#lock .dots{display:flex;gap:12px;margin-bottom:26px}
+#lock .dots i{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(242,238,227,.55);transition:background .15s,border-color .15s,transform .15s}
+#lock .dots i.on{background:#d9b45b;border-color:#d9b45b;transform:scale(1.12)}
+#lock .pad{display:grid;grid-template-columns:repeat(3,72px);gap:14px 24px;width:auto}
+#lock .pad button{width:72px;height:72px;border-radius:50%;border:1px solid rgba(242,238,227,.26);background:rgba(0,49,40,.35);color:#f2eee3;font:500 25px "Pretendard",sans-serif;display:grid;place-items:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:background .12s,border-color .12s,transform .08s}
+#lock .pad button:hover{background:rgba(242,238,227,.1);border-color:rgba(242,238,227,.5)}
+#lock .pad button:active{background:#d9b45b;border-color:#d9b45b;color:#003128;transform:scale(.95)}
+#lock .pad button:focus-visible{outline:2px solid #d9b45b;outline-offset:3px}
+#lock .pad button[data-n="x"]{border-color:transparent;background:none}
+@media(max-width:760px){.lk{grid-template-columns:1fr;gap:0;align-content:space-between;padding-bottom:max(22px,env(safe-area-inset-bottom))}.lkr{justify-self:center;width:auto;text-align:center}#lock .dots{justify-content:center}.lkf{height:36vh;opacity:.5}.lkd{margin-top:26px}#lock .pad{gap:12px 26px}}
+@media(max-height:640px){#lock .pad{grid-template-columns:repeat(3,60px);gap:10px 20px}#lock .pad button{width:60px;height:60px;font-size:22px}.lkd b{font-size:44px}}
+
+/* ══ 워크룸 v2: 종이 · 숲 · 금빛 한 점. 상자를 줄이고, 글과 여백으로 ══ */
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){--bg:#f6f6f2;--surface:#ffffff;--surface2:#ecece6;--ink:#17201c;--muted:#6c726d;--line:#e2e2da;--pine:#003128;--pine-ink:#ffffff;--pine-soft:#e3ece7;--gold:#b98a2b;--shadow:none}}
+:root[data-theme="light"]{--bg:#f6f6f2;--surface:#ffffff;--surface2:#ecece6;--ink:#17201c;--muted:#6c726d;--line:#e2e2da;--pine:#003128;--pine-ink:#ffffff;--pine-soft:#e3ece7;--gold:#b98a2b;--shadow:none}
+:root{--gold:#d9b45b}
+body{font-size:15.5px;line-height:1.6;letter-spacing:-.005em}
+header.top{border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px)}
+.bar{padding:12px 20px}main{padding:26px 20px 96px;gap:20px}nav.tabs,.row2{padding-left:20px;padding-right:20px}
+nav.tabs button{padding:11px 12px;font-weight:600;border-bottom-width:2px;color:var(--muted);transition:color .15s}nav.tabs button:hover{color:var(--ink)}nav.tabs button[aria-current="page"]{color:var(--ink);border-bottom-color:var(--pine)}
+.mode{background:var(--surface2);padding:3px}.mode button{padding:7px 18px;transition:background .18s,color .18s}body .mode button[aria-pressed="true"]{background:var(--pine);color:#fff}
+body .brchip{border-color:transparent;background:var(--surface2);padding:6px 14px}body .brchip[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.hero{margin:4px 0 20px}body .hero h2{font:800 clamp(30px,4.6vw,44px)/1.14 "Pretendard",sans-serif;letter-spacing:-.03em}
+body .sec{margin-top:10px}body .sec h2{font:700 19px/1.3 "Pretendard",sans-serif;letter-spacing:-.015em}
+body .card{border:0;box-shadow:none;border-radius:18px;padding:22px}body .card>h3{font:700 16.5px/1.3 "Pretendard",sans-serif;margin-bottom:12px}
+body .btn{border-radius:12px;padding:10px 16px;font-weight:600;border-color:var(--line);background:var(--surface);transition:background .12s,border-color .12s,transform .06s}body .btn:hover{border-color:var(--ink)}body .btn:active{transform:scale(.98)}
+body .btn.pri{background:var(--pine);border-color:var(--pine);color:#fff}body .btn.pri:hover{background:#064436;border-color:#064436}body .btn.sm{padding:6px 12px;border-radius:10px;font-size:13.5px}body .btn.ghost{background:none;border-color:transparent;color:var(--muted)}
+body .homeb{border-color:transparent;background:var(--surface2);border-radius:999px;padding:7px 13px}
+body .chip{border-color:transparent;background:var(--surface2);padding:6px 13px;font-size:14px;transition:background .12s}body .chip[aria-pressed="true"]{background:var(--pine);color:#fff;border-color:var(--pine)}
+body .subnav{background:var(--surface2)}body .subnav button[aria-pressed="true"]{background:var(--surface);color:var(--ink)}
+.li{padding:13px 0;border-bottom-color:var(--line)}.note{font-size:13px;color:var(--muted)}
+.pill{padding:2px 10px;font-size:12px}
+input[type=text],input[type=number],input[type=date],input[type=time],select,textarea{border-radius:12px;padding:11px 13px;border-color:var(--line);transition:border-color .12s,box-shadow .12s}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--pine);box-shadow:0 0 0 3px color-mix(in srgb,var(--pine) 16%,transparent)}
+/* 한 줄 입력: 상자가 아니라 밑줄 위에 적는다 — 이 앱의 얼굴 */
+body .card.qadd{background:none;padding:2px 0 0;border-radius:0}
+body .qadd .qrow{gap:10px;align-items:flex-end;border-bottom:2px solid var(--ink);padding-bottom:8px;transition:border-color .15s}body .qadd .qrow:focus-within{border-bottom-color:var(--pine)}
+body .qadd .qrow input{border:0;background:none;border-radius:0;padding:8px 2px;font-size:clamp(18px,2.4vw,23px);font-weight:500;letter-spacing:-.015em;box-shadow:none;outline:0}body .qadd .qrow input::placeholder{color:color-mix(in srgb,var(--muted) 70%,transparent);font-weight:400}
+body .qadd .qrow .btn,body .qadd .qrow label.btn{border-radius:999px;padding:9px 16px}body .qadd small{margin-top:10px}
+body .tkr{border-bottom:0}body .tkf .tkr input{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 13px;font-size:16px}
+details.fold{border-top:1px solid var(--line)}
+.tabs .tg{color:var(--gold);font-weight:700}
+body.vm{background:#dedfd8}
+/* ══ 모바일 다이얼 ══ */
+.dialw{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100%,430px);z-index:40;padding-bottom:env(safe-area-inset-bottom);background:linear-gradient(180deg,transparent,var(--bg) 34%);pointer-events:none}
+body:not(.vm) .dialw{width:100%}
+.dial{pointer-events:auto;display:flex;align-items:flex-start;gap:4px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;height:86px;padding-top:26px;background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--ink) 26%,transparent) 0 1px,transparent 1px 14px) local 0 0/100% 7px no-repeat}
+.dial::-webkit-scrollbar{display:none}.dial .dpad{flex:0 0 50%}
+.dial button{flex:0 0 auto;scroll-snap-align:center;border:0;background:none;padding:8px 16px;font:600 19px "Pretendard",sans-serif;letter-spacing:-.02em;color:var(--ink);white-space:nowrap;transform-origin:50% 0;will-change:transform,opacity}
+.dial button.on{font-weight:800;color:var(--pine)}
+.dialm{position:absolute;left:50%;top:0;width:2px;height:20px;margin-left:-1px;background:var(--gold);border-radius:2px;z-index:1}
+body.dialon nav.tabs{display:none}body.dialon main{padding-bottom:128px}body.dialon #toast{bottom:104px}
+@media (prefers-reduced-motion:reduce){.dial{scroll-behavior:auto}}
 </style>
 </head>
 <body>

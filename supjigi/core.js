@@ -111,10 +111,16 @@ function hooks(range=60){const y=+TODAY.slice(0,4),out=[];const fix=[['01-01','�
 
 /* 잠금 */
 let pin='';
-function lockUI(bad){$('lock').innerHTML=`<div class="lockbox ${bad?'shake':''}"><h1>더숲 워크룸</h1><p>${bad?'비밀번호가 맞지 않습니다':'화면 비밀번호 4자리'}</p><div class="dots">${[0,1,2,3].map(i=>`<i class="${i<pin.length?'on':''}"></i>`).join('')}</div>
-  <div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-a="pin" data-n="${n}">${n}</button>`).join('')}<span></span><button data-a="pin" data-n="0">0</button><button data-a="pin" data-n="x" aria-label="지우기">←</button></div></div>`}
+/* 잠금 화면: 책등으로 그린 북한산 능선. 날마다 조금씩 다른 숲이 선다. */
+function lockForest(){let s=+TODAY.replace(/-/g,'');const rnd=()=>{s=(s*1664525+1013904223)%4294967296;return s/4294967296},W=1600,H=460,G=['#0b4a3a','#0f5a45','#14614b','#1b735a','#0a3f32','#23826a'],ridge=x=>{const g=(m,sd,a)=>a*Math.exp(-((x-m)*(x-m))/(2*sd*sd));return .2+g(.3,.085,.5)+g(.47,.05,.74)+g(.62,.075,.56)+g(.84,.11,.3)};
+  let x=-6,o='',i=0;while(x<W){const w=14+Math.floor(rnd()*30),r=ridge((x+w/2)/W),h=Math.max(46,Math.min(H-8,r*H*(.8+rnd()*.3))),k=rnd(),fill=k<.085?'#d9b45b':k<.14?'#efe9da':G[Math.floor(rnd()*G.length)],d=(Math.abs(x+w/2-W*.47)/W*900)|0,light=fill[1]==='d'||fill[1]==='e';
+    o+=`<g class="sp" style="animation-delay:${d}ms"><rect x="${x}" y="${(H-h).toFixed(1)}" width="${w-2}" height="${h.toFixed(1)}" fill="${fill}"/>${rnd()<.55?`<rect x="${x+3}" y="${(H-h+h*(.12+rnd()*.2)).toFixed(1)}" width="${w-8}" height="${(6+rnd()*26).toFixed(1)}" fill="${light?'#003128':'#efe9da'}" opacity="${light?.55:.2}"/>`:''}${rnd()<.3?`<rect x="${x}" y="${(H-18-rnd()*30).toFixed(1)}" width="${w-2}" height="2" fill="${light?'#003128':'#d9b45b'}" opacity=".5"/>`:''}</g>`;x+=w;i++}
+  return `<svg class="lkf" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMax slice" aria-hidden="true">${o}</svg>`}
+function lockUI(bad){const L=$('lock');if(!$('lkMsg')){const d=pd(TODAY);L.innerHTML=`${lockForest()}<div class="lk"><div class="lkl"><img src="logo-w.png" alt="deosup" height="26"><p class="lkd"><b>${d.getMonth()+1}월 ${d.getDate()}일</b><span>${WD[d.getDay()]}요일</span></p><p class="lkt">워크룸</p></div>
+   <div class="lkr"><p id="lkMsg"></p><div class="dots" id="lkDots"></div><div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-a="pin" data-n="${n}">${n}</button>`).join('')}<span></span><button data-a="pin" data-n="0">0</button><button data-a="pin" data-n="x" aria-label="지우기"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-6-6z"/><path d="M12 10l4 4M16 10l-4 4"/></svg></button></div></div></div>`}
+  $('lkMsg').textContent=bad?'비밀번호가 맞지 않습니다':'화면 비밀번호 네 자리';$('lkDots').innerHTML=[0,1,2,3].map(i=>`<i class="${i<pin.length?'on':''}"></i>`).join('');const r=L.querySelector('.lkr');r.classList.remove('shake');if(bad){void r.offsetWidth;r.classList.add('shake')}}
 async function tryPin(){const h=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('theforest-books:'+pin)))].map(b=>b.toString(16).padStart(2,'0')).join('');
-  if(h===PIN_HASH){S.locked=false;try{sessionStorage.setItem('sj.p',pin)}catch(e){}$('lock').style.display='none';loadSeed(pin);render()}else{pin='';lockUI(true)}}
+  if(h===PIN_HASH){S.locked=false;try{sessionStorage.setItem('sj.p',pin)}catch(e){}{const L=$('lock');L.classList.add('out');setTimeout(()=>{L.style.display='none'},520)}loadSeed(pin);render()}else{pin='';lockUI(true)}}
 A.pin=d=>{if(d.n==='x')pin=pin.slice(0,-1);else if(pin.length<4)pin+=d.n;lockUI();if(pin.length===4)tryPin()};
 A.lock=()=>{S.locked=true;pin='';try{sessionStorage.removeItem('sj.p')}catch(e){}$('app').innerHTML='';$('lock').style.display='grid';lockUI()};
 document.addEventListener('keydown',e=>{if(!S.locked)return;if(/^\d$/.test(e.key))A.pin({n:e.key});else if(e.key==='Backspace')A.pin({n:'x'})});
