@@ -111,3 +111,21 @@ function spaceCard(){return `<div class="sec"><h2>다른 공간 읽기</h2></div
  <div class="card rule"><b>달리하는 것은 목적이 아닙니다.</b><ol><li>손님이 책을 찾는 데 방해가 되면 하지 않습니다. 기본 서가는 그대로 둡니다.</li><li>평대 하나, 2주 단위로 되돌릴 수 있을 때만 시험합니다.</li><li>시작 전에 볼 숫자를 정합니다. 그 평대의 판매 권수와, 없던 문의가 생겼는지.</li></ol></div>
  <div class="grid g2">${SPACES.map(s=>`<div class="card gd"><h3>${s.n}</h3><dl><dt>강점</dt><dd>${s.good}</dd><dt>약점</dt><dd>${s.weak}</dd><dt>그대로</dt><dd>${s.keep}</dd><dt>달리</dt><dd>${s.diff}</dd></dl><a class="lnk" href="${s.u}" target="_blank" rel="noopener">출처</a></div>`).join('')}</div>`}
 (()=>{const f=V.store.trend,g=()=>f()+spaceCard();V.store.trend=g;V.aka.trend=g})();
+
+/* ── 주문: 책 사진 → 제목·ISBN 목록 → 주문에 담기 ── */
+const isbnOk=s=>{s=String(s||'').replace(/[^0-9]/g,'');if(!/^97[89]\d{10}$/.test(s))return '';let n=0;for(let i=0;i<12;i++)n+=+s[i]*(i%2?3:1);return (10-n%10)%10===+s[12]?s:''};
+C.oPhoto=async el=>{const f=[...el.files].slice(0,4),br=S.br;if(!f.length||br==='all')return;
+  const out=await ask('ophoto','사진 속 책을 모두 읽어 주세요. 서점에서 도매상에 주문할 책입니다. 책등·표지·뒷면 바코드 어느 쪽이든 보이는 대로 읽습니다.\n책마다 제목, 저자, 출판사, 같은 책 권수(겹쳐 보이면 세어서, 아니면 1)를 적습니다. ISBN 은 사진에 숫자가 실제로 보일 때만 13자리로 적고, 보이지 않으면 빈 문자열로 둡니다. 기억으로 채우지 마세요. 읽히지 않는 책은 넣지 않습니다.\nJSON 배열로만: [{"title":"","author":"","publisher":"","isbn":"","qty":1}]',{images:f});el.value='';
+  if(!Array.isArray(out)||!out.length){if(out)toast('사진에서 읽은 책이 없습니다. 글자가 보이게 다시 찍어 주세요.');return}
+  let P=[];try{P=pool(br)}catch(e){}const cat=[...P,...((window.BOOKS||[]))];
+  S.ui.oPh=(S.ui.oPh||[]).concat(out.filter(x=>x&&x.title).map(x=>{const seen=isbnOk(x.isbn),h=cat.find(b=>seen&&b.isbn===seen)||cat.find(b=>nt(b.t)===nt(x.title));
+    return{t:h?h.t:x.title,a:(h&&h.a)||x.author||'',p:(h&&h.p)||x.publisher||'',isbn:seen||(h&&h.isbn)||'',price:(h&&h.price)||0,qty:Math.max(1,Math.min(99,+x.qty||1)),src:seen?'사진에서 읽음':h&&h.isbn?'목록에서 찾음':''}}));render()};
+A.oPhDel=d=>{(S.ui.oPh||[]).splice(+d.i,1);render()};A.oPhClear=()=>{S.ui.oPh=null;render()};
+A.oPhQty=d=>{const x=(S.ui.oPh||[])[+d.i];if(x){x.qty=Math.max(1,Math.min(99,x.qty+(+d.n)));render()}};
+A.oPhAdd=()=>{const L=S.ui.oPh||[];let n=0;L.forEach(b=>{if(addCart(S.br,{t:b.t,a:b.a,p:b.p,isbn:b.isbn,price:b.price},b.qty,'사진으로 담음'))n++});if(n){S.ui.oPh=null;toast(`${n}종을 주문에 담았습니다`);render()}};
+function oPhCard(){if(!AI||S.br==='all')return '';const L=S.ui.oPh,no=L?L.filter(b=>!b.isbn).length:0;
+  return `<div class="card oph"><div class="qbar" style="margin:0"><label class="btn ${L?'':'pri'}">${S.ui.busy==='ophoto'?'사진 읽는 중…':L?'사진 더 읽기':'책 사진으로 담기'}<input type="file" accept="image/*" multiple data-c="oPhoto" hidden ${S.ui.busy?'disabled':''}></label><span class="note">책등이나 뒷면 바코드를 찍으면 제목과 ISBN 을 읽어 목록으로 만듭니다. 한 번에 4장까지.</span></div>
+  ${(S.ui.err||{}).ophoto?`<p class="note">${esc(S.ui.err.ophoto)}</p>`:''}
+  ${L&&L.length?`<div class="list" style="margin-top:12px">${L.map((b,i)=>`<div class="li"><div class="t"><b>${esc(b.t)}</b><small>${esc([b.a,b.p].filter(Boolean).join(' · '))}</small></div>${b.isbn?`<span class="chip num" data-tip="${b.src}">${b.isbn}</span>`:'<span class="pill p-low">ISBN 확인 필요</span>'}<span class="qq"><button data-a="oPhQty" data-i="${i}" data-n="-1" aria-label="줄이기">−</button><b>${b.qty}</b><button data-a="oPhQty" data-i="${i}" data-n="1" aria-label="늘리기">+</button></span><button class="btn sm ghost" data-a="oPhDel" data-i="${i}">빼기</button></div>`).join('')}</div>
+   <div class="btns" style="margin-top:12px"><button class="btn pri" data-a="oPhAdd">${L.length}종 주문에 담기</button><button class="btn ghost" data-a="oPhClear">지우기</button>${no?`<span class="note">ISBN 이 없는 ${no}종은 담은 뒤 북센에서 제목으로 확인해 주세요.</span>`:''}</div>`:''}</div>`}
+(()=>{const f=V.store.stock;V.store.stock=()=>{const h=f(),c=oPhCard();if(!c)return h;const i=h.indexOf('<div class="card');return i>0?h.slice(0,i)+c+h.slice(i):c+h}})();
