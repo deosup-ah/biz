@@ -120,7 +120,7 @@ A.lock=()=>{S.locked=true;pin='';try{sessionStorage.removeItem('sj.p')}catch(e){
 document.addEventListener('keydown',e=>{if(!S.locked)return;if(/^\d$/.test(e.key))A.pin({n:e.key});else if(e.key==='Backspace')A.pin({n:'x'})});
 
 /* 머리줄 · 그리기 */
-function render(){if(S.locked)return;if(S.view.store==='today'&&!S.ui.seenToday){}const m=S.mode,v=V[m][S.view[m]]?S.view[m]:TABS[m][0][0],tv=TABS[m].some(t=>t[0]===v)?v:'more';const al=m==='store'?anomalies('all').length:0,cn=BR.reduce((a,b)=>a+cart(b.k).items.length,0);
+function render(){if(S.locked)return;if(S.view.store==='today'&&!S.ui.seenToday){}const m=S.mode,v=V[m][S.view[m]]?S.view[m]:TABS[m][0][0],tv=TABS[m].some(t=>t[0]===v)?v:(m==='aka'&&typeof GRP!=='undefined'&&GRP[v])||'more';const al=m==='store'?anomalies('all').length:0,cn=BR.reduce((a,b)=>a+cart(b.k).items.length,0);
   const sx=window.scrollX,sy=window.scrollY;
   $('app').innerHTML=`<header class="top"><div class="bar"><div class="brand"><img class="blogo" src="logo-g.png" alt="deosup" height="20"><span>워크룸</span></div>
     <div class="mode" role="group" aria-label="일 고르기"><button data-a="mode" data-m="aka" aria-pressed="${m==='aka'}">아카데미</button><button data-a="mode" data-m="store" aria-pressed="${m==='store'}">서점</button></div>
