@@ -20,7 +20,7 @@ function themeCard(t,i,saved){const its=items(t.br||S.br);const inStock=b=>its.f
    <dl class="kv"><dt>왜 지금</dt><dd>${esc(t.hook)}</dd><dt>목적</dt><dd>${esc(t.goal)}</dd><dt>누구에게</dt><dd>${esc(t.target)}</dd><dt>기간</dt><dd>${esc(t.period)}</dd><dt>놓을 자리</dt><dd>${esc(t.place)}</dd></dl>
    <div class="tw" style="margin-top:10px"><table><tr><th>책</th><th>고른 까닭</th><th>재고</th></tr>${(t.books||[]).map(b=>`<tr><td>${esc(b.t)}<small>${esc([b.a,b.p].filter(Boolean).join(' · '))}</small></td><td>${esc(b.why)}</td><td>${inStock(b)?`<span class="pill p-ok">있음 ${inStock(b).stock}</span>`:b.src==='추천'?'<span class="pill p-low">확인 필요</span>':'<span class="pill p-none">없음</span>'}</td></tr>`).join('')}</table></div>
    ${(t.check||[]).length?`<p class="note" style="margin-top:8px">할 일: ${t.check.map(esc).join(' → ')}</p>`:''}
-   <div class="btns" style="margin-top:12px"><button class="btn pri" data-a="toDesign" data-kind="pop" data-s="${saved?1:0}" data-i="${i}">POP 만들기</button><button class="btn" data-a="toDesign" data-kind="band" data-s="${saved?1:0}" data-i="${i}">띠지 만들기</button><button class="btn" data-a="toDesign" data-kind="shelf" data-s="${saved?1:0}" data-i="${i}">선반 이름표</button>
+   <div class="btns" style="margin-top:12px"><button class="btn pri" data-a="toDesign" data-kind="pop" data-s="${saved?1:0}" data-i="${i}">POP 만들기</button><button class="btn" data-a="toDesign" data-kind="band" data-s="${saved?1:0}" data-i="${i}">띠지 만들기</button><button class="btn" data-a="toDesign" data-kind="list" data-s="${saved?1:0}" data-i="${i}">평대 책 목록 (A4)</button><button class="btn" data-a="toDesign" data-kind="shelf" data-s="${saved?1:0}" data-i="${i}">선반 이름표</button>
     <button class="btn" data-a="curOrder" data-s="${saved?1:0}" data-i="${i}">없는 책 주문에 담기</button>${saved?`<button class="btn ghost" data-a="curDel" data-i="${i}">지우기</button>`:`<button class="btn" data-a="curSave" data-i="${i}">저장</button>`}</div></div>`}
 C.uiv=(el,d)=>{S.ui[d.k]=el.value};
 const getTheme=d=>d.s==='1'?S.db.curations.find(c=>c.id===d.i):(S.ui.cur||[])[+d.i];
@@ -56,8 +56,12 @@ JSON 배열로만 답하세요:
 A.curSave=async d=>{const t=S.ui.cur[+d.i];await put('curations',nid(),{...clone(t),at:new Date().toISOString()},true);S.ui.cur.splice(+d.i,1);toast('주제를 저장했습니다');render()};
 A.curDel=d=>del('curations',d.i);
 A.curOrder=d=>{const t=getTheme(d),br=t.br||S.br;if(br==='all'){toast('지점을 먼저 고르세요');return}const its=items(br);let n=0;(t.books||[]).forEach(b=>{const it=its.find(x=>nt(x.t)===nt(b.t));if(!it||!(it.stock>0)){addCart(br,{t:b.t,a:b.a,p:b.p,isbn:(it||{}).isbn,price:(it||{}).price},2,'큐레이션: '+t.title);n++}});toast(n?`${n}종을 ${brN(br)} 북센 주문에 담았습니다`:'모두 매장에 있습니다')};
-A.toDesign=d=>{const t=getTheme(d)||{},b=(t.books||[])[0]||{};S.ui.D=Object.assign(defD(),{kind:d.kind,tag:t.title||'',head:d.kind==='band'?(t.band||(t.pop||{}).head||''):d.kind==='shelf'?t.title||'':(t.pop||{}).head||'',body:d.kind==='shelf'?t.hook||'':(t.pop||{}).body||'',book:d.kind==='shelf'?'':b.t||'',author:d.kind==='shelf'?'':[b.a,b.p].filter(Boolean).join(' · '),br:t.br||curBr(),books:(t.books||[]).map(x=>({t:x.t,a:x.a,p:x.p}))});
-  S.view[S.mode]='design';window.scrollTo(0,0);render()};
+A.toDesign=d=>{const t=getTheme(d)||{},b=(t.books||[])[0]||{},k=d.kind,D=Object.assign(defD(),{kind:k,br:t.br||curBr(),books:(t.books||[]).map(x=>({t:x.t,a:x.a,p:x.p,why:x.why}))});
+  if(k==='band')D.phrases=t.band||(t.pop||{}).head||t.title||'';
+  else if(k==='list'){D.head='이 평대의 책';D.body=t.title||'';D.tag='더숲 '+brN(D.br==='all'?'aka':D.br);D.list=D.books.map(x=>`${x.t} | ${[x.a,x.p].filter(Boolean).join(' · ')} | ${x.why||''}`).join('\n')}
+  else if(k==='shelf'){D.head=t.title||'';D.body=t.hook||''}
+  else{D.head=(t.pop||{}).head||'';D.body=(t.pop||{}).body||'';D.book=b.t||'';D.author=[b.a,b.p].filter(Boolean).join(' · ')}
+  S.ui.D=D;S.ui.copies=[];S.view[S.mode]='design';window.scrollTo(0,0);render()};
 
 /* ── 공간 배치 ── */
 const FX={shelf:{n:'서가',w:1.8,h:.4,f:'#8a6b4a'},table:{n:'평대',w:1.2,h:.8,f:'#c9a36a'},face:{n:'면진열대',w:.9,h:.4,f:'#b08a5a'},counter:{n:'계산대',w:1.5,h:.7,f:'#6b7a71'},door:{n:'입구',w:1,h:.2,f:'#b23a2b'},sofa:{n:'읽는 자리',w:1.4,h:.7,f:'#1baf7a'},stage:{n:'무대 · 스크린',w:2.4,h:.5,f:'#6250d6'},seat:{n:'좌석',w:.45,h:.45,f:'#2a78d6'},wall:{n:'벽 · 기둥',w:.4,h:.4,f:'#444c48'}};
@@ -95,7 +99,7 @@ A.fxSel=d=>{S.ui.fx=d.id;render()};
 A.fxRot=()=>planMut(p=>{const f=p.fx.find(x=>x.id===S.ui.fx);if(f)[f.w,f.h]=[f.h,f.w]});
 A.fxDup=()=>{const id=nid();planMut(p=>{const f=p.fx.find(x=>x.id===S.ui.fx);if(f)p.fx.push({...f,id,x:snap(Math.min(p.w-f.w,f.x+.3)),y:snap(Math.min(p.h-f.h,f.y+.3))})});S.ui.fx=id};
 A.fxDel=()=>{const id=S.ui.fx;S.ui.fx=null;planMut(p=>p.fx=p.fx.filter(x=>x.id!==id))};
-A.fxPop=d=>{const f=plan(curBr()).fx.find(x=>x.id===d.id);S.ui.D=Object.assign(defD(),{kind:'shelf',head:f.theme,body:'',tag:f.label||'',br:curBr()});S.view[S.mode]='design';window.scrollTo(0,0);render()};
+A.fxPop=d=>{const f=plan(curBr()).fx.find(x=>x.id===d.id);S.ui.D=Object.assign(defD(),{kind:'shelf',head:f.theme,body:'',tag:f.label||'',br:curBr()});S.ui.copies=[];S.view[S.mode]='design';window.scrollTo(0,0);render()};
 C.fxSet=(el,d)=>planMut(p=>{const f=p.fx.find(x=>x.id===S.ui.fx);if(!f)return;f[d.k]=d.k==='w'||d.k==='h'?Math.max(.2,+el.value||.2):el.value},true).then(()=>{S.stale=true});
 C.plSet=(el,d)=>planMut(p=>{p[d.k]=Math.min(40,Math.max(3,+el.value||3))});
 A.seats=d=>planMut(p=>{p.fx=p.fx.filter(f=>f.type!=='seat');const n=+d.n;if(!n)return;const st=p.fx.find(f=>f.type==='stage'),gap=.6,cols=Math.max(4,Math.min(10,Math.floor((p.w-1.6)/gap))),half=Math.ceil(cols/2),x0=(p.w-(cols*gap+.6))/2,y0=(st?st.y+st.h:.6)+1.2;
@@ -108,59 +112,3 @@ A.spaceAsk=async()=>{const p=plan(curBr());const out=await ask('space',`서점 �
   document.addEventListener('pointermove',e=>{if(!d)return;const s=pt(d.svg,e);d.f.x=snap(Math.max(0,Math.min(d.p.w-d.f.w,s.x-d.ox)));d.f.y=snap(Math.max(0,Math.min(d.p.h-d.f.h,s.y-d.oy)));d.moved=true;d.g.setAttribute('transform',`translate(${d.f.x*PX},${d.f.y*PX})`)});
   document.addEventListener('pointerup',()=>{if(!d)return;const {f,moved}=d;d=null;S.drag=false;S.ui.fx=f.type==='seat'&&!moved?null:f.id;if(moved)planMut(p=>{const t=p.fx.find(x=>x.id===f.id);if(t){t.x=f.x;t.y=f.y}});else render()});})();
 
-/* ── POP · 띠지 디자인 ── */
-const PAL=[{n:'숲',bg:'#1d4d38',fg:'#f6f1e3',ac:'#e9c46a'},{n:'종이',bg:'#f6f1e3',fg:'#1f2a24',ac:'#b23a2b'},{n:'먹',bg:'#17191b',fg:'#f2f2ee',ac:'#ffd23f'},{n:'하늘',bg:'#dfeaf2',fg:'#17324d',ac:'#e4572e'},{n:'귤',bg:'#f4a52a',fg:'#231a0e',ac:'#ffffff'},{n:'흰',bg:'#ffffff',fg:'#111111',ac:'#1d6a49'}];
-const FONTS=[['명조','"Gowun Batang",serif'],['고딕','"IBM Plex Sans KR",sans-serif'],['손글씨','"Nanum Pen Script",cursive'],['굵게','"Black Han Sans",sans-serif']];
-const SIZES={pop:[['A6 세로',105,148],['A5 세로',148,210],['엽서 가로',148,100]],shelf:[['선반 이름표',90,55],['긴 이름표',180,50]],band:[['띠지',0,60]]};
-const KINDS=[['pop','POP'],['band','띠지'],['shelf','선반 이름표']];
-const defD=()=>({kind:'pop',size:0,pal:0,font:0,tag:'더숲의 추천',head:'',body:'',book:'',author:'',price:'',br:curBr(),bw:140,bs:18,bf:70,bh:60,books:[]});
-const mctx=document.createElement('canvas').getContext('2d');
-function wrap(text,font,size,maxW,maxLines){mctx.font=`${size*10}px ${font}`;const out=[];String(text||'').split('\n').forEach(par=>{let line='';for(const tok of par.split(/(\s+)/)){const tryL=line+tok;if(mctx.measureText(tryL).width/10<=maxW){line=tryL;continue}
-      if(line.trim()){out.push(line.trim());line=''}let w=tok.trim();while(mctx.measureText(w).width/10>maxW&&w.length>1){let i=w.length;while(i>1&&mctx.measureText(w.slice(0,i)).width/10>maxW)i--;out.push(w.slice(0,i));w=w.slice(i)}line=w}
-    if(line.trim())out.push(line.trim())});return maxLines&&out.length>maxLines?out.slice(0,maxLines-1).concat(out[maxLines-1]+'…'):out}
-function fit(text,font,size,maxW,maxLines,min){let s=size,l=wrap(text,font,s,maxW);while(l.length>maxLines&&s>min){s*=.92;l=wrap(text,font,s,maxW)}return{s,l:l.slice(0,maxLines)}}
-function layout(D){const P=PAL[D.pal]||PAL[0],hf=FONTS[D.font][1],bf=FONTS[1][1],pr=[],T=(x,y,txt,size,o={})=>pr.push({k:'t',x,y,txt,size,font:o.font||bf,fill:o.fill||P.fg,anchor:o.anchor||'start',weight:o.weight||400,rot:o.rot||0,ls:o.ls||0}),R=(x,y,w,h,fill,o={})=>pr.push({k:'r',x,y,w,h,fill,stroke:o.stroke,sw:o.sw,dash:o.dash}),brand='더숲 '+brN(D.br==='all'?'aka':D.br);
-  if(D.kind==='band'){const w=D.bf*2+D.bw*2+D.bs,h=D.bh,xf=D.bf+D.bw+D.bs;R(0,0,w,h,P.bg);R(0,0,w,2.2,P.ac);R(0,h-2.2,w,2.2,P.ac);[D.bf,D.bf+D.bw,xf,xf+D.bw].forEach(x=>R(x,0,.2,h,'none',{stroke:P.fg,sw:.15,dash:'1 1.5'}));
-    const H=fit(D.head||'띠지 문구를 적어 주세요',hf,h*.2,D.bw-16,2,5);let y=h*.5-(H.l.length-1)*H.s*.6-(D.body?h*.07:0);H.l.forEach(l=>{T(xf+D.bw/2,y,l,H.s,{font:hf,anchor:'middle',weight:700});y+=H.s*1.2});
-    if(D.body)wrap(D.body,bf,h*.075,D.bw-18,2).forEach(l=>{T(xf+D.bw/2,y+h*.02,l,h*.075,{anchor:'middle'});y+=h*.1});
-    T(xf+D.bw/2,h*.2,D.tag||'',h*.065,{anchor:'middle',fill:P.ac,weight:600,ls:.3});T(D.bf+D.bw+D.bs/2,h/2,(D.tag||brand).slice(0,14),Math.min(D.bs*.42,h*.08),{anchor:'middle',rot:90,weight:600});
-    wrap(D.book?`『${D.book}』 ${D.author||''}`:brand,bf,h*.07,D.bw-20,3).forEach((l,i)=>T(D.bf+D.bw/2,h*.42+i*h*.1,l,h*.07,{anchor:'middle'}));T(D.bf/2,h/2+1,brand,h*.06,{anchor:'middle',fill:P.ac});T(w-D.bf/2,h/2+1,'theforest',h*.06,{anchor:'middle',fill:P.ac});return{w,h,pr}}
-  const [,w,h]=SIZES[D.kind][D.size]||SIZES[D.kind][0],m=w*.09;R(0,0,w,h,P.bg);
-  if(D.kind==='shelf'){R(0,0,w*.035,h,P.ac);const H=fit(D.head||'매대 이름',hf,h*.3,w-m*2.4,2,6);let y=h*.5-(H.l.length-1)*H.s*.55+(D.body?-h*.06:H.s*.3);if(D.tag)T(m*1.4,h*.2,D.tag,h*.085,{fill:P.ac,weight:600,ls:.3});H.l.forEach(l=>{T(m*1.4,y,l,H.s,{font:hf,weight:700});y+=H.s*1.15});
-    if(D.body)wrap(D.body,bf,h*.09,w-m*2.6,2).forEach(l=>{T(m*1.4,y,l,h*.09);y+=h*.125});T(w-m*.6,h-m*.55,brand,h*.07,{anchor:'end',fill:P.ac});return{w,h,pr}}
-  R(m*.5,m*.5,w-m,h-m,'none',{stroke:P.ac,sw:.5});let y=m*1.9;if(D.tag){T(m*1.3,y,D.tag,w*.042,{fill:P.ac,weight:600,ls:.4});y+=w*.05}
-  const H=fit(D.head||'여기에 큰 문구',hf,w*.125,w-m*2.6,4,w*.07);y+=H.s*.95;H.l.forEach(l=>{T(m*1.3,y,l,H.s,{font:hf,weight:700});y+=H.s*1.22});
-  y+=w*.01;R(m*1.3,y-H.s*.6,w*.14,.9,P.ac);y+=w*.06;const bs=w*.05,room=Math.max(2,Math.floor((h-m*4.2-y)/(bs*1.55)));wrap(D.body||'',bf,bs,w-m*2.6,room).forEach(l=>{T(m*1.3,y,l,bs);y+=bs*1.55});
-  let by=h-m*1.5;if(D.price){T(w-m*1.3,by,D.price,w*.06,{anchor:'end',font:hf,weight:700,fill:P.ac})}
-  if(D.book){const bl=wrap(`『${D.book}』`,bf,w*.046,w-m*2.6-(D.price?w*.24:0),2);if(D.author)T(m*1.3,by,D.author,w*.034);bl.slice().reverse().forEach((l,i)=>T(m*1.3,by-(D.author?w*.055:0)-i*w*.06,l,w*.046,{weight:600}))}
-  T(w-m*1.3,m*1.35,brand,w*.03,{anchor:'end',fill:P.ac});return{w,h,pr}}
-function toSVG(L){return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${L.w} ${L.h}" width="${Math.min(L.w*3.4,900)}">${L.pr.map(p=>p.k==='r'?`<rect x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" fill="${p.fill}" ${p.stroke?`stroke="${p.stroke}" stroke-width="${p.sw}" ${p.dash?`stroke-dasharray="${p.dash}"`:''}`:''}/>`:`<text x="${p.x}" y="${p.y}" text-anchor="${p.anchor}" ${p.rot?`transform="rotate(${p.rot} ${p.x} ${p.y})" dominant-baseline="middle"`:''} style="font-family:${p.font.replace(/"/g,"'")};font-size:${p.size}px;font-weight:${p.weight};fill:${p.fill};letter-spacing:${p.ls}px">${esc(p.txt)}</text>`).join('')}</svg>`}
-function toPNG(L){const k=300/25.4,c=document.createElement('canvas');c.width=Math.round(L.w*k);c.height=Math.round(L.h*k);const x=c.getContext('2d');x.scale(k,k);L.pr.forEach(p=>{if(p.k==='r'){if(p.fill&&p.fill!=='none'){x.fillStyle=p.fill;x.fillRect(p.x,p.y,p.w,p.h)}if(p.stroke){x.strokeStyle=p.stroke;x.lineWidth=p.sw;x.setLineDash(p.dash?p.dash.split(' ').map(Number):[]);x.strokeRect(p.x,p.y,p.w,p.h);x.setLineDash([])}}
-    else{x.save();x.font=`${p.weight} ${p.size}px ${p.font}`;x.fillStyle=p.fill;x.textAlign={start:'left',middle:'center',end:'right'}[p.anchor];try{x.letterSpacing=p.ls+'px'}catch(e){}if(p.rot){x.translate(p.x,p.y);x.rotate(p.rot*Math.PI/180);x.textBaseline='middle';x.fillText(p.txt,0,0)}else x.fillText(p.txt,p.x,p.y);x.restore()}});return new Promise(r=>c.toBlob(r,'image/png'))}
-V.store.design=()=>{const D=S.ui.D=S.ui.D||defD(),L=layout(D),sz=SIZES[D.kind],F=(id,label,k,ph,ta)=>`<div class="fld"><label for="${id}">${label}</label>${ta?`<textarea id="${id}" rows="3" data-c="dSet" data-k="${k}" placeholder="${ph}">${esc(D[k])}</textarea>`:`<input type="text" id="${id}" data-c="dSet" data-k="${k}" value="${esc(D[k])}" placeholder="${ph}">`}</div>`;
-  return `<div class="sec"><h2>POP · 띠지 디자인</h2><p>글만 넣으면 바로 인쇄할 수 있는 그림 파일이 됩니다 (300dpi)</p></div>
-  <div class="grid g2" style="align-items:start"><div class="card form">
-    <div class="chips">${KINDS.map(([k,l])=>`<button class="chip" data-a="dKind" data-k="${k}" aria-pressed="${D.kind===k}">${l}</button>`).join('')}</div>
-    ${sz.length>1?`<div class="fld"><label>크기</label><div class="chips">${sz.map(([n,w,h],i)=>`<button class="chip" data-a="dPick" data-k="size" data-v="${i}" aria-pressed="${D.size===i}">${n} ${w}×${h}mm</button>`).join('')}</div></div>`:''}
-    ${D.kind==='band'?`<div class="grid g4">${[['bw','책 가로'],['bs','책등 두께'],['bf','날개'],['bh','띠지 높이']].map(([k,l])=>`<div class="fld"><label for="d_${k}">${l} (mm)</label><input type="number" id="d_${k}" data-c="dNum" data-k="${k}" value="${D[k]}" min="5" max="400"></div>`).join('')}</div><p class="note">전체 길이 ${D.bf*2+D.bw*2+D.bs}mm. 점선은 접는 자리입니다 (날개 · 뒤 · 책등 · 앞 · 날개).</p>`:''}
-    ${D.books&&D.books.length>1?`<div class="fld"><label>주제 속 책으로 바꾸기</label><div class="chips">${D.books.slice(0,10).map((b,i)=>`<button class="chip" data-a="dBook" data-i="${i}" aria-pressed="${D.book===b.t}">${esc(b.t.length>12?b.t.slice(0,12)+'…':b.t)}</button>`).join('')}</div></div>`:''}
-    ${F('dTag','작은 머리말','tag','예: 더숲의 추천 · 11월의 문학')}${F('dHead',D.kind==='shelf'?'매대 이름':'큰 문구','head','예: 긴 밤에는 긴 소설을')}${F('dBody',D.kind==='shelf'?'한 줄 설명':'소개 글','body','손님에게 건네는 두세 문장',true)}
-    ${D.kind==='shelf'?'':`<div class="f2">${F('dBook','책 이름','book','예: 가호')}${F('dAuth','저자 · 출판사','author','예: 무라카미 하루키 · 문학동네')}</div>`}${D.kind==='pop'?F('dPrice','값 (비워도 됨)','price','예: 16,800원'):''}
-    <div class="btns">${busyBtn('copy','문구 추천받기','dCopy')}</div>
-    ${(S.ui.copies||[]).length?`<div class="list">${S.ui.copies.map((c,i)=>`<div class="li"><div class="t"><b>${esc(c.head)}</b><small>${esc(c.body)}</small></div><button class="btn sm" data-a="dUse" data-i="${i}">쓰기</button></div>`).join('')}</div>`:''}
-    <div class="fld"><label>색</label><div class="btns">${PAL.map((p,i)=>`<button class="sw" data-a="dPick" data-k="pal" data-v="${i}" aria-pressed="${D.pal===i}" aria-label="${p.n}" title="${p.n}" style="background:linear-gradient(135deg,${p.bg} 60%,${p.ac} 60%)"></button>`).join('')}</div></div>
-    <div class="fld"><label>큰 글씨 모양</label><div class="chips">${FONTS.map(([n,f],i)=>`<button class="chip" data-a="dPick" data-k="font" data-v="${i}" aria-pressed="${D.font===i}" style="font-family:${f.replace(/"/g,"'")}">${n}</button>`).join('')}</div></div></div>
-   <div class="grid"><div class="stage" id="stage">${toSVG(L)}</div>
-    <div class="btns"><button class="btn pri" data-a="dPng">인쇄용 그림 받기 (PNG)</button><button class="btn" data-a="dNew">새로 만들기</button><span class="note">${Math.round(L.w)}×${Math.round(L.h)}mm · 프린터에서 「실제 크기」로 인쇄하세요</span></div></div></div>`};
-V.aka.design=V.store.design;
-function dRefresh(){const s=$('stage');if(s)s.innerHTML=toSVG(layout(S.ui.D))}
-C.dSet=(el,d)=>{S.ui.D[d.k]=el.value;dRefresh()};
-C.dNum=(el,d)=>{S.ui.D[d.k]=Math.max(5,Math.min(400,+el.value||5));render()};
-document.addEventListener('input',e=>{const el=e.target.closest&&e.target.closest('[data-c="dSet"]');if(el){S.ui.D[el.dataset.k]=el.value;dRefresh()}});
-A.dKind=d=>{S.ui.D.kind=d.k;S.ui.D.size=0;render()};A.dPick=d=>{S.ui.D[d.k]=+d.v;render()};A.dNew=()=>{S.ui.D=defD();S.ui.copies=[];render()};
-A.dBook=d=>{const b=S.ui.D.books[+d.i];S.ui.D.book=b.t;S.ui.D.author=[b.a,b.p].filter(Boolean).join(' · ');render()};
-A.dUse=d=>{const c=S.ui.copies[+d.i];S.ui.D.head=c.head;S.ui.D.body=c.body;render()};
-A.dCopy=async()=>{const D=S.ui.D,lim=D.kind==='band'?'head 22자 이내, body 30자 이내':D.kind==='shelf'?'head 12자 이내(매대 이름), body 28자 이내':'head 18자 이내, body 70자 이내';
-  const out=await ask('copy',`독립서점 "더숲"의 ${KINDS.find(k=>k[0]===D.kind)[1]}에 넣을 문구를 서로 다른 말투로 4개 써 주세요.\n주제/머리말: ${D.tag||'없음'}\n책: ${D.book||'특정 책 없음'} ${D.author||''}\n지금 적어 둔 문구: ${D.head||'없음'} / ${D.body||'없음'}\n오늘: ${TODAY}\n규칙: ${lim}. 손님에게 건네는 말투. 과장·최상급 금지. 책의 줄거리나 수상 이력 등 확실하지 않은 사실은 쓰지 마세요.\nJSON 배열로만: [{"head":"","body":""}]`,{modelTier:'quick'});
-  if(out)S.ui.copies=(Array.isArray(out)?out:[]).filter(c=>c&&c.head).slice(0,4)};
-A.dPng=async()=>{try{if(document.fonts&&document.fonts.ready)await document.fonts.ready}catch(e){}const D=S.ui.D,blob=await toPNG(layout(D));if(!blob){toast('그림을 만들지 못했습니다');return}await saveFile(`더숲_${KINDS.find(k=>k[0]===D.kind)[1]}_${(D.head||D.book||'디자인').replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,20)}.png`,blob)};

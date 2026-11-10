@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>숲지기</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Nanum+Pen+Script&family=Black+Han+Sans&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* 레이아웃: 위 머리줄(이름 · 서점/아카데미 전환) → 지점 고르기 → 화면 탭 → 본문 1단(넓으면 2단 카드) */
 :root{
@@ -26,6 +26,8 @@
   --pine:#4fb787; --pine-ink:#0c1511; --pine-soft:#1f3a2e;
   --warn:#e2a53a; --warn-soft:#3a2f17; --crit:#ec7c6c; --crit-soft:#40211c; --ok:#58c08f; --info:#7fb2e0; --info-soft:#1c2c3b;
   --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --shadow:none;}
+@font-face{font-family:"Pretendard";font-weight:800;font-display:swap;src:url(pretendard-800.woff) format("woff")}
+@font-face{font-family:"Pretendard";font-weight:500;font-display:swap;src:url(pretendard-500.woff) format("woff")}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--body);-webkit-text-size-adjust:100%}
@@ -125,7 +127,7 @@ svg text{font-family:var(--body);fill:var(--muted);font-size:11px}
 /* 디자인 */
 .stage{background:repeating-conic-gradient(var(--surface2) 0 25%,var(--surface) 0 50%) 0 0/18px 18px;border-radius:var(--r);padding:18px;display:grid;place-items:center;overflow:auto}
 .stage svg{max-width:100%;height:auto;max-height:70vh;box-shadow:0 4px 18px rgba(0,0,0,.18)}
-.stage svg text{fill:inherit;font-size:inherit;font-family:inherit}
+
 .sw{width:30px;height:30px;border-radius:50%;border:2px solid var(--line)}.sw[aria-pressed="true"]{outline:3px solid var(--pine);outline-offset:2px}
 .theme{border-left:5px solid var(--pine)}
 .theme h3{font-size:19px}
@@ -144,6 +146,7 @@ svg text{font-family:var(--body);fill:var(--muted);font-size:11px}
 <script src="core.js"></script>
 <script src="store.js"></script>
 <script src="studio.js"></script>
+<script src="design.js"></script>
 <script src="academy.js"></script>
 <script>boot();</script>
 </body>

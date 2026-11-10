@@ -55,7 +55,7 @@ A.plSave=async()=>{await put('ideas',nid(),{...clone(S.ui.pl),at:new Date().toIS
 A.plDel=d=>del('ideas',d.id);
 A.plToCal=d=>{const p=getPl(d);evForm({kind:p.kind,title:p.title,date:/^\d{4}-\d\d-\d\d$/.test(p.date||'')?p.date:'',time:/^\d\d:\d\d$/.test(p.time||'')?p.time:'',place:p.place||'',cap:p.cap||undefined,memo:p.concept||''})};
 A.plToIg=d=>{const p=getPl(d);S.ui.igK=p.kind==='영화'?'영화':'프로그램';S.ui.igT=`${p.title} — ${p.concept} (${p.when})`;S.view.aka='insta';window.scrollTo(0,0);render()};
-A.plToPop=d=>{const p=getPl(d);S.ui.D=Object.assign(defD(),{kind:'pop',tag:p.kind+' 안내',head:p.title,body:[p.concept,p.when].filter(Boolean).join('\n'),br:'aka'});S.view.aka='design';window.scrollTo(0,0);render()};
+A.plToPop=d=>{const p=getPl(d);S.ui.D=Object.assign(defD(),{kind:'pop',tag:p.kind,head:p.title,body:[p.concept,p.when].filter(Boolean).join('\n'),br:'aka'});S.view.aka='design';window.scrollTo(0,0);render()};
 
 /* 인스타 */
 const IGK=['책','영화','프로그램','공간 · 계절','다이닝 · 카페'];

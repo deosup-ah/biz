@@ -83,11 +83,11 @@ const SEED={sales:[],stock:[],asOf:'',credit:{}};
 const credit=br=>S.db.credit.find(c=>c.id===br)||(SEED.credit||{})[br]||null;
 const realSales=()=>S.db.sales.length?S.db.sales:SEED.sales,realStock=()=>S.db.stock.length?S.db.stock:SEED.stock;
 const hasReal=()=>realSales().length>0||realStock().length>0;
-const isDemo=()=>S.demoPref??!hasReal();
+const isDemo=()=>S.seeding?false:(S.demoPref??!hasReal());
 const sales=()=>isDemo()?demo().sales:realSales();
-async function loadSeed(p){try{let r=await fetch('priv.enc',{cache:'no-store'}).catch(()=>null);if(!r||!r.ok)r=await fetch('priv.json',{cache:'no-store'});if(!r.ok)return;const j=await r.json(),b=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0)),E=new TextEncoder();
+async function loadSeed(p){S.seeding=true;try{let r=await fetch('priv.enc',{cache:'no-store'}).catch(()=>null);if(!r||!r.ok)r=await fetch('priv.json',{cache:'no-store'});if(!r.ok)return;const j=await r.json(),b=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0)),E=new TextEncoder();
   const km=await crypto.subtle.importKey('raw',E.encode(p),'PBKDF2',false,['deriveKey']),key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b(j.s),iterations:150000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
-  const o=JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b(j.i)},key,b(j.d))));Object.assign(SEED,o);if(S.solo&&o.events&&!S.db.events.length)S.db.events=o.events;render()}catch(e){}}
+  const o=JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b(j.i)},key,b(j.d))));Object.assign(SEED,o);if(S.solo&&o.events&&!S.db.events.length)S.db.events=o.events}catch(e){}finally{S.seeding=false;render()}}
 function recentQty(br){const m={};const docs=sales().filter(d=>d.br===br).sort((a,b)=>a.ym<b.ym?1:-1).slice(0,2);let days=0;docs.forEach(d=>{days+=Object.keys(d.days||{}).length;(d.top||[]).forEach(x=>{const k=x.isbn||nt(x.t);m[k]=(m[k]||0)+(x.qty||0)})});const f=days?30/days:0;Object.keys(m).forEach(k=>m[k]=Math.round(m[k]*f));return m}
 function items(br){const src=isDemo()?demo().stock:realStock(),out=[];(br==='all'?BR.map(b=>b.k):[br]).forEach(k=>{let rq;src.filter(d=>d.br===k).forEach(d=>(d.items||[]).forEach(x=>{const o={...x,br:k};if(o.sold30==null){rq=rq||recentQty(k);o.sold30=rq[x.isbn||nt(x.t)]||0;o.est=true}out.push(o)}))});return out}
 const need=x=>Math.max(0,Math.ceil((x.sold30||0)/30*14)-(x.stock||0));
