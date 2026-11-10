@@ -87,13 +87,13 @@ V.store.cur=()=>{const br=S.br;if(S.solo)loadWx();
   const card=(t,i)=>`<div class="card pcard"><div class="phead">${thumb(t,i)}<div><h3>${esc(t.title)}</h3><p>${esc(t.hook)}</p></div></div>
     <p class="cmeta"><span>${esc(t.place||'입구 평대')}</span><span>${t.until?mdw(t.until)+'까지':'2주'}</span><span>${dpPlan(t,0).total}권</span></p>
     <ul class="blist">${t.books.slice(0,5).map((b,n)=>`<li><span><i class="no">${n+1}</i>${esc(b.t)}<small>${esc(b.a||'')}</small>${b.role&&b.role!=='곁들임'?`<small class="role">${b.role}</small>`:''}</span><em class="${b.src==='재고'?'in':''}">${b.src==='재고'?'있음':'?'}</em></li>`).join('')}</ul>
-    ${S.ui.cStn?`<ul class="stn">${stnFor(t).map(x=>`<li><b>${x.b} ${x.n}</b><small>${x.w}</small></li>`).join('')}</ul>`:''}
+    ${S.ui.cStn?`<ul class="stn">${stnFor(t).map(x=>`<li><b>${x.b}</b> <span class="note">${x.n}</span><small>${x.w}</small></li>`).join('')}</ul>`:''}
     <details class="fold cnote"><summary>기획 메모</summary><ul><li><b>왜 지금</b> ${esc(t.hook||'')}</li><li><b>중심 책</b> 『${esc((t.books[0]||{}).t||'')}』 — 가장 잘 보이는 자리에 가장 많이.</li><li><b>번호</b> 책 앞의 번호가 진열 자리 · 책 목록의 번호와 같습니다.</li><li><b>바꿀 때</b> ${t.until?mdw(t.until):''}까지 두고, 그 사이 3권도 안 나간 책은 다른 책으로 바꿉니다.</li></ul></details>
     <div class="btns"><button class="btn pri" data-a="toDesign" data-kind="pop" data-s="c" data-i="${i}">POP 만들기</button><button class="btn" data-a="dpOpen" data-i="${i}">진열 보기</button>
      <details class="menu"><summary>기타</summary><div><button data-a="toDesign" data-kind="band" data-s="c" data-i="${i}">띠지</button><button data-a="toDesign" data-kind="list" data-s="c" data-i="${i}">책 목록 A4</button><button data-a="toDesign" data-kind="card" data-s="c" data-i="${i}">쇼카드 (6장)</button><button data-a="curKit" data-i="${i}">전체 다운로드 (POP · 띠지 · 목록 · 쇼카드)</button><button data-a="curOrder" data-s="c" data-i="${i}">미보유 도서 주문 담기${lackN(t)?` (${lackN(t)}종)`:''}</button><button data-a="go" data-v="club">책모임으로 열기</button><button data-a="corFix" data-i="${i}">공간 매대에 넣기</button></div></details></div></div>`;
   const row=(b,k,i)=>`<div class="li"><div class="t"><b style="font-weight:600">${esc(b.t)}</b><small>${esc([b.a,b.p,b.why].filter(Boolean).join(' · '))}</small></div>${isbnChip(b)}<button class="btn sm" data-a="recAdd" data-k="${k}" data-i="${i}">담기</button></div>`;
   return `<div class="hero"><p>${[brN(br),mdw(TODAY),...hk].filter(Boolean).join(' · ')}</p><h2>이번 주 큐레이션</h2></div>
-  <div class="subnav" role="tablist">${['전체','제철','다른 시선','말놀이','꾸준한'].map(t=>`<button data-a="cTone" data-t="${t}" aria-pressed="${TN===t}">${t}</button>`).join('')}<button class="stnb" data-a="cStn" aria-pressed="${!!S.ui.cStn}">문구와 함께</button></div>
+  <div class="subnav" role="tablist">${['전체','제철','다른 시선','말놀이','꾸준한'].map(t=>`<button data-a="cTone" data-t="${t}" aria-pressed="${TN===t}">${t}</button>`).join('')}<button class="stnb" data-a="cStn" aria-pressed="${!!S.ui.cStn}">오브제와 함께</button></div>
   <div class="grid g2" style="align-items:start">${C.all.map((t,i)=>[t,i]).filter(([t])=>pick(t)).slice(0,S.ui.cMore?40:6).map(([t,i])=>card(t,i)).join('')||'<div class="card empty">지금 때에 맞는 제안이 없습니다.</div>'}</div>
   ${C.all.filter(pick).length>6?`<div class="btns" style="justify-content:center;margin-top:14px"><button class="btn ghost" data-a="cMore">${S.ui.cMore?'접기':`더 보기`}</button></div>`:''}
   <details class="fold" data-o="c1" ${S.ui.o_c1?'open':''}><summary>늘 두는 코너 <small>새 책 · 스테디셀러 · 다른 지점에서 팔리는 책</small></summary><div class="grid g2" style="align-items:start;margin-top:14px">${C.data.map((t,i)=>card(t,C.time.length+i)).join('')}</div></details>
@@ -113,19 +113,20 @@ A.cTone=d=>{S.ui.cTone=d.t;S.ui.cMore=false;render()};
 
 function FXB(L,pl){return L.map(([t,a,p])=>{const h=pl.find(b=>nt(b.t)===nt(t));return h?{...h,why:bookWhy(h),src:h.here>0?'재고':'들여놓기'}:{t,a,p,isbn:'',price:0,here:0,sold:0,why:'판매 상태 확인 전',src:'들여놓기'}})}
 
-/* 책 곁에 놓을 문구 — 주제·결에 맞춰 고른다. 입점·거래 조건은 확인 전. */
+/* 책 곁에 놓을 오브제 — 매장이나 집, 근처 마트에서 바로 구할 수 있는 것만. */
 const STN=[
- {b:'블랙윙',n:'602 연필',w:'밑줄과 필사에. 책 옆에 한 자루씩 낱개로.',k:/필사|문장|말|번역|시|방|쓰/},
- {b:'미도리',n:'MD 노트',w:'여백이 넓은 종이. 옮겨 적는 독자에게.',k:/필사|문장|말|읽|방|끝|아픈/},
- {b:'로이텀',n:'1917 노트',w:'쪽 번호와 차례가 있어 독서 기록에 맞습니다.',k:/질문|숫자|과학|이름|기록|일의/},
- {b:'트래블러스 컴퍼니',n:'트래블러스 노트',w:'들고 걷는 노트. 길 위에서 쓰는 사람에게.',k:/걷|국경|여행|도시|산|숲|나무/},
- {b:'카웨코',n:'스포츠 만년필',w:'주머니에 들어가는 만년필. 선물용으로 책과 묶기 좋습니다.',k:/걷|국경|선물|방|책방/},
- {b:'라미',n:'사파리 만년필',w:'처음 쓰는 만년필. 연말 선물 꾸러미에.',k:/선물|겨울|방|말|책방|질문/},
- {b:'스테들러',n:'마스 루모그래프 연필',w:'그리는 연필. 보는 법을 다루는 책 옆에.',k:/보는|예술|그림|사진|색|건물/},
- {b:'파버카스텔',n:'카스텔 9000 연필',w:'나무와 흑연. 숲과 식물 책 곁에 어울립니다.',k:/나무|숲|식물|뜨거|기후|먹히/},
- {b:'북다트',n:'금속 책갈피 클립',w:'접지 않고 줄을 표시합니다. 어느 주제에나.',k:/./},
- {b:'스탈로지',n:'반투명 메모지',w:'글자를 가리지 않는 메모지. 밑줄 대신 붙입니다.',k:/./},
- {b:'모나미',n:'153 볼펜',w:'가장 흔한 펜. 일과 노동을 다루는 책 옆에 일부러.',k:/일의|노동|숫자|차별|아니라고/},
- {b:'호보니치',n:'테쵸 다이어리',w:'하루 한 쪽. 연말·새해 평대에.',k:/겨울|새해|아무튼|하루/}];
+ {b:'마른 나뭇가지',n:'한두 개',w:'유리병에 꽂거나 책 위에 눕혀 둡니다. 산책길에서 주울 수 있습니다.',k:/나무|숲|식물|걷|산|겨울|뜨거/},
+ {b:'솔방울 · 도토리',n:'한 줌',w:'작은 접시에 담아 평대 모서리에.',k:/나무|숲|걷|가을|겨울|먹히/},
+ {b:'돌멩이',n:'두세 개',w:'펼친 책을 눌러 두는 문진으로 씁니다.',k:/걷|국경|끝|이름|도시|바다/},
+ {b:'머그컵',n:'1개',w:'빈 컵 하나면 읽는 자리가 됩니다. 카페에서 빌려 옵니다.',k:/먹는|아무튼|혼자|방|말이|책방|질문/},
+ {b:'양초',n:'1개 (불은 켜지 않음)',w:'밤과 고요를 다루는 책 옆에 세워 둡니다.',k:/끝|밤|아픈|돌보|혼자|고요/},
+ {b:'빈 유리병',n:'1~2개',w:'물만 담아도 빛을 받습니다. 가지나 풀을 꽂아도 좋습니다.',k:/뜨거|기후|숲|나무|이름|보는/},
+ {b:'접은 신문',n:'1부',w:'책 아래 깔면 오늘의 이야기처럼 보입니다.',k:/일의|숫자|차별|아니라고|국경|도시|집이/},
+ {b:'목장갑 · 앞치마',n:'1벌',w:'일하는 손을 보여 줍니다. 매장에 있는 것 그대로.',k:/일의|돌보|먹히|노동/},
+ {b:'귤 · 사과',n:'두세 알',w:'색 하나로 평대가 살아납니다. 며칠마다 바꿉니다.',k:/먹는|겨울|아무튼|색|집/},
+ {b:'안경',n:'안 쓰는 것 1개',w:'책 위에 올려 두면 방금까지 읽던 자리가 됩니다.',k:/보는|말이|번역|질문|책방|읽/},
+ {b:'종이 지도 · 엽서',n:'1장',w:'책 사이에 반쯤 끼워 둡니다.',k:/국경|걷|도시|건물|여행/},
+ {b:'크라프트지와 끈',n:'조금',w:'책 한 권을 싸서 올려 둡니다. 어느 주제에나.',k:/./},
+ {b:'접이식 독서대',n:'1개',w:'한 권을 세워 얼굴로 씁니다. 어느 주제에나.',k:/./}];
 function stnFor(t){const s=(t.title||'')+' '+(t.hook||''),sp=STN.filter(x=>x.k.source!=='.'&&x.k.test(s)),ge=STN.filter(x=>x.k.source==='.');return [...sp,...ge].slice(0,3)}
 A.cStn=()=>{S.ui.cStn=!S.ui.cStn;render()};
