@@ -397,15 +397,15 @@ body .card.kpi,body .kpi.card{border:0;border-top:2px solid var(--ink);backgroun
 body .kpi b{font-size:34px;line-height:1.15;letter-spacing:-.035em;display:block;margin:4px 0 2px}
 body .grid.g4{gap:28px}
 /* 전체 메뉴: 책의 차례처럼. 이름 … 점줄 … 설명 */
-body .card:has(>.mrow){border:0;background:none;padding:0;border-top:2px solid var(--ink)}
-body .mrow{padding:18px 0;gap:14px;align-items:baseline}
-body .mrow>span:first-child{display:flex;align-items:baseline;gap:12px;min-width:0}
-body .mrow b{display:flex;flex:1;align-items:baseline;gap:12px;font-size:21px;font-weight:800;letter-spacing:-.02em;white-space:nowrap}
-body .mrow b::after{content:"";flex:1;min-width:24px;border-bottom:1px dotted var(--muted);transform:translateY(-4px)}
-body .mrow small{color:var(--muted);font-size:13.5px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-body .mrow:hover b{color:var(--pine)}
-@media(max-width:720px){body .mrow>span:first-child{display:block}body .mrow b{font-size:19px}body .mrow b::after{display:none}body .mrow small{display:block;text-align:left;white-space:normal;margin-top:3px}body .kpi b{font-size:28px}body .grid.g4{gap:18px;grid-template-columns:1fr 1fr}}
-body.vm .mrow>span:first-child{display:block}body.vm .mrow b::after{display:none}body.vm .mrow small{display:block;text-align:left;white-space:normal;margin-top:3px}body.vm .grid.g4{grid-template-columns:1fr 1fr;gap:18px}
+body .card:has(>button.mrow[data-a="go"]){border:0;background:none;padding:0;border-top:2px solid var(--ink)}
+body button.mrow[data-a="go"]{padding:18px 0;gap:14px;align-items:baseline}
+body button.mrow[data-a="go"]>span:first-child{display:flex;align-items:baseline;gap:12px;min-width:0}
+body button.mrow[data-a="go"] b{display:flex;flex:1;align-items:baseline;gap:12px;font-size:21px;font-weight:800;letter-spacing:-.02em;white-space:nowrap}
+body button.mrow[data-a="go"] b::after{content:"";flex:1;min-width:24px;border-bottom:1px dotted var(--muted);transform:translateY(-4px)}
+body button.mrow[data-a="go"] small{color:var(--muted);font-size:13.5px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body button.mrow[data-a="go"]:hover b{color:var(--pine)}
+@media(max-width:720px){body button.mrow[data-a="go"]>span:first-child{display:block}body button.mrow[data-a="go"] b{font-size:19px}body button.mrow[data-a="go"] b::after{display:none}body button.mrow[data-a="go"] small{display:block;text-align:left;white-space:normal;margin-top:3px}body .kpi b{font-size:28px}body .grid.g4{gap:18px;grid-template-columns:1fr 1fr}}
+body.vm button.mrow[data-a="go"]>span:first-child{display:block}body.vm button.mrow[data-a="go"] b::after{display:none}body.vm button.mrow[data-a="go"] small{display:block;text-align:left;white-space:normal;margin-top:3px}body.vm .grid.g4{grid-template-columns:1fr 1fr;gap:18px}
 
 /* 둘러보기 */
 #guide{position:fixed;inset:0;z-index:80;background:#003128;color:#f2eee3;display:grid;place-items:center;padding:18px;overflow:auto}
@@ -417,6 +417,11 @@ body.vm .mrow>span:first-child{display:block}body.vm .mrow b::after{display:none
 .gda{border:0;background:none;color:#f2eee3;font:300 40px/1 "Pretendard",sans-serif;padding:20px 6px}
 .gdd{display:flex;gap:6px;margin-top:8px}.gdd button{width:26px;height:4px;border:0;padding:0;background:rgba(242,238,227,.3)}.gdd button[aria-pressed=true]{background:#d9b45b}
 body.dialon .gdbtn{margin-left:6px}
+
+/* 휴대폰: 주문 표는 책 한 권이 한 묶음. 옆으로 밀지 않는다 */
+@media(max-width:720px){.tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))){display:block;width:100%}.tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) tbody{display:block}.tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) tr:has(th){display:none}.tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) tr{display:grid;grid-template-columns:1fr auto auto auto auto;align-items:center;gap:6px 14px;padding:14px 0;border-bottom:1px solid var(--line)}.tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td{border:0!important;padding:0!important;white-space:normal;text-align:left}.tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td:nth-child(1){grid-column:1/-1;font-size:16px;font-weight:600} .tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td:nth-child(2){grid-column:1/2;min-width:0}.tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td:nth-child(2) .chip{font-size:12.5px;padding:4px 7px;white-space:nowrap}.tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td:nth-child(3)::before{content:"30일 ";color:var(--muted);font-size:12px}.tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td:nth-child(4)::before{content:"재고 ";color:var(--muted);font-size:12px}.tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td:nth-child(5)::before{content:"필요 ";color:var(--muted);font-size:12px}.tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td:nth-child(n+3){white-space:nowrap;font-size:14px}.tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td small{display:inline;margin-left:6px;font-weight:400}}
+body.vm .tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))){display:block;width:100%}body.vm .tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) tbody{display:block}body.vm .tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) tr:has(th){display:none}body.vm .tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) tr{display:grid;grid-template-columns:1fr auto auto auto auto;align-items:center;gap:6px 14px;padding:14px 0;border-bottom:1px solid var(--line)}body.vm .tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td{border:0!important;padding:0!important;white-space:normal;text-align:left}body.vm .tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td:nth-child(1){grid-column:1/-1;font-size:16px;font-weight:600} body.vm .tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td:nth-child(2){grid-column:1/2;min-width:0}body.vm .tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td:nth-child(2) .chip{font-size:12.5px;padding:4px 7px;white-space:nowrap}body.vm .tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td:nth-child(3)::before{content:"30일 ";color:var(--muted);font-size:12px}body.vm .tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td:nth-child(4)::before{content:"재고 ";color:var(--muted);font-size:12px}body.vm .tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td:nth-child(5)::before{content:"필요 ";color:var(--muted);font-size:12px}body.vm .tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td:nth-child(n+3){white-space:nowrap;font-size:14px}.tw table:has([data-a="needAdd"]):not(:has(th:nth-child(7))) td small{display:inline;margin-left:6px;font-weight:400}
+@media(max-width:720px){.tw table:not(:has([data-a="needAdd"])){min-width:520px}}body.vm .tw table:not(:has([data-a="needAdd"])){min-width:520px}
 </style>
 </head>
 <body>
