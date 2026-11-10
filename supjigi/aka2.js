@@ -25,7 +25,7 @@ function igCard(){const g=(SEED||{}).ig;if(!g)return `<div class="card empty">�
   return `<div class="card"><h3>인사이트 <small>@${esc(g.acct)} · 최근 ${g.days}일 · ${esc(g.asOf)} 읽음</small></h3>
    <div class="grid g4"><div class="kpi"><span>조회수</span><b class="num">약 ${Math.round(g.views/1000)/10}만</b><small>본 사람 ${won(g.reach)}명</small></div><div class="kpi"><span>반응(좋아요 · 댓글 · 저장 · 공유)</span><b class="num">${won(g.inter)}</b><small>참여 계정 ${won(g.engaged)} · 반응률 ${er}%</small></div><div class="kpi"><span>프로필 방문</span><b class="num">${won(g.visits)}</b><small>링크 누름 ${won(g.link)}</small></div><div class="kpi"><span>팔로워</span><b class="num">${won(g.followers)}</b><small>총 팔로워</small></div></div>
    <div class="grid g2" style="margin-top:14px"><div><h3 style="font-size:15px">누가 보나</h3>${bar('팔로워',g.viewsF,'var(--s1)')}${bar('팔로워 아닌 사람',g.viewsNon,'var(--s3)')}<h3 style="font-size:15px;margin-top:12px">무엇으로 보나 <small>조회수 기준</small></h3>${bar('게시물',g.mix.post,'var(--s1)')}${bar('스토리',g.mix.story,'var(--s4)')}${bar('릴스',g.mix.reels,'var(--s2)')}</div>
-    <div><h3 style="font-size:15px">반응이 컸던 글 <small>날짜 · 반응 수</small></h3>${(g.top||[]).map(t=>hbar(t.d,t.n,Math.max(...g.top.map(x=>x.n)),t.n+'건','var(--pine)',`${t.d} ${t.n}건`)).join('')}<h3 style="font-size:15px;margin-top:12px">읽어 보면</h3><ul style="margin:0;padding-left:18px;display:grid;gap:6px">${tips.map(t=>`<li>${t}</li>`).join('')}</ul></div></div>
+    <div><h3 style="font-size:15px">반응이 컸던 글 <small>날짜 · 반응 수</small></h3>${(g.top||[]).map(t=>hbar(t.d,t.n,Math.max(...g.top.map(x=>x.n)),t.n+'건','var(--pine)',`${t.d} ${t.n}건`)).join('')}<h3 style="font-size:15px;margin-top:12px">요약</h3><ul style="margin:0;padding-left:18px;display:grid;gap:6px">${tips.map(t=>`<li>${t}</li>`).join('')}</ul></div></div>
    <p class="note" style="margin-top:10px">인스타그램에 로그인된 사무실 컴퓨터의 Claude 앱 브라우저에서 읽은 숫자입니다. 다시 읽으려면 Claude 에게 「인스타 인사이트 갱신」이라고 하면 됩니다.</p></div>`}
 (()=>{const f=V.aka.insta;V.aka.insta=()=>{const h=f(),i=h.indexOf('</div>');let c='';try{c=igCard()}catch(e){}return h.slice(0,i+6)+c+h.slice(i+6)}})();
 
@@ -37,7 +37,7 @@ function nvAnalyze(txt){const rv=String(txt||'').split(/\n{2,}|\r?\n(?=\S{0,12}\
   let pos=0,neg=0;R.forEach(r=>{const a=NV_P.test(r),b=NV_N.test(r);if(a&&!b)pos++;else if(b&&!a)neg++});return{n:R.length,pos,neg,mix:R.length-pos-neg,T,at:TODAY}}
 const nvGet=()=>ls.get('naver',{an:null,log:[]}),nvSet=o=>ls.set('naver',o);
 V.aka.naver=()=>{const D=nvGet(),A_=D.an,L=(D.log||[]).slice().sort((a,b)=>a.m<b.m?-1:1);
-  return `<div class="hero"><p>네이버 · 리뷰와 언급</p><h2>손님이 남긴 말을 읽습니다</h2></div>
+  return `<div class="hero"><p>네이버 · 리뷰와 언급</p><h2>리뷰 · 언급 분석</h2></div>
   <div class="grid g2" style="align-items:start"><div class="card form"><h3>리뷰 분석 <small>붙여 넣으면 바로 셉니다</small></h3>
     <textarea id="nvT" rows="7" placeholder="스마트플레이스 › 리뷰 화면이나 네이버 지도 리뷰를 드래그해 복사한 뒤 여기에 붙여 넣으세요. 이름은 저장하지 않고, 숫자만 남깁니다."></textarea>
     <div class="btns"><button class="btn pri" data-a="nvGo">분석하기</button>${A_?`<button class="btn ghost" data-a="nvClear">지우기</button>`:''}</div>
