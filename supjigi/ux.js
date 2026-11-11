@@ -122,3 +122,6 @@ function livePost(){const mn=document.querySelector('main');if(!mn)return;clearI
 A.ordTab=d=>{S.ui.ordTab=d.t;render()};
 (()=>{const f=V.store.stock;V.store.stock=()=>{const r=S.ui.ordTab==='r';return `<div class="subnav ordt" role="tablist"><button data-a="ordTab" data-t="o" aria-pressed="${!r}">주문</button><button data-a="ordTab" data-t="r" aria-pressed="${r}">반품</button></div>${r?V.store.ret():f()}`}})();
 try{HELP.store.stock='떨어질 책을 담아 북센 주문을 준비하고, 같은 자리에서 반품 목록도 만듭니다. 확정은 사람이 합니다.';HELP.store.more='자주 쓰지 않는 화면을 모아 두었습니다.'}catch(e){}
+
+/* 다른 지점 큐레이션은 표지 벽 위에 둔다(아래에 두면 안 보인다) */
+(()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn||S.mode!=='store'||S.view.store!=='cur')return;const at=mn.querySelector('.tick')||mn.querySelector('.wall');if(!at)return;['.pks','.pkc','.pkl'].forEach(s=>{const e=mn.querySelector(':scope>'+s);if(e)at.before(e)});const p=mn.querySelector(':scope>.pks');if(p)p.classList.add('top')}catch(e){console.warn(e)}}})();
