@@ -546,6 +546,30 @@ body.vm .gbarx{flex-wrap:nowrap}body.vm .gbarx input[type=text]{flex:1 1 auto}bo
 main:has(.wall) .subnav button{font-size:14px;margin-right:18px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
 main:has(.wall) .subnav button::before{content:"";width:10px;height:10px;background:var(--line)}
 main:has(.wall) .subnav button[data-t="제철"]::before{background:#c9a24a}main:has(.wall) .subnav button[data-t="다른 시선"]::before{background:#003128}main:has(.wall) .subnav button[data-t="말놀이"]::before{background:#7d3a2b}main:has(.wall) .subnav button[data-t="꾸준한"]::before{background:#2b2b28}main:has(.wall) .subnav button[data-t="내 생각"]::before{background:#1f6b57}main:has(.wall) .subnav button[data-t="전체"]::before{display:none}main:has(.wall) .subnav .stnb::before{display:none}
+
+/* ══ 잠금 화면 v3: 표지 한 장. 위 초록 띠에 날짜, 가운데 흰 종이에 숫자판, 아래 금색 띠 ══ */
+#lock{background:#fcfcfa;color:#111;padding:0;display:block}
+#lock .lkf{display:none}
+#lock .lk{max-width:none;height:100%;margin:0;padding:0;display:grid;grid-template-columns:1fr;grid-template-rows:auto 1fr auto;gap:0;align-content:stretch;align-items:stretch}
+#lock .lk::after{content:"";display:block;height:clamp(26px,7vh,60px);background:#c9a24a}
+#lock .lkl{background:#003128;color:#f2eee3;padding:clamp(22px,5vh,46px) clamp(22px,7vw,88px) clamp(18px,4vh,38px);display:grid;grid-template-columns:1fr auto;align-items:end;gap:6px 20px}
+#lock .lkl img{grid-column:1;height:24px;width:auto}
+#lock .lkt{grid-column:2;grid-row:1;margin:0;font:600 14.5px "Pretendard",sans-serif;color:rgba(242,238,227,.8);align-self:center}
+#lock .lkd{grid-column:1/-1;margin:clamp(18px,5vh,54px) 0 0;display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap}
+#lock .lkd b{font:800 clamp(52px,11vw,128px)/.95 "Pretendard",sans-serif;letter-spacing:-.05em;color:#f2eee3}
+#lock .lkd span{font:600 clamp(16px,2vw,24px) "Pretendard",sans-serif;color:#d9b45b}
+#lock .lkr{background:none;width:auto;padding:0;justify-self:center;align-self:center;text-align:center;display:grid;justify-items:center;gap:0}
+#lock #lkMsg{margin:0 0 12px;font:500 14px "Pretendard",sans-serif;color:#5a5a55}
+#lock .dots{gap:0;margin:0 0 clamp(16px,3.5vh,30px);display:flex}
+#lock .dots i{width:40px;height:46px;border:1.5px solid #111;margin-right:-1.5px;border-radius:0;background:none!important;position:relative;transform:none!important}
+#lock .dots i.on{background:#111!important;border-color:#111}#lock .dots i.on::after{display:none}
+#lock .pad{display:grid;grid-template-columns:repeat(3,minmax(0,92px));gap:0;border-top:1.5px solid #111;border-left:1.5px solid #111}
+#lock .pad button,#lock .pad span{width:auto;height:clamp(52px,9vh,72px);border:0;border-right:1.5px solid #111;border-bottom:1.5px solid #111;border-radius:0;background:none;color:#111;font:800 26px "Pretendard",sans-serif;font-variant-numeric:tabular-nums;backdrop-filter:none;display:grid;place-items:center}
+#lock .pad button:hover{background:#efeee9;border-color:#111}#lock .pad button:active{background:#111;color:#fcfcfa;transform:none}
+#lock .pad button[data-n="x"]{background:none;border-right:1.5px solid #111;border-bottom:1.5px solid #111}
+@media(max-width:760px){#lock .pad{grid-template-columns:repeat(3,minmax(0,28vw))}#lock .lkd b{font-size:clamp(48px,17vw,84px)}#lock .lkr{background:none;padding:0}}
+@media(max-height:640px){#lock .pad{grid-template-columns:repeat(3,84px)}#lock .pad button,#lock .pad span{height:48px;width:auto}#lock .lkd{margin-top:10px}#lock .lkd b{font-size:54px}}
+#lock#lock{display:block}#lock#lock .lk{width:100%;max-width:none;justify-self:stretch;box-sizing:border-box}
 </style>
 </head>
 <body>
