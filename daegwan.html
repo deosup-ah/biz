@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>단체대관 상담·배치 보드</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Sans+KR:wght@800&family=Noto+Serif+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* 레이아웃: 왼쪽 건 목록(건별대장 스냅샷) + 오른쪽 선택 건 작업판(상담 → 배치 → 식음 → 사이니지) */
 :root{
@@ -245,13 +245,13 @@ body.locked .top,body.locked .wrap{display:none}
     <section class="view" id="v-signage">
       <div class="signgrid">
         <div class="signform">
-          <label class="field">방향<select id="sOri"><option value="p">세로 A3</option><option value="l">가로 A3</option></select></label>
-          <label class="field">상단 문구<input id="sHello" type="text"></label>
           <label class="field">단체명<input id="sOrg" type="text"></label>
-          <label class="field">행사명 (없으면 비움)<input id="sEvt" type="text"></label>
+          <label class="field">단체명 아래 작은 글씨 (영문명, 행사명 등 · 없으면 비움)<input id="sEvt" type="text"></label>
+          <label class="field">단체명 색<select id="sColor"><option value="#1a1a1a">검정</option><option value="#1c3266">남색</option></select></label>
+          <label class="field">단체 로고 이미지 (올리면 단체명 대신 들어갑니다)<input id="sLogo" type="file" accept="image/*"></label>
           <label class="field">장소<input id="sPlace" type="text"></label>
-          <label class="field">일시<input id="sWhen" type="text"></label>
-          <label class="field">방향 안내<select id="sArrow"><option value="">없음</option><option value="←">← 왼쪽</option><option value="→">→ 오른쪽</option><option value="↑">↑ 직진</option><option value="↓">↓ 아래층</option></select></label>
+          <label class="field">장소 아래 작은 글씨 (없으면 비움)<input id="sSub" type="text"></label>
+          <label class="field">날짜<input id="sWhen" type="text"></label>
           <div class="row"><button class="btn" id="savePdf" type="button" hidden>A3 PDF 저장</button><button class="btn ghost" id="savePng" type="button" hidden>PNG 저장</button></div>
           <span class="msg" id="sMsg">저장 기능을 확인하는 중입니다.</span>
         </div>

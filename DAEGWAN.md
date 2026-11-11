@@ -9,12 +9,14 @@
 - `daegwan.js` 화면 로직. 공간 정원, 기준 배치도 좌표, 다이닝 테이블표가 들어 있다.
 - `daegwan.enc` 건별대장 스냅샷(단체명·공간·일시·인원). 비밀번호로 잠겨 있다.
 - `daegwan-hall1966.jpg`, `daegwan-dawn.jpg` 대화의 집·새벽의 집 기준 배치도.
+- `daegwan-sign-bg.jpg` 사이니지 A3 배경. 그 위에 단체명 — 가는 줄 — 장소 — 날짜를 얹는다.
 
 ## 데이터 갱신
 1. 건별대장 공간 가용성 보드의 점유 현황(숙박 제외)을 읽어 `daegwan.data.js` 를 만든다. (읽기만 한다)
    형식: `window.DG_DATA={asOf:"YYYY-MM-DDTHH:MM", raw:"건번호|단체명|공간코드|시작|종료|c 또는 h|인원|단계\n…", extra:[{no,org,res,s,e,st,pax}]};`
    `raw` 는 건 대장에 있는 건, `extra` 는 가용성 보드에만 있는 점유(회의실 온라인 예약 등)다.
    모의 견적용으로 `price:{품목코드:{단위:정가}}`(건별대장 `price_of` 값, 1박 단가는 `[평일, 주말]`), `priceAsOf`, `spaceNote:{공간코드:"주의 문구"}` 도 함께 넣는다.
+   대관을 멈춘 공간은 `spaceStop:{공간코드:"사유"}` 에 넣는다. 건별대장 마스터 단가표 비고에 「판매 중지」가 있으면 넣고, 없어지면 뺀다. (2026-11-11 현재 새벽의 집 DAWN: 전시 일정)
 2. `node tools/enc.js --pin <접속 비밀번호> daegwan.enc daegwan.data.js`
 3. `daegwan.enc` 만 커밋한다. `daegwan.data.js` 는 .gitignore 에 있어 올라가지 않는다. 비밀번호는 어디에도 적지 않는다.
 

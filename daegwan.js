@@ -4,19 +4,19 @@ const DG=window.DG_DATA,RAW=DG.raw;
 
 // 공간: 이름, 사이니지 표기, 건별대장 품목표에 적힌 정원(없으면 null)
 const SP={
- "HALL1966":{n:"대화의 집",sign:"대화의 집 HALL 1966",cap:80,max:100,capLabel:"기준 배치(8인 테이블 10개) 80석"},
- "DAWN":{n:"새벽의 집",sign:"새벽의 집 MULTI-COMPLEX HALL",cap:99,max:200,capLabel:"기준 배치(T자 세트 11개) 99석"},
- "YEOHAE-S":{n:"여해의 집 세미나룸",sign:"여해의 집 세미나룸",cap:15},
- "YEOHAE-G":{n:"여해의 집 게스트룸",sign:"여해의 집 게스트룸",cap:4,soft:true},
+ "HALL1966":{n:"대화의 집",sign:"대화의 집",sub:"HALL 1966",cap:80,max:100,capLabel:"기준 배치(8인 테이블 10개) 80석"},
+ "DAWN":{n:"새벽의 집",sign:"새벽의 집",sub:"MULTI-COMPLEX HALL",cap:99,max:200,capLabel:"기준 배치(T자 세트 11개) 99석"},
+ "YEOHAE-S":{n:"여해의 집 세미나룸",sign:"여해의집 세미나룸",cap:15},
+ "YEOHAE-G":{n:"여해의 집 게스트룸",sign:"여해의집 게스트룸",cap:4,soft:true},
  "YEOHAE-ALL":{n:"여해의 집 전체",sign:"여해의 집",cap:12,soft:true},
  "ROOFTOP":{n:"본관 5F 루프탑",sign:"본관 5F 루프탑",cap:null},
- "C202-1":{n:"C202-1",sign:"회의실 C202-1 · 2F",cap:8},"C202-2":{n:"C202-2",sign:"회의실 C202-2 · 2F",cap:8},
- "C202T":{n:"C202 통합",sign:"회의실 C202 · 2F",cap:16},"C203-1":{n:"C203-1",sign:"회의실 C203-1 · 2F",cap:8},
- "C203-2":{n:"C203-2",sign:"회의실 C203-2 · 2F",cap:8},"C203T":{n:"C203 통합",sign:"회의실 C203 · 2F",cap:16},
- "C204":{n:"C204",sign:"회의실 C204 · 2F",cap:16},"C300":{n:"C300",sign:"회의실 C300 · 3F",cap:30},
- "C301":{n:"C301",sign:"회의실 C301 · 3F",cap:24},"C302":{n:"C302",sign:"회의실 C302 · 3F",cap:24},
- "C301T":{n:"C301+C302 통합",sign:"회의실 C301·C302 · 3F",cap:48},"C303":{n:"C303",sign:"회의실 C303 · 3F",cap:24},
- "C304":{n:"C304",sign:"회의실 C304 · 3F",cap:null},
+ "C202-1":{n:"C202-1",sign:"C 202-1 호",cap:8},"C202-2":{n:"C202-2",sign:"C 202-2 호",cap:8},
+ "C202T":{n:"C202 통합",sign:"C 202 호",cap:16},"C203-1":{n:"C203-1",sign:"C 203-1 호",cap:8},
+ "C203-2":{n:"C203-2",sign:"C 203-2 호",cap:8},"C203T":{n:"C203 통합",sign:"C 203 호",cap:16},
+ "C204":{n:"C204",sign:"C 204 호",cap:16},"C300":{n:"C300",sign:"C 300 호",cap:30},
+ "C301":{n:"C301",sign:"C 301 호",cap:24},"C302":{n:"C302",sign:"C 302 호",cap:24},
+ "C301T":{n:"C301+C302 통합",sign:"C 301 · 302 호",cap:48},"C303":{n:"C303",sign:"C 303 호",cap:24},
+ "C304":{n:"C304",sign:"C 304 호",cap:null},
  "MON-2F":{n:"75인치 모니터 (2F)",sign:"",cap:null,equip:true},"MON-3F":{n:"75인치 모니터 (3F)",sign:"",cap:null,equip:true}
 };
 // 기준 배치도: 프로젝트에 올라온 도면 그대로. pts는 도면 이미지 위 테이블(세트) 중심 좌표
@@ -111,6 +111,7 @@ function fit(){const sp=SP[blk.res];if(sp.equip)return{k:"n",t:"기자재 배정
 const cls=k=>k==="ok"?"ok":k==="bad"?"bad":"";
 function fitHtml(){const f=fit();let av="";
   if(cur.temp&&!SP[blk.res].equip){const v=verdict(blk.res,blk.s,blk.e,cur.pax,cur.no);av=`<div class="callout ${cls(v.av)}" style="margin-bottom:6px">가용성: ${esc(v.avText)}</div>`}
+  const stop=(DG.spaceStop||{})[blk.res];if(stop)av=`<div class="callout bad" style="margin-bottom:6px">${esc(stop)}</div>`+av;
   return av+`<div class="callout ${cls(f.k)}">${esc(f.t)}</div>`}
 
 /* ---------- 1차 상담 체크 ---------- */
@@ -285,16 +286,30 @@ function renderFnbText(){const st=store.get("fnb:"+cur.no,{});const pick=fnbOpti
 $("fopts").addEventListener("change",e=>{const k=e.target.dataset.f;if(!k)return;const st=store.get("fnb:"+cur.no,{});st[k]=e.target.checked;store.set("fnb:"+cur.no,st);renderFnb()});
 
 /* ---------- 사이니지 ---------- */
-function signDefaults(){const sp=SP[blk.res];const a=pd(blk.s),z=pd(blk.e);
-  const w=a.key===z.key?`${a.m}월 ${a.d}일 (${a.dow})  ${a.t} – ${z.t}`:`${a.m}월 ${a.d}일 (${a.dow}) ${a.t} – ${z.m}월 ${z.d}일 (${z.dow}) ${z.t}`;
-  return{ori:"p",hello:"환영합니다",org:cur.org,evt:"",place:sp.sign||sp.n,when:w,arrow:""}}
-function signState(){return Object.assign(signDefaults(),store.get("sign:"+cur.no+":"+blk.res+":"+blk.s,{}))}
-function renderSignForm(){const s=signState();$("sOri").value=s.ori;$("sHello").value=s.hello;$("sOrg").value=s.org;$("sEvt").value=s.evt;$("sPlace").value=s.place;$("sWhen").value=s.when;$("sArrow").value=s.arrow;drawSign()}
-function readSign(){return{ori:$("sOri").value,hello:$("sHello").value,org:$("sOrg").value,evt:$("sEvt").value,place:$("sPlace").value,when:$("sWhen").value,arrow:$("sArrow").value}}
-["sOri","sHello","sOrg","sEvt","sPlace","sWhen","sArrow"].forEach(id=>$(id).addEventListener("input",()=>{store.set("sign:"+cur.no+":"+blk.res+":"+blk.s,readSign());drawSign()}));
-const SERIF='"Noto Serif KR",serif',SANS='"IBM Plex Sans KR",sans-serif';
+// 사이니지: 더숲 A3 배경 위에 단체명 — 가는 줄 — 장소 — 날짜 (기존 안내판과 같은 구성)
+const dotDate=s=>{const p=pd(s);return `${p.y}. ${String(p.m).padStart(2,"0")}. ${String(p.d).padStart(2,"0")}.`};
+function signDefaults(){const sp=SP[blk.res];
+  // 같은 건이 같은 공간을 여러 날 쓰면 첫날~마지막 날로 묶는다
+  const same=cur.blocks.filter(b=>b.res===blk.res),first=same.map(b=>b.s).sort()[0],last=same.map(b=>b.e).sort().pop();
+  const d1=dotDate(first),d2=dotDate(last),p2=pd(last);
+  const w=d1===d2?d1:(d1.slice(0,4)===d2.slice(0,4)?`${d1} ~ ${String(p2.m).padStart(2,"0")}. ${String(p2.d).padStart(2,"0")}.`:`${d1} ~ ${d2}`);
+  return{org:cur.org,evt:"",color:"#1a1a1a",place:sp.sign||sp.n,sub:sp.sub||"",when:w}}
+const signKey=()=>"sign2:"+cur.no+":"+blk.res;
+function signState(){return Object.assign(signDefaults(),store.get(signKey(),{}))}
+let signLogo=null,signLogoFor="";
+function renderSignForm(){const s=signState();$("sOrg").value=s.org;$("sEvt").value=s.evt;$("sColor").value=s.color;$("sPlace").value=s.place;$("sSub").value=s.sub;$("sWhen").value=s.when;
+  if(signLogoFor!==signKey()){signLogo=null;signLogoFor=signKey();$("sLogo").value=""}drawSign()}
+function readSign(){return{org:$("sOrg").value,evt:$("sEvt").value,color:$("sColor").value,place:$("sPlace").value,sub:$("sSub").value,when:$("sWhen").value}}
+["sOrg","sEvt","sColor","sPlace","sSub","sWhen"].forEach(id=>$(id).addEventListener("input",()=>{store.set(signKey(),readSign());drawSign()}));
+$("sLogo").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f){signLogo=null;drawSign();return}
+  const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{signLogo=im;signLogoFor=signKey();drawSign()};im.onerror=()=>{signLogo=null;drawSign()};im.src=u});
+const SERIF='"Noto Serif KR",serif',SANS='"Noto Sans KR","IBM Plex Sans KR",sans-serif';
+const signBg=new Image();let signBgOk=false;signBg.onload=()=>{signBgOk=true;if(cur)drawSign()};signBg.src="daegwan-sign-bg.jpg";
+// 자간을 넣어 가운데 정렬로 쓴다 (canvas letterSpacing 을 못 쓰는 브라우저 대비)
+function spacedWidth(ctx,t,sp){let w=0;for(const ch of t)w+=ctx.measureText(ch).width+sp;return w-sp}
+function drawSpaced(ctx,t,cx,y,sp){let x=cx-spacedWidth(ctx,t,sp)/2;ctx.textAlign="left";for(const ch of t){ctx.fillText(ch,x,y);x+=ctx.measureText(ch).width+sp}ctx.textAlign="center"}
+function fitSpaced(ctx,t,font,maxW,start,min,spRatio){let size=start;for(;size>min;size-=4){ctx.font=font.replace("%",size);if(spacedWidth(ctx,t,size*spRatio)<=maxW)break}ctx.font=font.replace("%",size);return size}
 function fitLines(ctx,text,font,maxW,start,min,maxLines){
-  // 먼저 낱말을 쪼개지 않고 들어가는 가장 큰 글자 크기를 찾고, 없으면 쪼개기를 허용한다
   for(const allowBreak of [false,true]){const r=fitPass(ctx,text,font,maxW,start,min,maxLines,allowBreak);if(r)return r}
   ctx.font=font.replace("%",min);return{size:min,lines:[text]}}
 function fitPass(ctx,text,font,maxW,start,min,maxLines,allowBreak){for(let size=start;size>=min;size-=6){ctx.font=font.replace("%",size);const lines=[];let line="";let broke=false;
@@ -306,33 +321,33 @@ function fitPass(ctx,text,font,maxW,start,min,maxLines,allowBreak){for(let size=
     if(line.trim())lines.push(line.trim());
     if(lines.length<=maxLines&&(allowBreak||!broke))return{size,lines}}
   return null}
-function drawSign(){const s=readSign(),cv=$("sign");const P=s.ori==="p";cv.width=P?2339:3307;cv.height=P?3307:2339;const W=cv.width,H=cv.height,ctx=cv.getContext("2d");
-  const G="#1f5c46",INK="#17211d",MUTE="#5d6b65";const m=W*0.08;
-  ctx.fillStyle="#ffffff";ctx.fillRect(0,0,W,H);
-  const band=H*(P?0.11:0.14);ctx.fillStyle=G;ctx.fillRect(0,0,W,band);
-  ctx.fillStyle="#ffffff";ctx.textBaseline="middle";ctx.textAlign="left";ctx.font=`700 ${Math.round(band*0.3)}px ${SERIF}`;ctx.fillText("더숲 아카데미하우스",m,band/2);
-  ctx.textAlign="right";ctx.font=`500 ${Math.round(band*0.2)}px ${SANS}`;ctx.fillText("단체 행사 안내",W-m,band/2);
-  const foot=H*(P?0.30:0.34),footY=H-foot;ctx.fillStyle="#e2eee8";ctx.fillRect(0,footY,W,foot);ctx.fillStyle=G;ctx.fillRect(0,footY,W,Math.round(H*0.006));
-  // 가운데: 환영 문구, 단체명, 행사명
-  const midTop=band,midH=footY-band;ctx.textAlign="center";ctx.textBaseline="alphabetic";
-  const org=fitLines(ctx,s.org||" ",`900 %px ${SERIF}`,W-2*m,P?300:320,90,3);const lh=org.size*1.28;
-  const helloSize=Math.round(W*(P?0.042:0.03)),evtSize=Math.round(W*(P?0.046:0.034));
-  const blockH=(s.hello?helloSize*2.2:0)+org.lines.length*lh+(s.evt?evtSize*2.0:0);let y=midTop+(midH-blockH)/2;
-  if(s.hello){ctx.fillStyle=G;ctx.font=`600 ${helloSize}px ${SANS}`;y+=helloSize;ctx.fillText(s.hello,W/2,y);y+=helloSize*1.2}
-  ctx.fillStyle=INK;ctx.font=`900 ${org.size}px ${SERIF}`;org.lines.forEach(l=>{y+=lh;ctx.fillText(l,W/2,y-lh*0.22)});
-  if(s.evt){const e=fitLines(ctx,s.evt,`500 %px ${SANS}`,W-2*m,evtSize,40,1);ctx.fillStyle=MUTE;ctx.font=`500 ${e.size}px ${SANS}`;y+=evtSize*1.6;ctx.fillText(e.lines[0],W/2,y)}
-  // 아래: 장소, 일시, 방향
-  const aw=s.arrow?foot*0.62:0;const tx=m,tw=W-2*m-(aw?aw+m*0.5:0);ctx.textAlign="left";
-  const pl=fitLines(ctx,s.place||" ",`700 %px ${SERIF}`,tw,P?170:180,70,2);const plh=pl.size*1.2;const whenSize=Math.round(W*(P?0.036:0.027));
-  const wh=fitLines(ctx,s.when||" ",`500 %px ${SANS}`,tw,whenSize,36,2);const whh=wh.size*1.4;
-  let fy=footY+(foot-(pl.lines.length*plh+wh.lines.length*whh+whenSize*0.6))/2;
-  ctx.fillStyle=G;ctx.font=`700 ${pl.size}px ${SERIF}`;pl.lines.forEach(l=>{fy+=plh;ctx.fillText(l,tx,fy-plh*0.2)});
-  fy+=whenSize*0.6;ctx.fillStyle=INK;ctx.font=`500 ${wh.size}px ${SANS}`;wh.lines.forEach(l=>{fy+=whh;ctx.fillText(l,tx,fy-whh*0.25)});
-  if(s.arrow){const cx=W-m-aw/2,cy=footY+foot/2,r=aw/2;ctx.fillStyle=G;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();
-    const rot={"→":0,"↓":Math.PI/2,"←":Math.PI,"↑":-Math.PI/2}[s.arrow];ctx.save();ctx.translate(cx,cy);ctx.rotate(rot);ctx.strokeStyle="#ffffff";ctx.lineWidth=r*0.16;ctx.lineCap="round";ctx.lineJoin="round";
-    ctx.beginPath();ctx.moveTo(-r*0.5,0);ctx.lineTo(r*0.5,0);ctx.moveTo(r*0.1,-r*0.4);ctx.lineTo(r*0.5,0);ctx.lineTo(r*0.1,r*0.4);ctx.stroke();ctx.restore()}}
+function drawSign(){const s=readSign(),cv=$("sign");cv.width=2339;cv.height=3307;const W=cv.width,H=cv.height,ctx=cv.getContext("2d");
+  if(signBgOk)ctx.drawImage(signBg,0,0,W,H);else{ctx.fillStyle="#f3f2f0";ctx.fillRect(0,0,W,H)}
+  const INK="#262626",maxW=W*0.84;ctx.textAlign="center";ctx.textBaseline="alphabetic";
+  // 크기 정하기
+  const useLogo=!!signLogo;let logoW=0,logoH=0,org=null;
+  if(useLogo){const k=Math.min(maxW/signLogo.width,(H*0.085)/signLogo.height);logoW=signLogo.width*k;logoH=signLogo.height*k}
+  else org=fitLines(ctx,s.org||" ",`800 %px ${SANS}`,maxW,250,96,2);
+  const orgH=useLogo?logoH:org.lines.length*org.size*1.22;
+  const evtSize=s.evt&&!useLogo?fitSpaced(ctx,s.evt,`500 %px ${SANS}`,maxW,64,36,0.02):0;
+  const plSize=fitSpaced(ctx,s.place||" ",`500 %px ${SERIF}`,maxW,236,90,0.2);
+  const subSize=s.sub?fitSpaced(ctx,s.sub,`400 %px ${SERIF}`,maxW,84,44,0.3):0;
+  const whSize=fitSpaced(ctx,s.when||" ",`400 %px ${SERIF}`,maxW,108,56,0.06);
+  const gap=H*0.034,total=orgH+(evtSize?evtSize*1.5:0)+gap+gap+plSize*1.1+(subSize?subSize*1.9:0)+gap*0.75+whSize;
+  let y=H*0.47-total/2;
+  // 단체명 또는 로고
+  if(useLogo){ctx.drawImage(signLogo,W/2-logoW/2,y,logoW,logoH);y+=logoH}
+  else{ctx.fillStyle=s.color||"#1a1a1a";ctx.font=`800 ${org.size}px ${SANS}`;const lh=org.size*1.22;org.lines.forEach(l=>{y+=lh;ctx.fillText(l,W/2,y-lh*0.2)})}
+  if(evtSize){ctx.fillStyle=INK;ctx.font=`500 ${evtSize}px ${SANS}`;y+=evtSize*1.5;drawSpaced(ctx,s.evt,W/2,y-evtSize*0.2,evtSize*0.02)}
+  // 가는 줄
+  y+=gap;ctx.fillStyle="#4a4a4a";ctx.fillRect(W/2-W*0.032,y,W*0.064,Math.max(3,Math.round(H*0.0011)));y+=gap;
+  // 장소
+  ctx.fillStyle=INK;ctx.font=`500 ${plSize}px ${SERIF}`;y+=plSize*1.1;drawSpaced(ctx,s.place||" ",W/2,y-plSize*0.14,plSize*0.2);
+  if(subSize){ctx.font=`400 ${subSize}px ${SERIF}`;y+=subSize*1.9;drawSpaced(ctx,s.sub,W/2,y-subSize*0.2,subSize*0.3)}
+  // 날짜
+  y+=gap*0.75;ctx.font=`400 ${whSize}px ${SERIF}`;y+=whSize;drawSpaced(ctx,s.when||" ",W/2,y-whSize*0.1,whSize*0.06)}
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(cur)drawSign()});
-if(document.fonts&&document.fonts.load){Promise.all([document.fonts.load('900 100px "Noto Serif KR"',"더숲"),document.fonts.load('500 40px "IBM Plex Sans KR"',"더숲")]).then(()=>{if(cur)drawSign()}).catch(()=>{})}
+if(document.fonts&&document.fonts.load){Promise.all([document.fonts.load('800 100px "Noto Sans KR"',"더숲"),document.fonts.load('500 100px "Noto Serif KR"',"더숲"),document.fonts.load('400 40px "Noto Serif KR"',"더숲 2026")]).then(()=>{if(cur)drawSign()}).catch(()=>{})}
 
 let downloads=null;const nativeSave=!window.claude;
 function showSave(){$("savePdf").hidden=false;$("savePng").hidden=false;$("sMsg").textContent="A3 한 장으로 저장됩니다. 인쇄할 때 용지를 A3, 배율을 100%로 맞추세요."}
@@ -377,6 +392,7 @@ function verdict(r,s,e,pax,skipNo){const sp=SP[r],rs=rel(r),all=occ(skipNo).filt
   if(near.length)why.push("같은 날 다른 일정: "+near.map(bLabel).join(", "));
   if(cap.k!=="ok")why.push(cap.t);
   const sn=(DG.spaceNote||{})[r];if(sn)why.push(sn);
+  const stop=(DG.spaceStop||{})[r];if(stop){return{lvl:"bad",av:"bad",avText:stop,cap,why:[stop],alt:[],label:"대관 중지"}}
   let lvl=av;if(cap.k==="bad")lvl="bad";else if(lvl==="ok"&&(cap.k==="warn"||soft.length||sn))lvl="warn";
   let alt=[];if(cf.length&&cap.k!=="bad"){const ts=s.slice(10),te=e.slice(10);for(let n=1;n<=10&&alt.length<3;n++)for(const sg of[-1,1]){const d=shiftDate(day,n*sg);if(d<SNAP||alt.length>=3)continue;
       if(!all.some(b=>hit(b,d+ts,d+te)))alt.push(d)}alt.sort()}
