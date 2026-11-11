@@ -570,6 +570,18 @@ main:has(.wall) .subnav button[data-t="제철"]::before{background:#c9a24a}main:
 @media(max-width:760px){#lock .pad{grid-template-columns:repeat(3,minmax(0,28vw))}#lock .lkd b{font-size:clamp(48px,17vw,84px)}#lock .lkr{background:none;padding:0}}
 @media(max-height:640px){#lock .pad{grid-template-columns:repeat(3,84px)}#lock .pad button,#lock .pad span{height:48px;width:auto}#lock .lkd{margin-top:10px}#lock .lkd b{font-size:54px}}
 #lock#lock{display:block}#lock#lock .lk{width:100%;max-width:none;justify-self:stretch;box-sizing:border-box}
+
+/* 휴대폰 다이얼 = 선반에 꽂힌 책등. 컴퓨터의 책 쌓기와 같은 색. 고른 책이 위로 뽑힌다 */
+.dial button{--bk:#003128;--bt:#f2eee3}
+.dial button:nth-of-type(7n+2){--bk:#c9a24a;--bt:#1c1c1a}.dial button:nth-of-type(7n+3){--bk:#1f6b57}.dial button:nth-of-type(7n+4){--bk:#ece5d3;--bt:#1c1c1a}.dial button:nth-of-type(7n+5){--bk:#7d3a2b}.dial button:nth-of-type(7n+6){--bk:#12493b}.dial button:nth-of-type(7n+7){--bk:#2b2b28}
+.dialw{border-bottom:3px solid var(--ink)}
+.dial{align-items:flex-end;gap:0;height:66px;padding-top:0;background:none}
+.dial button{background:var(--bk);color:var(--bt)!important;height:40px;padding:0 15px;font:700 15.5px/40px "Pretendard",sans-serif;letter-spacing:-.01em;border-radius:0;box-shadow:inset 7px 0 0 rgba(0,0,0,.14),inset 9px 0 0 rgba(255,255,255,.16),inset -5px 0 0 rgba(0,0,0,.1);transform:none!important;opacity:.8!important;transition:transform .2s cubic-bezier(.2,.8,.2,1),opacity .2s;margin:0}
+.dial button:nth-of-type(3n+2){height:34px;line-height:34px}.dial button:nth-of-type(4n){height:46px;line-height:46px}
+.dial button.on{opacity:1!important;transform:translateY(-10px)!important;font-weight:800}
+.dialm{width:0;height:0;background:none;border:6px solid transparent;border-bottom:8px solid var(--ink);border-top:0;margin-left:-6px;bottom:0;top:auto}
+body.dialon #app{padding-top:calc(69px + env(safe-area-inset-top))}
+@media(prefers-reduced-motion:reduce){.dial button{transition:none}}
 </style>
 </head>
 <body>
