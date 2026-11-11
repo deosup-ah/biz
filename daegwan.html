@@ -145,7 +145,7 @@ body.locked .top,body.locked .wrap{display:none}
       <input id="q" type="search" placeholder="단체명 · 건번호" aria-label="단체명 또는 건번호 검색">
       <select id="fs" aria-label="공간 필터"></select>
     </div>
-    <div class="addbar"><button class="btn ghost" id="addBtn" type="button">+ 상담 중인 새 건 넣기</button></div>
+    <div class="addbar"><button class="btn ghost" id="addBtn" type="button">+ 모의 건 직접 넣기</button></div>
     <form class="newcase" id="newcase">
       <label class="field">단체명<input id="nOrg" type="text" required></label>
       <label class="field">인원<input id="nPax" type="number" min="1" max="500" required></label>
@@ -153,7 +153,7 @@ body.locked .top,body.locked .wrap{display:none}
       <label class="field">날짜<input id="nDate" type="date" required></label>
       <div class="row"><label class="field">시작<input id="nS" type="time" value="10:00" required></label><label class="field">종료<input id="nE" type="time" value="17:00" required></label></div>
       <div class="row"><button class="btn" type="submit">넣기</button><button class="btn ghost" id="nCancel" type="button">닫기</button></div>
-      <p class="note">건별대장에 등록되기 전 상담용입니다. 이 브라우저에만 저장됩니다.</p>
+      <p class="note">건대장에 반영되지 않는 모의 건입니다. 이 브라우저에만 저장됩니다.</p>
     </form>
     <ul class="cases" id="cases"></ul>
   </aside>
@@ -163,19 +163,20 @@ body.locked .top,body.locked .wrap{display:none}
       <div class="meta" id="meta"></div>
       <div class="blocks" id="blocks"></div>
       <div id="fit"></div>
+      <div id="handoff"></div>
     </div>
     <nav class="tabs" aria-label="작업 단계">
-      <a href="#check">가용성 모의체크</a><a href="#consult">1차 상담 체크</a><a href="#layout">배치·자원</a><a href="#fnb">식음 제안</a><a href="#signage">사이니지 A3</a>
+      <a href="#check">가용성 모의체크</a><a href="#consult">1차 상담 체크</a><a href="#quote">모의 견적</a><a href="#layout">배치·자원</a><a href="#fnb">식음 제안</a><a href="#signage">사이니지 A3</a>
     </nav>
 
     <section class="view" id="v-check">
-      <p class="note">건별대장에 접수하기 전, 날짜와 시간, 인원만으로 어느 공간이 비어 있는지 봅니다. 건별대장 공간 가용성 보드의 점유 현황(확정, 가예약, 회의실 온라인 예약)을 기준으로 판정하며, 여기서 확인해도 자리가 잡히지는 않습니다.</p>
+      <p class="note">날짜, 시간, 인원만으로 공간별 가능 여부와 정가를 봅니다. 「모의 건 만들기」를 누르면 그 조건으로 상담 체크, 모의 견적, 배치, 식음까지 이어서 볼 수 있습니다. 모의 건은 건대장에 반영되지 않고 자리도 잡히지 않습니다. 고객이 진행하기로 하면 모의 건 화면의 「건대장에 새 건 만들기」로 넘깁니다.</p>
       <form class="row" id="ckForm">
         <label class="field">날짜<input id="ckDate" type="date" required></label>
         <label class="field">시작<input id="ckS" type="time" required></label>
         <label class="field">종료<input id="ckE" type="time" required></label>
         <label class="field">인원<input id="ckPax" type="number" min="1" max="500" required></label>
-        <label class="field">단체명 (상담 시작할 때 사용)<input id="ckOrg" type="text" placeholder="신규 문의"></label>
+        <label class="field">단체명 (모의 건을 만들 때 사용)<input id="ckOrg" type="text" placeholder="신규 문의"></label>
       </form>
       <div id="ckSum"></div>
       <div class="tw"><table id="ckTable"></table></div>
@@ -189,6 +190,17 @@ body.locked .top,body.locked .wrap{display:none}
         <h3>상담 요약</h3>
         <textarea class="out" id="summary" readonly aria-label="상담 요약"></textarea>
         <div class="row"><button class="btn" id="copySum" type="button">요약 복사</button><span class="msg" id="copyMsg"></span></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-quote">
+      <p class="note">건별대장 단가표의 정가로 셈한 모의 견적입니다. 건대장 견적이 아니며, 할인과 부가세 처리, 협의 품목 금액은 건대장 견적에서 확정합니다.</p>
+      <div class="tw"><table id="qTable"></table></div>
+      <div class="grp" id="qOpts"></div>
+      <div class="grp">
+        <h3>고객 안내용 금액 문구</h3>
+        <textarea class="out" id="qText" readonly aria-label="모의 견적 문구"></textarea>
+        <div class="row"><button class="btn" id="copyQ" type="button">문구 복사</button><span class="msg" id="qMsg"></span></div>
       </div>
     </section>
 

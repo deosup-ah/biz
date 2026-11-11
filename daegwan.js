@@ -39,7 +39,7 @@ const DIN=[["A1",3,414,305,"c"],["A2",3,566,305,"c"],["A3",3,721,305,"c"],["A4",
 const DIN_TOTAL=DIN.reduce((a,t)=>a+t[1],0);
 // 단체 배정 우선순서: 큰 테이블과 붙어 있는 줄부터
 const DIN_ORDER=["C2","D1","D2","D3","C1","B6","B5","B4","B3","B2","B1","E1","E2","E3","A1","A2","A3","A4","A5","A7","A6","A8","A9"];
-const STAGE={TMP:"1차 상담 (대장 미등록)",S10:"문의 접수",S20:"상담·견적",S30:"가예약",S40:"견적 발송",S50:"계약·계약금",S60:"확정"};
+const STAGE={TMP:"모의체크 (건대장 미반영)",S10:"문의 접수",S20:"상담·견적",S30:"가예약",S40:"견적 발송",S50:"계약·계약금",S60:"확정"};
 const DOW="일월화수목금토";
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -55,8 +55,8 @@ function addTemp(t){const r={no:t.no,org:t.org,res:t.res,s:t.s,e:t.e,st:"h",pax:
   byNo[t.no]={no:t.no,org:t.org,pax:t.pax,stage:"TMP",blocks:[r],first:t.s,confirmed:false,temp:true};cases.push(byNo[t.no])}
 store.get("temp",[]).forEach(addTemp);
 const sortCases=()=>cases.sort((a,b)=>a.first<b.first?-1:1);sortCases();
-const pill=(st,stage)=>stage==="TMP"?'<span class="pill n">상담 중</span>':`<span class="pill ${st==="c"?"c":"h"}">${st==="c"?"확정":"가예약"}</span>`;
-const stText=b=>b.stage==="TMP"?"상담 중":b.st==="c"?"확정":"가예약";
+const pill=(st,stage)=>stage==="TMP"?'<span class="pill n">모의</span>':`<span class="pill ${st==="c"?"c":"h"}">${st==="c"?"확정":"가예약"}</span>`;
+const stText=b=>b.stage==="TMP"?"모의":b.st==="c"?"확정":"가예약";
 
 const pd=s=>{const [d,t]=s.split("T");const [y,m,dd]=d.split("-").map(Number);return{y,m,d:dd,t,dow:DOW[new Date(y,m-1,dd).getDay()],key:d}};
 const md=s=>{const p=pd(s);return String(p.m).padStart(2,"0")+"-"+String(p.d).padStart(2,"0")};
@@ -91,7 +91,7 @@ $("q").addEventListener("input",renderList);$("fs").addEventListener("change",re
 /* ---------- 건 선택 ---------- */
 function select(no){cur=byNo[no];blk=cur.blocks.find(b=>!SP[b.res].equip)||cur.blocks[0];store.set("last",no);renderList();renderHead();renderAll()}
 function renderHead(){$("org").textContent=cur.org;
-  $("meta").innerHTML=`<span>${cur.no}</span><span>${cur.pax}명</span><span>단계 ${STAGE[cur.stage]||cur.stage}</span>${cur.temp?'<button class="btn ghost" id="delTemp" type="button" style="padding:2px 10px">이 상담 건 지우기</button>':""}`;
+  $("meta").innerHTML=`<span>${cur.no}</span><span>${cur.pax}명</span><span>단계 ${STAGE[cur.stage]||cur.stage}</span>${cur.temp?'<button class="btn ghost" id="delTemp" type="button" style="padding:2px 10px">이 모의 건 지우기</button>':""}`;
   if(cur.temp)$("delTemp").addEventListener("click",()=>removeTemp(cur.no));
   $("blocks").innerHTML=cur.blocks.map((b,i)=>`<button class="blk" type="button" data-i="${i}" aria-pressed="${b===blk}">
     <b>${esc(SP[b.res].n)} ${pill(b.st,b.stage)}</b><span>${when(b)}</span></button>`).join("");
@@ -135,6 +135,7 @@ function renderSummary(){const st=chkState();const L=[];
   cur.blocks.forEach(b=>L.push(`- ${SP[b.res].n} · ${when(b)} · ${stText(b)}`));
   L.push("수용 판단: "+fit().t);
   const lay=layoutCalc();L.push(`배치: ${lay.label} · ${lay.needText}`);
+  const qq=quoteCalc();L.push(`모의 견적(정가): ${won(qq.total)}${qq.nego?` · 협의 품목 ${qq.nego}건 별도`:""}`);
   const done=[],todo=[];CHECKS.forEach(([g,items],gi)=>items.forEach((it,ii)=>{const v=st[gi+"-"+ii]||{};(v.on?done:todo).push(v.on?`- ${it}${v.note?": "+v.note:""}`:`- ${it}`)}));
   L.push("",`확인함 (${done.length})`,...(done.length?done:["- 없음"]),"",`미확인 (${todo.length})`,...(todo.length?todo:["- 없음"]));
   $("summary").value=L.join("\n")}
@@ -375,7 +376,8 @@ function verdict(r,s,e,pax,skipNo){const sp=SP[r],rs=rel(r),all=occ(skipNo).filt
   const day=s.slice(0,10),near=all.filter(b=>!hit(b,s,e)&&b.s<day+"T24:00"&&b.e>day+"T00:00");
   if(near.length)why.push("같은 날 다른 일정: "+near.map(bLabel).join(", "));
   if(cap.k!=="ok")why.push(cap.t);
-  let lvl=av;if(cap.k==="bad")lvl="bad";else if(lvl==="ok"&&(cap.k==="warn"||soft.length))lvl="warn";
+  const sn=(DG.spaceNote||{})[r];if(sn)why.push(sn);
+  let lvl=av;if(cap.k==="bad")lvl="bad";else if(lvl==="ok"&&(cap.k==="warn"||soft.length||sn))lvl="warn";
   let alt=[];if(cf.length&&cap.k!=="bad"){const ts=s.slice(10),te=e.slice(10);for(let n=1;n<=10&&alt.length<3;n++)for(const sg of[-1,1]){const d=shiftDate(day,n*sg);if(d<SNAP||alt.length>=3)continue;
       if(!all.some(b=>hit(b,d+ts,d+te)))alt.push(d)}alt.sort()}
   const label=lvl==="ok"?"가능":lvl==="warn"?(av==="warn"?"가예약 겹침":"조건부"):(conf.length?"불가":"인원 초과");
@@ -386,15 +388,15 @@ function renderCheck(){const q=ckQuery(),sum=$("ckSum");store.set("ck",q);
   if(!q.d||!q.s||!q.e||!q.pax){sum.innerHTML='<div class="callout">날짜, 시간, 인원을 모두 넣으세요.</div>';$("ckTable").innerHTML="";$("ckExtra").innerHTML="";return}
   if(q.e<=q.s){sum.innerHTML='<div class="callout bad">종료 시간이 시작 시간보다 늦어야 합니다.</div>';$("ckTable").innerHTML="";$("ckExtra").innerHTML="";return}
   const s=q.d+"T"+q.s,e=q.d+"T"+q.e,cnt={ok:0,warn:0,bad:0};let body="";
-  GROUPS.forEach(([g,list])=>{body+=`<tr><th colspan="5" style="background:var(--bg)">${g}</th></tr>`;
+  GROUPS.forEach(([g,list])=>{body+=`<tr><th colspan="6" style="background:var(--bg)">${g}</th></tr>`;
     list.forEach(r=>{const sp=SP[r],v=verdict(r,s,e,q.pax);cnt[v.lvl]++;
       const capTxt=sp.cap==null?"정보 없음":sp.max?`기준 ${sp.cap} / 최대 ${sp.max}`:`${sp.cap}명${sp.soft?" (숙박 기준)":""}`;
       const pc=v.lvl==="ok"?"c":v.lvl==="warn"?"h":"bad";
       const alt=v.alt.length?`<br><span style="color:var(--accent);font-weight:600">같은 시간 가까운 가능일: ${v.alt.map(dLabel).join(", ")}</span>`:"";
-      body+=`<tr><td style="white-space:nowrap;font-weight:600">${esc(sp.n)}</td><td style="white-space:nowrap">${capTxt}</td><td><span class="pill ${pc}">${v.label}</span></td>
+      body+=`<tr><td style="white-space:nowrap;font-weight:600">${esc(sp.n)}</td><td style="white-space:nowrap">${capTxt}</td><td class="num" style="white-space:nowrap">${esc(spacePrice(r,s,e).txt)}</td><td><span class="pill ${pc}">${v.label}</span></td>
         <td style="font-size:13px">${v.why.map(esc).join("<br>")}${alt}</td>
-        <td>${v.lvl==="bad"?"":`<button class="btn ghost" type="button" data-start="${r}" style="padding:4px 10px;white-space:nowrap">상담 시작</button>`}</td></tr>`})});
-  $("ckTable").innerHTML=`<thead><tr><th>공간</th><th>정원</th><th>판정</th><th>근거</th><th></th></tr></thead><tbody>${body}</tbody>`;
+        <td>${v.lvl==="bad"?"":`<button class="btn ghost" type="button" data-start="${r}" style="padding:4px 10px;white-space:nowrap">모의 건 만들기</button>`}</td></tr>`})});
+  $("ckTable").innerHTML=`<thead><tr><th>공간</th><th>정원</th><th class="num">대관료 (정가)</th><th>판정</th><th>근거</th><th></th></tr></thead><tbody>${body}</tbody>`;
   const days=Math.round((Date.parse(q.d)-Date.parse(SNAP))/864e5);let warn="";
   if(q.d<SNAP)warn='<div class="callout bad">스냅샷 날짜보다 앞선 날짜입니다. 스냅샷 이후 점유만 들어 있습니다.</div>';
   else if(days<3)warn='<div class="callout">이용일까지 3일이 안 남았습니다. 건별대장 가예약 규칙(행사 전 최소 3일, 가예약 유효 7일)을 확인하세요.</div>';
@@ -403,8 +405,8 @@ function renderCheck(){const q=ckQuery(),sum=$("ckSum");store.set("ck",q);
   $("ckExtra").innerHTML=`<p class="note">${mon}. 75인치 모니터는 회의실 전용이며 대화의 집 등 대관 공간에서는 쓸 수 없습니다.</p>
     <p class="note">다이닝은 건별대장에서 좌석 예약으로 관리하지 않습니다. ${q.pax}명은 다이닝 ${DIN_TOTAL}석 ${q.pax<=DIN_TOTAL?"이내라 한 번에 앉을 수 있지만":"을 넘어 2부제나 케이터링이 필요하며"}, 식사 가능 여부는 다이닝팀에 따로 확인하세요.</p>
     <p class="note">연수객실과 숙박은 이 체크에 들어 있지 않습니다.</p>`}
-function createTemp(org,pax,res,s,e){const list=store.get("temp",[]);let n=1;while(byNo["상담-"+n])n++;
-  const t={no:"상담-"+n,org,pax,res,s,e};list.push(t);store.set("temp",list);addTemp(t);sortCases();fillFilter();return t.no}
+function createTemp(org,pax,res,s,e){const list=store.get("temp",[]);let n=1;while(byNo["모의-"+n]||byNo["상담-"+n])n++;
+  const t={no:"모의-"+n,org,pax,res,s,e};list.push(t);store.set("temp",list);addTemp(t);sortCases();fillFilter();return t.no}
 ["ckDate","ckS","ckE","ckPax"].forEach(id=>$(id).addEventListener("input",renderCheck));
 $("ckForm").addEventListener("submit",e=>e.preventDefault());
 $("ckTable").addEventListener("click",e=>{const b=e.target.closest("[data-start]");if(!b)return;const q=ckQuery();
@@ -412,17 +414,71 @@ $("ckTable").addEventListener("click",e=>{const b=e.target.closest("[data-start]
 (function(){const t=new Date(),pad=n=>String(n).padStart(2,"0");const today=`${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}`;
   const q=store.get("ck",null)||{};$("ckDate").value=q.d&&q.d>=today?q.d:shiftDate(today,7);$("ckS").value=q.s||"10:00";$("ckE").value=q.e||"17:00";$("ckPax").value=q.pax||30})();
 
+/* ---------- 모의 견적 (건별대장 단가표 정가) ---------- */
+const PR=DG.price||{},ULBL={H2:"2시간",H4:"4시간",H8:"8시간",H9:"9시간",NIGHT:"1박",HALFDAY:"반나절",FULLDAY:"종일"};
+const won=n=>Number(n).toLocaleString("ko-KR")+"원";
+const hoursOf=(s,e)=>(Date.parse(e)-Date.parse(s))/36e5;
+// 건대장과 같은 규칙: 2시간 이하 H2, 4시간 이하 H4, 8시간 이하 H8, 그 밖은 H9(없으면 H8)
+function unitFor(res,h){const us=Object.keys(PR[res]||{});if(!us.length)return null;if(us.includes("NIGHT"))return"NIGHT";
+  if(us.includes("H2")&&h<=2)return"H2";if(us.includes("H4")&&h<=4)return"H4";if(us.includes("H8")&&h<=8)return"H8";if(us.includes("H9"))return"H9";if(us.includes("H8"))return"H8";return null}
+function spacePrice(res,s,e){const h=hoursOf(s,e),u=unitFor(res,h);if(!u)return{txt:"협의",amt:null,unit:""};
+  if(u==="NIGHT"){const [a,b]=PR[res].NIGHT;return{txt:`1박 ${won(a)}~${won(b)}`,amt:null,unit:"1박 (평일 "+won(a)+" / 주말 "+won(b)+")"}}
+  const lim={H2:2,H4:4,H8:8,H9:9}[u],over=h>lim;return{txt:won(PR[res][u]),amt:PR[res][u],unit:ULBL[u]+" 단가"+(over?` · ${h}시간 이용, 초과분 협의`:"")}}
+const EQ=[["EQ-PKG","LED+음향 패키지"],["EQ-LED","LED 스크린"],["EQ-SOUND","음향장비"]];
+function quoteCalc(){const st=store.get("q:"+cur.no,{}),lines=[];let total=0,nego=0,maxH=0;
+  cur.blocks.filter(b=>!SP[b.res].equip).forEach(b=>{const p=spacePrice(b.res,b.s,b.e);maxH=Math.max(maxH,hoursOf(b.s,b.e));
+    lines.push({n:`${SP[b.res].n} 대관`,d:`${when(b)} · ${p.unit||"협의 품목"}`,amt:p.amt});if(p.amt!=null)total+=p.amt;else nego++});
+  const eu=maxH<=4?"HALFDAY":"FULLDAY";
+  EQ.forEach(([c,n])=>{if(st[c]){const a=PR[c]&&PR[c][eu];lines.push({n,d:ULBL[eu]+(maxH>9?" · 9시간 초과분 별도":""),amt:a??null});if(a!=null)total+=a;else nego++}});
+  const fs=store.get("fnb:"+cur.no,{});fnbOptions().filter(o=>fs[o.id]).forEach(o=>{lines.push({n:o.t,d:"식음 · 협의 품목",amt:null});nego++});
+  return{st,lines,total,nego,eu}}
+function renderQuote(){const q=quoteCalc();
+  $("qTable").innerHTML=`<thead><tr><th>항목</th><th>기준</th><th class="num">정가</th></tr></thead><tbody>`+q.lines.map(l=>`<tr><td style="font-weight:600">${esc(l.n)}</td><td style="font-size:13px">${esc(l.d)}</td><td class="num">${l.amt!=null?won(l.amt):"협의"}</td></tr>`).join("")+
+    `<tr><td colspan="2" style="font-weight:700">정가 합계${q.nego?` (협의 품목 ${q.nego}건 별도)`:""}</td><td class="num" style="font-weight:700">${won(q.total)}</td></tr></tbody>`;
+  const hall=cur.blocks.some(b=>SP[b.res].capLabel||/YEOHAE|ROOFTOP/.test(b.res));
+  $("qOpts").innerHTML=`<h3>기자재 추가</h3>`+(hall?EQ.map(([c,n])=>`<label class="opt"><input type="checkbox" id="q-${c}" data-q="${c}" ${q.st[c]?"checked":""}><span><b>${n} · ${ULBL[q.eu]} ${PR[c]&&PR[c][q.eu]?won(PR[c][q.eu]):"협의"}</b><span>건별대장 「새벽의집 기자재이용료」 단가입니다. 다른 공간에 적용되는지는 확인이 필요합니다.</span></span></label>`).join("")
+    :`<p class="note">회의실은 75인치 이동식 모니터를 무상으로 쓸 수 있습니다(층별 2대, 가용성 모의체크에서 남은 대수 확인).</p>`)+
+    `<p class="note">식음 제안 탭에서 체크한 항목은 협의 품목으로 위 표에 들어갑니다. 단가 기준일 ${esc(DG.priceAsOf||"")}.</p>`;
+  $("qText").value=[`${cur.org} 담당자님, 문의하신 일정의 예상 금액을 안내드립니다.`,"",...q.lines.map(l=>`· ${l.n} (${l.d}): ${l.amt!=null?won(l.amt):"협의 후 안내"}`),"",`정가 합계 ${won(q.total)}${q.nego?` (협의 품목 ${q.nego}건 별도)`:""}`,"","정가 기준 예상 금액이며, 최종 금액은 견적서로 다시 안내드리겠습니다.","더숲 아카데미하우스 단체팀 드림"].join("\n")}
+$("qOpts").addEventListener("change",e=>{const k=e.target.dataset.q;if(!k)return;const st=store.get("q:"+cur.no,{});st[k]=e.target.checked;store.set("q:"+cur.no,st);renderQuote();renderHandoff()});
+
+/* ---------- 모의 건 → 건대장 새 건 ---------- */
+const LEDGER="https://academyhouse.deosup.com/admin-cases";
+function handoffText(){const q=quoteCalc(),lay=layoutCalc(),b0=cur.blocks[0],v=verdict(b0.res,b0.s,b0.e,cur.pax,cur.no);const st=chkState(),L=[];
+  L.push("[모의체크에서 넘어온 건]",`단체: ${cur.org} · 인원 ${cur.pax}명`);
+  cur.blocks.forEach(b=>L.push(`희망: ${SP[b.res].n} · ${when(b)}`));
+  L.push(`가용성(${DG.asOf.replace("T"," ")} 기준): ${v.avText}`,`수용: ${fit().t}`,`배치: ${lay.label} · ${lay.needText}`);
+  L.push("모의 견적(정가):",...q.lines.map(l=>`- ${l.n} (${l.d}): ${l.amt!=null?won(l.amt):"협의"}`),`- 정가 합계 ${won(q.total)}${q.nego?` · 협의 ${q.nego}건 별도`:""}`);
+  const done=[];CHECKS.forEach(([g,items],gi)=>items.forEach((it,ii)=>{const c=st[gi+"-"+ii]||{};if(c.on)done.push(`- ${it}${c.note?": "+c.note:""}`)}));
+  if(done.length)L.push("상담에서 확인한 것:",...done);
+  return L.join("\n")}
+function renderHandoff(){const el=$("handoff");if(!cur||!cur.temp){el.innerHTML="";return}
+  const t=store.get("temp",[]).find(x=>x.no===cur.no)||{},b=cur.blocks[0];
+  el.innerHTML=`<div class="callout" style="display:flex;flex-direction:column;gap:8px;border-color:var(--accent);background:var(--accent-soft)">
+    <div><b>고객이 진행하기로 했나요?</b> 이 모의 건은 건대장에 없습니다. 아래 버튼이 모의체크 내용을 복사하고 건대장을 새 창으로 엽니다.</div>
+    <div class="row" style="align-items:center"><a class="btn" id="hoGo" href="${LEDGER}" target="_blank" rel="noopener" style="text-decoration:none">건대장에 새 건 만들기</a><span class="msg" id="hoMsg"></span></div>
+    <div id="hoSteps" ${t.sent?"":"hidden"} style="font-size:13.5px">
+      건대장에서 <b>+ 새 건</b>을 누르고 아래 값을 넣은 뒤, <b>고객 원문</b> 칸에 붙여넣기(Ctrl+V) 하고 접수합니다.<br>
+      단체·기관명 <b>${esc(cur.org)}</b> · 시작일 <b>${b.s.slice(0,10)}</b> · 종료일 <b>${b.e.slice(0,10)}</b> · 인원 <b>${cur.pax}</b>
+      <div class="row" style="margin-top:8px;align-items:flex-end"><label class="field">접수된 건번호 (예: GS-2611-024)<input id="hoNo" type="text" value="${esc(t.gs||"")}" placeholder="GS-"></label><button class="btn ghost" id="hoSave" type="button">건번호 기록</button></div>
+      ${t.gs?`<div style="margin-top:6px">건대장 <b>${esc(t.gs)}</b>로 넘겼습니다. 이후 진행은 건대장에서 합니다. 이 모의 건은 지워도 됩니다.</div>`:""}
+    </div></div>`;
+  $("hoGo").addEventListener("click",()=>{const txt=handoffText();const mark=()=>{const l=store.get("temp",[]);const x=l.find(y=>y.no===cur.no);if(x){x.sent=true;store.set("temp",l)}$("hoSteps").hidden=false};
+    try{navigator.clipboard.writeText(txt).then(()=>{$("hoMsg").textContent="모의체크 내용을 복사했습니다."},()=>{$("hoMsg").textContent="자동 복사가 막혔습니다. 1차 상담 체크 탭의 요약을 복사해 쓰세요."})}catch(e){$("hoMsg").textContent="자동 복사가 막혔습니다. 1차 상담 체크 탭의 요약을 복사해 쓰세요."}
+    mark()});
+  $("hoSave").addEventListener("click",()=>{const l=store.get("temp",[]);const x=l.find(y=>y.no===cur.no);if(x){x.gs=$("hoNo").value.trim();x.sent=true;store.set("temp",l)}renderHandoff()})}
+
 /* ---------- 복사, 탭 ---------- */
 function copyBtn(btn,src,msg){$(btn).addEventListener("click",async()=>{const el=$(src);try{await navigator.clipboard.writeText(el.value);$(msg).textContent="복사했습니다."}
   catch(e){el.focus();el.select();$(msg).textContent="자동 복사가 막혔습니다. 선택된 글을 직접 복사하세요."}})}
-copyBtn("copySum","summary","copyMsg");copyBtn("copyWork","work","workMsg");copyBtn("copyF","ftext","fMsg");
-const VIEWS=["check","consult","layout","fnb","signage"];
+copyBtn("copySum","summary","copyMsg");copyBtn("copyWork","work","workMsg");copyBtn("copyF","ftext","fMsg");copyBtn("copyQ","qText","qMsg");
+const VIEWS=["check","consult","quote","layout","fnb","signage"];
 function route(){const h=(location.hash||"").slice(1);const v=VIEWS.includes(h)?h:"check";
   document.querySelector(".head").style.display=v==="check"?"none":"";if(v==="check")renderCheck();
   VIEWS.forEach(x=>$("v-"+x).classList.toggle("on",x===v));
   document.querySelectorAll(".tabs a").forEach(a=>{if(a.getAttribute("href")==="#"+v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
-  if(v==="signage"&&cur)drawSign()}
+  if(v==="signage"&&cur)drawSign();if(v==="quote"&&cur)renderQuote()}
 window.addEventListener("hashchange",route);
-function renderAll(){renderLayout();renderChecks();renderFnb();renderSignForm()}
+function renderAll(){renderLayout();renderChecks();renderFnb();renderQuote();renderHandoff();renderSignForm()}
 
 const last=store.get("last",null);select(byNo[last]?last:cases[0].no);route();
