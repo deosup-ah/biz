@@ -16,10 +16,10 @@ const keyHash=async(kind,v)=>[...new Uint8Array(await crypto.subtle.digest('SHA-
 (()=>{const s=lvS();if(!s.days.includes(TODAY)){s.days=[...s.days,TODAY].slice(-120);ls.set('lv',s)}})();
 
 /* ── 관리자만 보는 화면 ── */
-const HID={store:['ana','stock','today','rank','ret','data','biz','talk'],aka:['today','cal','talk']};
+const HID={store:['ana','stock','today','rank','ret','data','biz','talk','club'],aka:['today','cal','talk']};
 (()=>{const f=navList;navList=function(){const L=f();return isAdmin()?L:L.filter(t=>!(HID[t[2]]||[]).includes(t[0]))}})();
-(()=>{const r=render;render=function(){if(!S.locked&&!isAdmin()){if(S.ui.mkTab==='talk')S.ui.mkTab='p';const m=S.mode,v=S.view[m];if((HID[m]||[]).includes(v)){if(m==='aka'){S.mode='store';S.br='aka'}S.view.store='cur';if(S.loaded&&!S.ui.hidT){S.ui.hidT=1;setTimeout(()=>{S.ui.hidT=0;toast('이 화면은 안정화 테스트 중입니다. 며칠만 기다려 주세요.')},50)}}}
-  r.apply(this,arguments);try{if(isAdmin())return;const mn=document.querySelector('main');if(mn)mn.querySelectorAll('[data-a="mkTab"][data-t="talk"]').forEach(b=>b.remove());if(mn)mn.querySelectorAll('button.mrow[data-a="go"]').forEach(b=>{if(HID.store.includes(b.dataset.v))b.remove()})}catch(e){}}})();
+(()=>{const r=render;render=function(){if(!S.locked&&!isAdmin()){if(S.ui.mkTab&&S.ui.mkTab!=='p')S.ui.mkTab='p';const m=S.mode,v=S.view[m];if((HID[m]||[]).includes(v)){if(m==='aka'){S.mode='store';S.br='aka'}S.view.store='cur';if(S.loaded&&!S.ui.hidT){S.ui.hidT=1;setTimeout(()=>{S.ui.hidT=0;toast('이 화면은 안정화 테스트 중입니다. 며칠만 기다려 주세요.')},50)}}}
+  r.apply(this,arguments);try{if(isAdmin())return;const mn=document.querySelector('main');if(mn)mn.querySelectorAll('.subt [data-a="mkTab"]').forEach(b=>{const s=b.parentElement;if(s)s.remove()});if(mn)mn.querySelectorAll('[data-a="dKind"][data-k="rent"],[data-a="dKind"][data-k="sign"],[data-a="curOrder"],[data-a="go"][data-v="club"]').forEach(b=>b.remove());if(mn&&S.mode==='store'&&S.view.store==='cur')mn.querySelectorAll(':scope>details.fold:not(.hmore)').forEach(b=>b.remove());if(mn)mn.querySelectorAll('button.mrow[data-a="go"]').forEach(b=>{if(HID.store.includes(b.dataset.v))b.remove()})}catch(e){}}})();
 (()=>{const g=A.gGo;A.gGo=async d=>{const el=$('gIn'),v=((d&&d.v)||(el&&el.value)||'').trim();if(v&&!isAdmin()&&typeof G_SCHED!=='undefined'&&G_SCHED.test(v)&&!(typeof G_NOTE!=='undefined'&&G_NOTE.test(v))){toast('일정 넣기는 안정화 테스트 중입니다. 며칠만 기다려 주세요.');return}if(v)lvAdd('cur',v);return g(d)}})();
 /* 가이드: 관리자가 아니면 일정 · 매출 장을 빼고 안내 한 줄 */
 if(!isAdmin()){for(let i=GDS.length-1;i>=0;i--)if(GDS[i][0]==='b'||GDS[i][0]==='d'||GDS[i][0]==='c')GDS.splice(i,1)}
@@ -67,7 +67,7 @@ A.lvFromGd=()=>{A.gdClose();A.lvOpen()};A.dpEx=d=>{const el=$('dpCmd');if(!el)re
   const how=box.querySelector('.dphow'),cmd=box.querySelector('.dpcmd'),v=box.querySelector('.dpv'),bk=$('dpBks'),chs=[...box.querySelectorAll(':scope>.chips')];if(!v||!cmd||!bk)return;
   box.prepend(v);v.after(bk);bk.after(cmd);const ci=$('dpCmd');if(ci)ci.placeholder='말로 옮기기';
   const ex=document.createElement('div');ex.className='dpex';ex.innerHTML=['1번 맨 앞으로','1번이랑 2번 바꿔','한 바퀴','위에서','처음 배치로'].map(c=>`<button class="chip" data-a="dpEx" data-c="${c}">${c}</button>`).join('');cmd.after(ex);
-  const m=document.createElement('details');m.className='fold dpmore';m.open=!!S.ui.dpMo;m.innerHTML='<summary>더 보기 · 오브제 · 놓는 결 · 사용법</summary>';m.append(...chs,...(how?[how]:[]));m.addEventListener('toggle',()=>{S.ui.dpMo=m.open});ex.after(m)}catch(e){}}})();
+  const m=document.createElement('details');m.className='fold dpmore';m.open=!!S.ui.dpMo;m.innerHTML='<summary>더 보기 · 오브제 · 놓는 결 · 사용법</summary>';m.append(...chs,...(how?[how]:[]));m.addEventListener('toggle',()=>{S.ui.dpMo=m.open});ex.after(m);const sb=$('sheetBox');m.append(...sb.querySelectorAll(':scope>.tw,:scope>ol.steps,:scope>p.note'));const bt=sb.querySelector(':scope>.btns');if(bt){if(!isAdmin()){const o=bt.querySelector('[data-a="dpOrder"]');if(o)o.remove()}const pg=bt.querySelector('[data-a="dpPng"]');if(pg){pg.textContent='그림 저장';pg.classList.remove('pri')}if(!bt.querySelector('[data-a="dpSend"]'))bt.insertAdjacentHTML('afterbegin','<button class="btn pri" data-a="dpSend">직원에게 보내기</button>')}}catch(e){}}})();
 
 /* ── 단계에 따라 열리는 진열 기능 ── */
 const lvLock=n=>{toast(`${n}단계 「${LVN[n]}」에서 열립니다`);return false};
@@ -123,3 +123,30 @@ const popMach=(w,n)=>[`> ${w}_`,`「${w}」 → ?`,`${w} + 책 = ___`,`if (${w})
 
 /* 진열 오브제에서 이름표를 뺀다(쇼카드와 겹침, 11/11 결정) */
 (()=>{try{const i=DPOBJ.findIndex(x=>x[0]==='card');if(i>=0)DPOBJ.splice(i,1)}catch(e){}const cut=P=>{if(P&&P.it)P.it=P.it.filter(i=>i.k!=='card');if(P&&P.need)P.need=P.need.filter(x=>!/이름표/.test(x));if(P&&P.tips)P.tips=P.tips.filter(x=>!/이름표/.test(x));return P};const g=dpPlan;dpPlan=function(){return cut(g.apply(this,arguments))}})();
+
+/* ── 11/12 단순화: 아래 고정 메뉴 · 카드 빠른 버튼 · 홈 단계 한 줄 · 직원에게 보내기 ── */
+function lvBot(){let b=$('bnav');const off=isAdmin()||S.locked||!S.loaded;document.body.classList.toggle('hasbn',!off);if(off){if(b)b.remove();return}if(!b){b=document.createElement('nav');b.id='bnav';document.body.append(b)}
+  let c='';try{c=navCur()}catch(e){}b.innerHTML=navList().map(([v,n,m])=>`<button data-a="go" data-v="${v}" data-m="${m}" ${c===m+':'+v?'aria-current="page"':''}>${n}</button>`).join('')+'<button data-a="gdOpen">도움말</button>'}
+(()=>{const r=render;render=function(){r.apply(this,arguments);try{lvBot();const mn=document.querySelector('main');if(!mn||S.locked)return;
+  if(S.mode==='store'&&S.view.store==='cur'){
+    const sn=mn.querySelector(':scope>.subnav:not(.subt)');if(sn){const on=sn.querySelector('[aria-pressed="true"]');if(!on||/전체/.test(on.textContent))sn.style.display='none'}
+    const pcs=[...mn.querySelectorAll('.pcard')];mn.querySelectorAll('.wall>.cv').forEach(cv=>{const pc=pcs[+cv.dataset.i];if(!pc)return;const bs=[[pc.querySelector('[data-a="dpOpen"]'),'진열 보기'],[[...pc.querySelectorAll('[data-a="toDesign"][data-kind="pop"]')].pop(),'POP 만들기']].filter(x=>x[0]);if(!bs.length)return;const w=document.createElement('div');w.className='cvw';cv.replaceWith(w);const q=document.createElement('div');q.className='cvq';bs.forEach(([o,n])=>{const x=document.createElement('button');Object.assign(x.dataset,o.dataset);x.textContent=n;q.append(x)});w.append(cv,q)});
+    const t=mn.querySelector('.gdtop');if(t&&!t.querySelector('.lvline')){const L=lvNow();if(L<3){const s=lvS(),R=LVREQ[L+1],ks=Object.keys(R),pc=Math.round(ks.reduce((a,k)=>a+Math.min(1,lvVal(s,k)/R[k]),0)/ks.length*100),SH={cur:'큐레이션',pop:'인쇄물',dp:'진열안',vid:'영상',send:'주고받기',days:'사용일'};const b=document.createElement('button');b.className='lvline';b.dataset.a='lvOpen';b.innerHTML=`<span>${L+1}단계까지 ${pc}%</span><i><u style="width:${pc}%"></u></i><small>${ks.slice(0,3).map(k=>`${SH[k]} ${Math.min(lvVal(s,k),R[k])}/${R[k]}`).join(' · ')}</small>`;t.prepend(b)}}}
+  }catch(e){}}})();
+A.dpSend=async()=>{try{const t=S.ui.cor[S.ui.dp.i],P=dpPlan(t,S.ui.dpM||0),el=$('dpTop');if(!t||!el)return;lvAdd('dp');toast('보낼 그림을 만드는 중입니다');
+  const vb=(el.getAttribute('viewBox')||'0 0 900 900').split(/\s+/).map(Number),sw=vb[2],sh=vb[3];let svg=new XMLSerializer().serializeToString(el);if(!/xmlns=/.test(svg.slice(0,200)))svg=svg.replace('<svg','<svg xmlns="http://www.w3.org/2000/svg"');svg=svg.replace(/^<svg([^>]*)>/,(m,a)=>`<svg${a.replace(/\sstyle="[^"]*"/,'').replace(/\s(width|height)="[^"]*"/g,'')} width="${sw}" height="${sh}">`);svg=svg.replace(/^(<svg[^>]*>)/,'$1'+await fontCSS());
+  const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);await img.decode();
+  const W=1080,F='Pretendard,"Malgun Gothic",sans-serif',rows=(P.rows||[]).filter(r=>r&&r.b),iw=920,ih=Math.round(iw*sh/sw),c=document.createElement('canvas'),x=c.getContext('2d');
+  const wrap=(s,mw,f)=>{x.font=f;const out=[];let cur='';for(const ch of String(s)){if(x.measureText(cur+ch).width>mw){out.push(cur);cur=ch}else cur+=ch}if(cur)out.push(cur);return out};
+  const RL=rows.map(r=>({n:r.n,t:wrap(r.b.t.replace(/\s*[\(\[].*$/,''),820,`800 34px ${F}`).slice(0,1)[0],p:wrap(r.place||'',820,`500 26px ${F}`).slice(0,2)})),TL=(P.tips||[]).slice(0,2).flatMap(s=>wrap('· '+s,920,`500 26px ${F}`)),NL=(P.need||[]).length?wrap('준비물  '+P.need.join(' · '),920,`500 26px ${F}`):[];
+  const H=250+ih+50+RL.reduce((a,r)=>a+58+r.p.length*36+18,0)+(TL.length?30+TL.length*38:0)+(NL.length?30+NL.length*38:0)+110;c.width=W;c.height=H;
+  x.fillStyle='#f7f5ef';x.fillRect(0,0,W,H);x.fillStyle='#003128';x.fillRect(0,0,W,200);x.fillStyle='#c9a24a';x.fillRect(0,200,W,10);
+  x.fillStyle='#d9b45b';x.font=`600 28px ${F}`;x.fillText('오늘의 진열 · '+('더숲 '+brN(P.br||S.br)),80,78);x.fillStyle='#f2eee3';x.font=`800 56px ${F}`;x.fillText(wrap(t.title,920,`800 56px ${F}`)[0],80,152);
+  let y=250;x.drawImage(img,80,y,iw,ih);y+=ih+50;x.textBaseline='alphabetic';
+  RL.forEach(r=>{x.fillStyle='#003128';x.beginPath();x.arc(104,y+22,24,0,7);x.fill();x.fillStyle='#fff';x.font=`800 26px ${F}`;x.textAlign='center';x.fillText(r.n,104,y+31);x.textAlign='left';x.fillStyle='#1c1c1a';x.font=`800 34px ${F}`;x.fillText(r.t,150,y+34);y+=58;x.fillStyle='#55554f';x.font=`500 26px ${F}`;r.p.forEach(s=>{x.fillText(s,150,y+22);y+=36});y+=18});
+  if(TL.length){y+=30;x.fillStyle='#1c1c1a';x.font=`500 26px ${F}`;TL.forEach(s=>{x.fillText(s,80,y+22);y+=38})}
+  if(NL.length){y+=30;x.fillStyle='#7d3a2b';x.font=`500 26px ${F}`;NL.forEach(s=>{x.fillText(s,80,y+22);y+=38})}
+  x.fillStyle='#8a8a80';x.font=`400 22px ${F}`;x.fillText('Planned by 쿼부장',W-290,H-44);
+  const blob=await new Promise(r=>c.toBlob(r,'image/png'));if(!blob)return;const name=`더숲_진열안내_${t.title.replace(/[\\/:*?"<>|\s,]+/g,'_').slice(0,20)}.png`;
+  try{const f=new File([blob],name,{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:t.title});return}}catch(e){if(e&&e.name==='AbortError')return}
+  await saveFile(name,blob);toast('그림을 저장했습니다. 카카오톡으로 직원에게 보내 주세요.')}catch(e){console.warn(e);toast('그림을 만들지 못했습니다')}};
