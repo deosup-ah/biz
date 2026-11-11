@@ -625,6 +625,16 @@ body .chip.phm svg{display:block}
 main [data-a="dBr"]{display:none}
 @media(min-width:900px){body:not(.dialon) header.top .bar{padding:0 12px 0 16px;gap:0}body:not(.dialon) header.top .brand{flex:0 0 auto;white-space:nowrap}body:not(.dialon) header.top .brand span{white-space:nowrap;font-size:14px}body:not(.dialon) .navb button{width:28px;height:30px}body:not(.dialon) .navb svg{width:19px;height:19px}}
 .brand{white-space:nowrap}
+
+/* 오늘의 소식: 누르게 만든다. 오른쪽 + 로 펼친다 */
+.tick{padding:15px 0;border-bottom:3px solid var(--ink)}.tick span{font-size:18px;font-weight:700}
+.tick .tkp{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;background:var(--ink);color:var(--bg);font:400 26px/1 "Pretendard",sans-serif;margin-left:6px}
+.tick[aria-expanded="true"]{margin-bottom:0}
+.tkpn{margin:0 0 34px;padding:6px 0 0}.wgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 34px}.wgrid .wn{max-width:none;border-top:1px solid var(--line);padding:18px 0 22px}.wgrid .wn:nth-child(-n+2){border-top:0}
+.wna{display:flex;gap:6px;margin-top:10px}.wna .btn{text-decoration:none;margin:0}
+.tkpn .anaf{margin-top:8px}
+@media(max-width:720px){.wgrid{grid-template-columns:1fr}.wgrid .wn:nth-child(2){border-top:1px solid var(--line)}.tick .tkp{order:2;margin-left:auto}.tick small{display:none}}
+body.vm .wgrid{grid-template-columns:1fr}body.vm .tick .tkp{order:2;margin-left:auto}body.vm .tick small{display:none}
 </style>
 </head>
 <body>
