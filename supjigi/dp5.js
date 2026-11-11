@@ -3,6 +3,7 @@
 const D3C=(()=>{let TH={a:'#f6f3ec',b:'#e9e4d8',top:'#d8c29a',leg:'#a8895c',rim:'#bfa275'};let cv=null,P=null,yaw=-0.55,pitch=0.95,spin=0,raf=0,rec=null;
   const F='Pretendard,"Malgun Gothic","Apple SD Gothic Neo",sans-serif',SF='"Gowun Batang",Batang,serif';
   const L=(()=>{const v=[-0.45,-0.55,0.75],m=Math.hypot(...v);return v.map(x=>x/m)})();
+  const rz=(p,r)=>{if(!r||!r.a)return p;const c=Math.cos(r.a),s=Math.sin(r.a),x=p[0]-r.cx,y=p[1]-r.cy;return [r.cx+x*c-y*s,r.cy+x*s+y*c,p[2]]},rn=(n,r)=>{if(!r||!r.a)return n;const c=Math.cos(r.a),s=Math.sin(r.a);return [n[0]*c-n[1]*s,n[0]*s+n[1]*c,n[2]]};
   const hx=c=>{c=c.replace('#','');if(c.length===3)c=c.split('').map(x=>x+x).join('');return [0,2,4].map(i=>parseInt(c.slice(i,i+2),16))};
   const shade=(c,k)=>{const [r,g,b]=hx(c);return `rgb(${Math.round(r*k)},${Math.round(g*k)},${Math.round(b*k)})`};
   function cam(){const W=P.W,D=P.D,cx=W/2,cy=D/2,cs=Math.cos(yaw),sn=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
@@ -18,7 +19,7 @@ const D3C=(()=>{let TH={a:'#f6f3ec',b:'#e9e4d8',top:'#d8c29a',leg:'#a8895c',rim:
       else if(i.k==='pop')out.push({kind:'pop',i,cx:i.x+105,cy:i.y+10});
       else if(i.k==='card')out.push({kind:'card',i,cx:i.x+45,cy:i.y+17});
       else if(i.k==='vase')out.push({kind:'vase',i,cx:i.x+30,cy:i.y+30});
-      else if(i.k==='note')out.push({kind:'note',i,cx:i.x,cy:i.y})});
+      else if(i.k==='note')out.push({kind:'note',i,cx:i.x,cy:i.y});else if(i.k==='show')out.push({kind:'show',i,cx:i.x+52,cy:i.y+3})});
     return out}
   function draw(){if(!cv||!P)return;const ctx=cv.getContext('2d'),Wc=cv.width,Hc=cv.height,pr=cam(),W=P.W,D=P.D;
     ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,Wc,Hc);const g=ctx.createLinearGradient(0,0,0,Hc);g.addColorStop(0,TH.a);g.addColorStop(1,TH.b);ctx.fillStyle=g;ctx.fillRect(0,0,Wc,Hc);
@@ -28,7 +29,7 @@ const D3C=(()=>{let TH={a:'#f6f3ec',b:'#e9e4d8',top:'#d8c29a',leg:'#a8895c',rim:
     const s=Math.min(Wc*0.92/(mxx-mnx),Hc*0.88/(mxy-mny)),ox=Wc/2-(mnx+mxx)/2*s,oy=Hc/2-(mny+mxy)/2*s;
     const S2=p=>{const q=pr(p);return [ox+q[0]*s,oy+q[1]*s,q[2]]};
     const poly=(v,fill,stroke)=>{ctx.beginPath();v.forEach((p,k)=>{const q=S2(p);k?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1])});ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}};
-    const box=(x,y,z,w,d,h,col,opt={})=>{boxFaces(x,y,z,w,d,h).filter(f=>visible(f.n)).forEach(f=>{const c=(opt.side&&f.k!=='top'&&f.k!=='bottom'&&!(opt.spine&&f.k===opt.spine))?opt.side:col;poly(f.v,shade(c,lit(f.n)),opt.edge);if(opt.onFace)opt.onFace(f)})};
+    const box=(x,y,z,w,d,h,col,opt={})=>{boxFaces(x,y,z,w,d,h).map(f=>({...f,v:f.v.map(p=>rz(p,opt.rot)),n:rn(f.n,opt.rot)})).filter(f=>visible(f.n)).forEach(f=>{const c=(opt.side&&f.k!=='top'&&f.k!=='bottom'&&!(opt.spine&&f.k===opt.spine))?opt.side:col;poly(f.v,shade(c,lit(f.n)),opt.edge);if(opt.onFace)opt.onFace(f)})};
     /* 면 위 글씨: 면의 두 변으로 affine 변환 */
     const faceText=(o,u,v,wu,hv,fn)=>{const a=S2(o),b=S2(u),c=S2(v);ctx.save();ctx.setTransform((b[0]-a[0])/wu,(b[1]-a[1])/wu,(c[0]-a[0])/hv,(c[1]-a[1])/hv,a[0],a[1]);fn(ctx);ctx.restore()};
     const wrap=(t,k,mx)=>{t=String(t||'').replace(/\s*[\(\[].*$/,'');const o=[];let cur='';for(const w of t.split(/\s+/)){if((cur+' '+w).trim().length<=k)cur=(cur+' '+w).trim();else{if(cur)o.push(cur);cur=w;while(cur.length>k){o.push(cur.slice(0,k));cur=cur.slice(k)}}}if(cur)o.push(cur);return o.slice(0,mx)};
@@ -40,11 +41,12 @@ const D3C=(()=>{let TH={a:'#f6f3ec',b:'#e9e4d8',top:'#d8c29a',leg:'#a8895c',rim:
     /* 물건: 먼 것부터 */
     const O=scene().filter(o=>o.kind!=='table').map(o=>({...o,dep:pr([o.cx,o.cy,0])[2]})).sort((a,b)=>a.dep-b.dep);
     O.forEach(o=>{const i=o.i;
-      if(o.kind==='stack'){for(let j=0;j<o.n;j++){const jx=((i.n*37+j*23)%9)-4,jy=((i.n*19+j*31)%7)-3,last=j===o.n-1;
-          box(i.x+jx,i.y+jy,j*20,i.w,i.d,20,i.c,{side:'#f3ecdc',edge:'rgba(0,0,0,.18)',onFace:last?(f=>{if(f.k!=='top')return;const L2=wrap(o.t,7,3);
-            faceText([i.x+jx,i.y+jy,(j+1)*20],[i.x+jx+i.w,i.y+jy,(j+1)*20],[i.x+jx,i.y+jy+i.d,(j+1)*20],i.w,i.d,c=>{c.strokeStyle='rgba(255,255,255,.4)';c.lineWidth=2;c.strokeRect(12,14,i.w-24,i.d-28);c.fillStyle='#fff';c.font=`700 21px ${SF}`;L2.forEach((l,k)=>c.fillText(l,22,58+k*27));c.font=`800 18px ${F}`;c.fillText(String(i.n),i.w-34,i.d-24);c.font=`600 13px ${F}`;c.globalAlpha=.85;c.fillText(o.n+'권',22,i.d-24)})}):null});
+      if(o.kind==='stack'){for(let j=0;j<o.n;j++){const jx=((i.n*37+j*23)%9)-4,jy=((i.n*19+j*31)%7)-3,last=j===o.n-1,rot={a:(i.rot||0)+(i.rot?(((j*13+i.n)%5)-2)*0.012:0),cx:i.x+i.w/2,cy:i.y+i.d/2};
+          box(i.x+jx,i.y+jy,j*20,i.w,i.d,20,i.c,{rot,side:'#f3ecdc',edge:'rgba(0,0,0,.18)',onFace:last?(f=>{if(f.k!=='top')return;const L2=wrap(o.t,7,3);
+            faceText(rz([i.x+jx,i.y+jy,(j+1)*20],rot),rz([i.x+jx+i.w,i.y+jy,(j+1)*20],rot),rz([i.x+jx,i.y+jy+i.d,(j+1)*20],rot),i.w,i.d,c=>{if(i.band){c.fillStyle='#f2c230';c.fillRect(0,i.d*.66,i.w,i.d*.2);c.fillStyle='#1a1a1a';c.font=`700 13px ${F}`;c.fillText('띠지 · 한 줄 설명',10,i.d*.66+26)}c.strokeStyle='rgba(255,255,255,.4)';c.lineWidth=2;c.strokeRect(12,14,i.w-24,i.d-28);c.fillStyle='#fff';c.font=`700 21px ${SF}`;L2.forEach((l,k)=>c.fillText(l,22,58+k*27));c.font=`800 18px ${F}`;c.fillText(String(i.n),i.w-34,i.d-24);c.font=`600 13px ${F}`;c.globalAlpha=.85;c.fillText(o.n+'권',22,i.d-24)})}):null});
           /* 책등 띠 */
-          const sp=[[i.x+jx,i.y+jy+i.d,j*20+3],[i.x+jx+i.w,i.y+jy+i.d,j*20+3],[i.x+jx+i.w,i.y+jy+i.d,j*20+6],[i.x+jx,i.y+jy+i.d,j*20+6]];if(visible([0,1,0]))poly(sp,shade(i.c,.8))}}
+          const sp=[[i.x+jx,i.y+jy+i.d,j*20+3],[i.x+jx+i.w,i.y+jy+i.d,j*20+3],[i.x+jx+i.w,i.y+jy+i.d,j*20+6],[i.x+jx,i.y+jy+i.d,j*20+6]].map(p=>rz(p,rot));if(visible(rn([0,1,0],rot)))poly(sp,shade(i.c,.8))}}
+      else if(o.kind==='show'){box(i.x,i.y,0,105,6,74,'#fffdf6',{edge:'rgba(125,58,43,.6)'});if(visible([0,1,0]))faceText([i.x,i.y+6,74],[i.x+105,i.y+6,74],[i.x,i.y+6,0],105,74,c=>{c.fillStyle='#7d3a2b';c.font=`800 13px ${F}`;c.fillText('쇼카드',8,20);c.fillStyle='rgba(31,42,68,.45)';c.fillRect(8,30,86,3);c.fillRect(8,40,70,3);c.fillRect(8,50,80,3)})}
       else if(o.kind==='face'){box(i.x-6,i.y-20,0,162,40,8,'#dfe6e8',{edge:'rgba(0,0,0,.15)'});box(i.x,i.y,8,150,22,215,i.c,{side:'#f3ecdc',edge:'rgba(0,0,0,.2)'});
         if(visible([0,1,0])){const L2=wrap(o.t,6,4);faceText([i.x,i.y+22,223],[i.x+150,i.y+22,223],[i.x,i.y+22,8],150,215,c=>{c.strokeStyle='rgba(255,255,255,.4)';c.lineWidth=2;c.strokeRect(10,10,130,195);c.fillStyle='#fff';c.font=`700 21px ${SF}`;L2.forEach((l,k)=>c.fillText(l,18,48+k*27));c.fillStyle='rgba(255,255,255,.85)';c.fillRect(0,160,150,30);c.fillStyle=shade(i.c,.55);c.font=`700 13px ${F}`;c.fillText('더숲의 추천',40,180)})}}
       else if(o.kind==='pop'){box(i.x+10,i.y-30,0,190,60,6,'#dfe6e8');box(i.x,i.y,6,210,10,297,'#fbf8f0',{edge:'rgba(0,0,0,.2)'});
@@ -83,8 +85,10 @@ function dpOps(t,s){const ops=[],R=dpRef(t,s);
   if(/(영상|녹화|동영상)/.test(s))return [{op:'rec'}];
   if(/(한\s*바퀴|빙글|돌려|회전)/.test(s)&&!R.length)return [{op:'spin'}];
   if(/(위에서)/.test(s)&&!R.length)return [{op:'view',v:'top'}];if(/(앞에서|정면)/.test(s)&&!R.length)return [{op:'view',v:'front'}];
-  const objs={꽃병:'vase',꽃:'vase',쪽지:'note',POP:'pop',pop:'pop',팝:'pop',이름표:'card'};for(const [w,k] of Object.entries(objs))if(s.includes(w)&&!R.length){ops.push({op:'obj',k,on:!/(빼|치워|숨|없애|지워)/.test(s)});return ops}
+  const objs={쇼카드:'show',띠지:'band',꽃병:'vase',꽃:'vase',쪽지:'note',POP:'pop',pop:'pop',팝:'pop',이름표:'card'};for(const [w,k] of Object.entries(objs))if(s.includes(w)&&!R.length){ops.push({op:'obj',k,on:!/(빼|치워|숨|없애|지워)/.test(s)});return ops}
   if(/(처음|원래)/.test(s)&&/(배치|대로|자리)/.test(s))return [{op:'reset'}];
+  if(/(메인|주인공|얼굴)/.test(s)&&R.length)return [{op:'main',i:R[0]}];
+  if(/비정형|흐트|자유롭/.test(s))return [{op:'free',on:true}];if(/가지런|반듯|정렬/.test(s))return [{op:'free',on:false}];
   if(/(바꿔|교환|자리\s*바꾸)/.test(s)&&R.length>=2)return [{op:'swap',a:R[0],b:R[1]}];
   if(/(빼|치워|없애|지워|삭제|내려)/.test(s))return R.map(i=>({op:'rm',i}));
   const where=/(맨\s*앞|제일\s*앞)/.test(s)?'front':/(맨\s*뒤|제일\s*뒤)/.test(s)?'back':/가운데|중앙/.test(s)?'center':/앞/.test(s)?'fwd':/뒤/.test(s)?'bwd':/왼/.test(s)?'left':/오른/.test(s)?'right':null;
@@ -99,6 +103,7 @@ function dpApply(t,ops){const md=S.ui.dpM||0;let msg=[];for(const o of ops){cons
     else if(o.op==='mv'){const c=stk(o.i);if(!c)continue;const [x,y]=dpFree(P,'k'+o.i,...at(o.where,c));dpSetPos(t,'k'+o.i,x,y);msg.push(`「${nm(o.i)}」 옮겼습니다`)}
     else if(o.op==='swap'){const a=stk(o.a),b=stk(o.b);if(!a||!b)continue;dpSetPos(t,'k'+o.a,b.x,b.y);dpSetPos(t,'k'+o.b,a.x,a.y);msg.push('두 책의 자리를 바꿨습니다')}
     else if(o.op==='obj'){S.ui.dpObj={...(S.ui.dpObj||{}),[o.k]:o.on};msg.push(o.on?'보이게 했습니다':'숨겼습니다')}
+    else if(o.op==='main'){if(!dpPick(t).includes(o.i))A.dpPk({i:o.i});A.dpMainSet({id:'k'+o.i});return}else if(o.op==='free'){A.dpFreeT({v:o.on?'1':'0'});return}
     else if(o.op==='reset'){A.dpReset();return}
     else if(o.op==='spin'){D3C.turn(4000);return}else if(o.op==='view'){A.d3v({v:o.v});return}else if(o.op==='rec'){A.d3rec();return}}
   dpRe();toast(msg.length?msg.join(' · '):'알아듣지 못했습니다. 예: 「3번 맨 앞으로」')}
