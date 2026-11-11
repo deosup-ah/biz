@@ -1,8 +1,8 @@
 /* ux.js — 쓰는 사람 쪽에서 다시 짠 것들: 한 줄 입력 하나, 한 벌 뽑기, 보관함, 매출 줄이기, 빈 화면의 다음 행동, 지점 주소 */
 
 /* 지점 주소: 주소 끝에 #choso 처럼 붙이면 그 지점으로 열린다. #academy 는 아카데미 */
-(()=>{try{const q=new URLSearchParams(location.search).get('br')||decodeURIComponent(location.hash.slice(1));if(q==='academy')S.mode='aka';else if(BR.some(b=>b.k===q)){S.mode='store';S.br=q;ls.set('br',q)}}catch(e){}})();
-A.cpLink=()=>{const u=location.origin+location.pathname+'#'+(S.mode==='aka'?'academy':S.br);copyText(u)};
+(()=>{try{const q=new URLSearchParams(location.search).get('br')||decodeURIComponent(location.hash.slice(1));if(q==='academy'||q==='aka'){S.mode='store';S.br='aka';S.view.store='cur';ls.set('br','aka')}else if(BR.some(b=>b.k===q)){S.mode='store';S.br=q;ls.set('br',q)}if(S.br==='all'||!S.br){S.br='aka';ls.set('br','aka')}}catch(e){}})();
+A.cpLink=()=>{const u=location.origin+location.pathname+'#'+S.br;copyText(u)};
 
 /* 한 줄 입력 하나: 어느 화면에서나 맨 위 같은 자리. 내용을 보고 일정 · 안내문 · 평대 · POP 으로 간다 */
 const G_SCHED=/(오늘|내일|모레|글피|\d\s*시|\d{1,2}:\d{2}|\d+\s*(명|인)|\d+\s*월|\d+\s*일|요일|\d{1,2}[\/.]\d{1,2})/,G_NOTE=/(습니다|주세요|마세요|안내문|안내판|공지)/,G_CMD=/단체표|주차|길\s*안내|화살표|대관|금연|정숙|출입|알림판|공간\s*소개/;
@@ -47,3 +47,16 @@ function uxPost(){const mn=document.querySelector('main');if(!mn)return;const m=
     if(ul)lis.splice(0,3).forEach(li=>ul.appendChild(li));
     const g=mn.querySelector(':scope>.grid.g4');if(g){let st=g.nextElementSibling;if(st&&st.matches('p.note'))st=st.nextElementSibling;const rest=[];for(let e=st;e;e=e.nextElementSibling)rest.push(e);if(rest.length){const dt=document.createElement('details');dt.className='anaf';dt.open=!!S.ui.anaOpen;dt.innerHTML='<summary>그래프와 표 자세히 보기</summary>';if(lis.length){const c=document.createElement('div');c.className='card';c.innerHTML='<h3>더 읽기</h3><ul></ul>';lis.forEach(li=>c.lastChild.appendChild(li));dt.appendChild(c)}rest.forEach(e=>dt.appendChild(e));dt.addEventListener('toggle',()=>{S.ui.anaOpen=dt.open});mn.appendChild(dt)}}}}
 (()=>{const r=render;render=function(){r.apply(this,arguments);try{uxPost()}catch(e){console.warn(e)}}})();
+
+/* ── 곳 고르기 하나: 아카데미 · 노원 · 초소 · 소전 · 본점 · 중계. 「서점 / 전체」는 없다. 아카데미는 공간 일과 책 일을 한 묶음으로 ── */
+const PLACES=[['aka','아카데미'],['nowon','노원'],['choso','초소'],['sojeon','소전'],['nmain','본점'],['njung','중계']];
+const akaCtx=()=>S.mode==='aka'||S.br==='aka';
+function navList(){if(!akaCtx())return TABS.store.map(([v,l],i)=>[v,l,'store',i===0?'기획':v==='stock'?'실제':'']);
+  return [['cur','큐레이션','store','기획'],['space','공간','aka',''],['design','만들기','aka',''],['trend','트렌드','aka',''],['talk','북토크','aka',''],['insta','홍보','aka',''],['today','오늘','aka','실제'],['cal','일정','aka',''],['stock','주문','store',''],['ana','매출','store',''],['more','더보기','store','']]}
+function navCur(){const L=navList(),m=S.mode,v=S.view[m];let t=L.find(x=>x[2]===m&&x[0]===v);if(!t&&m==='aka'&&typeof GRP!=='undefined'&&GRP[v])t=L.find(x=>x[2]==='aka'&&x[0]===GRP[v]);if(!t)t=L.find(x=>x[2]===m&&x[0]==='more')||L.find(x=>x[2]===m)||L[0];return t[2]+':'+t[0]}
+A.place=d=>{const k=d.k;if(k==='aka'){if(!akaCtx()){S.mode='store';S.view.store='cur'}}else{if(S.mode!=='store'){S.mode='store'}}A.br({k});window.scrollTo(0,0)};
+(()=>{const h=A.home;A.home=d=>{if(akaCtx()){S.mode='store';S.br='aka';S.view.store='cur';try{ss.set('view',S.view)}catch(e){}window.scrollTo(0,0);render();return}return h(d)}})();
+function navPost(){if(S.br==='all'||!S.br)S.br='aka';const hd=document.querySelector('header.top');if(!hd)return;const md=hd.querySelector('.mode');if(md)md.remove();let r2=hd.querySelector('.row2');const cur=akaCtx()?'aka':S.br,html=PLACES.map(([k,n])=>`<button class="brchip" data-a="place" data-k="${k}" aria-pressed="${cur===k}">${n}</button>`).join('');
+  if(!r2){r2=document.createElement('div');r2.className='row2';r2.setAttribute('role','group');const bar=hd.querySelector('.bar');bar.after(r2)}r2.classList.add('places');r2.setAttribute('aria-label','곳 고르기');r2.innerHTML=html;
+  const nv=hd.querySelector('nav.tabs');if(nv){const c=navCur();let al=0,cn=0;try{al=anomalies('all').length;cn=BR.reduce((a,b)=>a+cart(b.k).items.length,0)}catch(e){}nv.innerHTML=navList().map(([v,l,m,g])=>`${g?`<span class="tg">${g}</span>`:''}<button data-a="go" data-v="${v}" data-m="${m}" ${c===m+':'+v?'aria-current="page"':''}>${l}${v==='more'&&al?`<span class="b">${al}</span>`:''}${v==='stock'&&cn?`<span class="b" style="background:var(--pine)">${cn}</span>`:''}</button>`).join('')}}
+(()=>{const r=render;render=function(){r.apply(this,arguments);try{navPost()}catch(e){console.warn(e)}try{if(window.dialSync)window.dialSync()}catch(e){}}})();
