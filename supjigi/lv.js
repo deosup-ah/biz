@@ -25,7 +25,8 @@ const HID={store:['ana','stock','today','rank','ret','data','biz'],aka:['today',
 if(!isAdmin()){for(let i=GDS.length-1;i>=0;i--)if(GDS[i][0]==='b'||GDS[i][0]==='d')GDS.splice(i,1)}
 if(!isAdmin())GDS.push(['z','곧 열립니다','주문 · 매출 · 지원사업']);
 let gdTy=0;
-(()=>{const g=gdDraw;gdDraw=function(){g.apply(this,arguments);try{const G=$('guide');if(!G||G.classList.contains('bs'))return;const k=(GDS[S.ui.gd|0]||[])[0];
+(()=>{const g=gdDraw;gdDraw=function(){g.apply(this,arguments);try{const G=$('guide');if(!G)return;G.classList.toggle('gdfit',!G.classList.contains('bs'));if(G.classList.contains('bs'))return;const gi=S.ui.gd|0,k=(GDS[gi]||[])[0],last=gi===GDS.length-1;
+  const B=G.querySelector('.gdb');if(B&&!B.querySelector('.gdnx')){const im0=G.querySelector('.gdi img');if(im0){im0.dataset.a=last?'gdClose':'gdGo';im0.dataset.d='1'}const nx=document.createElement('div');nx.className='gdnx';nx.innerHTML=(gi?'<button class="gdpv" data-a="gdGo" data-d="-1" aria-label="이전">‹</button>':'')+(last?'<button class="gdgo" data-a="gdClose">시작하기</button>':'<button class="gdgo" data-a="gdGo" data-d="1">다음 ›</button>');B.append(nx)}
   if(k==='z'){const im=G.querySelector('.gdi img');if(im)im.outerHTML=`<div class="gdz">${[['주문','팔린 만큼 알아서 셈하고, 북센 주문에 담아 둡니다'],['매출','숫자 대신 이번 주 할 일 세 가지로 알려 줍니다'],['지원사업','공모 일정과 신청 기록을 한곳에 모읍니다']].map(([a,b])=>`<div><b>${a}</b><span>${b}</span><em>안정화 중</em></div>`).join('')}<p>시스템 안정화 테스트 중입니다. 며칠만 기다려 주세요.</p></div>`}
   const h=G.querySelector('.gdb h2');if(h){const t=h.textContent,id=++gdTy;h.textContent='';h.classList.add('gdty');let n=0;const st=()=>{if(id!==gdTy||!h.isConnected)return;h.textContent=t.slice(0,++n);if(n<t.length)setTimeout(st,28);else setTimeout(()=>h.classList.add('done'),600)};st()}}catch(e){}}})();
 
