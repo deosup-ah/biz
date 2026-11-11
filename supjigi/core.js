@@ -1,6 +1,6 @@
 'use strict';
 /* 숲지기 — 공통: 상태 · 저장 · 잠금 · 머리줄 · 도우미 */
-const PIN_HASH='29034ea8787d9397e8532aaafed1d44c7fb23fc664eaa4f5e5e51a669db408ec';
+const PIN_HASH='e1c5f2decd3b41837d282ce6d155419361ea4e809ba2b539605676bcbb375f1f';
 const BR=[{k:'aka',n:'아카',c:'var(--s1)'},{k:'choso',n:'초소',c:'var(--s2)'},{k:'sojeon',n:'소전',c:'var(--s3)'},{k:'nowon',n:'노원더숲',c:'var(--s4)'},{k:'nmain',n:'노원문고 본점',c:'var(--s5)'},{k:'njung',n:'노원문고 중계',c:'var(--s6)'}];
 const NM=br=>br==='nmain'||br==='njung',BP=br=>NM(br)?'노원문고 ':'더숲 ';
 const brN=k=>k==='all'?'전체':(BR.find(b=>b.k===k)||{}).n||k;
