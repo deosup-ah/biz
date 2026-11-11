@@ -156,27 +156,28 @@ document.addEventListener('keydown',e=>{if(e.target&&e.target.id==='ideaIn'&&e.k
 (()=>{const f=A.qAdd;A.qAdd=()=>{const el=$('qIn'),v=el?el.value.trim():'';if(v&&!v.includes('\n')&&!/(오늘|내일|모레|글피|\d\s*시|\d{1,2}:\d{2}|\d+\s*(명|인)|\d+\s*월|\d+\s*일|요일|\d{1,2}[\/.]\d{1,2})/.test(v)&&!/단체표|주차|길\s*안내|화살표|대관|금연|정숙|출입|알림판|공간\s*소개/.test(v)&&!(/(POP|pop|팝|띠지|쇼카드|안내문)/.test(v)&&Object.keys(QAL).some(x=>v.includes(x)))){A.ideaGo({v});return}f()}})();
 
 /* ── 떠오른 생각 한 줄 → 한 벌 완성 (주제 · 책 · POP · 띠지 · 목록 · 쇼카드 · 진열 · 오브제) ── */
-S.ui.myT=ls.get('myT',[]);
+const ssT={get(){try{return JSON.parse(sessionStorage.getItem('sj.myT')||'[]')}catch(e){return []}},set(v){try{sessionStorage.setItem('sj.myT',JSON.stringify(v))}catch(e){}}};try{localStorage.removeItem('sj.myT')}catch(e){}
+S.ui.myT=ssT.get();
 (()=>{const g=corners;corners=function(br){const C=g(br),my=(S.ui.myT||[]).map(t=>({...t,br,books:myBooks(t,br)}));C.time=[...my,...C.time];C.all=[...C.time,...C.data];return C}})();
 function myBooks(t,br){let P=[];try{P=pool(br)}catch(e){}const pick=(t.pick||[]).map(x=>P.find(b=>nt(b.t)===nt(x))).filter(Boolean),W=(t.src||'').split(/[\s,.·]+/).filter(w=>w.length>1).map(w=>w.replace(/(은|는|이|가|을|를|의|에|에서|으로|로|과|와|도|들)$/,'')).filter(w=>w.length>1);
   const TP=topicsOf(t.src||''),TW=TP.flatMap(x=>x.w),TC=TP.flatMap(x=>x.c||[]),hasW=(s,w)=>w.length>1?s.includes(w):new RegExp('(^|[\\s,])'+w+'($|[\\s,])').test(s),W2=W.filter(w=>!/^(이야기|사람|읽는|읽기|좋은|오는|싶은|건네고|전날|그냥|아는데|가기|한테|에서)$/.test(w)),sc=b=>(/취미|아동|경제|수험|참고/.test(b.cat||'')&&!TC.includes(b.cat))||/배우는|기초|완성|돈이 되는|문제집|자격증|수험/.test(b.t||'')?0:W2.reduce((a,w)=>a+(hasW(b.t||'',w)?4:0)+((b.a||'').includes(w)&&w.length>1?1:0),0)+TW.reduce((a,w)=>a+(hasW(b.t||'',w)?3:0),0)+(TW.some(w=>(b.t||'').includes(w))&&TC.includes(b.cat)?1:0)+((b.here||0)>0?.5:0),rest=P.filter(b=>!pick.includes(b)).map(b=>[sc(b),b]).filter(x=>x[0]>0).sort((a,b)=>b[0]-a[0]||(b[1].here||0)-(a[1].here||0)).map(x=>x[1]);
   let L=[...pick,...rest].filter((b,i,A)=>A.findIndex(z=>nt(z.t).slice(0,5)===nt(b.t).slice(0,5))===i);if(L.length<4)L=[...L,...P.filter(b=>b.here>0&&!L.includes(b)).sort((a,b)=>(b.mine||0)-(a.mine||0))].slice(0,5);
   return L.slice(0,6).map((b,i)=>({...b,why:bookWhy(b),src:b.here>0?'재고':'들여놓기',role:i===0?'중심':'곁들임'}))}
-A.myDel=d=>{S.ui.myT=(S.ui.myT||[]).filter(t=>t.id!==d.id);ls.set('myT',S.ui.myT);render()};
+A.myDel=d=>{S.ui.myT=(S.ui.myT||[]).filter(t=>t.id!==d.id);ssT.set(S.ui.myT);render()};
 (()=>{const f=A.ideaGo;A.ideaGo=async d=>{if(S.mode!=='store'||S.br==='all'){if(S.mode==='store'){toast('위에서 지점을 먼저 고르세요');return}return f(d)}
   const el=$('ideaIn')||$('cIdea'),v=((d&&d.v)||(el&&el.value)||'').trim();if(!v){toast('떠오른 생각을 한 줄 적어 주세요');return}
   const D=ideaLocal(v),id='m'+Date.now().toString(36),un=addDays(TODAY,14),sh=false,t={id,tone:'내 생각',src:v,title:D.head.replace(/\n/g,' '),hook:D.body||'',sym:D.sym,bpal:D.pal,ppal:D.pal,until:un,place:'입구 평대',pop:{head:D.head,body:D.body||''},band:v.length<=20?v:D.head,pick:[]};
-  S.ui.myT=[t,...(S.ui.myT||[])].slice(0,6);ls.set('myT',S.ui.myT);S.ui.cTone='내 생각';S.view.store='cur';window.scrollTo(0,0);render();if(!AI)return;
+  S.ui.myT=[t,...(S.ui.myT||[])].slice(0,6);ssT.set(S.ui.myT);S.ui.cTone='내 생각';S.view.store='cur';window.scrollTo(0,0);render();if(!AI)return;
   let P=[];try{P=pool(S.br)}catch(e){}const cand=P.filter(b=>b.here>0||b.sold>0).slice(0,150).map(b=>b.t);
   const out=await ask('idea',`서점 "더숲"의 평대 기획입니다. 직원이 떠올린 생각 한 줄로 평대 하나를 완성해 주세요.\n생각: "${v.replace(/"/g,"'")}"\n말투: 조용하고 담백하게. 느낌표·이모지·과장 금지. 뻔한 표현 대신 한 번 비튼 낱말 하나. 없는 사실은 지어내지 않습니다.\ntitle 은 14자 안쪽 평대 이름, hook 은 45자 안쪽 한두 문장, band 는 띠지용 18자 안쪽 한 줄, sym 은 ${Object.keys(ICON).filter(x=>!x.startsWith('ph')).join('|')}|none.\nbooks 는 아래 [이 지점에서 다루는 책] 목록에 있는 제목만, 생각에 맞는 순서로 4~6권. 목록에 맞는 책이 없으면 빈 배열. 목록에 없는 책은 넣지 않습니다.\n[이 지점에서 다루는 책]\n${cand.join(' / ')}\nJSON 으로만: {"title":"","hook":"","band":"","sym":"","books":["제목"]}`,{modelTier:'quick'});
-  const m=(S.ui.myT||[]).find(x=>x.id===id);if(!out||!out.title||!m)return;m.title=out.title;m.hook=out.hook||m.hook;m.band=out.band||m.band;m.pop={head:out.title,body:out.hook||''};if(ICON[out.sym])m.sym=out.sym;m.pick=(Array.isArray(out.books)?out.books:[]).filter(x=>cand.includes(x)).slice(0,6);ls.set('myT',S.ui.myT);render()}})();
+  const m=(S.ui.myT||[]).find(x=>x.id===id);if(!out||!out.title||!m)return;m.title=out.title;m.hook=out.hook||m.hook;m.band=out.band||m.band;m.pop={head:out.title,body:out.hook||''};if(ICON[out.sym])m.sym=out.sym;m.pick=(Array.isArray(out.books)?out.books:[]).filter(x=>cand.includes(x)).slice(0,6);ssT.set(S.ui.myT);render()}})();
 (()=>{const f=V.store.cur;V.store.cur=()=>{let h=f();if(S.br==='all')return h;const has=(S.ui.myT||[]).length;
   if(has)h=h.replace(`aria-pressed="${(S.ui.cTone||'전체')==='전체'}">전체</button>`,m=>m+`<button data-a="cTone" data-t="내 생각" aria-pressed="${S.ui.cTone==='내 생각'}">내 생각</button>`);
   const bar=`<div class="card qadd"><div class="qrow"><input type="text" id="cIdea" autocomplete="off" enterkeyhint="go" placeholder="떠오른 생각 한 줄 — 비 오는 날엔 얇은 책"><label class="btn">사진<input type="file" accept="image/*" data-c="feelPhoto" hidden></label>${micBtn('cIdea')}<button class="btn pri" data-a="ideaGo">${S.ui.busy==='idea'?'고르는 중…':'완성하기'}</button></div><small class="note">낱말 하나나 사진 한 장이면 세 갈래로 넓혀 평대 한 벌을 만듭니다. 문장으로 적으면 그대로, 「~습니다」로 끝내면 안내문이 됩니다${has&&S.ui.cTone==='내 생각'?` <button class="lnk" data-a="myClear">내 생각 모두 지우기</button>`:''}</small></div>`;
   const i=h.indexOf('<div class="subnav"');return i>0?h.slice(0,i)+bar+h.slice(i):bar+h}})();
 document.addEventListener('keydown',e=>{if(e.target&&e.target.id==='cIdea'&&e.key==='Enter'&&!e.isComposing){e.preventDefault();A.ideaGo({v:e.target.value})}});
 
-A.myClear=()=>{S.ui.myT=[];ls.set('myT',[]);S.ui.cTone='전체';render()};
+A.myClear=()=>{S.ui.myT=[];ssT.set([]);S.ui.cTone='전체';render()};
 
 /* ── 말로 넣기 · 안내문도 생각 한 줄로 (아카 · 서점 모두) ── */
 if(!KSHOW.store.includes('sign'))KSHOW.store.push('sign');
@@ -285,7 +286,7 @@ const josa=(w,a,b)=>{const c=w.charCodeAt(w.length-1);return w+((c>=0xAC00&&c<=0
 function feelOf(w){const A=ASSOC.find(x=>x[0].test(w));return A?{f:A[1],l:A[2]}:{f:'',l:[[`${w}의 반대편`,w],[`${josa(w,'을','를')} 기다리는 사람`,w],[`${w} 다음에 오는 것`,w]]}}
 A.feelGo=d=>{const w=(d.w||'').trim();if(!w)return;const F=feelOf(w),sym=(IDS.find(([r])=>r.test(w+' '))||[0,'none'])[1],dark=/밤|어둠|새벽|겨울|안개|고독|침묵/.test(w),pal=dark?2:/숲|나무|풀|산|꽃|봄/.test(w)?1:/노을|가을|커피|저녁/.test(w)?3:/바다|강|비|물/.test(w)?4:0,chain=`「${w}」${F.f?' → '+F.f:''}`;
   if(S.mode==='store'&&S.br!=='all'){const un=addDays(TODAY,14),T=F.l.map(([t,kw],i)=>({id:'f'+Date.now().toString(36)+i,tone:'내 생각',src:w+' '+kw,title:t,hook:`${chain}${d.note?' · '+d.note:''}`,sym,bpal:pal,ppal:pal,until:un,place:'입구 평대',pop:{head:t,body:chain},band:t,pick:[],key:w}));
-    S.ui.myT=[...T,...(S.ui.myT||[])].slice(0,6);ls.set('myT',S.ui.myT);S.ui.cTone='내 생각';S.view.store='cur';window.scrollTo(0,0);render();toast(`「${w}」에서 세 갈래로 넓혔습니다`);return}
+    S.ui.myT=[...T,...(S.ui.myT||[])].slice(0,6);ssT.set(S.ui.myT);S.ui.cTone='내 생각';S.view.store='cur';window.scrollTo(0,0);render();toast(`「${w}」에서 세 갈래로 넓혔습니다`);return}
   if(S.mode==='store'){toast('위에서 지점을 먼저 고르세요');return}
   const H=S.ui.dH=S.ui.dH||[];if(S.ui.D)H.push(JSON.stringify(S.ui.D));const n=(S.ui.feelN=((S.ui.feelW===w?(S.ui.feelN|0)+1:0))%3);S.ui.feelW=w;S.ui.D=Object.assign(defD(),{kind:'pop',br:'aka',tag:'아카데미하우스',sym,st:dark?1:0,pal,head:F.l[n][0],body:chain+(d.note?'\n'+d.note:''),mkey:w});S.ui.gen=null;S.view.aka='design';window.scrollTo(0,0);render();toast('같은 낱말을 다시 넣으면 다른 갈래가 나옵니다')};
 (()=>{const f=A.ideaGo;A.ideaGo=async d=>{const el=$('ideaIn')||$('cIdea')||$('qIn'),v=((d&&d.v)||(el&&el.value)||'').trim();if(v&&!/\s/.test(v)&&v.length<=6&&/^[가-힣]+$/.test(v)&&!genreOf(v)&&!NOTR.test(v)){A.feelGo({w:v});return}return f(d)}})();
