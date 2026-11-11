@@ -66,7 +66,7 @@ function navPost(){if(S.br==='all'||!S.br)S.br='aka';const hd=document.querySele
 const hsh=s=>{let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return (h>>>0)/4294967296};
 const brAdd=()=>{const L=ls.get('brAdd',[]);return Array.isArray(L)?L:[]};
 const plName=k=>(PLACES.find(p=>p[0]===k)||[k,k])[1];
-(()=>{const g=corners;corners=function(br){const C=g(br);try{const wk=Math.floor(new Date(TODAY+'T00:00:00').getTime()/6048e5),my=C.time.filter(t=>t.tone==='내 생각'),rest=C.time.filter(t=>t.tone!=='내 생각'),same=rest.slice(0,3),G=rest.slice(3).map(t=>[hsh(wk+'|'+t.title),t]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]),bi=Math.max(0,PLACES.findIndex(p=>p[0]===br)),st=G.length?(bi*Math.max(2,Math.floor(G.length/PLACES.length)))%G.length:0,mix=[...G.slice(st),...G.slice(0,st)];let P=[];try{P=pool(br)}catch(e){}
+(()=>{const g=corners;corners=function(br){const C=g(br);try{const wk=curSeed(),my=C.time.filter(t=>t.tone==='내 생각'),rest=C.time.filter(t=>t.tone!=='내 생각'),A0=rest.map(t=>[hsh(wk+'|'+t.title)-(t.tone==='제철'?.12:0),t]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]),same=A0.slice(0,3),G=A0.slice(3),bi=Math.max(0,PLACES.findIndex(p=>p[0]===br)),st=G.length?(bi*Math.max(2,Math.floor(G.length/PLACES.length)))%G.length:0,mix=[...G.slice(st),...G.slice(0,st)];let P=[];try{P=pool(br)}catch(e){}
     const have=new Set([...my,...rest].map(t=>t.title)),got=brAdd().filter(x=>x.br===br&&x.t).map(x=>({...x.t,br,tone:'가져온 것',hook:x.t.hook||'',books:(x.t.books||[]).map(b=>P.find(p=>nt(p.t)===nt(b.t))||{...b,src:''})}));
     {const mx=mix.filter(t=>!got.some(q=>q.title===t.title));C.time=[...got,...my,...mx.slice(0,2),...same.slice(0,2),...mx.slice(2,3),...same.slice(2),...mx.slice(3)]}C.all=[...C.time,...C.data]}catch(e){console.warn(e)}return C}})();
 A.peek=d=>{S.ui.peek=S.ui.peek===d.k?null:d.k;render()};
@@ -125,3 +125,13 @@ try{HELP.store.stock='떨어질 책을 담아 북센 주문을 준비하고, 같
 
 /* 다른 지점 큐레이션은 표지 벽 위에 둔다(아래에 두면 안 보인다) */
 (()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn||S.mode!=='store'||S.view.store!=='cur')return;const at=mn.querySelector('.tick')||mn.querySelector('.wall');if(!at)return;['.pks','.pkc','.pkl'].forEach(s=>{const e=mn.querySelector(':scope>'+s);if(e)at.before(e)});const p=mn.querySelector(':scope>.pks');if(p)p.classList.add('top')}catch(e){console.warn(e)}}})();
+
+/* ── 큐레이션 묶음 갱신: 주마다 또는 달마다 저절로 전체가 바뀌고, 「지금 바꾸기」로 손으로도 바꾼다 ── */
+const curPer=()=>ls.get('curPer','w')==='m'?'m':'w';
+function curSpan(){const d=new Date(TODAY+'T00:00:00');if(curPer()==='m'){const n=new Date(d.getFullYear(),d.getMonth()+1,1);return{k:d.getFullYear()*12+d.getMonth(),next:n,label:'이번 달'}}const dow=(d.getDay()+6)%7,mon=new Date(d);mon.setDate(d.getDate()-dow);const n=new Date(mon);n.setDate(mon.getDate()+7);return{k:'w'+Math.floor(mon.getTime()/864e5),next:n,label:'이번 주'}}
+function curSeed(){const b=ls.get('curBump',null),sp=curSpan();return sp.k+'|'+(b&&b.k===String(sp.k)?b.n:0)}
+A.curPerSet=d=>{ls.set('curPer',d.v==='m'?'m':'w');S.ui.cOpen=null;render();toast(d.v==='m'?'달마다 전체가 바뀝니다':'주마다 전체가 바뀝니다')};
+A.curBump=()=>{const sp=curSpan(),b=ls.get('curBump',null),n=(b&&b.k===String(sp.k)?b.n:0)+1;ls.set('curBump',{k:String(sp.k),n});S.ui.cOpen=null;S.ui.cMore=false;render();window.scrollTo(0,0);toast('큐레이션 전체를 새로 바꿨습니다')};
+C.curPer=el=>A.curPerSet({v:el.value});
+(()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn||S.mode!=='store'||S.view.store!=='cur'||mn.querySelector('.rfr'))return;const sp=curSpan(),h=mn.querySelector('.hero h2');if(h&&h.firstChild&&h.firstChild.nodeType===3)h.firstChild.textContent=sp.label+' 큐레이션';
+  const n=(S.ui.cor||[]).length,w=document.createElement('div');w.className='rfr';w.innerHTML=`<span>모두 ${n}개 · ${sp.next.getMonth()+1}/${sp.next.getDate()}에 전체가 바뀝니다</span><select data-c="curPer" aria-label="바뀌는 주기"><option value="w" ${curPer()==='w'?'selected':''}>주마다</option><option value="m" ${curPer()==='m'?'selected':''}>달마다</option></select><button class="btn sm" data-a="curBump">지금 바꾸기</button>`;const at=mn.querySelector('.subnav');if(at)at.after(w);else mn.querySelector('.hero').after(w)}catch(e){console.warn(e)}}})();
