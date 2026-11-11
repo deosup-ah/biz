@@ -611,6 +611,20 @@ body.vm .tick{flex-wrap:wrap;gap:6px 10px}body.vm .tick span{flex:1 1 100%;white
 body .chip.phm{display:inline-grid;justify-items:center;gap:4px;padding:8px 12px 7px;min-width:78px;border:1.5px solid var(--line);color:var(--muted);font-size:12.5px;font-weight:600;line-height:1.2}
 body .chip.phm[aria-pressed="true"]{background:none;border-color:var(--ink);color:var(--ink);box-shadow:inset 0 -4px 0 var(--ink)}
 .phl{align-self:center;margin-right:2px}
+
+/* 앞 · 다음 · 처음 */
+.navb{display:flex;gap:2px;margin-left:auto}.navb button{display:grid;place-items:center;width:36px;height:36px;border:0;background:none;color:var(--ink);cursor:pointer;padding:0;border-radius:50%}.navb button:hover{background:var(--surface2)}.navb button:disabled{color:var(--line);cursor:default;background:none}
+header.top .bar{display:flex;align-items:center}
+@media(min-width:900px){body:not(.dialon) header.top .bar{flex-wrap:nowrap}body:not(.dialon) header.top .brand{flex:1 1 auto;margin:0}}
+.railf{display:none!important}
+/* 그림 칸 공통 */
+body .qbar{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch}
+body label.chip.phm{cursor:pointer;background:var(--pine);border-color:var(--pine);color:#fff}
+body .chip.phm svg{display:block}
+/* POP 화면: 지점 칩은 위에서 고른 곳을 따르므로 숨긴다 */
+main [data-a="dBr"]{display:none}
+@media(min-width:900px){body:not(.dialon) header.top .bar{padding:0 12px 0 16px;gap:0}body:not(.dialon) header.top .brand{flex:0 0 auto;white-space:nowrap}body:not(.dialon) header.top .brand span{white-space:nowrap;font-size:14px}body:not(.dialon) .navb button{width:28px;height:30px}body:not(.dialon) .navb svg{width:19px;height:19px}}
+.brand{white-space:nowrap}
 </style>
 </head>
 <body>
