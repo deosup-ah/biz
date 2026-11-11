@@ -19,7 +19,7 @@ const DPOBJ=[['pop','POP'],['card','이름표'],['vase','꽃병'],['note','손�
 function dpPick(t){const all=(t.books||[]).slice(0,10),P=S.ui.dpPick||{},k=dpKey(t);let L=P[k];if(!Array.isArray(L))L=all.map((_,i)=>i).slice(0,Math.min(6,all.length));return L.filter(i=>i<all.length)}
 function dpPicked(t){const all=(t.books||[]).slice(0,10);return{...t,books:dpPick(t).map(i=>all[i])}}
 const dpPosK=t=>dpKey(t)+'|'+(S.ui.dpM||0);
-function dpBuild(g,t,md,tmp){const pk=dpPick(t),T=dpPicked(t),P=g(T,md),n=(T.books||[]).length,[W,D]=DPSZ2(n),sx=(W-150)/750,sy=(D-230)/670;
+function dpBuild(g,t,md,tmp){const pk=dpPick(t),T=dpPicked(t),P=g(T,md),n=(T.books||[]).length,[W,D]=(S.ui.dpSzO&&typeof lvNow==='function'&&lvNow()>=3)?S.ui.dpSzO:DPSZ2(n),sx=(W-150)/750,sy=(D-230)/670;
   P.W=W;P.D=D;P.pk=pk;const ob=S.ui.dpObj||{};
   let it=P.it.filter(i=>i.k==='table'||!(i.k in ob)||ob[i.k]!==false).map(i=>{if(i.k==='table')return i;const o={...i,x:Math.round(i.x*sx),y:Math.round(i.y*sy)};if(i.k==='card'){o.x=Math.round(W/2-45);o.y=D-40}return o});
   if(ob.vase===true&&!it.some(i=>i.k==='vase'))it.push({k:'vase',x:40,y:Math.round(120*sy)});
@@ -28,6 +28,7 @@ function dpBuild(g,t,md,tmp){const pk=dpPick(t),T=dpPicked(t),P=g(T,md),n=(T.boo
   it.forEach(i=>{if(i.k!=='stack')return;i.id='k'+pk[i.n-1];const a=ov[i.id];if(!a)return;const nx=Math.max(0,Math.min(W-i.w,a[0])),ny=Math.max(0,Math.min(D-i.d,a[1])),dx=nx-i.x,dy=ny-i.y;
     it.forEach(f=>{if(f.k==='face'&&f.n===i.n){f.x+=dx;f.y+=dy}});i.x=nx;i.y=ny});
   it.forEach(i=>{if(i.k==='face'||i.k==='stack'||i.k==='table')return;i.id=i.k;const a=ov[i.id];if(a){i.x=Math.max(0,Math.min(W-60,a[0]));i.y=Math.max(0,Math.min(D-30,a[1]))}});
+  const Q=(S.ui.dpQ||{})[dpPosK(t)]||{};it.forEach(i=>{if(i.k==='stack'&&Q[i.id]){i.h=Q[i.id]*20;const r=P.rows.find(r=>r.n===i.n);if(r)r.qty=Q[i.id]+(it.some(f=>f.k==='face'&&f.n===i.n)?1:0)}});P.total=P.rows.reduce((a,r)=>a+r.qty,0);
   P.it=it;return P}
 let dpG0=null;
 (()=>{const g=dpPlan;dpG0=g;dpPlan=function(t,m){return dpBuild(g,t,m==null?(S.ui.dpM||0):m)}})();

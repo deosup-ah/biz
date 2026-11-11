@@ -1,6 +1,6 @@
 'use strict';
 /* 더숲 워크룸 — 진열 3D(캔버스): 실제 치수(mm)로 책 한 권 한 권, 표지 제목, 세운 책, POP, 꽃병까지. 끌어 돌리고, 한 바퀴 영상으로 저장. 말로 옮기기 */
-const D3C=(()=>{let cv=null,P=null,yaw=-0.55,pitch=0.95,spin=0,raf=0,rec=null;
+const D3C=(()=>{let TH={a:'#f6f3ec',b:'#e9e4d8',top:'#d8c29a',leg:'#a8895c',rim:'#bfa275'};let cv=null,P=null,yaw=-0.55,pitch=0.95,spin=0,raf=0,rec=null;
   const F='Pretendard,"Malgun Gothic","Apple SD Gothic Neo",sans-serif',SF='"Gowun Batang",Batang,serif';
   const L=(()=>{const v=[-0.45,-0.55,0.75],m=Math.hypot(...v);return v.map(x=>x/m)})();
   const hx=c=>{c=c.replace('#','');if(c.length===3)c=c.split('').map(x=>x+x).join('');return [0,2,4].map(i=>parseInt(c.slice(i,i+2),16))};
@@ -21,7 +21,7 @@ const D3C=(()=>{let cv=null,P=null,yaw=-0.55,pitch=0.95,spin=0,raf=0,rec=null;
       else if(i.k==='note')out.push({kind:'note',i,cx:i.x,cy:i.y})});
     return out}
   function draw(){if(!cv||!P)return;const ctx=cv.getContext('2d'),Wc=cv.width,Hc=cv.height,pr=cam(),W=P.W,D=P.D;
-    ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,Wc,Hc);const g=ctx.createLinearGradient(0,0,0,Hc);g.addColorStop(0,'#f6f3ec');g.addColorStop(1,'#e9e4d8');ctx.fillStyle=g;ctx.fillRect(0,0,Wc,Hc);
+    ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,Wc,Hc);const g=ctx.createLinearGradient(0,0,0,Hc);g.addColorStop(0,TH.a);g.addColorStop(1,TH.b);ctx.fillStyle=g;ctx.fillRect(0,0,Wc,Hc);
     const top=Math.max(300,...(P.it||[]).map(i=>i.k==='stack'?i.h:i.k==='pop'?300:i.k==='face'?230:0));
     const pts=[];[[0,0,-40],[W,0,-40],[W,D,-40],[0,D,-40],[0,0,top],[W,0,top],[W,D,top],[0,D,top],[0,0,-160],[W,D,-160],[W,0,-160],[0,D,-160]].forEach(p=>pts.push(pr(p)));
     const mnx=Math.min(...pts.map(p=>p[0])),mxx=Math.max(...pts.map(p=>p[0])),mny=Math.min(...pts.map(p=>p[1])),mxy=Math.max(...pts.map(p=>p[1]));
@@ -34,8 +34,8 @@ const D3C=(()=>{let cv=null,P=null,yaw=-0.55,pitch=0.95,spin=0,raf=0,rec=null;
     const wrap=(t,k,mx)=>{t=String(t||'').replace(/\s*[\(\[].*$/,'');const o=[];let cur='';for(const w of t.split(/\s+/)){if((cur+' '+w).trim().length<=k)cur=(cur+' '+w).trim();else{if(cur)o.push(cur);cur=w;while(cur.length>k){o.push(cur.slice(0,k));cur=cur.slice(k)}}}if(cur)o.push(cur);return o.slice(0,mx)};
     /* 바닥 그림자 · 다리 · 상판 */
     poly([[-60,-60,-760],[W+60,-60,-760],[W+60,D+60,-760],[-60,D+60,-760]],'rgba(60,45,25,.10)');
-    [[40,40],[W-90,40],[40,D-90],[W-90,D-90]].sort((p,q)=>pr([p[0],p[1],0])[2]-pr([q[0],q[1],0])[2]).forEach(([x,y])=>box(x,y,-760,50,50,720,'#a8895c'));
-    box(60,60,-110,W-120,D-120,26,'#bfa275');box(0,0,-40,W,D,40,'#d8c29a',{edge:'rgba(120,95,60,.35)'});
+    [[40,40],[W-90,40],[40,D-90],[W-90,D-90]].sort((p,q)=>pr([p[0],p[1],0])[2]-pr([q[0],q[1],0])[2]).forEach(([x,y])=>box(x,y,-760,50,50,720,TH.leg));
+    box(60,60,-110,W-120,D-120,26,TH.rim);box(0,0,-40,W,D,40,TH.top,{edge:'rgba(120,95,60,.35)'});
     for(let v=150;v<W;v+=150){const a=S2([v,0,0.5]),b=S2([v,D,0.5]);ctx.strokeStyle='rgba(150,120,80,.22)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}
     /* 물건: 먼 것부터 */
     const O=scene().filter(o=>o.kind!=='table').map(o=>({...o,dep:pr([o.cx,o.cy,0])[2]})).sort((a,b)=>a.dep-b.dep);
@@ -69,7 +69,7 @@ const D3C=(()=>{let cv=null,P=null,yaw=-0.55,pitch=0.95,spin=0,raf=0,rec=null;
     const st=cv.captureStream(30),mr=new MediaRecorder(st,ty?{mimeType:ty,videoBitsPerSecond:4e6}:{}),ch=[];rec=mr;mr.ondataavailable=e=>{if(e.data&&e.data.size)ch.push(e.data)};
     mr.onstop=()=>{rec=null;const b=new Blob(ch,{type:ty||'video/webm'});saveFile(`더숲_진열_한바퀴_${String(name||'').replace(/[\\/:*?"<>|\s,]+/g,'_').slice(0,20)}.${ext}`,b);toast(`한 바퀴 영상(${ext.toUpperCase()})을 저장했습니다`)};
     toast('한 바퀴 도는 동안 녹화합니다 (6초)');mr.start();anim([yaw,0.9],400,()=>turn(6000,()=>setTimeout(()=>mr.stop(),200)))}
-  return{mount,set,draw,anim,turn,record,view:()=>[yaw,pitch],rot:d=>{anim([yaw+d,pitch],500)}}})();
+  return{theme:t=>{TH={...TH,...t};draw()},mount,set,draw,anim,turn,record,view:()=>[yaw,pitch],rot:d=>{anim([yaw+d,pitch],500)}}})();
 A.d3v=d=>{if(d.v==='front')D3C.anim([0,1.2],500);else if(d.v==='top')D3C.anim([0,0.05],500);else D3C.turn(4000)};
 A.d3rec=()=>{const t=(S.ui.cor||[])[S.ui.dp.i];D3C.record(t&&t.title)};
 
