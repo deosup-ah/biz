@@ -99,3 +99,10 @@ A.lvSerial=d=>{if(lvNow()<2)return lvLock(2);const t=(S.ui.cor||[])[+d.i];if(!t)
 const LVSEA={1:['새해 첫 책','겨울밤','다짐','눈'],2:['겨울 끝','편지','졸업','봄 기다리기'],3:['새 학기','봄','시작','꽃'],4:['산책','벚꽃','나무','봄비'],5:['가족','숲','여행 준비','초록'],6:['여름 시작','비','바다','밤'],7:['여름방학','여행','바다','더위'],8:['한여름','휴가','밤','별'],9:['가을','독서의 계절','편지','하늘'],10:['단풍','산책','고독','노을'],11:['늦가을','겨울 준비','차 한 잔','첫눈'],12:['첫눈','선물','한 해 돌아보기','새해 준비']};
 A.lvSeason=()=>{if(lvNow()<3)return lvLock(3);const m=+TODAY.slice(5,7),W=LVSEA[m]||LVSEA[11];lvAdd('cur',m+'월 계절 기획');
   lvPut(W.map((w,i)=>{const dark=/밤|겨울|고독|눈/.test(w),pal=dark?2:/숲|나무|봄|초록|꽃/.test(w)?1:/노을|가을|단풍|차/.test(w)?3:/바다|비|여름/.test(w)?4:0;return{id:'q'+Date.now().toString(36)+i,tone:'내 생각',src:w,title:`${m}월 ${i+1}주 · ${w}`,hook:`4주 계절 기획 ${i+1}주차 · 주마다 평대를 바꿉니다`,sym:'book',bpal:pal,ppal:pal,until:addDays(TODAY,(i+1)*7),place:'입구 평대',pop:{head:w,body:`${m}월 ${i+1}주의 평대`},band:w,pick:[],key:w}}),`${m}월 4주 계절 기획을 만들었습니다. 맨 앞 네 표지입니다`)};
+
+/* ── 메인 POP 원칙(참부장): 심플하면 이미지 · 기호 · 상징 · 기계 언어로 보완한다. 아니면 질문을 더 넣는다. 나머지 설명은 쇼카드 · 띠지가 맡는다 ── */
+const POPQ=['왜 지금, 이 이야기일까요?','마지막으로 그래 본 게 언제인가요?','당신이라면 어떻게 하겠습니까?','이 가운데 당신의 책은 무엇입니까?','읽고 나면 무엇이 달라질까요?'];
+const popMach=(w,n)=>[`> ${w}_`,`「${w}」 → ?`,`${w} + 책 = ___`,`if (${w}) { 읽는다 }`,`${w} ≠ ?`,`[ ${w} ]  ⌕`][n%6];
+(()=>{const f=mkD;mkD=function(t,k){const D=f(t,k);try{if(k!=='pop')return D;const head=String(D.head||'').replace(/\n/g,' ').trim(),core=head.replace(/[\s,.!?·「」]/g,''),h=[...core].reduce((a,c)=>a+c.charCodeAt(0),0),simple=core.length<=8&&head.split(/\s+/).length<=2;
+  if(simple){if(!D.sym||D.sym==='none'){let s='book';try{s=(IDS.find(([r])=>r.test(head+' '))||[0,'book'])[1]}catch(e){}D.sym=s}D.body=popMach(head,h)}
+  else if(!/[?？]\s*$/.test(D.body||'')){const q=POPQ[h%POPQ.length];D.body=(D.body&&D.body.length<=28?D.body+'\n':'')+q}}catch(e){}return D}})();
