@@ -490,6 +490,14 @@ body.dialon .row2.places{margin:10px 20px 14px!important}body.dialon .row2.place
 .bsn{display:grid;gap:18px;margin:16px 0 8px}.bsg>b{display:block;font:700 13.5px "Pretendard",sans-serif;color:#6a6a64;margin-bottom:6px}
 .bsc{display:flex;flex-wrap:wrap;border:1px solid #1c1c1a}.bsc>div{flex:1 1 110px;padding:12px 10px 12px;border-right:1px solid #d9d6ca;border-bottom:1px solid #d9d6ca;margin:0 -1px -1px 0}.bsc code{display:block;font:800 24px/1.1 "Pretendard",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.02em;color:#003128}.bsc em{display:block;font:700 13.5px "Pretendard",sans-serif;font-style:normal;margin:6px 0 2px}.bsc small{display:block;font-size:13px;line-height:1.5;color:#55554f}
 @media(max-width:600px){.bsd>div{grid-template-columns:1fr;gap:3px}.bsf{flex-direction:column}.bsf i{flex:0 0 40px;padding:0}.bsf i::after,.bsf i::before{display:none}}
+
+/* 큐레이션 카드 버튼: 큰 것 하나, 작은 것 셋 */
+.pcard .btns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;align-items:stretch}
+.pcard .btns>.btn.pri{grid-column:1/-1;padding:12px;font-size:15.5px}
+.pcard .btns>.btn:not(.pri){padding:9px 4px;font-size:13.5px;white-space:nowrap;text-align:center;border-color:var(--line)}
+.pcard .btns>.menu{margin:0;display:block}.pcard .btns>.menu>summary{display:block;text-align:center;padding:9px 4px;font-size:13.5px;border-radius:3px;height:100%}
+/* 느낌 고르기: 아홉 가지를 셋씩 */
+.feels{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 12px;max-width:420px}
 </style>
 </head>
 <body>

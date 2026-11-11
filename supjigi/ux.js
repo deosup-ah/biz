@@ -53,7 +53,7 @@ const PLACES=[['aka','아카데미'],['nowon','노원'],['choso','초소'],['soj
 const akaCtx=()=>S.mode==='aka'||S.br==='aka';
 function navList(){if(!akaCtx())return TABS.store.map(([v,l],i)=>[v,l,'store',i===0?'기획':v==='stock'?'실제':'']);
   return [['cur','큐레이션','store','기획'],['space','공간','aka',''],['design','만들기','aka',''],['trend','트렌드','aka',''],['talk','북토크','aka',''],['insta','홍보','aka',''],['today','오늘','aka','실제'],['cal','일정','aka',''],['stock','주문','store',''],['ana','매출','store',''],['more','더보기','store','']]}
-function navCur(){const L=navList(),m=S.mode,v=S.view[m];let t=L.find(x=>x[2]===m&&x[0]===v);if(!t&&m==='aka'&&typeof GRP!=='undefined'&&GRP[v])t=L.find(x=>x[2]==='aka'&&x[0]===GRP[v]);if(!t)t=L.find(x=>x[2]===m&&x[0]==='more')||L.find(x=>x[2]===m)||L[0];return t[2]+':'+t[0]}
+function navCur(){const L=navList(),m=S.mode,v=S.view[m];let t=L.find(x=>x[2]===m&&x[0]===v);if(!t&&m==='aka'&&typeof GRP!=='undefined'&&GRP[v])t=L.find(x=>x[2]==='aka'&&x[0]===GRP[v]);if(!t&&m==='store'&&/^(design|dp)$/.test(v))t=L.find(x=>x[2]==='store'&&x[0]==='design')||L.find(x=>x[2]==='store'&&x[0]==='cur');if(!t)t=L.find(x=>x[2]===m&&x[0]==='more')||L.find(x=>x[2]===m)||L[0];return t[2]+':'+t[0]}
 A.place=d=>{const k=d.k;if(k==='aka'){if(!akaCtx()){S.mode='store';S.view.store='cur'}}else{if(S.mode!=='store'){S.mode='store'}}A.br({k});window.scrollTo(0,0)};
 (()=>{const h=A.home;A.home=d=>{if(akaCtx()){S.mode='store';S.br='aka';S.view.store='cur';try{ss.set('view',S.view)}catch(e){}window.scrollTo(0,0);render();return}return h(d)}})();
 function navPost(){if(S.br==='all'||!S.br)S.br='aka';const hd=document.querySelector('header.top');if(!hd)return;const md=hd.querySelector('.mode');if(md)md.remove();let r2=hd.querySelector('.row2');const cur=akaCtx()?'aka':S.br,html=PLACES.map(([k,n])=>`<button class="brchip" data-a="place" data-k="${k}" aria-pressed="${cur===k}">${n}</button>`).join('');
@@ -93,3 +93,6 @@ function bsHTML(){const dl=L=>`<dl class="bsd">${L.map(([a,b])=>`<div><dt>${esc(
 (()=>{const g0=gdDraw;gdDraw=function(){const tab=S.ui.gdTab==='b'?'b':'a',tabs=`<div class="gdtab" role="tablist"><button data-a="gdTab" data-t="a" aria-pressed="${tab==='a'}">화면 안내</button><button data-a="gdTab" data-t="b" aria-pressed="${tab==='b'}">서점 기초</button></div>`;
   if(tab==='a'){g0();const b=document.querySelector('#guide .gdb');if(b){const x=b.querySelector('.gdx');x.insertAdjacentHTML('afterend',tabs)}const g=$('guide');if(g)g.classList.remove('bs');return}
   let g=$('guide');if(!g){g0();g=$('guide')}g.classList.add('bs');g.innerHTML=`<div class="gdb bsb"><button class="gdx" data-a="gdClose" aria-label="닫기">닫기</button>${tabs}<div class="bsp"><h2>서점 기초</h2><p class="bsl">처음 서점 일을 하는 사람이 먼저 알아 둘 다섯 가지입니다.</p><div class="bsnav">${BASICS.map(s=>`<button data-a="bsGo" data-id="${s.id}">${s.t}</button>`).join('')}</div>${bsHTML()}</div></div>`}})();
+
+/* 그림책 · 유아 · 아동 주제는 POP 을 「어린이」 느낌으로 연다 */
+(()=>{const f=A.toDesign;A.toDesign=d=>{f(d);try{const D=S.ui.D,k=STY.indexOf('어린이');if(D&&D.kind==='pop'&&k>=0&&/그림책|어린이|아동|유아|동화|아이와/.test([D.head,D.body,D.book,D.tag].join(' '))){D.st=k;render()}}catch(e){}}})();
