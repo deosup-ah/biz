@@ -329,17 +329,23 @@ function drawSign(){const s=readSign(),cv=$("sign");cv.width=2339;cv.height=3307
   if(useLogo){const k=Math.min(maxW/signLogo.width,(H*0.085)/signLogo.height);logoW=signLogo.width*k;logoH=signLogo.height*k}
   else org=fitLines(ctx,s.org||" ",`800 %px ${SANS}`,maxW,250,96,2);
   const orgH=useLogo?logoH:org.lines.length*org.size*1.22;
-  // 작은 글씨는 단체명 글자 크기의 38% (로고일 때는 로고 높이의 30%). 폭을 넘을 때만 줄인다
-  const evtSize=s.evt?fitSpaced(ctx,s.evt,`500 %px ${SANS}`,maxW,Math.round(useLogo?logoH*0.3:org.size*0.38),36,0.02):0;
+  // 작은 글씨는 단체명(또는 로고)과 같은 폭이 되게 크기를 맞춘다. 글자 수가 적어 너무 커질 때는 단체명의 70%에서 멈추고 자간으로 폭을 맞춘다
+  let orgW=logoW;if(!useLogo){ctx.font=`800 ${org.size}px ${SANS}`;orgW=Math.max(...org.lines.map(l=>ctx.measureText(l).width))}
+  let evtSize=0,evtSp=0;
+  if(s.evt){const n=[...s.evt].length;ctx.font=`500 100px ${SANS}`;const w100=spacedWidth(ctx,s.evt,2);
+    const cap=useLogo?logoH*0.6:org.size*0.7;evtSize=Math.max(36,Math.min(cap,100*orgW/w100));
+    ctx.font=`500 ${evtSize}px ${SANS}`;const raw=spacedWidth(ctx,s.evt,0);
+    evtSp=n>1?Math.min(evtSize*1.0,Math.max(0,(orgW-raw)/(n-1))):0;
+    if(raw>maxW){evtSize=fitSpaced(ctx,s.evt,`500 %px ${SANS}`,maxW,Math.round(evtSize),30,0);evtSp=0}}
   const plSize=fitSpaced(ctx,s.place||" ",`500 %px ${SERIF}`,maxW,236,90,0.2);
   const subSize=s.sub?fitSpaced(ctx,s.sub,`400 %px ${SERIF}`,maxW,84,44,0.3):0;
   const whSize=fitSpaced(ctx,s.when||" ",`400 %px ${SERIF}`,maxW,108,56,0.06);
-  const gap=H*0.034,total=orgH+(evtSize?evtSize*1.45:0)+gap+gap+plSize*1.1+(subSize?subSize*1.9:0)+gap*0.75+whSize;
+  const gap=H*0.034,total=orgH+(evtSize?evtSize*1.4:0)+gap+gap+plSize*1.1+(subSize?subSize*1.9:0)+gap*0.75+whSize;
   let y=H*0.47-total/2;
   // 단체명 또는 로고
   if(useLogo){ctx.drawImage(signLogo,W/2-logoW/2,y,logoW,logoH);y+=logoH}
   else{ctx.fillStyle=s.color||"#1a1a1a";ctx.font=`800 ${org.size}px ${SANS}`;const lh=org.size*1.22;org.lines.forEach(l=>{y+=lh;ctx.fillText(l,W/2,y-lh*0.2)})}
-  if(evtSize){ctx.fillStyle=INK;ctx.font=`500 ${evtSize}px ${SANS}`;y+=evtSize*1.45;drawSpaced(ctx,s.evt,W/2,y-evtSize*0.2,evtSize*0.02)}
+  if(evtSize){ctx.fillStyle=INK;ctx.font=`500 ${evtSize}px ${SANS}`;y+=evtSize*1.4;drawSpaced(ctx,s.evt,W/2,y-evtSize*0.2,evtSp)}
   // 가는 줄
   y+=gap;ctx.fillStyle="#4a4a4a";ctx.fillRect(W/2-W*0.032,y,W*0.064,Math.max(3,Math.round(H*0.0011)));y+=gap;
   // 장소
