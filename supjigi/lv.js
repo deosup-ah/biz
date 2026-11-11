@@ -5,7 +5,7 @@ const LVK={adm:'',2:'',3:''};
 const LVN=['','책 고르는 사람','코너 큐레이터','공간 기획자'];
 const LVREQ={2:{cur:10,pop:5,dp:3,days:5},3:{cur:30,pop:15,dp:10,vid:3,send:3,days:14}};
 const LVLAB={cur:'큐레이션 만들기',pop:'인쇄물 만들기',dp:'진열안 저장',vid:'한 바퀴 영상',send:'다른 지점과 주고받기',days:'사용한 날'};
-const LVGET={1:['6종 평대','진열 방법 세 가지','POP · 이름표','3D 돌려 보기 · 말로 옮기기 · 한 바퀴 영상'],2:['10종 큰 평대(120×90cm)','진열 방법 아홉 가지 전체','벽 서가','꽃병 · 손글씨 쪽지'],3:['평대 크기 직접 고르기(180×90cm 까지)','더미 높이를 한 권씩 조절','무대 색 바꾸기(밝은 나무 · 짙은 무대 · 흰 무대)']};
+const LVGET={1:['6종 평대','진열 방법 세 가지','POP · 이름표','3D 돌려 보기 · 말로 옮기기 · 한 바퀴 영상'],2:['10종 큰 평대(120×90cm)','진열 방법 아홉 가지 전체','벽 서가','꽃병 · 손글씨 쪽지','POP 느낌 아홉 가지 전체','3주 연작 주제(문 열기 → 깊이 → 넓히기)'],3:['평대 크기 직접 고르기(180×90cm 까지)','더미 높이를 한 권씩 조절','무대 색 바꾸기(밝은 나무 · 짙은 무대 · 흰 무대)','4주 계절 기획(주마다 바뀌는 네 평대)']};
 const lvS=()=>{const s=ls.get('lv',{});return{cur:0,pop:0,dp:0,vid:0,send:0,days:[],words:[],...s}};
 const lvAdd=(k,w)=>{const s=lvS();if(k==='cur'){w=String(w||'').trim().slice(0,30);if(!w||s.words.includes(w))return;s.words=[w,...s.words].slice(0,60);s.cur++}else s[k]=(s[k]||0)+1;ls.set('lv',s)};
 const lvVal=(s,k)=>k==='days'?s.days.length:(s[k]||0);
@@ -85,3 +85,17 @@ A.caseMake=async d=>{const c=CASES[+d.i];if(!c)return;S.ui.tkOpen=false;lvAdd('c
 (()=>{const f=newsPanel;newsPanel=function(){const h=f(),cs=typeof CASES==='undefined'?'':`<div class="sec"><h2>사례 · 시장 흐름</h2></div><div class="wgrid">${CASES.map((c,i)=>`<article class="wn"><p class="wnm"><b>${esc(c.c)}</b> · ${esc(c.src)} · ${esc(c.d)}</p><h3>${esc(nb(c.t))}</h3><p class="wns">${esc(nb(c.sum))}</p><p class="wnw"><b>우리 지점에서</b> ${esc(nb(c.do))}</p><div class="wna"><button class="btn sm pri" data-a="caseMake" data-i="${i}">「${esc(c.w)}」로 평대 만들기</button><a class="btn sm" href="${c.url}" target="_blank" rel="noopener">원문</a></div></article>`).join('')}</div><div class="sec"><h2>오늘의 소식</h2></div>`;return h.replace('<div class="tkpn">','<div class="tkpn">'+cs)}})();
 /* 가이드 셋째 장: 쓸수록 열리는 세 단계 */
 GDS.splice(2,0,['h','쓸수록 열리는 세 단계','책 고르는 사람 → 코너 큐레이터 → 공간 기획자']);
+
+/* ── 만들기 · 주제 고도화: POP 느낌(1단계 3가지 → 2단계 9가지), 2단계 3주 연작, 3단계 4주 계절 기획 ── */
+(()=>{const f=A.dSt;A.dSt=d=>{if(+d.v>=3&&lvNow()<2)return lvLock(2);return f(d)};
+  const r=render;render=function(){r.apply(this,arguments);try{const L=lvNow();
+    if(L<2)document.querySelectorAll('.feels button').forEach((b,i)=>{if(i>=3&&!b.querySelector('.lkb')){b.classList.add('lk');b.insertAdjacentHTML('beforeend','<i class="lkb">2단계</i>')}});
+    const mn=document.querySelector('main');if(mn&&S.mode==='store'&&S.view.store==='cur'&&!mn.querySelector('.lvplan')){const w=mn.querySelector('.tick')||mn.querySelector('.grid');if(w){const b=document.createElement('div');b.className='lvplan';
+      b.innerHTML=`<button class="btn sm" data-a="lvSeason">${L>=3?'':'<u>3단계</u> '}4주 계절 기획 만들기</button>`;w.before(b)}}
+    document.querySelectorAll('details.menu>div').forEach(dv=>{const s=dv.querySelector('[data-a="sendOpen"]');if(s&&!dv.querySelector('[data-a="lvSerial"]')){const b=document.createElement('button');b.dataset.a='lvSerial';b.dataset.i=s.dataset.i;b.innerHTML=(L>=2?'':'<u>2단계</u> ')+'3주 연작으로 만들기';s.before(b)}})}catch(e){}}})();
+const lvPut=(T,msg)=>{S.ui.myT=[...T,...(S.ui.myT||[])].slice(0,8);ssT.set(S.ui.myT);S.ui.cTone='내 생각';S.ui.cOpen=null;S.view.store='cur';window.scrollTo(0,0);render();toast(msg)};
+A.lvSerial=d=>{if(lvNow()<2)return lvLock(2);const t=(S.ui.cor||[])[+d.i];if(!t)return;const base=String(t.title||'').replace(/[,.]\s*$/,''),src=[t.src,t.key,base].filter(Boolean).join(' '),st=[['문 열기','처음 만나는 사람을 위한 쉬운 책부터',7],['깊이 읽기','한 걸음 더 들어가는 책',14],['옆으로 넓히기','다른 분야에서 같은 주제를 만나는 책',21]];
+  lvAdd('cur','연작 '+base);lvPut(st.map(([a,b,dd],i)=>({id:'s'+Date.now().toString(36)+i,tone:'내 생각',src,title:`${base} ${'①②③'[i]} ${a}`,hook:`3주 연작 ${i+1}주차 · ${b}`,sym:t.sym||'book',bpal:t.bpal||0,ppal:t.ppal||0,until:addDays(TODAY,dd),place:t.place||'입구 평대',pop:{head:`${base}\n${'①②③'[i]} ${a}`,body:b},band:`${base} · ${a}`,pick:i===0?(t.books||[]).slice(0,4).map(b=>b.t):[],key:base})),`「${base}」 3주 연작을 만들었습니다. 맨 앞 세 표지입니다`)};
+const LVSEA={1:['새해 첫 책','겨울밤','다짐','눈'],2:['겨울 끝','편지','졸업','봄 기다리기'],3:['새 학기','봄','시작','꽃'],4:['산책','벚꽃','나무','봄비'],5:['가족','숲','여행 준비','초록'],6:['여름 시작','비','바다','밤'],7:['여름방학','여행','바다','더위'],8:['한여름','휴가','밤','별'],9:['가을','독서의 계절','편지','하늘'],10:['단풍','산책','고독','노을'],11:['늦가을','겨울 준비','차 한 잔','첫눈'],12:['첫눈','선물','한 해 돌아보기','새해 준비']};
+A.lvSeason=()=>{if(lvNow()<3)return lvLock(3);const m=+TODAY.slice(5,7),W=LVSEA[m]||LVSEA[11];lvAdd('cur',m+'월 계절 기획');
+  lvPut(W.map((w,i)=>{const dark=/밤|겨울|고독|눈/.test(w),pal=dark?2:/숲|나무|봄|초록|꽃/.test(w)?1:/노을|가을|단풍|차/.test(w)?3:/바다|비|여름/.test(w)?4:0;return{id:'q'+Date.now().toString(36)+i,tone:'내 생각',src:w,title:`${m}월 ${i+1}주 · ${w}`,hook:`4주 계절 기획 ${i+1}주차 · 주마다 평대를 바꿉니다`,sym:'book',bpal:pal,ppal:pal,until:addDays(TODAY,(i+1)*7),place:'입구 평대',pop:{head:w,body:`${m}월 ${i+1}주의 평대`},band:w,pick:[],key:w}}),`${m}월 4주 계절 기획을 만들었습니다. 맨 앞 네 표지입니다`)};
