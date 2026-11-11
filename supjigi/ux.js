@@ -51,8 +51,8 @@ function uxPost(){const mn=document.querySelector('main');if(!mn)return;const m=
 /* ── 곳 고르기 하나: 아카데미 · 노원 · 초소 · 소전 · 본점 · 중계. 「서점 / 전체」는 없다. 아카데미는 공간 일과 책 일을 한 묶음으로 ── */
 const PLACES=[['aka','아카데미'],['nowon','노원'],['choso','초소'],['sojeon','소전'],['nmain','본점'],['njung','중계']];
 const akaCtx=()=>S.mode==='aka'||S.br==='aka';
-function navList(){if(!akaCtx())return [['cur','큐레이션','store','기획'],['design','만들기','store',''],['biz','지원사업','store',''],['stock','주문','store','실제'],['ana','매출','store','']];
-  return [['cur','큐레이션','store','기획'],['space','공간','aka',''],['design','만들기','aka',''],['insta','홍보','aka',''],['biz','지원사업','store',''],['today','일정','aka','실제'],['stock','주문','store',''],['ana','매출','store','']]}
+function navList(){if(!akaCtx())return [['cur','큐레이션','store','기획'],['design','만들기','store',''],['biz','지원사업','store',''],['stock','주문/반품/순위','store','실제'],['ana','매출','store','']];
+  return [['cur','큐레이션','store','기획'],['space','공간','aka',''],['design','만들기','aka',''],['insta','홍보','aka',''],['biz','지원사업','store',''],['today','일정','aka','실제'],['stock','주문/반품/순위','store',''],['ana','매출','store','']]}
 function navCur(){const L=navList(),m=S.mode,v=S.view[m];let t=L.find(x=>x[2]===m&&x[0]===v);if(!t&&m==='aka'&&typeof GRP!=='undefined'&&GRP[v])t=L.find(x=>x[2]==='aka'&&x[0]===GRP[v]);if(!t&&m==='store'&&/^(design|dp)$/.test(v))t=L.find(x=>x[2]==='store'&&x[0]==='design')||L.find(x=>x[2]==='store'&&x[0]==='cur');if(!t&&m==='aka'&&v==='cal')t=L.find(x=>x[0]==='today');if(!t&&v==='talk')t=L.find(x=>x[0]==='design');if(!t)return 'none:none';return t[2]+':'+t[0]}
 A.place=d=>{const k=d.k;if(k==='aka'){if(!akaCtx()){S.mode='store';S.view.store='cur'}}else{if(S.mode!=='store'){S.mode='store'}}A.br({k});window.scrollTo(0,0)};
 (()=>{const h=A.home;A.home=d=>{if(akaCtx()){S.mode='store';S.br='aka';S.view.store='cur';try{ss.set('view',S.view)}catch(e){}window.scrollTo(0,0);render();return}return h(d)}})();
