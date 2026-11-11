@@ -106,3 +106,19 @@ function wallPost(){const mn=document.querySelector('main');if(!mn||S.mode!=='st
     html+=`<button class="cv" data-a="cOpen" data-i="${i}" aria-expanded="${on}" style="--c:${tc[0]};--t:${tc[1]}"><span class="cvt"><em>${esc(t.tone||'')}</em><i>${String(n+1).padStart(2,'0')}</i></span><span class="cvm"><b>${esc(t.title||'')}</b><small>${esc(t.hook||'')}</small></span><span class="cvb">${bk.length}권${inn?` · 있음 ${inn}`:''}</span></button>`});
   wall.innerHTML=html;host.before(wall);host.classList.add('cvhost')}
 (()=>{const r=render;render=function(){r.apply(this,arguments);try{wallPost()}catch(e){console.warn(e)}}})();
+
+/* ── 살아 있는 첫 화면: 표지 벽 위 「오늘의 소식」 한 줄, 어제 없던 표지에 「새」 ── */
+let _tk=0;
+function livePost(){const mn=document.querySelector('main');if(!mn)return;clearInterval(_tk);
+  if(S.mode==='store'&&S.view.store==='cur'){const wall=mn.querySelector('.wall'),N=(window.NEWS&&NEWS.items)||[];
+    if(wall&&N.length&&!mn.querySelector('.tick')){const t=document.createElement('button');t.className='tick';t.dataset.a='go';t.dataset.v='trend';t.dataset.m=akaCtx()?'aka':'store';let i=S.ui.tki|0;const put=()=>{const n=N[i%N.length];t.innerHTML=`<em>오늘의 소식</em><span>${esc(n.t)}</span><small>${esc(n.src||'')}</small>`};put();wall.before(t);_tk=setInterval(()=>{if(!document.body.contains(t)){clearInterval(_tk);return}i++;S.ui.tki=i;t.classList.add('sw');setTimeout(()=>{put();t.classList.remove('sw')},260)},4200)}
+    if(wall){try{const k='cov.'+S.br,ts=[...wall.querySelectorAll('.cvm b')].map(b=>b.textContent);let r=ls.get(k,null);if(!r||r.d!==TODAY){r={d:TODAY,prev:r?r.cur:null,cur:ts};ls.set(k,r)}if(r.prev)wall.querySelectorAll('.cv').forEach(c=>{const b=c.querySelector('.cvm b');if(b&&!r.prev.includes(b.textContent)&&!c.querySelector('.cvn'))c.querySelector('.cvt em').insertAdjacentHTML('beforeend','<u class="cvn">새</u>')})}catch(e){}}}
+  /* 해외 책 소식: 옮겨 읽기 + 원문 보기 + 책 정보 */
+  if(S.view[S.mode]==='trend'&&!mn.querySelector('.wnews')){const N=((window.NEWS&&NEWS.items)||[]).filter(n=>n.tag==='해외');if(N.length){const h=[...mn.querySelectorAll('h3')].find(x=>/오늘의 소식/.test(x.textContent)),host=h&&h.closest('.card');if(host){const w=document.createElement('div');w.className='wnews';w.innerHTML=`<div class="sec"><h2>해외 책 소식 <small class="note">우리말로 줄여 옮겼습니다 · ${esc(NEWS.asOf||'')}</small></h2></div>${N.map(n=>`<article class="wn"><p class="wnm">${esc(n.src||'')} · ${esc(n.d||'')}</p><h3>${esc(n.t)}</h3>${n.sum?`<p class="wns">${esc(n.sum)}</p>`:`<p class="wns">${esc(n.why||'')}</p>`}${n.sum&&n.why?`<p class="wnw"><b>우리 지점에는</b> ${esc(n.why)}</p>`:''}${n.book&&n.book.t?`<p class="wnb"><b>기사에 나온 책</b> ${esc(n.book.t)}${n.book.a?` · ${esc(n.book.a)}`:''}${n.book.ko?` · 우리말 책 「${esc(n.book.ko)}」`:' · 우리말 책은 확인되지 않음'}</p>`:''}<a class="btn sm" href="${n.url}" target="_blank" rel="noopener">원문 보기</a></article>`).join('')}`;host.after(w)}}}
+  /* 더보기: 메뉴에 이미 있는 것은 빼고, 반품은 주문 안으로 */
+  if(S.mode==='store'&&S.view.store==='more'){const have=new Set(navList().map(x=>x[0]));mn.querySelectorAll('button.mrow[data-a="go"]').forEach(b=>{const v=b.dataset.v;if(v==='ret'||(v!=='more'&&have.has(v)))b.remove()})}}
+(()=>{const r=render;render=function(){r.apply(this,arguments);try{livePost()}catch(e){console.warn(e)}}})();
+/* 주문 화면 안에 주문 | 반품 */
+A.ordTab=d=>{S.ui.ordTab=d.t;render()};
+(()=>{const f=V.store.stock;V.store.stock=()=>{const r=S.ui.ordTab==='r';return `<div class="subnav ordt" role="tablist"><button data-a="ordTab" data-t="o" aria-pressed="${!r}">주문</button><button data-a="ordTab" data-t="r" aria-pressed="${r}">반품</button></div>${r?V.store.ret():f()}`}})();
+try{HELP.store.stock='떨어질 책을 담아 북센 주문을 준비하고, 같은 자리에서 반품 목록도 만듭니다. 확정은 사람이 합니다.';HELP.store.more='자주 쓰지 않는 화면을 모아 두었습니다.'}catch(e){}
