@@ -16,7 +16,7 @@ const keyHash=async(kind,v)=>[...new Uint8Array(await crypto.subtle.digest('SHA-
 (()=>{const s=lvS();if(!s.days.includes(TODAY)){s.days=[...s.days,TODAY].slice(-120);ls.set('lv',s)}})();
 
 /* ── 관리자만 보는 화면 ── */
-const HID={store:['ana','stock','today','rank','ret','data'],aka:['today','cal']};
+const HID={store:['ana','stock','today','rank','ret','data','biz'],aka:['today','cal']};
 (()=>{const f=navList;navList=function(){const L=f();return isAdmin()?L:L.filter(t=>!(HID[t[2]]||[]).includes(t[0]))}})();
 (()=>{const r=render;render=function(){if(!S.locked&&!isAdmin()){const m=S.mode,v=S.view[m];if((HID[m]||[]).includes(v)){if(m==='aka'){S.mode='store';S.br='aka'}S.view.store='cur';if(S.loaded&&!S.ui.hidT){S.ui.hidT=1;setTimeout(()=>{S.ui.hidT=0;toast('이 화면은 안정화 테스트 중입니다. 며칠만 기다려 주세요.')},50)}}}
   r.apply(this,arguments);try{if(isAdmin())return;const mn=document.querySelector('main');if(mn)mn.querySelectorAll('button.mrow[data-a="go"]').forEach(b=>{if(HID.store.includes(b.dataset.v))b.remove()})}catch(e){}}})();
@@ -79,3 +79,9 @@ function bsFigs(){try{const B=['코스모스','소년이 온다','아몬드','�
   const a=dpSVG(dpBuild(dpG0,{title:'예시 · 여섯 권',books:B},3)),b=dpSVG(dpBuild(dpG0,{title:'예시 · 세 권',books:B.slice(0,3)},2)),c=dpSVG(dpBuild(dpG0,{title:'예시 · 들쭉날쭉',books:B},0)),d=shelfPlan({title:'예시 · 서가',books:B},0).svg;
   S.ui.dpObj=keep[0];S.ui.dpSzO=keep[1];
   return `<h4>그림으로 보기</h4><div class="bsfg">${fig(a,'<b>6종 · 90×90cm · 계단처럼</b> 뒷줄은 높게 세우고 앞줄은 낮게. 어디서 봐도 모든 표지가 보입니다.')}${fig(b,'<b>3종 · 60×60cm · 돋보이게</b> 책이 적으면 자리도 작게. 한 권을 얼굴로 세웁니다.')}${fig(c,'<b>6종 · 무심하게</b> 높이를 1~4권으로 다르게, 모서리를 일부러 맞추지 않습니다.')}${fig(d,'<b>벽 서가 · 면진열</b> 눈높이 칸에 표지를 앞으로. 아래 칸은 책등으로 꽂습니다.')}</div>`}catch(e){return ''}}
+
+/* ── 사례 · 시장 흐름: 「오늘의 소식」을 펼치면 맨 위에. 사례마다 우리 지점에서 해 볼 것과 평대 만들기 ── */
+A.caseMake=async d=>{const c=CASES[+d.i];if(!c)return;S.ui.tkOpen=false;lvAdd('cur',c.w);await A.ideaGo({v:c.w});window.scrollTo(0,0);setTimeout(()=>toast(`「${c.w}」로 평대 한 벌을 만들었습니다. 맨 앞 표지입니다`),300)};
+(()=>{const f=newsPanel;newsPanel=function(){const h=f(),cs=typeof CASES==='undefined'?'':`<div class="sec"><h2>사례 · 시장 흐름</h2></div><div class="wgrid">${CASES.map((c,i)=>`<article class="wn"><p class="wnm"><b>${esc(c.c)}</b> · ${esc(c.src)} · ${esc(c.d)}</p><h3>${esc(nb(c.t))}</h3><p class="wns">${esc(nb(c.sum))}</p><p class="wnw"><b>우리 지점에서</b> ${esc(nb(c.do))}</p><div class="wna"><button class="btn sm pri" data-a="caseMake" data-i="${i}">「${esc(c.w)}」로 평대 만들기</button><a class="btn sm" href="${c.url}" target="_blank" rel="noopener">원문</a></div></article>`).join('')}</div><div class="sec"><h2>오늘의 소식</h2></div>`;return h.replace('<div class="tkpn">','<div class="tkpn">'+cs)}})();
+/* 가이드 셋째 장: 쓸수록 열리는 세 단계 */
+GDS.splice(2,0,['h','쓸수록 열리는 세 단계','책 고르는 사람 → 코너 큐레이터 → 공간 기획자']);
