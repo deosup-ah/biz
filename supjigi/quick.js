@@ -120,13 +120,13 @@ function oPhCard(){if(S.br==='all')return '';const L=S.ui.oPh,no=L?L.filter(b=>!
 
 /* ── 진열: 자리 사진으로 규모 읽기 · 돌려 보는 3D ── */
 (()=>{const g=dpPlan;dpPlan=function(t,m){return g(S.ui.dpCap?{...t,books:(t.books||[]).slice(0,S.ui.dpCap)}:t,m)};const h=shelfPlan;shelfPlan=function(t,m){return h(S.ui.dpCap?{...t,books:(t.books||[]).slice(0,S.ui.dpCap)}:t,m)}})();
-function dp3d(P){const s=.4,W=900*s,bk=(i,z)=>`<i style="background:${i.c}"></i>`;let o='';
+function dp3d(P){const s=.4,W=(P.W||900)*s,DD=(P.D||900)*s,bk=(i,z)=>`<i style="background:${i.c}"></i>`;let o='';
   (P.it||[]).forEach(i=>{const x=(i.x||0)*s,y=(i.y||0)*s;
     if(i.k==='stack'){const w=i.w*s,d=i.d*s,h=Math.max(4,i.h*s*1.3),n=Math.max(1,Math.round(i.h/20));o+=`<div class="d3b" style="left:${x}px;top:${y}px;width:${w}px;height:${d}px"><div class="tp" style="background:${i.c};transform:translateZ(${h}px)"><b>${i.n}</b></div><div class="fr" style="height:${h}px;top:${d-h}px;background-size:100% ${h/n}px"></div><div class="rt" style="width:${h}px;left:${w-h}px;background-size:${h/n}px 100%"></div><div class="lf" style="width:${h}px;background-size:${h/n}px 100%"></div><div class="bkk" style="height:${h}px;background-size:100% ${h/n}px"></div></div>`}
     else if(i.k==='face'){o+=`<div class="d3f" style="left:${x}px;top:${y+210*s}px;width:${150*s}px;height:${210*s}px;background:${i.c}"><b>${i.n}</b></div>`}
     else if(i.k==='pop'){o+=`<div class="d3f pp" style="left:${x}px;top:${y+150*s}px;width:${210*s*.75}px;height:${297*s*.6}px">POP</div>`}
     else if(i.k==='vase'){o+=`<div class="d3f vs" style="left:${x}px;top:${y+60*s}px;width:${60*s}px;height:${150*s}px"></div>`}});
-  return `<div class="d3" id="d3"><div class="d3s" id="d3s" style="width:${W}px;height:${W}px"><div class="d3t"></div><div class="d3e e1"></div><div class="d3e e2"></div>${o}</div></div><p class="note" style="text-align:center">끌어서 돌려 봅니다 · 그림은 90×90cm 평대 기준</p>`}
+  return `<div class="d3" id="d3"><div class="d3s" id="d3s" style="width:${W}px;height:${DD}px"><div class="d3t"></div><div class="d3e e1"></div><div class="d3e e2"></div>${o}</div></div><p class="note" style="text-align:center">끌어서 돌려 봅니다 · 그림은 ${(P.W||900)/10}×${(P.D||900)/10}cm 평대 기준</p>`}
 (()=>{let dn=null,a=-28,t=58;const ap=()=>{const e=$('d3s');if(e)e.style.transform=`rotateX(${t}deg) rotateZ(${a}deg)`};
   document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('#d3')){dn=[e.clientX,e.clientY,a,t];e.preventDefault()}});
   document.addEventListener('pointermove',e=>{if(!dn)return;a=dn[2]+(e.clientX-dn[0])*.5;t=Math.max(25,Math.min(80,dn[3]-(e.clientY-dn[1])*.3));ap()});
@@ -207,12 +207,12 @@ A.akDp=()=>{let L=[];try{L=corners('aka').all||[]}catch(e){}const i=L.findIndex(
 DMOOD.push('계단처럼','한 줄로','둥글게','대칭으로','탑 하나','짝지어');
 (()=>{const g=dpPlan,h=shelfPlan;shelfPlan=function(t,m){return h(t,(m|0)%3)};
  dpPlan=function(t,mode){const md=mode==null?(S.ui.dpM||0):mode;if(md<3)return g(t,md);
-  const B=(t.books||[]).slice(0,S.ui.dpCap||8),n=B.length,it=[{k:'table'}],rows=[],bw=150,bd=210,th=20;
+  const B=(t.books||[]).slice(0,S.ui.dpCap||10),n=B.length,it=[{k:'table'}],rows=[],bw=150,bd=210,th=20;
   const put=(i,x,y,q,pl,face)=>{x=Math.round(Math.max(20,Math.min(730,x)));y=Math.round(Math.max(face?250:60,Math.min(670,y)));if(face)it.push({k:'face',x,y:y-235,c:DPC[i%6],n:i+1});it.push({k:'stack',x,y,w:bw,d:bd,h:q*th,c:DPC[i%6],n:i+1});rows.push({n:i+1,b:B[i],place:pl,qty:q+(face?1:0)})};
   let tips=[],need=['A5 POP 꽂이 1개'],pop=[345,40];
   if(md===3){const cols=n<=4?2:3,R=Math.ceil(n/cols),gx=cols===2?[200,550]:[90,375,660],gy=R<=1?[420]:R===2?[300,600]:[200,430,660];B.forEach((b,i)=>{const r=Math.floor(i/cols),c=i%cols,q=Math.max(1,(R-r)*2+(R===1?1:0));put(i,gx[c],gy[r],q,`${['뒷줄','가운뎃줄','앞줄'][R===1?2:R===2?r*2:r]} ${c+1}번째 · ${q}권`,r===0&&R>1)});
     tips=['뒷줄을 가장 높게, 앞으로 올수록 낮게. 어디서 봐도 모든 표지가 보입니다.','뒷줄은 한 권씩 세워 얼굴을 보여 줍니다.','줄과 줄 사이는 손이 들어갈 만큼 띄웁니다.'];need=['북엔드 '+Math.min(4,cols)+'개','A5 POP 꽂이 1개']}
-  else if(md===4){B.forEach((b,i)=>{const f=n>1?i/(n-1):.5,q=[2,3,1,3,2,1,3,2][i];put(i,40+f*(690),300+f*220,q,`왼쪽 뒤에서 오른쪽 앞으로 ${i+1}번째 · ${q}권`,i===0)});pop=[600,60];
+  else if(md===4){B.forEach((b,i)=>{const f=n>1?i/(n-1):.5,q=[2,3,1,3,2,1,3,2,1,3][i];put(i,40+f*(690),300+f*220,q,`왼쪽 뒤에서 오른쪽 앞으로 ${i+1}번째 · ${q}권`,i===0)});pop=[600,60];
     tips=['사선 한 줄. 걸어오는 방향에서 차례로 읽힙니다.','첫 권만 세우고 나머지는 눕힙니다. 순서가 있는 주제에 좋습니다.','줄 바깥은 비워 둡니다. POP 은 줄이 끝나는 반대편에.'];need=['북엔드 1개','A5 POP 꽂이 1개']}
   else if(md===5){B.forEach((b,i)=>{const a=-Math.PI/2+i/n*Math.PI*2,q=1+(i%2);put(i,375+Math.cos(a)*300,380+Math.sin(a)*250,q,`둥근 자리 ${i+1}번째 (시계 방향) · ${q}권`)});pop=[345,330];
     tips=['가운데를 비우고 둘러 놓습니다. 평대를 한 바퀴 돌게 됩니다.','POP 은 가운데에 세웁니다. 어느 쪽에서도 보이게 양면으로.','높이는 1~2권으로 낮게. 둥근 모양이 먼저 보여야 합니다.'];need=['양면 POP 꽂이 1개']}
