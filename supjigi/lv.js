@@ -5,7 +5,7 @@ const LVK={adm:'c9c6e7270b84e1fe95a4695de4374d0374d569f3071cf04939eefdd2399688d2
 const LVN=['','책 고르는 사람','코너 큐레이터','공간 기획자'];
 const LVREQ={2:{cur:10,pop:5,dp:3,days:5},3:{cur:30,pop:15,dp:10,vid:3,send:3,days:14}};
 const LVLAB={cur:'큐레이션 만들기',pop:'인쇄물 만들기',dp:'진열안 저장',vid:'한 바퀴 영상',send:'다른 지점과 주고받기',days:'사용한 날'};
-const LVGET={1:['6종 평대','진열 방법 세 가지','POP · 이름표','3D 돌려 보기 · 말로 옮기기 · 한 바퀴 영상'],2:['10종 큰 평대(120×90cm)','진열 방법 아홉 가지 전체','벽 서가','꽃병 · 손글씨 쪽지','POP 느낌 아홉 가지 전체','3주 연작 주제(문 열기 → 깊이 → 넓히기)'],3:['평대 크기 직접 고르기(180×90cm 까지)','더미 높이를 한 권씩 조절','무대 색 바꾸기(밝은 나무 · 짙은 무대 · 흰 무대)','4주 계절 기획(주마다 바뀌는 네 평대)']};
+const LVGET={1:['6종 평대','진열 방법 세 가지','POP · 쇼카드 · 띠지','3D 돌려 보기 · 말로 옮기기 · 한 바퀴 영상'],2:['10종 큰 평대(120×90cm)','진열 방법 아홉 가지 전체','벽 서가','꽃병 · 손글씨 쪽지','POP 느낌 아홉 가지 전체','3주 연작 주제(문 열기 → 깊이 → 넓히기)'],3:['평대 크기 직접 고르기(180×90cm 까지)','더미 높이를 한 권씩 조절','무대 색 바꾸기(밝은 나무 · 짙은 무대 · 흰 무대)','4주 계절 기획(주마다 바뀌는 네 평대)']};
 const lvS=()=>{const s=ls.get('lv',{});return{cur:0,pop:0,dp:0,vid:0,send:0,days:[],words:[],...s}};
 const lvAdd=(k,w)=>{const s=lvS();if(k==='cur'){w=String(w||'').trim().slice(0,30);if(!w||s.words.includes(w))return;s.words=[w,...s.words].slice(0,60);s.cur++}else s[k]=(s[k]||0)+1;ls.set('lv',s)};
 const lvVal=(s,k)=>k==='days'?s.days.length:(s[k]||0);
@@ -16,18 +16,18 @@ const keyHash=async(kind,v)=>[...new Uint8Array(await crypto.subtle.digest('SHA-
 (()=>{const s=lvS();if(!s.days.includes(TODAY)){s.days=[...s.days,TODAY].slice(-120);ls.set('lv',s)}})();
 
 /* ── 관리자만 보는 화면 ── */
-const HID={store:['ana','stock','today','rank','ret','data','biz'],aka:['today','cal']};
+const HID={store:['ana','stock','today','rank','ret','data','biz','talk'],aka:['today','cal','talk']};
 (()=>{const f=navList;navList=function(){const L=f();return isAdmin()?L:L.filter(t=>!(HID[t[2]]||[]).includes(t[0]))}})();
-(()=>{const r=render;render=function(){if(!S.locked&&!isAdmin()){const m=S.mode,v=S.view[m];if((HID[m]||[]).includes(v)){if(m==='aka'){S.mode='store';S.br='aka'}S.view.store='cur';if(S.loaded&&!S.ui.hidT){S.ui.hidT=1;setTimeout(()=>{S.ui.hidT=0;toast('이 화면은 안정화 테스트 중입니다. 며칠만 기다려 주세요.')},50)}}}
-  r.apply(this,arguments);try{if(isAdmin())return;const mn=document.querySelector('main');if(mn)mn.querySelectorAll('button.mrow[data-a="go"]').forEach(b=>{if(HID.store.includes(b.dataset.v))b.remove()})}catch(e){}}})();
+(()=>{const r=render;render=function(){if(!S.locked&&!isAdmin()){if(S.ui.mkTab==='talk')S.ui.mkTab='p';const m=S.mode,v=S.view[m];if((HID[m]||[]).includes(v)){if(m==='aka'){S.mode='store';S.br='aka'}S.view.store='cur';if(S.loaded&&!S.ui.hidT){S.ui.hidT=1;setTimeout(()=>{S.ui.hidT=0;toast('이 화면은 안정화 테스트 중입니다. 며칠만 기다려 주세요.')},50)}}}
+  r.apply(this,arguments);try{if(isAdmin())return;const mn=document.querySelector('main');if(mn)mn.querySelectorAll('[data-a="mkTab"][data-t="talk"]').forEach(b=>b.remove());if(mn)mn.querySelectorAll('button.mrow[data-a="go"]').forEach(b=>{if(HID.store.includes(b.dataset.v))b.remove()})}catch(e){}}})();
 (()=>{const g=A.gGo;A.gGo=async d=>{const el=$('gIn'),v=((d&&d.v)||(el&&el.value)||'').trim();if(v&&!isAdmin()&&typeof G_SCHED!=='undefined'&&G_SCHED.test(v)&&!(typeof G_NOTE!=='undefined'&&G_NOTE.test(v))){toast('일정 넣기는 안정화 테스트 중입니다. 며칠만 기다려 주세요.');return}if(v)lvAdd('cur',v);return g(d)}})();
 /* 가이드: 관리자가 아니면 일정 · 매출 장을 빼고 안내 한 줄 */
-if(!isAdmin()){for(let i=GDS.length-1;i>=0;i--)if(GDS[i][0]==='b'||GDS[i][0]==='d')GDS.splice(i,1)}
-if(!isAdmin())GDS.push(['z','곧 열립니다','주문 · 매출 · 지원사업']);
+if(!isAdmin()){for(let i=GDS.length-1;i>=0;i--)if(GDS[i][0]==='b'||GDS[i][0]==='d'||GDS[i][0]==='c')GDS.splice(i,1)}
+if(!isAdmin())GDS.push(['z','곧 열립니다','주문 · 반품 · 매출 · 지원사업']);
 let gdTy=0;
 (()=>{const g=gdDraw;gdDraw=function(){g.apply(this,arguments);try{const G=$('guide');if(!G)return;const gt=G.querySelector('.gdtab');if(gt&&!gt.querySelector('[data-a=lvFromGd]'))gt.insertAdjacentHTML('beforeend','<button data-a="lvFromGd">내 단계</button>');G.classList.toggle('gdfit',!G.classList.contains('bs'));if(G.classList.contains('bs'))return;const gi=S.ui.gd|0,k=(GDS[gi]||[])[0],last=gi===GDS.length-1;
   const B=G.querySelector('.gdb');if(B&&!B.querySelector('.gdnx')){const im0=G.querySelector('.gdi img');if(im0){im0.dataset.a=last?'gdClose':'gdGo';im0.dataset.d='1'}const nx=document.createElement('div');nx.className='gdnx';nx.innerHTML=(gi?'<button class="gdpv" data-a="gdGo" data-d="-1" aria-label="이전">‹</button>':'')+(last?'<button class="gdgo" data-a="gdClose">시작하기</button>':'<button class="gdgo" data-a="gdGo" data-d="1">다음 ›</button>');B.append(nx)}
-  if(k==='z'){const im=G.querySelector('.gdi img');if(im)im.outerHTML=`<div class="gdz">${[['주문','팔린 만큼 알아서 셈하고, 북센 주문에 담아 둡니다'],['매출','숫자 대신 이번 주 할 일 세 가지로 알려 줍니다'],['지원사업','공모 일정과 신청 기록을 한곳에 모읍니다']].map(([a,b])=>`<div><b>${a}</b><span>${b}</span><em>안정화 중</em></div>`).join('')}<p>시스템 안정화 테스트 중입니다. 며칠만 기다려 주세요.</p></div>`}
+  if(k==='z'){const im=G.querySelector('.gdi img');if(im)im.outerHTML=`<div class="gdz">${[['주문 · 반품','팔린 만큼 셈해 주문에 담고, 반품할 책은 사진만 찍으면 자동으로 반품 등록'],['매출','숫자 대신 이번 주 할 일 세 가지로 알려 줍니다'],['지원사업','공모 일정과 신청 기록을 한곳에 모읍니다']].map(([a,b])=>`<div><b>${a}</b><span>${b}</span><em>안정화 중</em></div>`).join('')}<p>시스템 안정화 테스트 중입니다. 며칠만 기다려 주세요.</p></div>`}
   const h=G.querySelector('.gdb h2');if(h){const t=h.textContent,id=++gdTy;h.textContent='';h.classList.add('gdty');let n=0;const st=()=>{if(id!==gdTy||!h.isConnected)return;h.textContent=t.slice(0,++n);if(n<t.length)setTimeout(st,28);else setTimeout(()=>h.classList.add('done'),600)};st()}}catch(e){}}})();
 
 /* ── 쓴 만큼 세기 ── */
@@ -120,3 +120,6 @@ const popMach=(w,n)=>[`> ${w}_`,`「${w}」 → ?`,`${w} + 책 = ___`,`if (${w})
 (()=>{const f=mkD;mkD=function(t,k){const D=f(t,k);try{if(k!=='pop')return D;const head=String(D.head||'').replace(/\n/g,' ').trim(),core=head.replace(/[\s,.!?·「」]/g,''),h=[...core].reduce((a,c)=>a+c.charCodeAt(0),0),simple=core.length<=8&&head.split(/\s+/).length<=2;
   if(simple){if(!D.sym||D.sym==='none'){let s='book';try{s=(IDS.find(([r])=>r.test(head+' '))||[0,'book'])[1]}catch(e){}D.sym=s}D.body=popMach(head,h)}
   else if(!/[?？]\s*$/.test(D.body||'')){const q=POPQ[h%POPQ.length];D.body=(D.body&&D.body.length<=28?D.body+'\n':'')+q}}catch(e){}return D}})();
+
+/* 진열 오브제에서 이름표를 뺀다(쇼카드와 겹침, 11/11 결정) */
+(()=>{try{const i=DPOBJ.findIndex(x=>x[0]==='card');if(i>=0)DPOBJ.splice(i,1)}catch(e){}const cut=P=>{if(P&&P.it)P.it=P.it.filter(i=>i.k!=='card');if(P&&P.need)P.need=P.need.filter(x=>!/이름표/.test(x));if(P&&P.tips)P.tips=P.tips.filter(x=>!/이름표/.test(x));return P};const g=dpPlan;dpPlan=function(){return cut(g.apply(this,arguments))}})();
