@@ -498,6 +498,54 @@ body.dialon .row2.places{margin:10px 20px 14px!important}body.dialon .row2.place
 .pcard .btns>.menu{margin:0;display:block}.pcard .btns>.menu>summary{display:block;text-align:center;padding:9px 4px;font-size:13.5px;border-radius:3px;height:100%}
 /* 느낌 고르기: 아홉 가지를 셋씩 */
 .feels{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 12px;max-width:420px}
+
+/* ══ v5: 흰 종이, 굵은 먹줄, 색은 책이 맡는다. 상자 대신 굵은 윗줄 하나 ══ */
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){--bg:#fcfcfa;--surface:#ffffff;--surface2:#efeee9;--ink:#111111;--muted:#5a5a55;--line:#deddd6}}
+:root[data-theme="light"]{--bg:#fcfcfa;--surface:#ffffff;--surface2:#efeee9;--ink:#111111;--muted:#5a5a55;--line:#deddd6}
+body .card{border:0;border-top:3px solid var(--ink);background:none;padding:16px 0 6px;border-radius:0}
+body .card.kpi,body .kpi.card{border-top-width:3px}
+body .card.empty{border-top:1px solid var(--line);color:var(--muted);padding:28px 0}
+body .card.todo .li,body .card .li{border-color:var(--line)}
+body .hero{border-bottom:0;margin:6px 0 26px;padding:0}
+body .hero p{font-size:13.5px;color:var(--muted);margin:0 0 8px}
+body .hero h2{font-size:clamp(36px,5.2vw,60px);font-weight:800;letter-spacing:-.045em;line-height:1.04}
+body .sec{margin-top:44px}body .sec h2{font-size:22px;font-weight:800;letter-spacing:-.03em}
+.gbarx{border-bottom-width:3px;margin-bottom:34px}
+body .subnav{border-bottom:0;gap:0;margin-bottom:22px}body .subnav button{font-size:15.5px;padding:6px 0;margin-right:22px;border-bottom:3px solid transparent}body .subnav button[aria-pressed="true"]{border-bottom-color:var(--ink)}
+@media(min-width:900px){body:not(.dialon) header.top{border-right:3px solid var(--ink);background:var(--bg)}body:not(.dialon) nav.tabs::after{border-top-width:3px}}
+body .btn{border-width:1.5px}
+.hpd{background:none;border-left:3px solid var(--ink);padding:2px 0 2px 14px}
+.pks{border-top:3px solid var(--ink)}
+.anaf{border-top:3px solid var(--ink)}
+.setb{border:3px solid var(--ink)}
+/* 면진열 벽 */
+.wall{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px 22px;margin:4px 0 30px}
+.cv{display:grid;grid-template-rows:auto 1fr auto;aspect-ratio:3/4;padding:0;border:0;background:#fff;color:#111;text-align:left;cursor:pointer;box-shadow:inset 0 0 0 1.5px #111;transition:transform .18s cubic-bezier(.2,.8,.2,1);font:inherit;overflow:hidden;border-radius:0}
+.cv:hover{transform:translateY(-5px)}.cv[aria-expanded="true"]{box-shadow:inset 0 0 0 4px #111}
+.cvt{display:flex;justify-content:space-between;align-items:flex-end;background:var(--c);color:var(--t);padding:16px 16px 12px;min-height:26%}
+.cvt em{font:700 13px/1 "Pretendard",sans-serif;font-style:normal;letter-spacing:.01em}.cvt i{font:800 34px/.9 "Pretendard",sans-serif;font-style:normal;font-variant-numeric:tabular-nums;letter-spacing:-.04em}
+.cvm{display:grid;align-content:center;gap:10px;padding:14px 16px}
+.cvm b{font:800 clamp(20px,2.1vw,28px)/1.18 "Pretendard",sans-serif;letter-spacing:-.035em;word-break:keep-all}
+.cvm small{font-size:13.5px;line-height:1.5;color:#55554f;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.cvb{background:var(--c);color:var(--t);padding:9px 16px;font:600 13px/1.2 "Pretendard",sans-serif}
+.cvhost{display:block!important}.cvhost>.pcard{display:none}.cvhost>.pcard.on{display:block;border-top:4px solid var(--ink);padding-top:20px;margin-bottom:34px;max-width:760px}
+@media(max-width:720px){.wall{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 12px}.cvt i{font-size:26px}.cvm b{font-size:19px}.cvm small{-webkit-line-clamp:2;font-size:13px}.cvt,.cvm,.cvb{padding-left:12px;padding-right:12px}}
+body.vm .wall{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 12px}body.vm .cvt i{font-size:26px}body.vm .cvm b{font-size:19px}body.vm .cvm small{-webkit-line-clamp:2}
+@media(prefers-reduced-motion:reduce){.cv{transition:none}}
+
+/* 버튼 줄이기: 머리줄은 로고(=처음으로)와 곳 고르기만. 가이드 · 화면 전환은 작은 글씨로 */
+.railf{display:flex;gap:14px;padding:18px 18px 0}.railf button{border:0;background:none;padding:0;font:500 13px "Pretendard",sans-serif;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer}.railf button:hover{color:var(--ink)}
+@media(min-width:900px){body:not(.dialon) .railf{order:9;margin-top:auto;padding-top:26px}body:not(.dialon) header.top .brand{margin-bottom:0}}
+body.dialon .railf{position:absolute;right:20px;top:18px;padding:0}body.dialon header.top{position:relative}
+/* 한 줄 입력: 글자 버튼 대신 그림 셋 */
+.gbarx{gap:2px}.gbarx .gi{flex:0 0 auto;display:grid;place-items:center;width:42px;height:42px;border:0;background:none;color:var(--muted);cursor:pointer;border-radius:50%;padding:0}.gbarx .gi:hover{color:var(--ink)}.gbarx .gi[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.gbarx .gi.go{color:var(--ink)}.gbarx:has(#gIn:not(:placeholder-shown)) .gi.go{background:var(--pine);color:#fff}
+@media(max-width:720px){.gbarx{flex-wrap:nowrap}.gbarx input[type=text]{flex:1 1 auto;font-size:16.5px}.gbarx .gi{flex:0 0 auto;width:38px}}
+body.vm .gbarx{flex-wrap:nowrap}body.vm .gbarx input[type=text]{flex:1 1 auto}body.vm .gbarx .gi{flex:0 0 auto;width:38px}
+/* 큐레이션: 갈래는 색 네모가 붙은 작은 글씨 */
+main:has(.wall) .subnav button{font-size:14px;margin-right:18px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+main:has(.wall) .subnav button::before{content:"";width:10px;height:10px;background:var(--line)}
+main:has(.wall) .subnav button[data-t="제철"]::before{background:#c9a24a}main:has(.wall) .subnav button[data-t="다른 시선"]::before{background:#003128}main:has(.wall) .subnav button[data-t="말놀이"]::before{background:#7d3a2b}main:has(.wall) .subnav button[data-t="꾸준한"]::before{background:#2b2b28}main:has(.wall) .subnav button[data-t="내 생각"]::before{background:#1f6b57}main:has(.wall) .subnav button[data-t="전체"]::before{display:none}main:has(.wall) .subnav .stnb::before{display:none}
 </style>
 </head>
 <body>
