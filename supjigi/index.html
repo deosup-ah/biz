@@ -635,6 +635,14 @@ main [data-a="dBr"]{display:none}
 .tkpn .anaf{margin-top:8px}
 @media(max-width:720px){.wgrid{grid-template-columns:1fr}.wgrid .wn:nth-child(2){border-top:1px solid var(--line)}.tick .tkp{order:2;margin-left:auto}.tick small{display:none}}
 body.vm .wgrid{grid-template-columns:1fr}body.vm .tick .tkp{order:2;margin-left:auto}body.vm .tick small{display:none}
+
+/* 줄바꿈: 낱말 가운데서 끊지 않고, 제목은 줄 길이를 고르게, 본문은 끝줄에 한 낱말만 남지 않게 */
+body{word-break:keep-all;overflow-wrap:break-word;line-break:strict}
+h1,h2,h3,h4,.cvm b,.tick span,.wn h3,.pkr b,.mkc b,.gdb h2,.bsp h2,.bsp h3,.li b,.pcard h3,.hero h2{text-wrap:balance}
+p,small,dd,li,.note,.wns,.wnw,.cvm small,.hpd{text-wrap:pretty}
+.cvm b{hyphens:none}
+@media(max-width:720px){.gbarx input[type=text]::placeholder{font-size:15px;letter-spacing:-.02em}}
+body.vm .gbarx input[type=text]::placeholder{font-size:15px;letter-spacing:-.02em}
 </style>
 </head>
 <body>
