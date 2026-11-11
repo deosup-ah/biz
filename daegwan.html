@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>단체대관 상담·배치 보드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+/* 레이아웃: 왼쪽 건 목록(건별대장 스냅샷) + 오른쪽 선택 건 작업판(상담 → 배치 → 식음 → 사이니지) */
+:root{
+  --bg:#f3f5f4; --panel:#ffffff; --ink:#17211d; --mute:#5d6b65; --line:#d6ddd9;
+  --accent:#1f5c46; --accent-ink:#ffffff; --accent-soft:#e2eee8;
+  --ok:#1d6b3a; --ok-bg:#e0f1e5; --warn:#8a5a00; --warn-bg:#fbefd2; --bad:#a3271f; --bad-bg:#fbe3e0;
+  --display:"Noto Serif KR","Apple SD Gothic Neo",serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#111715; --panel:#1a2320; --ink:#e8efeb; --mute:#9aaaa3; --line:#2f3d38;
+    --accent:#6fc7a3; --accent-ink:#0d1a15; --accent-soft:#22352e;
+    --ok:#7fd69a; --ok-bg:#183424; --warn:#f0c463; --warn-bg:#3a2e12; --bad:#f39a92; --bad-bg:#3d1c19;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#111715; --panel:#1a2320; --ink:#e8efeb; --mute:#9aaaa3; --line:#2f3d38;
+  --accent:#6fc7a3; --accent-ink:#0d1a15; --accent-soft:#22352e;
+  --ok:#7fd69a; --ok-bg:#183424; --warn:#f0c463; --warn-bg:#3a2e12; --bad:#f39a92; --bad-bg:#3d1c19;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+h1,h2,h3{margin:0;text-wrap:balance}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.top{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:baseline;padding:18px 20px 12px;border-bottom:1px solid var(--line)}
+.top h1{font-family:var(--display);font-size:22px;font-weight:700}
+.top p{margin:0;color:var(--mute);font-size:13px}
+.wrap{display:grid;grid-template-columns:330px minmax(0,1fr);gap:16px;padding:16px 20px 40px;align-items:start}
+@media (max-width:900px){.wrap{grid-template-columns:1fr;padding:16px}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.list{position:sticky;top:12px;max-height:calc(100vh - 24px);display:flex;flex-direction:column}
+@media (max-width:900px){.list{position:static;max-height:340px}}
+.filters{display:flex;gap:8px;padding:12px;border-bottom:1px solid var(--line)}
+.filters input,.filters select,.field input,.field select,.field textarea{background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:7px 9px;min-width:0}
+.filters input{flex:1}
+.cases{overflow:auto;margin:0;padding:6px;list-style:none;display:flex;flex-direction:column;gap:2px}
+.case{display:grid;grid-template-columns:56px 1fr auto;gap:2px 10px;width:100%;text-align:left;background:none;border:0;border-left:3px solid transparent;border-radius:6px;padding:8px 10px;cursor:pointer}
+.case:hover{background:var(--accent-soft)}
+.case[aria-current="true"]{background:var(--accent-soft);border-left-color:var(--accent)}
+.case .d{font-variant-numeric:tabular-nums;font-weight:600}
+.case .o{font-weight:600;overflow-wrap:anywhere}
+.case .pill{align-self:start}
+.case .s{grid-column:2/4;color:var(--mute);font-size:12.5px}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:1px 8px;border-radius:99px;white-space:nowrap}
+.pill.c{background:var(--ok-bg);color:var(--ok)} .pill.h{background:var(--warn-bg);color:var(--warn)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.n{background:var(--accent-soft);color:var(--accent)}
+.head{padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.head h2{font-family:var(--display);font-size:24px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;color:var(--mute);font-size:13.5px}
+.blocks{display:flex;flex-wrap:wrap;gap:8px}
+.blk{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 11px;cursor:pointer;text-align:left}
+.blk[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.blk b{display:block}.blk span{font-size:12.5px;color:var(--mute);font-variant-numeric:tabular-nums}
+.tabs{display:flex;gap:4px;padding:0 12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs a{padding:10px 12px;color:var(--mute);text-decoration:none;font-weight:600;white-space:nowrap;border-bottom:2px solid transparent}
+.tabs a[aria-current="page"]{color:var(--accent);border-bottom-color:var(--accent)}
+.view{padding:18px;display:none;flex-direction:column;gap:18px}
+.view.on{display:flex}
+.view h3{font-size:15px;font-weight:700}
+.note{font-size:13px;color:var(--mute);margin:0;max-width:65ch}
+.callout{border-left:3px solid var(--warn);background:var(--warn-bg);color:var(--ink);padding:9px 12px;border-radius:0 7px 7px 0;font-size:13.5px}
+.callout.ok{border-color:var(--ok);background:var(--ok-bg)} .callout.bad{border-color:var(--bad);background:var(--bad-bg)}
+.grp{display:flex;flex-direction:column;gap:6px}
+.chk{display:grid;grid-template-columns:auto 1fr minmax(120px,38%);gap:10px;align-items:center;padding:6px 8px;border-radius:6px}
+.chk:hover{background:var(--bg)}
+.chk input[type=checkbox]{width:17px;height:17px;accent-color:var(--accent)}
+.chk input[type=text]{background:transparent;border:0;border-bottom:1px dashed var(--line);padding:3px 2px;min-width:0}
+@media (max-width:560px){.chk{grid-template-columns:auto 1fr}.chk input[type=text]{grid-column:2}}
+.row{display:flex;flex-wrap:wrap;gap:12px}
+.field{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--mute)}
+.field input[type=number]{width:96px}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:7px;padding:8px 14px;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.btn[hidden]{display:none}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.tw{overflow-x:auto}
+.plan{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;overflow-x:auto}
+.plan svg{display:block;width:100%;max-width:640px;height:auto;margin:0 auto}
+.rt{cursor:pointer}.rt:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.newcase{display:none;flex-direction:column;gap:8px;padding:12px;border-bottom:1px solid var(--line)}
+.newcase.on{display:flex}
+.newcase .field input,.newcase .field select{width:100%}
+.addbar{padding:8px 12px;border-bottom:1px solid var(--line)}
+.addbar .btn{width:100%}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:8px}
+.opt input{margin-top:4px;accent-color:var(--accent)}
+.opt b{display:block}.opt span{font-size:13px;color:var(--mute)}
+textarea.out{width:100%;min-height:150px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:13.5px;line-height:1.6}
+.signgrid{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:760px){.signgrid{grid-template-columns:1fr}}
+.signform{display:flex;flex-direction:column;gap:10px}
+.signform .field input,.signform .field select{width:100%}
+.canvasbox{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:14px;display:flex;justify-content:center}
+canvas{max-width:100%;max-height:640px;height:auto;width:auto;box-shadow:0 2px 14px rgba(0,0,0,.18);background:#fff}
+.msg{font-size:13px;color:var(--mute);min-height:1.2em}
+
+body.locked .top,body.locked .wrap{display:none}
+#gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+#gate[hidden]{display:none}
+.gbox{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:28px 26px;width:100%;max-width:320px;display:flex;flex-direction:column;gap:18px;align-items:center}
+.gbox h1{font-family:var(--display);font-size:20px;text-align:center}
+.gbox p{margin:0;color:var(--mute);font-size:13.5px;text-align:center;min-height:1.4em}
+.dots{display:flex;gap:14px}.dots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--accent)}.dots i.on{background:var(--accent)}
+.pad{display:grid;grid-template-columns:repeat(3,72px);gap:10px}
+.pad button{height:56px;border-radius:10px;border:1px solid var(--line);background:var(--bg);font-size:20px;font-weight:600;cursor:pointer}
+.pad button:hover{background:var(--accent-soft)}.pad button.sm{font-size:14px;color:var(--mute)}
+</style>
+</head>
+<body class="locked">
+<div id="gate"><div class="gbox">
+  <h1>단체대관 상담·배치 보드</h1>
+  <div class="dots" id="gDots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <p id="gMsg" role="status">비밀번호 4자리를 누르세요</p>
+  <div class="pad" id="gPad">
+    <button type="button">1</button><button type="button">2</button><button type="button">3</button>
+    <button type="button">4</button><button type="button">5</button><button type="button">6</button>
+    <button type="button">7</button><button type="button">8</button><button type="button">9</button>
+    <button type="button" class="sm" data-k="clr">지우기</button><button type="button">0</button><button type="button" class="sm" data-k="del">←</button>
+  </div>
+</div></div>
+
+<header class="top">
+  <h1>단체대관 상담·배치 보드</h1>
+  <p id="asof"></p>
+</header>
+<div class="wrap">
+  <aside class="panel list" aria-label="건 목록">
+    <div class="filters">
+      <input id="q" type="search" placeholder="단체명 · 건번호" aria-label="단체명 또는 건번호 검색">
+      <select id="fs" aria-label="공간 필터"></select>
+    </div>
+    <div class="addbar"><button class="btn ghost" id="addBtn" type="button">+ 상담 중인 새 건 넣기</button></div>
+    <form class="newcase" id="newcase">
+      <label class="field">단체명<input id="nOrg" type="text" required></label>
+      <label class="field">인원<input id="nPax" type="number" min="1" max="500" required></label>
+      <label class="field">공간<select id="nRes"></select></label>
+      <label class="field">날짜<input id="nDate" type="date" required></label>
+      <div class="row"><label class="field">시작<input id="nS" type="time" value="10:00" required></label><label class="field">종료<input id="nE" type="time" value="17:00" required></label></div>
+      <div class="row"><button class="btn" type="submit">넣기</button><button class="btn ghost" id="nCancel" type="button">닫기</button></div>
+      <p class="note">건별대장에 등록되기 전 상담용입니다. 이 브라우저에만 저장됩니다.</p>
+    </form>
+    <ul class="cases" id="cases"></ul>
+  </aside>
+  <main class="panel">
+    <div class="head">
+      <h2 id="org"></h2>
+      <div class="meta" id="meta"></div>
+      <div class="blocks" id="blocks"></div>
+      <div id="fit"></div>
+    </div>
+    <nav class="tabs" aria-label="작업 단계">
+      <a href="#check">가용성 모의체크</a><a href="#consult">1차 상담 체크</a><a href="#layout">배치·자원</a><a href="#fnb">식음 제안</a><a href="#signage">사이니지 A3</a>
+    </nav>
+
+    <section class="view" id="v-check">
+      <p class="note">건별대장에 접수하기 전, 날짜와 시간, 인원만으로 어느 공간이 비어 있는지 봅니다. 건별대장 공간 가용성 보드의 점유 현황(확정, 가예약, 회의실 온라인 예약)을 기준으로 판정하며, 여기서 확인해도 자리가 잡히지는 않습니다.</p>
+      <form class="row" id="ckForm">
+        <label class="field">날짜<input id="ckDate" type="date" required></label>
+        <label class="field">시작<input id="ckS" type="time" required></label>
+        <label class="field">종료<input id="ckE" type="time" required></label>
+        <label class="field">인원<input id="ckPax" type="number" min="1" max="500" required></label>
+        <label class="field">단체명 (상담 시작할 때 사용)<input id="ckOrg" type="text" placeholder="신규 문의"></label>
+      </form>
+      <div id="ckSum"></div>
+      <div class="tw"><table id="ckTable"></table></div>
+      <div class="grp" id="ckExtra"></div>
+    </section>
+
+    <section class="view" id="v-consult">
+      <p class="note">상담 중 확인한 항목에 체크하고 오른쪽에 내용을 적습니다. 체크 내용은 이 브라우저에 임시 저장됩니다. 다른 사람과 나누려면 아래 요약을 복사하세요.</p>
+      <div id="checks"></div>
+      <div class="grp">
+        <h3>상담 요약</h3>
+        <textarea class="out" id="summary" readonly aria-label="상담 요약"></textarea>
+        <div class="row"><button class="btn" id="copySum" type="button">요약 복사</button><span class="msg" id="copyMsg"></span></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-layout">
+      <div class="callout" id="planNote"></div>
+      <div class="row">
+        <label class="field">배치 형태<select id="ltype"></select></label>
+        <label class="field"><span id="perLabel">테이블당 인원</span><input id="per" type="number" min="1" max="20"></label>
+        <label class="field">진행·등록용 추가 테이블<input id="extra" type="number" min="0" max="20"></label>
+        <label class="field">배치 인원<input id="lpax" type="number" min="1" max="500"></label>
+      </div>
+      <div class="plan" id="plan"></div>
+      <div class="grp">
+        <h3>필요 수량과 보유 수량</h3>
+        <p class="note">접이식 테이블 25개, 의자 100개는 새벽의 집 배치도에 적힌 수량입니다. 대화의 집 비품과 함께 쓰는 수량인지 확인하고 고치세요. 고친 값은 모든 건에 적용됩니다.</p>
+        <div class="tw"><table id="need"></table></div>
+      </div>
+      <div class="grp">
+        <h3>세팅 작업지시</h3>
+        <textarea class="out" id="work" readonly aria-label="세팅 작업지시"></textarea>
+        <div class="row"><button class="btn" id="copyWork" type="button">작업지시 복사</button><span class="msg" id="workMsg"></span></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-fnb">
+      <p class="note">배정 시간과 인원으로 뽑은 제안 초안입니다. 품목은 건별대장 품목표 기준이며 단가와 메뉴는 넣지 않았습니다. 고객에게 제안할 항목만 체크하세요.</p>
+      <div class="grp" id="fopts"></div>
+      <div class="grp">
+        <h3>다이닝 좌석 배정 · 1F 테이블 23개 88석</h3>
+        <div id="dinNote"></div>
+        <div class="row"><button class="btn" id="dinAuto" type="button">인원에 맞춰 자동 배정</button><button class="btn ghost" id="dinClear" type="button">배정 지우기</button></div>
+        <div class="plan" id="din"></div>
+        <p class="note">테이블을 눌러 이 단체 자리로 넣거나 뺍니다. A는 원형 2~3인, B·C는 4인(C2는 8인), D는 직사각 4~6인, E는 쇼파 4인입니다.</p>
+      </div>
+      <div class="grp">
+        <h3>고객 안내 문구</h3>
+        <textarea class="out" id="ftext" readonly aria-label="식음 제안 문구"></textarea>
+        <div class="row"><button class="btn" id="copyF" type="button">문구 복사</button><span class="msg" id="fMsg"></span></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-signage">
+      <div class="signgrid">
+        <div class="signform">
+          <label class="field">방향<select id="sOri"><option value="p">세로 A3</option><option value="l">가로 A3</option></select></label>
+          <label class="field">상단 문구<input id="sHello" type="text"></label>
+          <label class="field">단체명<input id="sOrg" type="text"></label>
+          <label class="field">행사명 (없으면 비움)<input id="sEvt" type="text"></label>
+          <label class="field">장소<input id="sPlace" type="text"></label>
+          <label class="field">일시<input id="sWhen" type="text"></label>
+          <label class="field">방향 안내<select id="sArrow"><option value="">없음</option><option value="←">← 왼쪽</option><option value="→">→ 오른쪽</option><option value="↑">↑ 직진</option><option value="↓">↓ 아래층</option></select></label>
+          <div class="row"><button class="btn" id="savePdf" type="button" hidden>A3 PDF 저장</button><button class="btn ghost" id="savePng" type="button" hidden>PNG 저장</button></div>
+          <span class="msg" id="sMsg">저장 기능을 확인하는 중입니다.</span>
+        </div>
+        <div class="canvasbox"><canvas id="sign" width="2339" height="3307" aria-label="사이니지 미리보기"></canvas></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+/* 진입 잠금: 비밀번호로 daegwan.enc 를 풀어야 데이터와 화면이 열린다. 비밀번호는 어디에도 적지 않는다. (tools/enc.js 와 같은 방식) */
+(function(){"use strict";
+const SALT="deosup-akaeven-v1",ITER=310000,te=new TextEncoder();
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const msg=document.getElementById("gMsg"),dots=[...document.querySelectorAll("#gDots i")];let pin="",busy=false;
+function paint(){dots.forEach((d,i)=>d.classList.toggle("on",i<pin.length))}
+async function unlock(p){
+  const r=await fetch("daegwan.enc?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error("net");const j=await r.json();
+  const km=await crypto.subtle.importKey("raw",te.encode(p),"PBKDF2",false,["deriveKey"]);
+  const key=await crypto.subtle.deriveKey({name:"PBKDF2",salt:te.encode(SALT),iterations:ITER,hash:"SHA-256"},km,{name:"AES-GCM",length:256},false,["decrypt"]);
+  let pt;try{pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64(j.iv)},key,b64(j.d))}catch(e){throw new Error("pin")}
+  const s=document.createElement("script");s.textContent=new TextDecoder().decode(pt);document.head.appendChild(s);
+  await new Promise((ok,no)=>{const a=document.createElement("script");a.src="daegwan.js?v="+encodeURIComponent(j.at||"");a.onload=ok;a.onerror=()=>no(new Error("net"));document.body.appendChild(a)});
+  try{sessionStorage.setItem("dg.p",p)}catch(e){}
+  document.getElementById("gate").hidden=true;document.body.classList.remove("locked")}
+async function tryPin(p,quiet){if(busy)return;busy=true;msg.textContent="확인하는 중입니다";
+  try{await unlock(p)}catch(e){pin="";paint();try{sessionStorage.removeItem("dg.p")}catch(_){}
+    msg.textContent=quiet?"비밀번호 4자리를 누르세요":e.message==="pin"?"비밀번호가 맞지 않습니다. 다시 누르세요":"자료를 불러오지 못했습니다. 연결을 확인하고 다시 누르세요"}
+  busy=false}
+function key(k){if(busy)return;if(k==="clr")pin="";else if(k==="del")pin=pin.slice(0,-1);else if(pin.length<4)pin+=k;paint();
+  if(pin.length===4)tryPin(pin);else msg.textContent="비밀번호 4자리를 누르세요"}
+document.getElementById("gPad").addEventListener("click",e=>{const b=e.target.closest("button");if(b)key(b.dataset.k||b.textContent)});
+document.addEventListener("keydown",e=>{if(document.getElementById("gate").hidden)return;if(/^[0-9]$/.test(e.key))key(e.key);else if(e.key==="Backspace")key("del")});
+let saved="";try{saved=sessionStorage.getItem("dg.p")||""}catch(e){}
+if(/^\d{4}$/.test(saved))tryPin(saved,true);
+})();
+</script>
+</body>
+</html>
