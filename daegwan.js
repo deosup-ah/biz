@@ -180,7 +180,11 @@ function renderLayout(){const c=layoutCalc(),s=c.s,isRef=s.type==="ref",ref=REF[
     else if(short>0){note.className="callout bad";note.textContent=`선택한 ${c.units}개로는 ${c.seats}석입니다. ${short}석이 모자랍니다. 도면에서 ${ref.unit}을 더 눌러 추가하세요.`}
     else{note.className="callout ok";note.textContent=`${ref.title}. ${c.pax}명은 ${ref.unit} ${c.units}개(${c.seats}석)로 배치합니다. 도면에서 ${ref.unit}을 눌러 쓸 자리와 뺄 자리를 바꿀 수 있습니다. ${ref.info}`}
     $("plan").innerHTML=refSvg(c)}
-  else{note.textContent=ref?"기준 배치도와 다른 형태입니다. 아래 그림은 수량 확인용 개념도이며 기둥, 피아노, 단상 위치는 반영되지 않았습니다. 현장에서 실제 배치 가능 여부를 확인하세요.":"아래 그림은 수량 확인용 개념도입니다. 실제 치수는 반영되지 않았습니다.";
+  else if(ROOM[blk.res]){const rp=roomPlan(c);c.room=rp;const unitName=s.type==="theater"?"의자":s.type==="round"?"원탁":s.type==="stand"?"스탠딩 테이블":s.type==="group"?"조":"테이블";
+    if(rp.placed<rp.need){note.className="callout bad";note.textContent=`도면에 축척대로 놓으면 ${unitName} ${rp.need}개 중 ${rp.placed}개까지만 들어갑니다(${rp.cap}명). 배치 인원 ${c.pax}명에는 모자라니 테이블당 인원을 늘리거나 다른 형태를 고르세요.`}
+    else{note.className="callout ok";note.textContent=`${SP[blk.res].n} 도면에 축척대로 놓은 배치입니다. ${unitName} ${rp.placed}개, ${rp.rows}줄. 접이식 테이블은 1800×600, 벽에서 30cm, 피아노·기둥·입구 동선을 피해 놓았습니다.`}
+    $("plan").innerHTML=rp.svg+`<p class="note" style="margin:8px auto 0;max-width:560px">전면을 창 쪽(도면 위쪽)으로 두고 자동으로 놓은 안입니다. 벽과 기둥 위치는 도면 이미지에서 읽은 값이라 10cm 안팎 오차가 있을 수 있습니다.${s.type==="round"?" 원탁은 지름 1.8m로 가정했고 보유 비품이 아니라 외부 조달입니다.":""}</p>`}
+  else{note.textContent="아래 그림은 수량 확인용 개념도입니다. 실제 치수는 반영되지 않았습니다.";
     $("plan").innerHTML=planSvg(c)}
   const inv=Object.assign({},INV_DEFAULT,store.get("inv",{}));const R=[["rect","접이식 테이블 (1800×600)"],["round","원탁"],["stand","스탠딩 테이블"],["chair","의자"]];
   $("need").innerHTML=`<thead><tr><th>품목</th><th class="num">필요</th><th class="num">보유</th><th>판단</th></tr></thead><tbody>`+R.map(([k,n])=>{const need=c.need[k],have=inv[k];
@@ -198,6 +202,7 @@ function renderLayout(){const c=layoutCalc(),s=c.s,isRef=s.type==="ref",ref=REF[
     const off=ref.pts.map((_,i)=>i).filter(i=>!c.used.includes(i));if(off.length)W.push(`세팅하지 않는 자리: ${off.map(i=>i+1).join(", ")}번`);
     if(c.seats>c.pax)W.push(`빈 좌석 ${c.seats-c.pax}석은 마지막 번호 ${ref.unit}에서 뺍니다`);
     W.push(blk.res==="HALL1966"?"고정: 피아노와 기둥 주변은 비움, 입구에서 중앙으로 들어오는 동선 확보":"고정: 단상 서쪽 벽 중앙, 세로 테이블이 단상을 향하게, 앞쪽 홀은 별도 배치 구역")}
+  if(c.room)W.push(`도면 배치: ${c.room.placed}개를 ${c.room.rows}줄로, 전면은 창 쪽. 벽에서 30cm, 피아노·기둥·입구 동선 비움${c.room.placed<c.room.need?` (주의: ${c.room.need-c.room.placed}개는 도면에 들어가지 않음)`:""}`);
   if(s.extra)W.push(`진행·등록용 테이블 ${s.extra}개 별도`);
   W.push("세팅 완료 시각: 행사 시작 30분 전까지 (상담 시 확정)");
   $("work").value=W.join("\n")}
@@ -220,6 +225,57 @@ function planSvg(c){const s=c.s,W=640;let H=120,els="";const ink="var(--ink)",fi
       els+=`<text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="12" font-weight="600" fill="${ink}">${i+1}</text>`}
     H=78+rowsN*ch+16}
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${c.label} 개념도"><rect x="6" y="6" width="${W-12}" height="${H-12}" rx="6" fill="none" stroke="var(--line)" stroke-dasharray="5 4"/>${front}${els}</svg>`}
+/* ---------- 실제 도면 위 축척 배치 (기준 배치도와 다른 형태) ---------- */
+// 좌표는 도면 이미지 픽셀. ppm = 1m 당 픽셀(도면 축척 막대 5m = 327px). poly 는 벽에서 30cm 띄운 안쪽, obs 는 피아노·기둥·입구 동선
+const ROOM={HALL1966:{img:"daegwan-hall1966-empty.jpg",iw:1414,ih:2000,vb:[60,215,1290,1590],ppm:65.4,cx:715,y0:455,yMax:1362,
+  poly:[[566,290],[860,290],[1060,500],[1060,1362],[362,1362],[362,500]],
+  obs:[[948,506,1095,720,"피아노"],[528,994,584,1050,"기둥"],[842,994,898,1050,"기둥"],[630,1270,810,1362,"입구 동선"]],
+  u:{x0:397,x1:893,y1:965},
+  gpts:[[609,428,1],[816,428,1],[505,652,0],[817,652,0],[439,871,1],[738,872,0],[983,871,1],[453,1150,0],[712,1105,1],[971,1150,0]]}};
+function inPoly(P,x,y){let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const[xi,yi]=P[i],[xj,yj]=P[j];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c}return c}
+function rectOK(R,x0,y0,x1,y1){if(![[x0,y0],[x1,y0],[x0,y1],[x1,y1]].every(([x,y])=>inPoly(R.poly,x,y)))return false;
+  return !R.obs.some(([a,b,c2,d])=>x0<c2+10&&x1>a-10&&y0<d+10&&y1>b-10)}
+function gridPlace(R,n,w,h,px,py,aisle){const out=[];let rows=0;
+  for(let y=R.y0;y+h<=R.yMax&&out.length<n;y+=py){const xs=[];
+    if(aisle>0){for(let k=0;k<14;k++){xs.push(R.cx+aisle/2+k*px);xs.push(R.cx-aisle/2-w-k*px)}}
+    else{xs.push(R.cx-w/2);for(let k=1;k<9;k++){xs.push(R.cx-w/2+k*px);xs.push(R.cx-w/2-k*px)}}
+    let ok=xs.filter(x=>rectOK(R,x,y,x+w,y+h));if(!ok.length)continue;
+    ok.sort((a,b)=>Math.abs(a+w/2-R.cx)-Math.abs(b+w/2-R.cx));ok=ok.slice(0,n-out.length).sort((a,b)=>a-b);ok.forEach(x=>out.push([x,y]));rows++}
+  return{pos:out,rows}}
+function roomPlan(c){const R=ROOM[blk.res],m=R.ppm,s=c.s,T="#e8cfa0",TS="#a87b3b",CH="#3d5a80";const tw=1.8*m,td=0.6*m,ch=0.42*m;let o="",placed=0,rows=0,cap=0,seatsPer=c.per;
+  const chair=(x,y)=>`<rect x="${x-ch/2}" y="${y-ch/2}" width="${ch}" height="${ch}" rx="5" fill="${CH}"/>`;
+  const num=(x,y,i)=>`<text x="${x}" y="${y+9}" text-anchor="middle" font-size="24" font-weight="700" fill="#3b2a10">${i}</text>`;
+  const table=(x,y,w,hh)=>`<rect x="${x}" y="${y}" width="${w}" height="${hh}" fill="${T}" stroke="${TS}" stroke-width="2"/>`;
+  if(s.type==="class"){const hh=td+8+ch,g=gridPlace(R,c.units,tw,hh,tw+0.2*m,hh+0.75*m,1.2*m);rows=g.rows;placed=g.pos.length;
+    g.pos.forEach(([x,y],i)=>{o+=table(x,y,tw,td)+num(x+tw/2,y+td/2,i+1);for(let k=0;k<c.per;k++)o+=chair(x+tw*(k+0.5)/c.per,y+td+8+ch/2)})}
+  else if(s.type==="group"){const w=tw+2*(ch+8),hh=2*td+2*(ch+8);let pos;
+    // 조별은 기준 배치도에서 검증된 10자리를 그대로 쓴다(세로·가로 방향 포함)
+    if(R.gpts){pos=R.gpts.slice(0,c.units).map(([cx,cy,v])=>[cx-w/2,cy-hh/2,v]);rows=Math.ceil(pos.length/3)}
+    else{const g=gridPlace(R,c.units,w,hh,w+0.8*m,hh+0.8*m,0);pos=g.pos;rows=g.rows}
+    placed=pos.length;
+    pos.forEach(([x,y,v],i)=>{const tx=x+ch+8,ty=y+ch+8;let u=table(tx,ty,tw,td)+table(tx,ty+td,tw,td);
+      const side=Math.min(2,Math.max(0,c.per-6)),long=c.per-side,top=Math.ceil(long/2),bot=long-top;
+      for(let k=0;k<top;k++)u+=chair(tx+tw*(k+0.5)/top,y+ch/2);for(let k=0;k<bot;k++)u+=chair(tx+tw*(k+0.5)/bot,ty+2*td+8+ch/2);
+      if(side>0)u+=chair(x+ch/2,ty+td);if(side>1)u+=chair(tx+tw+8+ch/2,ty+td);
+      o+=(v?`<g transform="rotate(90 ${x+w/2} ${y+hh/2})">${u}</g>`:u)+num(x+w/2,y+hh/2,i+1)})}
+  else if(s.type==="round"){const d=1.8*m,w=d+2*(ch+8),g=gridPlace(R,c.units,w,w,w+0.7*m,w+0.7*m,0);rows=g.rows;placed=g.pos.length;
+    g.pos.forEach(([x,y],i)=>{const cx=x+w/2,cy=y+w/2;o+=`<circle cx="${cx}" cy="${cy}" r="${d/2}" fill="${T}" stroke="${TS}" stroke-width="2"/>`+num(cx,cy,i+1);
+      for(let k=0;k<c.per;k++){const a=2*Math.PI*k/c.per;o+=chair(cx+Math.cos(a)*(d/2+8+ch/2),cy+Math.sin(a)*(d/2+8+ch/2))}})}
+  else if(s.type==="stand"){const d=0.7*m,g=gridPlace(R,c.units,d,d,d+1.5*m,d+1.5*m,0);rows=g.rows;placed=g.pos.length;
+    g.pos.forEach(([x,y],i)=>{o+=`<circle cx="${x+d/2}" cy="${y+d/2}" r="${d/2}" fill="${T}" stroke="${TS}" stroke-width="2"/>`+num(x+d/2,y+d/2,i+1)})}
+  else if(s.type==="theater"){seatsPer=1;const g=gridPlace(R,c.pax,ch,ch,0.5*m,0.95*m,1.2*m);rows=g.rows;placed=g.pos.length;g.pos.forEach(([x,y])=>{o+=chair(x+ch/2,y+ch/2)})}
+  else if(s.type==="u"){const n=c.units,U=R.u,maxSide=Math.floor((U.y1-R.y0-td-ch-8)/tw),maxBottom=Math.floor((U.x1-U.x0-2*td)/tw);
+    // ㄷ자는 피아노 왼쪽, 가운데 기둥 앞까지만 놓을 수 있다. 열린 쪽이 전면
+    const side=Math.min(maxSide,Math.ceil(n/3)),bottom=Math.max(1,Math.min(maxBottom,n-2*side));const W0=bottom*tw+2*td,x0=(U.x0+U.x1)/2-W0/2,yb=R.y0+side*tw;let i=0;
+    const put=(x,y,w,hh,cxs)=>{if(i>=n)return;o+=table(x,y,w,hh)+num(x+w/2,y+hh/2,i+1)+cxs.map(([p,q])=>chair(p,q)).join("");placed++;i++};
+    const seat=k=>(k+0.5)/c.per;
+    for(let k=0;k<side;k++){const y=R.y0+k*tw;put(x0,y,td,tw,Array.from({length:c.per},(_,q)=>[x0-8-ch/2,y+tw*seat(q)]))}
+    for(let k=0;k<bottom;k++){const x=x0+td+k*tw;put(x,yb,tw,td,Array.from({length:c.per},(_,q)=>[x+tw*seat(q),yb+td+8+ch/2]))}
+    for(let k=0;k<side;k++){const y=R.y0+k*tw;put(x0+W0-td,y,td,tw,Array.from({length:c.per},(_,q)=>[x0+W0+8+ch/2,y+tw*seat(q)]))}rows=side}
+  const need=s.type==="theater"?c.pax:c.units;cap=placed*seatsPer;
+  const front=`<rect x="${R.cx-150}" y="300" width="300" height="34" rx="4" fill="#1f5c46"/><text x="${R.cx}" y="324" text-anchor="middle" font-size="22" font-weight="700" fill="#fff">전면 · 강단 · 스크린</text>`;
+  const[x,y,w,hh]=R.vb;
+  return{placed,need,rows,cap,svg:`<svg viewBox="${x} ${y} ${w} ${hh}" style="max-width:560px;background:#fff;border-radius:4px" role="img" aria-label="${SP[blk.res].n} 도면 위 ${c.label} 배치"><image href="${R.img}" width="${R.iw}" height="${R.ih}"/>${s.type==="stand"?"":front}${o}</svg>`}}
 function refSvg(c){const r=c.ref,[x,y,w,h]=r.vb;let o="";
   r.pts.forEach(([cx,cy],i)=>{const on=c.used.includes(i);
     o+=`<g class="rt" data-i="${i}" role="button" tabindex="0" aria-pressed="${on}" aria-label="${r.unit} ${i+1}번 ${on?"사용":"미사용"}">`+
