@@ -23,7 +23,11 @@ const HID={store:['ana','stock','today','rank','ret','data','biz'],aka:['today',
 (()=>{const g=A.gGo;A.gGo=async d=>{const el=$('gIn'),v=((d&&d.v)||(el&&el.value)||'').trim();if(v&&!isAdmin()&&typeof G_SCHED!=='undefined'&&G_SCHED.test(v)&&!(typeof G_NOTE!=='undefined'&&G_NOTE.test(v))){toast('일정 넣기는 안정화 테스트 중입니다. 며칠만 기다려 주세요.');return}if(v)lvAdd('cur',v);return g(d)}})();
 /* 가이드: 관리자가 아니면 일정 · 매출 장을 빼고 안내 한 줄 */
 if(!isAdmin()){for(let i=GDS.length-1;i>=0;i--)if(GDS[i][0]==='b'||GDS[i][0]==='d')GDS.splice(i,1)}
-(()=>{const g=gdDraw;gdDraw=function(){g.apply(this,arguments);if(isAdmin())return;const x=document.querySelector('#guide .gdx');if(x&&!document.querySelector('#guide .gdw'))x.insertAdjacentHTML('afterend','<p class="gdw">시스템 안정화 테스트 중입니다. 며칠만 기다려 주세요.</p>')}})();
+if(!isAdmin())GDS.push(['z','곧 열립니다','주문 · 매출 · 지원사업']);
+let gdTy=0;
+(()=>{const g=gdDraw;gdDraw=function(){g.apply(this,arguments);try{const G=$('guide');if(!G||G.classList.contains('bs'))return;const k=(GDS[S.ui.gd|0]||[])[0];
+  if(k==='z'){const im=G.querySelector('.gdi img');if(im)im.outerHTML=`<div class="gdz">${[['주문','팔린 만큼 알아서 셈하고, 북센 주문에 담아 둡니다'],['매출','숫자 대신 이번 주 할 일 세 가지로 알려 줍니다'],['지원사업','공모 일정과 신청 기록을 한곳에 모읍니다']].map(([a,b])=>`<div><b>${a}</b><span>${b}</span><em>안정화 중</em></div>`).join('')}<p>시스템 안정화 테스트 중입니다. 며칠만 기다려 주세요.</p></div>`}
+  const h=G.querySelector('.gdb h2');if(h){const t=h.textContent,id=++gdTy;h.textContent='';h.classList.add('gdty');let n=0;const st=()=>{if(id!==gdTy||!h.isConnected)return;h.textContent=t.slice(0,++n);if(n<t.length)setTimeout(st,28);else setTimeout(()=>h.classList.add('done'),600)};st()}}catch(e){}}})();
 
 /* ── 쓴 만큼 세기 ── */
 (()=>{const m=mkKeep;mkKeep=function(D){const n=made().length;m.apply(this,arguments);if(made().length!==n||n===0)lvAdd('pop')};
@@ -35,7 +39,7 @@ if(!isAdmin()){for(let i=GDS.length-1;i>=0;i--)if(GDS[i][0]==='b'||GDS[i][0]==='
 function lvBar(n){const s=lvS(),R=LVREQ[n];return Object.keys(R).map(k=>{const v=Math.min(lvVal(s,k),R[k]);return `<div class="lvr"><span>${LVLAB[k]}</span><div class="lvb"><i style="width:${Math.round(v/R[k]*100)}%"></i></div><b>${v}/${R[k]}</b></div>`}).join('')}
 A.lvOpen=()=>{const L=lvNow(),nx=L<3?L+1:0;
   openSheet(`<h3>${L}단계 · ${LVN[L]}</h3><p class="note">큐레이션과 진열을 써 볼수록 다음 단계가 열립니다. 조건을 채우고 신청하면 참부장이 만든 것을 보고 열쇠를 드립니다.</p>
-   <div class="lvs">${[1,2,3].map(n=>`<div class="lvc${n<=L?' on':''}${n===L?' cur':''}"><em>${n}</em><b>${LVN[n]}</b><ul>${LVGET[n].map(x=>`<li>${n<=L?'':'<u>잠김</u> '}${x}</li>`).join('')}</ul></div>`).join('')}</div>
+   <div class="lvs">${[1,2,3].map(n=>`<div class="lvc${n<=L?' on':''}${n===L?' cur':''}"><em>${n}</em><b>${LVN[n]}</b><ul>${LVGET[n].map(x=>`<li>${n<=L?x:'<u>잠김</u> ? ? ?'}</li>`).join('')}</ul></div>`).join('')}</div>
    ${nx?`<h4>${nx}단계 「${LVN[nx]}」까지</h4>${lvBar(nx)}
    <div class="btns"><button class="btn pri" data-a="lvAsk" ${lvReady(nx)?'':'disabled'}>${lvReady(nx)?'승급 신청 카드 만들기':'조건을 채우면 신청할 수 있습니다'}</button></div>
    <p class="note">신청 카드(그림)를 카카오톡으로 참부장에게 보내 주세요. 허가되면 받은 열쇠를 아래에 넣습니다.</p>`:`<p class="note">가장 높은 단계입니다.</p>`}
@@ -84,7 +88,7 @@ function bsFigs(){try{const B=['코스모스','소년이 온다','아몬드','�
 A.caseMake=async d=>{const c=CASES[+d.i];if(!c)return;S.ui.tkOpen=false;lvAdd('cur',c.w);await A.ideaGo({v:c.w});window.scrollTo(0,0);setTimeout(()=>toast(`「${c.w}」로 평대 한 벌을 만들었습니다. 맨 앞 표지입니다`),300)};
 (()=>{const f=newsPanel;newsPanel=function(){const h=f(),cs=typeof CASES==='undefined'?'':`<div class="sec"><h2>사례 · 시장 흐름</h2></div><div class="wgrid">${CASES.map((c,i)=>`<article class="wn"><p class="wnm"><b>${esc(c.c)}</b> · ${esc(c.src)} · ${esc(c.d)}</p><h3>${esc(nb(c.t))}</h3><p class="wns">${esc(nb(c.sum))}</p><p class="wnw"><b>우리 지점에서</b> ${esc(nb(c.do))}</p><div class="wna"><button class="btn sm pri" data-a="caseMake" data-i="${i}">「${esc(c.w)}」로 평대 만들기</button><a class="btn sm" href="${c.url}" target="_blank" rel="noopener">원문</a></div></article>`).join('')}</div><div class="sec"><h2>오늘의 소식</h2></div>`;return h.replace('<div class="tkpn">','<div class="tkpn">'+cs)}})();
 /* 가이드 셋째 장: 쓸수록 열리는 세 단계 */
-GDS.splice(2,0,['h','쓸수록 열리는 세 단계','책 고르는 사람 → 코너 큐레이터 → 공간 기획자']);
+GDS.splice(2,0,['h','> 다음 단계: ???','쓸수록 열립니다. 2단계와 3단계는 가 본 사람만 압니다']);
 
 /* ── 만들기 · 주제 고도화: POP 느낌(1단계 3가지 → 2단계 9가지), 2단계 3주 연작, 3단계 4주 계절 기획 ── */
 (()=>{const f=A.dSt;A.dSt=d=>{if(+d.v>=3&&lvNow()<2)return lvLock(2);return f(d)};
