@@ -329,16 +329,17 @@ function drawSign(){const s=readSign(),cv=$("sign");cv.width=2339;cv.height=3307
   if(useLogo){const k=Math.min(maxW/signLogo.width,(H*0.085)/signLogo.height);logoW=signLogo.width*k;logoH=signLogo.height*k}
   else org=fitLines(ctx,s.org||" ",`800 %px ${SANS}`,maxW,250,96,2);
   const orgH=useLogo?logoH:org.lines.length*org.size*1.22;
-  const evtSize=s.evt&&!useLogo?fitSpaced(ctx,s.evt,`500 %px ${SANS}`,maxW,64,36,0.02):0;
+  // 작은 글씨는 단체명 글자 크기의 38% (로고일 때는 로고 높이의 30%). 폭을 넘을 때만 줄인다
+  const evtSize=s.evt?fitSpaced(ctx,s.evt,`500 %px ${SANS}`,maxW,Math.round(useLogo?logoH*0.3:org.size*0.38),36,0.02):0;
   const plSize=fitSpaced(ctx,s.place||" ",`500 %px ${SERIF}`,maxW,236,90,0.2);
   const subSize=s.sub?fitSpaced(ctx,s.sub,`400 %px ${SERIF}`,maxW,84,44,0.3):0;
   const whSize=fitSpaced(ctx,s.when||" ",`400 %px ${SERIF}`,maxW,108,56,0.06);
-  const gap=H*0.034,total=orgH+(evtSize?evtSize*1.5:0)+gap+gap+plSize*1.1+(subSize?subSize*1.9:0)+gap*0.75+whSize;
+  const gap=H*0.034,total=orgH+(evtSize?evtSize*1.45:0)+gap+gap+plSize*1.1+(subSize?subSize*1.9:0)+gap*0.75+whSize;
   let y=H*0.47-total/2;
   // 단체명 또는 로고
   if(useLogo){ctx.drawImage(signLogo,W/2-logoW/2,y,logoW,logoH);y+=logoH}
   else{ctx.fillStyle=s.color||"#1a1a1a";ctx.font=`800 ${org.size}px ${SANS}`;const lh=org.size*1.22;org.lines.forEach(l=>{y+=lh;ctx.fillText(l,W/2,y-lh*0.2)})}
-  if(evtSize){ctx.fillStyle=INK;ctx.font=`500 ${evtSize}px ${SANS}`;y+=evtSize*1.5;drawSpaced(ctx,s.evt,W/2,y-evtSize*0.2,evtSize*0.02)}
+  if(evtSize){ctx.fillStyle=INK;ctx.font=`500 ${evtSize}px ${SANS}`;y+=evtSize*1.45;drawSpaced(ctx,s.evt,W/2,y-evtSize*0.2,evtSize*0.02)}
   // 가는 줄
   y+=gap;ctx.fillStyle="#4a4a4a";ctx.fillRect(W/2-W*0.032,y,W*0.064,Math.max(3,Math.round(H*0.0011)));y+=gap;
   // 장소
