@@ -794,7 +794,7 @@ body.vm .gbarx input[type=text]::placeholder{font-size:15px;letter-spacing:-.02e
 .g2h{display:flex;align-items:baseline;gap:10px}.g2n{font:700 13px Pretendard,sans-serif;color:#1c1c1a;font-variant-numeric:tabular-nums}.g2n i{font-style:normal;color:#9a958a;font-weight:500;margin-left:3px}.g2f{font-size:13px;color:#8a6a10;font-weight:600}
 .g2c h2{margin:0;font:700 clamp(24px,6.6vw,30px)/1.3 "Gowun Batang","Noto Serif CJK KR",serif;color:#1c1c1a;word-break:keep-all}
 .g2m{background:#efebe0;border-radius:3px;display:flex;justify-content:center;align-items:center;height:min(38dvh,330px);overflow:hidden}.g2m img{max-width:100%;max-height:100%;object-fit:contain;display:block}
-.g2ag{flex-direction:column;align-items:stretch;justify-content:center;gap:8px;padding:16px}.g2ag p{margin:0;max-width:80%;padding:9px 12px;font-size:14px;line-height:1.5;border-radius:3px}.g2ag .me{align-self:flex-end;background:#003128;color:#fff}.g2ag .it{align-self:flex-start;background:#fff;border:1px solid #d8d3c4}
+.g2ag{flex-direction:column;align-items:stretch;justify-content:flex-end;gap:6px;padding:12px}.g2ag p{margin:0;max-width:82%;padding:7px 10px;font-size:13px;line-height:1.5;border-radius:3px}.g2ag .me{align-self:flex-end;background:#003128;color:#fff}.g2ag .it{align-self:flex-start;background:#fff;border:1px solid #d8d3c4}
 .g2why b{display:block;font-size:13px;color:#003128;margin-bottom:4px}.g2why p{margin:0;font-size:15px;line-height:1.65;color:#1c1c1a;word-break:keep-all}
 .g2how{list-style:none;counter-reset:s;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}.g2how li{counter-increment:s;display:flex;align-items:center;gap:6px;font-size:13px;color:#55554f;background:#fff;border:1px solid #e2ddd0;padding:6px 10px;border-radius:3px}.g2how li::before{content:counter(s);font-weight:700;color:#003128}
 .g2soon{display:grid;gap:0;border-top:1px solid #d8d3c4}.g2soon>div{padding:12px 0;border-bottom:1px solid #e6e1d4}.g2soon span{display:flex;justify-content:space-between;align-items:center;gap:8px}.g2soon b{font-size:16px}.g2soon em{font-style:normal;font-size:12px;font-weight:700;color:#8a6a10;border:1px solid #c9a24a;padding:2px 8px;border-radius:3px;white-space:nowrap}.g2soon p{margin:4px 0 0;font-size:14px;color:#55554f;line-height:1.55}
@@ -812,6 +812,25 @@ body.vm .gbarx input[type=text]::placeholder{font-size:15px;letter-spacing:-.02e
 .g2rule section{padding:16px 0 18px;border-top:1px solid #d8d3c4}.g2rule section:last-of-type{border-bottom:1px solid #d8d3c4}
 .g2rule h3{margin:0 0 6px;font:700 17px "Gowun Batang","Noto Serif CJK KR",serif;color:#003128}.g2rule p{margin:0;font-size:15px;line-height:1.7;color:#1c1c1a;word-break:keep-all}
 .g2rule .g2sig{margin:14px 0 24px;text-align:right;font:400 14px "Gowun Batang","Noto Serif CJK KR",serif;color:#6b6b63}
+/* 가이드: 작은 화면에서도 한 화면 (11/13) */
+#guide.g2:not(.g2free):not(.g2bs){overflow:hidden}
+#guide.g2:not(.g2free):not(.g2bs) .g2b{height:100dvh;min-height:0;overflow:hidden}
+#guide.g2 .g2b{padding:10px 18px calc(10px + env(safe-area-inset-bottom))}
+#guide.g2 .g2top b{font-size:17px}#guide.g2 .g2x{padding:5px 11px;font-size:13px}
+#guide.g2 .g2ai{margin:10px 0 0;padding:10px 14px;display:flex;align-items:center;gap:8px}#guide.g2 .g2ai1{font-size:15px}#guide.g2 .g2ai2{font-size:12.5px;flex:1}#guide.g2 .g2ai i{font-size:20px}
+#guide.g2 .g2seg{margin-top:8px}#guide.g2 .g2seg button{padding:8px 4px;font-size:13.5px}
+#guide.g2 .g2bar{margin-top:10px}
+#guide.g2 .g2c{padding:12px 0 10px;gap:9px;min-height:0}
+#guide.g2 .g2c h2{font-size:clamp(20px,5.8vw,27px)}
+#guide.g2:not(.g2free) .g2m{flex:1 1 0;height:auto;min-height:110px;max-height:340px}
+#guide.g2 .g2why p{font-size:14px;line-height:1.55}#guide.g2 .g2why b{margin-bottom:2px}
+#guide.g2 .g2how li{font-size:12px;padding:5px 8px}
+#guide.g2 .g2nav{padding-top:8px}#guide.g2 .g2nav .btn{min-height:44px}
+@media (max-height:640px){#guide.g2 .g2ai2{display:none}#guide.g2 .g2how{display:none}}
+.g2tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g2t{position:relative;display:grid;align-content:start;gap:4px;padding:14px 12px 12px;background:#fff;border:1px solid #e2ddd0;border-radius:3px;overflow:hidden}
+.g2t>i{position:relative;width:34px;height:16px;margin-bottom:6px}.g2t>i b{position:absolute;inset:0;border:1px solid #8a6a10;border-radius:2px;background:rgba(201,162,74,.10)}.g2t>i b:nth-child(2){transform:translate(7px,-4px);opacity:.5}
+.g2t>b{font-size:15px;line-height:1.3;color:#1c1c1a;word-break:keep-all}.g2t p{margin:0;font-size:12.5px;line-height:1.5;color:#55554f;word-break:keep-all}.g2t em{font-style:normal;font-size:11.5px;font-weight:700;color:#8a6a10;margin-top:4px}
 </style>
 </head>
 <body>
