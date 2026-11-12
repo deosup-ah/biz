@@ -169,7 +169,7 @@ async function igCanvases({t,ph,fmt,ct,cs}){await upFont();const [,W,H]=IGF[fmt|
   return out}
 
 /* ── 가득 채우기(내부 지침: 빈틈없이 채우되, 군데군데 포인트를 다르게 — 세운 표지 · 높은 더미 · 메인. 설명은 짧게) ── */
-(()=>{const g=dpPlan;dpPlan=function(t,m){const P=g(t,m);try{if(!S.ui.dpFull||S.ui.dpF||!P||!P.it)return P;const W=P.W,D=P.D,st=P.it.filter(i=>i.k==='stack');if(!st.length)return P;
+(()=>{const g0=dpBuild;dpBuild=function(g,t,md,tmp){const P=g0(g,t,md,tmp);try{if(!S.ui.dpFull||S.ui.dpF||!P||!P.it)return P;const ov={...((S.ui.dpAbs||{})[dpPosK(t)]||{}),...(tmp||{})};const W=P.W,D=P.D,st=P.it.filter(i=>i.k==='stack');if(!st.length)return P;
   const keep=P.it.filter(i=>i.k!=='stack'&&i.k!=='face'&&i.k!=='show'),bw=150,bd=210,gx=14,gy=18,m0=22,cols=Math.max(1,Math.floor((W-2*m0+gx)/(bw+gx))),rowsN=Math.max(1,Math.floor((D-2*m0-30+gy)/(bd+gy))),ox=(W-(cols*(bw+gx)-gx))/2,oy=m0+30;
   const hit=(x,y)=>keep.some(o=>{const ow=o.k==='pop'?210:o.k==='table'?0:110,od=o.k==='pop'?40:o.k==='table'?0:60;return ow&&x<o.x+ow&&x+bw>o.x&&y<o.y+od&&y+bd>o.y});
   let cells=[];for(let r=0;r<rowsN;r++)for(let c=0;c<cols;c++){const x=ox+c*(bw+gx),y=oy+r*(bd+gy);if(!hit(x,y))cells.push({x,y,r,c})}
@@ -179,11 +179,15 @@ async function igCanvases({t,ph,fmt,ct,cs}){await upFont();const [,W,H]=IGF[fmt|
   cells.forEach((cl,k)=>{const n=k<seq.length?seq[k]:seq[(k-seq.length)%Math.max(1,Math.min(seq.length,Math.ceil(seq.length/2)))+0];const b=byN[n];if(!b)return;cnt[n]=(cnt[n]||0)+1;
     const first=cnt[n]===1,pt=k===0?'main':(k%4===2&&cl.r===0)?'face':(k%5===3)?'tall':'';
     const s2={...b,x:cl.x,y:cl.y,rot:(S.ui.dpFree!==false&&pt!=='main')?((((n*47+k*13)%11)-5)*Math.PI/180):0,h:pt==='tall'||pt==='main'?140:80,id:first?b.id:('f'+n+'_'+cnt[n]),pt};
-    s2.main=pt==='main';s2.band=pt==='main'&&!!ob.band;out.push(s2);if(pt==='face'||pt==='main')out.push({k:'face',x:cl.x,y:Math.max(0,cl.y-30),c:b.c,n})});
-  const mi=out.find(i=>i.main);if(mi&&ob.show)out.push({k:'show',id:'show',x:Math.min(W-110,mi.x+bw-40),y:Math.min(D-20,mi.y+bd-20)});
+    s2.main=pt==='main';s2.band=pt==='main'&&!!ob.band;const a=ov[s2.id];if(a){if(s2.id[0]==='f'&&(a[0]+75<0||a[1]+105<0||a[0]+75>W||a[1]+105>D))return;s2.x=Math.max(0,Math.min(W-bw,a[0]));s2.y=Math.max(0,Math.min(D-bd,a[1]))}
+    out.push(s2);if(pt==='face'||pt==='main')out.push({k:'face',x:s2.x,y:Math.max(0,s2.y-30),c:b.c,n,fid:s2.id})});
+  const mi=out.find(i=>i.main);if(mi&&ob.show){const a=ov.show;out.push({k:'show',id:'show',x:a?a[0]:Math.min(W-110,mi.x+bw-40),y:a?a[1]:Math.min(D-20,mi.y+bd-20)})}
   P.it=[...keep,...out];const R={};out.forEach(i=>{if(i.k!=='stack')return;const o=R[i.n]=R[i.n]||{c:0,q:0,p:[]};o.c++;o.q+=Math.round(i.h/20);if(i.pt)o.p.push(i.pt)});out.forEach(i=>{if(i.k==='face'&&R[i.n])R[i.n].q++});
   const PN={main:'메인',face:'세우기',tall:'높게'};P.rows.forEach(r=>{const o=R[r.n];if(!o){r.qty=0;r.place='—';return}r.qty=o.q;r.place=`${o.c}칸${o.p.length?' · '+[...new Set(o.p)].map(x=>PN[x]).join(' · '):''}`});
   P.total=P.rows.reduce((a,r)=>a+r.qty,0);P.full={cells:out.filter(i=>i.k==='stack').length};P.tips=['빈칸 없이 채우고, 포인트 자리만 다르게 놓습니다.'];}catch(e){console.warn(e)}return P}})();
 /* 놓는 법 설명은 짧게 */
 (()=>{const g=dpPlan;dpPlan=function(t,m){const P=g(t,m);try{(P.rows||[]).forEach(r=>{if(r.place)r.place=String(r.place).replace(/^메인\s*—\s*한 권 세우고\s*(\d+)권 높이로.*$/,'메인 · 세우고 $1권').replace(/[,.]\s*(반듯하게|조금|살짝|설명은).*$/,'')});if(P.tips)P.tips=P.tips.slice(0,2)}catch(e){}return P}})();
 A.dpReset=(f=>d=>{S.ui.dpFull=false;return f(d)})(A.dpReset);
+
+/* 가득 채우기: 세운 칸이 아닌 같은 책 칸에 「세움」 표시가 붙지 않게 */
+(()=>{const f=dpTop;dpTop=function(P){let h=f(P);try{if(!P||!P.full)return h;const fids=new Set(P.it.filter(i=>i.k==='face'&&i.fid).map(i=>i.fid));P.it.forEach(i=>{if(i.k!=='stack'||fids.has(i.id))return;const k=h.indexOf(`data-id="${i.id}"`);if(k<0)return;const e=h.indexOf('<title>',k);if(e<0)return;let seg=h.slice(k,e);seg=seg.replace(' · 세움</text>','</text>').replace(new RegExp(`<rect x="${i.x}" y="${i.y-26}" width="150" height="22"[^>]*/>`),'');h=h.slice(0,k)+seg+h.slice(e)})}catch(e){}return h}})();
