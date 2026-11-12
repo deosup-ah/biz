@@ -49,16 +49,16 @@ A.setAll=d=>{S.ui.setK={pop:1,card:1,list:0,band:1,ig:1};A.setOpen(d)};
   if(ig&&t){try{const cs=await igCanvases({t,ph:[],fmt:0,ct:t.title,cs:t.hook});await upSaveMany(cs,'더숲_인스타_'+upName(t.title));A.setClose()}catch(e){console.warn(e);toast('인스타 이미지를 만들지 못했습니다')}}else if(!other)toast('하나 이상 골라 주세요')}})();
 
 /* ── 추천 배치 3안 ── */
-const DPREC=[['무난하게','재고 있는 책 위주로 고르게'],['눈에 띄게','4종만, 메인 한 권을 크게'],['이야기 있게','꽃 · 쪽지와 함께 포근하게']];
+const DPREC=[['무난하게','재고 위주'],['눈에 띄게','4종 · 메인 크게'],['이야기 있게','포근하게'],['가득 채우기','빈틈없이']];
 (()=>{const f=A.dpOpen;A.dpOpen=d=>{f(d);try{const b=document.querySelector('#sheetBox .dprec');if(b){const w=document.createElement('div');w.className='dprec3';w.innerHTML=`<b>추천 배치</b><div>${DPREC.map(([n,s],i)=>`<button data-a="dpRec" data-v="${i}" aria-pressed="${S.ui.dpRv===i}"><b>${n}</b><small>${s}</small></button>`).join('')}</div>`;b.replaceWith(w)}
   const sb=$('sheetBox');if(sb&&AI&&!sb.querySelector('.dpchk')&&sb.querySelector('.dpv')){const c=document.createElement('label');c.className='dpchk';c.innerHTML=`<b>사진으로 점검</b><span>진열을 마친 평대를 찍으면 빠진 책 · 가려진 표지 · 메인 자리를 짚어 줍니다</span><input type="file" accept="image/*" capture="environment" hidden data-c="dpChk">`;const bt=sb.querySelector(':scope>.btns');(bt||sb.lastElementChild).before(c);if(S.ui.dpChkR&&S.ui.dpChkR.k===dpKey((S.ui.cor||[])[S.ui.dp.i]))c.after(dpChkBox(S.ui.dpChkR))}}catch(e){console.warn(e)}}})();
 A.dpRec=d=>{try{const v=d&&d.v!=null?+d.v:0,t=S.ui.cor[S.ui.dp.i];if(!t)return;const k=dpKey(t),all=(t.books||[]).slice(0,10),L=lvNow(),cap=L>=2?8:6;
   const sc=b=>((b.here>0||b.src==='재고')?100:0)+(b.mine||0)*3+(b.sold||0)+(b.role==='중심'?5:0),ord=all.map((b,i)=>[i,sc(b)]).sort((a,b)=>b[1]-a[1]||a[0]-b[0]),ins=ord.filter(x=>x[1]>=100).length;
-  const n=v===1?Math.min(4,all.length):Math.max(Math.min(3,all.length),Math.min(cap,all.length,v===0&&ins>=3?ins:cap)),pk=ord.slice(0,n).map(x=>x[0]).sort((a,b)=>a-b),main=ord[0][0],md=v===1?2:v===2?1:0;
+  S.ui.dpFull=v===3;const n=v===3?Math.min(cap,all.length):v===1?Math.min(4,all.length):Math.max(Math.min(3,all.length),Math.min(cap,all.length,v===0&&ins>=3?ins:cap)),pk=ord.slice(0,n).map(x=>x[0]).sort((a,b)=>a-b),main=ord[0][0],md=v===1?2:v===2?1:0;S.ui.dpOrd=ord.map(x=>x[0]);
   S.ui.dpPick={...(S.ui.dpPick||{}),[k]:pk};S.ui.dpMain={...(S.ui.dpMain||{}),[k]:main};const O={...(S.ui.dpObj||{}),show:true,band:v===1};if(L>=2){O.vase=v===2;O.note=v===2}S.ui.dpObj=O;S.ui.dpFree=v!==1;S.ui.dpM=md;S.ui.dpF=0;S.ui.dpRv=v;
   try{const ps=S.ui.dpAbs||{};Object.keys(ps).forEach(x=>{if(x.indexOf(k)===0)delete ps[x]});S.ui.dpAbs=ps}catch(e){}
   A.dpOpen({i:S.ui.dp.i});const nm=String(all[main].t).replace(/\s*[\(\[].*$/,''),inn=pk.filter(i=>all[i].here>0||all[i].src==='재고').length,w=document.querySelector('#sheetBox .dprec3');
-  if(w)w.insertAdjacentHTML('afterend',`<p class="dprw"><b>「${DPREC[v][0]}」</b> ${n}종 · 메인 「${esc(nm)}」${v===1?' · 쇼카드와 띠지로 메인을 세웁니다':' · 쇼카드는 메인 곁에'} · 재고 있는 책 ${inn}종 먼저${v===2&&L<2?' · 꽃과 쪽지는 2단계에서 열립니다':''}. 끌어서 고치면 됩니다.</p>`)}catch(e){console.warn(e);toast('추천 배치를 만들지 못했습니다')}};
+  if(w){const P2=dpPlan(t,md);w.insertAdjacentHTML('afterend',`<p class="dprw"><b>${DPREC[v][0]}</b> ${n}종 · ${P2.total}권 · 메인 「${esc(nm)}」${v===3&&P2.full?` · ${P2.full.cells}칸`:''}</p>`)}}catch(e){console.warn(e);toast('추천 배치를 만들지 못했습니다')}};
 
 /* ── 사진으로 진열 점검 (Claude 안에서만) ── */
 function dpChkBox(r){const d=document.createElement('div');d.className='dpchkr';const li=(n,a,c)=>a&&a.length?`<li class="${c}"><b>${n}</b> ${a.map(esc).join(' · ')}</li>`:'';d.innerHTML=`<h4>점검 결과</h4><ul>${li('빠진 책',r.missing,'bad')}${li('표지가 가려진 책',r.covered,'warn')}${li('잘 놓인 책',r.found,'ok')}<li class="${r.main_ok?'ok':'warn'}"><b>메인</b> ${esc(r.main||'')}</li>${(r.tips||[]).slice(0,3).map(x=>`<li><b>고칠 점</b> ${esc(x)}</li>`).join('')}</ul>`;return d}
@@ -167,3 +167,23 @@ async function igCanvases({t,ph,fmt,ct,cs}){await upFont();const [,W,H]=IGF[fmt|
     const q=popQ(t);if(q){y+=40;x.fillStyle='#003128';x.font=`800 44px ${F}`;wrapW(x,q,W-144,2).forEach(s=>{x.fillText(s,72,y+20);y+=60})}
     if(lg)x.drawImage(lg,72,H-120,130,130*lg.height/lg.width);x.fillStyle='#003128';x.font=`600 26px ${F}`;const w=x.measureText(where).width;x.fillText(where,W-72-w,H-80);out.push(c)}
   return out}
+
+/* ── 가득 채우기(내부 지침: 빈틈없이 채우되, 군데군데 포인트를 다르게 — 세운 표지 · 높은 더미 · 메인. 설명은 짧게) ── */
+(()=>{const g=dpPlan;dpPlan=function(t,m){const P=g(t,m);try{if(!S.ui.dpFull||S.ui.dpF||!P||!P.it)return P;const W=P.W,D=P.D,st=P.it.filter(i=>i.k==='stack');if(!st.length)return P;
+  const keep=P.it.filter(i=>i.k!=='stack'&&i.k!=='face'&&i.k!=='show'),bw=150,bd=210,gx=14,gy=18,m0=22,cols=Math.max(1,Math.floor((W-2*m0+gx)/(bw+gx))),rowsN=Math.max(1,Math.floor((D-2*m0-30+gy)/(bd+gy))),ox=(W-(cols*(bw+gx)-gx))/2,oy=m0+30;
+  const hit=(x,y)=>keep.some(o=>{const ow=o.k==='pop'?210:o.k==='table'?0:110,od=o.k==='pop'?40:o.k==='table'?0:60;return ow&&x<o.x+ow&&x+bw>o.x&&y<o.y+od&&y+bd>o.y});
+  let cells=[];for(let r=0;r<rowsN;r++)for(let c=0;c<cols;c++){const x=ox+c*(bw+gx),y=oy+r*(bd+gy);if(!hit(x,y))cells.push({x,y,r,c})}
+  const cx=W/2,cy=D*.55;cells.sort((a,b)=>Math.hypot(a.x+bw/2-cx,a.y+bd/2-cy)-Math.hypot(b.x+bw/2-cx,b.y+bd/2-cy));
+  const byN={};st.forEach(i=>{byN[i.n]=i});const pk=P.pk||[],ordAll=S.ui.dpOrd||pk,ordN=ordAll.map(bi=>pk.indexOf(bi)+1).filter(n=>n>0&&byN[n]);st.forEach(i=>{if(!ordN.includes(i.n))ordN.push(i.n)});
+  const mainN=P.main!=null?pk.indexOf(P.main)+1:ordN[0],seq=[mainN,...ordN.filter(n=>n!==mainN)],out=[],cnt={},ob=S.ui.dpObj||{};
+  cells.forEach((cl,k)=>{const n=k<seq.length?seq[k]:seq[(k-seq.length)%Math.max(1,Math.min(seq.length,Math.ceil(seq.length/2)))+0];const b=byN[n];if(!b)return;cnt[n]=(cnt[n]||0)+1;
+    const first=cnt[n]===1,pt=k===0?'main':(k%4===2&&cl.r===0)?'face':(k%5===3)?'tall':'';
+    const s2={...b,x:cl.x,y:cl.y,rot:(S.ui.dpFree!==false&&pt!=='main')?((((n*47+k*13)%11)-5)*Math.PI/180):0,h:pt==='tall'||pt==='main'?140:80,id:first?b.id:('f'+n+'_'+cnt[n]),pt};
+    s2.main=pt==='main';s2.band=pt==='main'&&!!ob.band;out.push(s2);if(pt==='face'||pt==='main')out.push({k:'face',x:cl.x,y:Math.max(0,cl.y-30),c:b.c,n})});
+  const mi=out.find(i=>i.main);if(mi&&ob.show)out.push({k:'show',id:'show',x:Math.min(W-110,mi.x+bw-40),y:Math.min(D-20,mi.y+bd-20)});
+  P.it=[...keep,...out];const R={};out.forEach(i=>{if(i.k!=='stack')return;const o=R[i.n]=R[i.n]||{c:0,q:0,p:[]};o.c++;o.q+=Math.round(i.h/20);if(i.pt)o.p.push(i.pt)});out.forEach(i=>{if(i.k==='face'&&R[i.n])R[i.n].q++});
+  const PN={main:'메인',face:'세우기',tall:'높게'};P.rows.forEach(r=>{const o=R[r.n];if(!o){r.qty=0;r.place='—';return}r.qty=o.q;r.place=`${o.c}칸${o.p.length?' · '+[...new Set(o.p)].map(x=>PN[x]).join(' · '):''}`});
+  P.total=P.rows.reduce((a,r)=>a+r.qty,0);P.full={cells:out.filter(i=>i.k==='stack').length};P.tips=['빈칸 없이 채우고, 포인트 자리만 다르게 놓습니다.'];}catch(e){console.warn(e)}return P}})();
+/* 놓는 법 설명은 짧게 */
+(()=>{const g=dpPlan;dpPlan=function(t,m){const P=g(t,m);try{(P.rows||[]).forEach(r=>{if(r.place)r.place=String(r.place).replace(/^메인\s*—\s*한 권 세우고\s*(\d+)권 높이로.*$/,'메인 · 세우고 $1권').replace(/[,.]\s*(반듯하게|조금|살짝|설명은).*$/,'')});if(P.tips)P.tips=P.tips.slice(0,2)}catch(e){}return P}})();
+A.dpReset=(f=>d=>{S.ui.dpFull=false;return f(d)})(A.dpReset);
