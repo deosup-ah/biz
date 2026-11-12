@@ -212,7 +212,7 @@ V.store.design=()=>{if(!S.ui.D&&S.mode==='aka')S.ui.D=Object.assign(defD(),RENT0
     :k==='card'?F('dList','책 (한 줄에: 번호. 책 이름 | 저자 · 출판사 · 값 | 한마디)','list','1. 가호 | 무라카미 하루키 · 문학동네 · 18,500원 | 이 평대의 중심 책',8)
     :k==='list'?F('dHead','제목','head','이 평대의 책')+F('dBody','부제','body','예: 좁쌀 한 알이 차린 40년의 밥상')+F('dList','책 목록 (한 줄에: 책 이름 | 저자 · 출판사 | 한 줄 소개)','list','가호 | 무라카미 하루키 · 문학동네 | 긴 밤에 어울리는 긴 소설.',8)
     :k==='shelf'?F('dHead','매대 이름','head','예: 긴 밤에는, 긴 소설')+F('dBody','한 줄 설명','body','')
-    :F('dHead','큰 문구','head','예: 긴 밤에는,\n긴 소설.',2)+F('dBody','소개 글','body','손님에게 건네는 두세 문장',2);
+    :F('dHead','큰 문구','head','예: 긴 밤에는,\n긴 소설.',2)+F('dBody','소개 글','body','고객에게 건네는 두세 문장',2);
   const more=`${sz.length>1?`<div class="fld"><label>크기 · 방향</label><div class="chips">${sz.map(([n],i)=>`<button class="chip" data-a="dPick" data-k="size" data-v="${i}" aria-pressed="${D.size===i}">${n}</button>`).join('')}${k==='pop'||k==='sign'?`<span style="width:8px"></span><button class="chip" data-a="dLand" data-v="0" aria-pressed="${!D.land}">세로</button><button class="chip" data-a="dLand" data-v="1" aria-pressed="${!!D.land}">가로</button>`:''}</div></div>`:''}
     <div class="fld"><label>그림</label><div class="chips">${MOTIF.map(([v,n])=>`<button class="chip" data-a="dSym" data-k="${v}" aria-pressed="${(D.sym||'none')===v}">${n}</button>`).join('')}</div></div>
     ${k==='list'?'':`<div class="fld"><label>색</label><div class="btns">${pals.map(([a,b,n],i)=>`<button class="sw" data-a="dPick" data-k="pal" data-v="${i}" aria-pressed="${D.pal===i}" aria-label="${n}" title="${n}" style="background:linear-gradient(135deg,${a} 60%,${b} 60%)"></button>`).join('')}</div></div>`}

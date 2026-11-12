@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>말로 찾는 서가 · 더숲</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:"Pretendard";font-weight:400;src:url(pretendard-400.woff) format("woff")}@font-face{font-family:"Pretendard";font-weight:600;src:url(pretendard-600.woff) format("woff")}
+:root{--pa:#fbfaf6;--ink:#1c1c1a;--gr:#6b6b63;--pn:#003128;--gd:#b8913a}
+*{box-sizing:border-box}body{margin:0;background:var(--pa);color:var(--ink);font:400 16px/1.6 Pretendard,"Noto Sans KR",sans-serif;min-height:100svh;display:flex;flex-direction:column}
+main{flex:1;max-width:520px;width:100%;margin:0 auto;padding:28px 26px 40px;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between;align-items:baseline;border-bottom:3px solid var(--ink);padding-bottom:10px;box-shadow:0 5px 0 -4px var(--ink)}
+.top b{font:700 22px "Gowun Batang",serif}.top span{font-size:13px;color:var(--gr)}
+.w{margin:56px 0 0;font-size:14px;color:var(--gr)}.w q{display:block;quotes:none;font:700 clamp(38px,11vw,56px)/1.2 "Gowun Batang",serif;color:var(--ink);margin-top:6px;word-break:keep-all}
+.go{margin-top:44px;padding:22px 0 0;border-top:1px solid #d8d3c4}.go small{display:block;font-size:14px;color:var(--gr)}
+.go strong{display:block;font:700 clamp(30px,9vw,42px)/1.25 "Gowun Batang",serif;color:var(--pn);margin:4px 0 0;word-break:keep-all}
+.go i{display:block;width:44px;height:4px;background:var(--gd);margin:22px 0 18px}
+.th{font-size:18px;font-weight:600;word-break:keep-all}.th small{display:block;font-weight:400;font-size:14px;color:var(--gr);margin-bottom:2px}
+.ask{margin-top:auto;padding-top:48px;font-size:14px;color:var(--gr)}
+.none{margin-top:80px;font:700 26px/1.4 "Gowun Batang",serif}
+</style></head><body><main id="m"></main>
+<script>
+(function(){var m=document.getElementById('m'),h=location.hash.slice(1),p=null;
+try{var b=atob(h.replace(/-/g,'+').replace(/_/g,'/')),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);p=new TextDecoder().decode(u).split('|')}catch(e){}
+var e=function(s){return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+if(!p||!p[0]){m.innerHTML='<div class="top"><b>말로 찾는 서가</b><span>더숲</span></div><p class="none">POP 의 말 옆 네모를 다시 찍어 주세요.</p>';return}
+document.title=p[0]+' · 말로 찾는 서가';
+m.innerHTML='<div class="top"><b>말로 찾는 서가</b><span>'+e(p[3]||'더숲')+'</span></div>'+
+'<p class="w">고르신 말<q>'+e(p[0])+'</q></p>'+
+'<div class="go"><small>이 말에 어울리는 책은</small><strong>'+e(p[1]||'입구 평대')+'</strong><i></i>'+(p[2]?'<p class="th"><small>그곳의 주제</small>'+e(p[2])+'</p>':'')+'</div>'+
+'<p class="ask">찾기 어려우면 이 화면을 직원에게 보여 주세요.</p>'})();
+</script></body></html>

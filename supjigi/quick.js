@@ -1,7 +1,7 @@
 /* 더숲 워크룸 — 오늘: 캘린더 자동 + 한 줄 입력 · 사진으로 만들기 · 아카데미 주제 · 굿즈 제안 */
 const GCID='7dffddc55d74289b36e08e3cf6e03ed143131648f770c61de7dcb8e1a9ac30f1@group.calendar.google.com';
 const GC={st:'idle',ev:[],at:0,code:''};
-/* ── 구글 캘린더(단체 예약) 읽기. 읽기만 한다. 손님 개인 이름은 지운다. ── */
+/* ── 구글 캘린더(단체 예약) 읽기. 읽기만 한다. 고객 개인 이름은 지운다. ── */
 function gcParse(L){return (L||[]).map(e=>{const s=(e.start||{}),en=(e.end||{}),from=(s.date||(s.dateTime||'').slice(0,10)),to=(en.date||(en.dateTime||'').slice(0,10));
   const m=/^\s*\[(.+?)\]\s*(.+?)\s+[—–-]\s+(.+)$/.exec(e.summary||'');let st=m?m[1]:'',org=m?m[2]:(e.summary||''),sp=m?m[3]:'';
   if(org.includes(' / '))org=org.split(' / ').slice(1).join(' / ');org=org.split(' · ')[0].replace(/01\d[- ]?\d{3,4}[- ]?\d{4}/g,'').trim();
@@ -96,7 +96,7 @@ function goodsCard(){const m=S.mode,L=[...(S.ui.gd||[]),...GOODS.filter(g=>g.mod
 /* ── 다른 공간 읽기: 잘하는 것 · 약한 것 · 더숲은 언제 따르고 언제 달리할지 ── */
 
 function spaceCard(){return `<div class="sec"><h2>다른 공간 읽기</h2></div>
- <div class="card rule"><b>달리하는 것은 목적이 아닙니다.</b><ol><li>손님이 책을 찾는 데 방해가 되면 하지 않습니다. 기본 서가는 그대로 둡니다.</li><li>평대 하나, 2주 단위로 되돌릴 수 있을 때만 시험합니다.</li><li>시작 전에 볼 숫자를 정합니다. 그 평대의 판매 권수와, 없던 문의가 생겼는지.</li></ol></div>
+ <div class="card rule"><b>달리하는 것은 목적이 아닙니다.</b><ol><li>고객이 책을 찾는 데 방해가 되면 하지 않습니다. 기본 서가는 그대로 둡니다.</li><li>평대 하나, 2주 단위로 되돌릴 수 있을 때만 시험합니다.</li><li>시작 전에 볼 숫자를 정합니다. 그 평대의 판매 권수와, 없던 문의가 생겼는지.</li></ol></div>
  <div class="grid g2">${SPACES.map(s=>`<div class="card gd"><h3>${s.n}</h3><dl><dt>강점</dt><dd>${s.good}</dd><dt>약점</dt><dd>${s.weak}</dd><dt>그대로</dt><dd>${s.keep}</dd><dt>달리</dt><dd>${s.diff}</dd></dl><a class="lnk" href="${s.u}" target="_blank" rel="noopener">출처</a></div>`).join('')}</div>`}
 (()=>{const f=V.store.trend,g=()=>f()+spaceCard();V.store.trend=g;V.aka.trend=g})();
 
@@ -189,7 +189,7 @@ function noticeLocal(v){const w=v.replace(/(안내문|안내판|공지|알림)(�
   return Object.assign(defD(),SIGN.notice.d,{kind:'sign',sg:'notice',cv:0,br,tag:aka?'아카데미하우스':TAGN(br),head,body,list:'',sym})}
 (()=>{const f=A.ideaGo;A.ideaGo=async d=>{const el=$('ideaIn')||$('cIdea')||$('qIn'),v=((d&&d.v)||(el&&el.value)||'').trim();if(!v||!NOTR.test(v)||/(POP|pop|팝|띠지|쇼카드)/.test(v))return f(d);
   const H=S.ui.dH=S.ui.dH||[];if(S.ui.D)H.push(JSON.stringify(S.ui.D));const D0=noticeLocal(v);S.ui.D=D0;S.ui.idea=v;S.view[S.mode]='design';window.scrollTo(0,0);render();if(!AI)return;
-  const snap=JSON.stringify(D0),out=await ask('idea',`"더숲" ${S.mode==='aka'?'아카데미하우스(복합 문화 공간)':'서점'}에 붙일 안내문입니다. 직원이 말한 내용을 손님이 한눈에 읽는 안내문으로 다듬어 주세요.\n내용: "${v.replace(/"/g,"'")}"\n정중하지만 짧게. 명령조·느낌표·이모지 금지. 말한 내용에 없는 날짜·시간·장소는 지어내지 않습니다.\nhead 는 16자 안쪽 한 줄(가장 중요한 말), body 는 40자 안쪽 덧붙임(없으면 빈 문자열), sym 은 ${Object.keys(ICON).filter(x=>!x.startsWith('ph')).join('|')}|none.\nJSON 으로만: {"head":"","body":"","sym":""}`,{modelTier:'quick'});
+  const snap=JSON.stringify(D0),out=await ask('idea',`"더숲" ${S.mode==='aka'?'아카데미하우스(복합 문화 공간)':'서점'}에 붙일 안내문입니다. 직원이 말한 내용을 고객이 한눈에 읽는 안내문으로 다듬어 주세요.\n내용: "${v.replace(/"/g,"'")}"\n정중하지만 짧게. 명령조·느낌표·이모지 금지. 말한 내용에 없는 날짜·시간·장소는 지어내지 않습니다.\nhead 는 16자 안쪽 한 줄(가장 중요한 말), body 는 40자 안쪽 덧붙임(없으면 빈 문자열), sym 은 ${Object.keys(ICON).filter(x=>!x.startsWith('ph')).join('|')}|none.\nJSON 으로만: {"head":"","body":"","sym":""}`,{modelTier:'quick'});
   if(!out||!out.head||JSON.stringify(S.ui.D)!==snap)return;S.ui.D.head=out.head;S.ui.D.body=out.body||'';if(ICON[out.sym])S.ui.D.sym=out.sym;render()}})();
 (()=>{const f=A.qAdd;A.qAdd=()=>{const el=$('qIn'),v=el?el.value.trim():'';if(v&&!v.includes('\n')&&/(습니다|주세요|마세요|안내문|안내판|공지)/.test(v)){A.ideaGo({v});return}f()}})();
 
@@ -302,10 +302,10 @@ function salesActs(br){const out=[],all=yms(),nowYm=TODAY.slice(0,7),full=all.fi
   let R=null;try{R=autoSum(br)}catch(e){}const a=row(br,m1),p=row(br,m0);
   if(R&&R.pace&&R.fc){const gap=Math.round((R.pace.proj-R.fc)/R.fc*100);if(gap<=-10)out.push({lv:'low',t:`이번 달은 지금 속도로 ${Math.round(R.pace.proj/1e4)}만원, 예상보다 ${Math.abs(gap)}% 낮습니다`,s:`${R.pace.day}일까지 ${Math.round(R.pace.amt/1e4)}만원. 남은 주말 전에 평대를 한 번 바꿉니다.`,b:['큐레이션 열기','go','cur']});else if(gap>=10)out.push({lv:'ok',t:`이번 달은 지금 속도로 ${Math.round(R.pace.proj/1e4)}만원, 예상보다 ${gap}% 높습니다`,s:'잘 나가는 책이 떨어지지 않게 주문을 먼저 봅니다.',b:['주문 보기','go','stock']})}
   let nd=[];try{nd=needs(br)}catch(e){}if(nd.length)out.push({lv:'low',t:`2주 안에 떨어질 책 ${nd.length}종`,s:nd.slice(0,3).map(x=>x.t).join(' · '),b:['주문에 담으러 가기','go','stock']});
-  if(a&&p&&p.amt>0&&a.cu&&p.cu&&a.cu.rc&&p.cu.rc){const rc=pct(a.cu.rc,p.cu.rc),pa=pct(a.amt/a.cu.rc,p.amt/p.cu.rc);if(Math.abs(rc)>=10||Math.abs(pa)>=10)out.push({lv:rc<0&&pa<=0?'low':'mute',t:`손님 수 ${rc>=0?'+':''}${rc}% · 한 번에 쓰는 돈 ${pa>=0?'+':''}${pa}%`,s:rc<-9&&pa>=0?'오는 사람이 줄었습니다. 입구에서 보이는 평대와 안내가 먼저입니다.':rc>=0&&pa<-9?'사람은 왔는데 적게 삽니다. 책 옆에 함께 살 책을 붙여 놓습니다.':rc<0?'손님과 객단가가 함께 줄었습니다. 평대부터 바꿉니다.':'손님이 늘었습니다. 계산대 옆에 가벼운 책을 둡니다.',b:rc>=0&&pa<-9?['짝지어 진열 보기','go','cur']:['큐레이션 열기','go','cur']})}
+  if(a&&p&&p.amt>0&&a.cu&&p.cu&&a.cu.rc&&p.cu.rc){const rc=pct(a.cu.rc,p.cu.rc),pa=pct(a.amt/a.cu.rc,p.amt/p.cu.rc);if(Math.abs(rc)>=10||Math.abs(pa)>=10)out.push({lv:rc<0&&pa<=0?'low':'mute',t:`고객 수 ${rc>=0?'+':''}${rc}% · 한 번에 쓰는 돈 ${pa>=0?'+':''}${pa}%`,s:rc<-9&&pa>=0?'오는 사람이 줄었습니다. 입구에서 보이는 평대와 안내가 먼저입니다.':rc>=0&&pa<-9?'사람은 왔는데 적게 삽니다. 책 옆에 함께 살 책을 붙여 놓습니다.':rc<0?'고객과 객단가가 함께 줄었습니다. 평대부터 바꿉니다.':'고객이 늘었습니다. 계산대 옆에 가벼운 책을 둡니다.',b:rc>=0&&pa<-9?['짝지어 진열 보기','go','cur']:['큐레이션 열기','go','cur']})}
   try{const P=profile(br),g=GR.filter(x=>x!=='기타').map(x=>[x,P.sh[x]-P.avg[x]]).sort((x,y)=>y[1]-x[1])[0];if(g&&g[1]>=.08)out.push({lv:'ok',t:`${g[0]} 비중이 다른 지점보다 ${Math.round(g[1]*100)}%p 높습니다`,s:'이 지점의 얼굴입니다. 서가 안내와 추천 POP 을 이 분야로 만듭니다.',b:[`${g[0]} 추천 POP`,'idea',g[0]+' 추천']})}catch(e){}
   const L3=full.slice(-3).map(y=>row(br,y)).filter(d=>d&&d.cu),T=[0,0,0,0];let wkd=0,wke=0;L3.forEach(d=>{(d.cu.t||[]).forEach((v,i)=>T[i]+=v||0);wkd+=d.cu.wkd||0;wke+=d.cu.wke||0});const ts=T.reduce((x,y)=>x+y,0);
-  if(ts){const i=T.indexOf(Math.max(...T)),lab=['12시 이전','12~15시','15~18시','18시 이후'][i];out.push({lv:'mute',t:`가장 붐비는 때는 ${lab} (${Math.round(T[i]/ts*100)}%)`,s:'북토크와 낭독은 이 시간 바로 뒤에 잡으면 지나던 손님이 앉습니다.',b:S.br==='aka'?['북토크 만들기','talk','']:null})}
+  if(ts){const i=T.indexOf(Math.max(...T)),lab=['12시 이전','12~15시','15~18시','18시 이후'][i];out.push({lv:'mute',t:`가장 붐비는 때는 ${lab} (${Math.round(T[i]/ts*100)}%)`,s:'북토크와 낭독은 이 시간 바로 뒤에 잡으면 지나던 고객이 앉습니다.',b:S.br==='aka'?['북토크 만들기','talk','']:null})}
   if(wkd+wke){const w=Math.round(wke/(wkd+wke)*100);if(w>=35)out.push({lv:'mute',t:`주말 매출이 ${w}%`,s:'평대는 금요일 저녁에 바꾸고, 주말 재고는 목요일까지 주문합니다.',b:null})}
   const O={low:0,ok:1,mute:2};return out.sort((x,y)=>O[x.lv]-O[y.lv]).slice(0,6)}
 A.saDo=d=>{if(d.t==='br'){A.br({k:d.v})}else if(d.t==='go')A.go({v:d.v});else if(d.t==='idea')A.ideaGo({v:d.v});else if(d.t==='talk'){S.mode='aka';try{sessionStorage.setItem('sj.mode','aka')}catch(e){}A.go({v:'talk'})}};

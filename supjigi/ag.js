@@ -37,6 +37,8 @@ function agRun(acts){let closed=false;const close=()=>{if(!closed){closed=true;A
     else if(a.do==='pperson'){close();A.pzPerson({who:a.who})}
     else if(a.do==='puzzle'){close();A.pzOpen();const P=S.ui.pz;if(a.lv>=1&&a.lv<=5)P.lv=+a.lv;if(a.th&&PZTH.includes(a.th))P.th=a.th;if(a.age!=null&&PZAGE.some(x=>x[1]===a.age))P.age=a.age;if(a.lv||a.th||a.age!=null){pzNewZ();pzDraw()}}
     else if(a.do==='level'){close();A.lvOpen()}
+    else if(a.do==='lastsale'){close();A.lsOpen()}
+    else if(a.do==='wordpop'){close();A.wdOpen()}
     else if(a.do==='cmd'&&a.text&&S.ui.dp){const el=$('dpCmd');if(el){el.value=a.text;A.dpCmd()}}
   }catch(e){console.warn(e)}}}
 
@@ -59,6 +61,8 @@ function agLocal(q0){const q=q0.replace(/\s+/g,' ').trim(),qs=q.replace(/\s/g,''
   const W={dp:/진열|평대|배치|매대|디스플레이|놓아|놔|놓기|깔아|3d|입체|돌려|한바퀴|영상|동영상|녹화|릴스영상|가득|꽉|빼곡|빈틈|채워|채우/,pop:/pop|팝|포스터|홍보물|인쇄|출력|프린트|쇼카드|띠지|책목록|목록|리스트|안내문/i,ig:/인스타|피드|sns|게시물|업로드|올릴|올리|캡션|해시태그|스토리|릴스/i,set:/한번에|한꺼번에|전부|다받|모두받|일괄|세트/,make:/만들|짜|추천|골라|뽑아|구성|기획|해줘|해볼래|해봐/,lv:/단계|레벨|승급|등급|열쇠|잠김|잠겨|안열려|왜안돼|못써/,go:/화면|메뉴|페이지|가줘|가자|이동|열어/};
   const hid=has(/매출|주문|반품|지원사업|정산|북센|이지정보|발주|재고조사/);
   if(hid&&!isAdmin()&&!has(W.dp)&&!has(W.pop)&&!has(W.ig)){const bb=agBasics(q);return{t:`매출 · 주문 · 반품 · 지원사업은 지금 안정화 테스트 중이라 열 수 없습니다.${has(/반품/)?' 반품은 서가 사진으로 후보를 만들고, 확인한 뒤에만 이지정보에 넣는 방식으로 준비 중입니다.':''}${bb?`\n\n서점 기초 「${bb.b.t}」: ${bb.it?bb.it[1]:bb.b.lead}`:''}`,btn:bb?[{n:`「${bb.b.t}」 자세히`,a:[{do:'basics',id:bb.b.id}]}]:[]}}
+  if(has(/마지막\s*판매|최종\s*판매|언제\s*팔|안\s*팔린|반품\s*(할|필요|후보|고르)|오래된\s*재고/)){acts.push({do:'lastsale'});return{t:'마지막 판매일 창을 엽니다. 바코드나 제목을 찍거나 「재고 전체에서 고르기」를 누르세요.',acts}}
+  if(has(/말로\s*찾|단어\s*(pop|POP|큐알|QR)|감정\s*(pop|POP)|qr|QR|큐알/)){acts.push({do:'wordpop'});return{t:'「말로 찾는 서가」를 엽니다.',acts}}
   if(has(/퍼즐|가로세로|크로스워드|낱말퀴즈|단어퀴즈|십자말/)&&typeof PZP!=='undefined'){const who=Object.keys(PZP).find(n=>qs.includes(n));if(who||has(/인물/)){acts.push({do:'pperson',who:who||null});return{t:`${say.join(' ')} 인물도서관 퍼즐을 열었습니다.${who?` 「${who}」로 만들었습니다.`:' 인물을 고르세요.'} 단계는 입문 · 보통 · 깊이 세 가지입니다.`.trim(),a:acts}}}
   if(has(/퍼즐|가로세로|크로스워드|낱말퀴즈|단어퀴즈|십자말/)){const m=qs.match(/([1-5])단계|난이도([1-5])/),lv=m?+(m[1]||m[2]):has(/쉬운|쉽게/)?1:has(/어려운|어렵게|전문|고수/)?5:null,th=(PZTH.find(t=>qs.includes(t.replace(/\s|·/g,'').slice(0,2)))||null),age=has(/어린이|아이|초등|꼬마/)?'k':has(/청소년|중학|고등|학생/)?'t':has(/어르신|노인|시니어|할머니|할아버지/)?'s':has(/어른|성인/)?'a':null;acts.push({do:'puzzle',lv,th,age});return{t:`${say.join(' ')} 「가로세로 숲」 퍼즐을 열었습니다.${lv?` 난이도 ${lv}단계로 만들었습니다.`:''} 지점 이름 · 형태를 고르고 저장하거나 PDF로 인쇄하세요.`.trim(),a:acts}}
   if(has(W.lv)){const L=lvNow();acts.push({do:'level'});return{t:`${say.join(' ')} 지금 ${L}단계 「${LVN[L]}」입니다.${L<3?` 큐레이션 · 인쇄물 · 진열안을 쓸수록 ${L+1}단계 조건이 채워지고, 다 채우면 신청 카드를 참부장께 보내면 열쇠를 받습니다.`:''} 단계 화면을 열었습니다.`.trim(),a:acts}}

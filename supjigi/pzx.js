@@ -50,12 +50,12 @@ async function pzPrev(){const P=S.ui.pz;if(!P||!P.Z)return;try{const cs=await pz
 C.pzSel=el=>{const P=S.ui.pz,k=el.dataset.k,v=el.value;if(k==='lv'||k==='plv'||k==='f')P[k]=+v;else P[k]=v;if(k!=='f'&&k!=='br')pzNewZ();pzPrev()};
 A.pzAns=()=>{S.ui.pz.ans=!S.ui.pz.ans;pzPrev()};A.pzNew=()=>{pzNewZ();pzPrev()};A.pzMd=d=>{S.ui.pz.md=d.v;pzNewZ();pzPrev()};
 A.pzOpen=()=>{S.ui.pz=S.ui.pz||{lv:2,f:0,br:'사유의숲',ans:true,th:'책과 서점',age:'',md:'t',plv:1,who:'신영복'};if(!S.ui.pz.Z)pzNewZ();pzPrev()};
-A.pzPerson=d=>{S.ui.pz=S.ui.pz||{lv:2,f:0,br:'사유의숲',ans:true,th:'책과 서점',age:'',plv:1,who:'신영복'};const P=S.ui.pz;P.md='p';if(d&&d.who&&PZP[d.who])P.who=d.who;P.plv=P.plv||1;pzNewZ();pzPrev()};
-function pzDraw(fromPrev){const P=S.ui.pz;if(!P)return;if(!fromPrev&&!P.urls){pzPrev();return}const BRS=[...new Set(['사유의숲',...Object.values(typeof BRAND!=='undefined'?BRAND:{})])];
+A.pzPerson=d=>{if(S.br!=='aka'){try{A.place?A.place({k:'aka'}):A.br({k:'aka'})}catch(e){}}S.ui.pz=S.ui.pz||{lv:2,f:0,br:'사유의숲',ans:true,th:'책과 서점',age:'',plv:1,who:'신영복'};const P=S.ui.pz;P.md='p';if(d&&d.who&&PZP[d.who])P.who=d.who;P.plv=P.plv||1;pzNewZ();pzPrev()};
+function pzDraw(fromPrev){const P=S.ui.pz;if(!P)return;const AKA=S.br==='aka';if(!AKA&&P.md==='p'){P.md='t';pzNewZ();pzPrev();return}if(!fromPrev&&!P.urls){pzPrev();return}const BRS=[...new Set(['사유의숲',...Object.values(typeof BRAND!=='undefined'?BRAND:{})])];
   const sel=(k,opts,cur,lab)=>`<label class="pzl"><span>${lab}</span><select data-c="pzSel" data-k="${k}">${opts.map(([v,n])=>`<option value="${esc(v)}" ${String(cur)===String(v)?'selected':''}>${esc(n)}</option>`).join('')}</select></label>`;
   const ctl=P.md==='p'?sel('who',Object.keys(PZP).map(n=>{const s=PZPSH(n);return[n,n+(s&&s.no?` · 서가 ${s.no}`:'')]}),P.who,'인물')+sel('plv',[[1,'입문'],[2,'보통'],[3,'깊이']],P.plv||1,'단계')
     :sel('th',PZTH.map(t=>[t,t]),P.th,'주제')+sel('age',PZAGE.map(([n,v])=>[v,n]),P.age||'','누가')+sel('lv',[1,2,3,4,5].map(n=>[n,`${n} · ${PZL[n].n}`]),P.lv,'난이도');
-  const h=`<div class="pzx"><div class="pzxh"><b>${PZT}</b><div class="pzxm"><button data-a="pzMd" data-v="t" aria-pressed="${P.md!=='p'}">주제</button><button data-a="pzMd" data-v="p" aria-pressed="${P.md==='p'}">인물도서관</button></div></div>
+  const h=`<div class="pzx"><div class="pzxh"><b>${PZT}</b>${AKA?`<div class="pzxm"><button data-a="pzMd" data-v="t" aria-pressed="${P.md!=='p'}">주제</button><button data-a="pzMd" data-v="p" aria-pressed="${P.md==='p'}">인물도서관</button></div>`:''}</div>
    <div class="pzxp">${(P.urls||[]).map((u,i)=>`<figure><img src="${u}" alt=""><figcaption>${i===(P.urls.length-1)&&P.ans?'정답':i+1}</figcaption></figure>`).join('')||'<div class="igxe">만드는 중…</div>'}</div>
    <div class="pzxc">${ctl}${sel('br',BRS.map(b=>[b,b]),P.br,'지점')}${sel('f',PZF.map(([n],i)=>[i,n]),P.f|0,'형태')}<label class="pzl pzck"><input type="checkbox" data-a="pzAns" ${P.ans?'checked':''}><span>정답 장 붙이기</span></label></div>
    <div class="pzxa"><button class="btn" data-a="pzNew">다른 퍼즐</button><button class="btn pri" data-a="pzSave">저장 · 공유</button><button class="btn" data-a="pzPdf">인쇄 PDF</button></div></div>`;

@@ -41,7 +41,7 @@ function custCard(P){const br=S.br,C=agg(br,P.cur).cu;if(!C.has)return '';const 
   if(wsum)ins.push(`주말 매출이 ${pct(C.wke,wsum)}%입니다 — 주말 이틀이 평일 닷새${C.wke>C.wkd?'보다 큽니다':'의 '+pct(C.wke,C.wkd)+'% 수준입니다'}.`);
   if(tsum){const i=C.t.indexOf(Math.max(...C.t));ins.push(`가장 붐비는 때는 ${TL[i]}(${pct(C.t[i],tsum)}%)입니다.`)}if(bsum)ins.push(`한 번에 3권 이상 사는 거래가 ${pct(C.bk[2],bsum)}%, 1권만 사는 거래가 ${pct(C.bk[0],bsum)}%입니다.`);
   const brs=br==='all'?BR:BR.filter(b=>b.k===br),labs=P.cur.map(y=>(y.slice(5)==='01'||y===P.cur[0]?y.slice(2,4)+'.':'')+(+y.slice(5))+'월');
-  return `<div class="sec"><h2 style="font-size:19px">손님 특성</h2><p>${brN(br)} · 영수증 단위로 본 사는 모습 · 이름 같은 개인정보는 쓰지 않습니다${br==='all'||br==='aka'?'':''}</p></div>
+  return `<div class="sec"><h2 style="font-size:19px">고객 특성</h2><p>${brN(br)} · 영수증 단위로 본 사는 모습 · 이름 같은 개인정보는 쓰지 않습니다${br==='all'||br==='aka'?'':''}</p></div>
   <div class="grid g4"><div class="card kpi"><span>거래(영수증) 수</span><b class="num">${won(C.rc)}건</b><small>한 달 평균 ${won(C.rc/Math.max(1,rows.length))}건</small></div>
    <div class="card kpi"><span>한 번에 쓰는 돈</span><b class="num">${C.rc?won(C.amt/C.rc):'—'}원</b><small>매출 ÷ 거래 수</small></div>
    <div class="card kpi"><span>한 번에 사는 권수</span><b class="num">${C.rc&&C.qty?(C.qty/C.rc).toFixed(2):'—'}권</b><small>권수 ÷ 거래 수</small></div>
@@ -158,7 +158,7 @@ A.retSave=async()=>{await put('returns',nid(),{br:S.br,date:TODAY,items:clone(S.
 
 /* ── 자료 · 설정 ── */
 const FIELDS={sales:[['date','판매일',/일자|날짜|판매일|거래일/,1],['t','도서명',/도서명|상품명|서명|제목|품명|책/,1],['qty','수량',/수량|권수/,1],['amt','판매금액',/금액|매출|판매가|실판매/,1],['isbn','ISBN',/isbn|바코드|코드/i],['a','저자',/저자|지은이|작가/],['p','출판사',/출판|발행/],['cat','분야',/분류|분야|카테고리|장르|부문/]],
-  stock:[['t','도서명',/도서명|상품명|서명|제목|품명|책/,1],['stock','재고',/재고/,1],['isbn','ISBN',/isbn|바코드|코드/i],['a','저자',/저자|지은이|작가/],['p','출판사',/출판|발행/],['cat','분야',/분류|분야|카테고리|장르|부문/],['price','정가',/정가|가격|판매가/],['sold30','30일 판매',/30일|월판매|한달/]]};
+  stock:[['t','도서명',/도서명|상품명|서명|제목|품명|책/,1],['stock','재고',/재고/,1],['isbn','ISBN',/isbn|바코드|코드/i],['a','저자',/저자|지은이|작가/],['p','출판사',/출판|발행/],['cat','분야',/분류|분야|카테고리|장르|부문/],['price','정가',/정가|가격|판매가/],['sold30','30일 판매',/30일|월판매|한달/],['ld','마지막 판매일',/최종.*판매|마지막.*판매|최근.*판매|최종.*출고|판매일/]]};
 V.store.data=()=>{const br=S.br,I=S.ui.imp,rows=k=>S.db[k].filter(d=>d.br).reduce((m,d)=>(m[d.br]=(m[d.br]||0)+1,m),{});const cnt=a=>a.reduce((m,d)=>(m[d.br]=(m[d.br]||0)+1,m),{}),sm=cnt(realSales()),st=cnt(realStock());
   return `<div class="sec"><h2>자료 · 설정</h2><p>자료가 어디서 오고 지금 어디까지 연결됐는지</p></div>
   <div class="card"><h3>연결 상태</h3><div class="tw"><table><tr><th>자료</th><th>상태</th><th>방법</th></tr>
@@ -168,7 +168,7 @@ V.store.data=()=>{const br=S.br,I=S.ui.imp,rows=k=>S.db[k].filter(d=>d.br).reduc
    <tr><td>교보문고 · 분야별 100위 · 신간</td><td><span class="pill p-low">대기</span></td><td>매주 갱신 작업에 붙일 예정</td></tr></table></div></div>
   <div class="card form"><h3>엑셀 올리기 <small>${br==='all'?'위에서 지점을 먼저 고르세요':brN(br)+' 지점에 넣습니다'}</small></h3>
    ${br==='all'?'':`<div class="f2"><div class="fld"><label for="impS">판매 내역 (날짜 · 책 · 수량 · 금액)</label><input type="file" id="impS" accept=".xlsx,.xls,.csv" data-c="imp" data-kind="sales"></div><div class="fld"><label for="impT">재고 현황 (책 · 재고)</label><input type="file" id="impT" accept=".xlsx,.xls,.csv" data-c="imp" data-kind="stock"></div></div>
-   <p class="note">손님 이름 · 전화 같은 칸은 읽지 않고 버립니다. 같은 달을 다시 올리면 그 달만 새로 덮어씁니다.</p>`}
+   <p class="note">고객 이름 · 전화 같은 칸은 읽지 않고 버립니다. 같은 달을 다시 올리면 그 달만 새로 덮어씁니다.</p>`}
    ${I?`<div class="al" style="border-color:var(--info);background:var(--info-soft)"><b>${esc(I.name)}</b> · ${I.rows.length}줄 · ${I.kind==='sales'?'판매 내역':'재고 현황'} — 칸을 맞게 골랐는지 확인하세요.</div>
    <div class="grid g4">${FIELDS[I.kind].map(([k,l,,req])=>`<div class="fld"><label for="m_${k}">${l}${req?' (꼭)':''}</label><select id="m_${k}" data-c="impMap" data-k="${k}"><option value="-1">없음</option>${I.head.map((h,i)=>`<option value="${i}" ${I.map[k]===i?'selected':''}>${esc(h||'(빈 칸 '+(i+1)+')')}</option>`).join('')}</select></div>`).join('')}</div>
    <div class="btns"><button class="btn pri" data-a="impSave">${brN(br)}에 저장</button><button class="btn ghost" data-a="impCancel">취소</button></div>`:''}</div>
@@ -188,10 +188,10 @@ function toDate(v){if(v instanceof Date&&!isNaN(v))return dstr(v);if(typeof v===
 const numv=v=>typeof v==='number'?v:+String(v).replace(/[^\d.\-]/g,'')||0;
 A.impSave=async()=>{const I=S.ui.imp,br=S.br,g=(r,k)=>I.map[k]>=0?r[I.map[k]]:'';const miss=FIELDS[I.kind].filter(f=>f[3]&&!(I.map[f[0]]>=0)).map(f=>f[1]);if(miss.length){toast('꼭 필요한 칸을 골라 주세요: '+miss.join(', '));return}
   if(I.kind==='sales'){const by={};let bad=0;I.rows.forEach(r=>{const ds=toDate(g(r,'date')),t=String(g(r,'t')).trim();if(!ds||!t){bad++;return}const ym=ds.slice(0,7),d=by[ym]=by[ym]||{br,ym,days:{},cats:{},top:{}},qty=numv(g(r,'qty')),amt=numv(g(r,'amt')),cat=String(g(r,'cat')||'미분류').trim()||'미분류',isbn=String(g(r,'isbn')||'').replace(/\D/g,'');
-      d.days[ds.slice(8)]=(d.days[ds.slice(8)]||0)+amt;const c=d.cats[cat]=d.cats[cat]||{qty:0,amt:0};c.qty+=qty;c.amt+=amt;const k=isbn||nt(t),o=d.top[k]=d.top[k]||{t,a:String(g(r,'a')||''),p:String(g(r,'p')||''),isbn,cat,qty:0,amt:0};o.qty+=qty;o.amt+=amt});
+      d.days[ds.slice(8)]=(d.days[ds.slice(8)]||0)+amt;const c=d.cats[cat]=d.cats[cat]||{qty:0,amt:0};c.qty+=qty;c.amt+=amt;const k=isbn||nt(t),o=d.top[k]=d.top[k]||{t,a:String(g(r,'a')||''),p:String(g(r,'p')||''),isbn,cat,qty:0,amt:0};o.qty+=qty;o.amt+=amt;const L=d.last=d.last||{};if(!L[k]||L[k]<ds)L[k]=ds});
     const ks=Object.keys(by);if(!ks.length){toast('날짜와 책 이름을 읽지 못했습니다. 칸을 다시 골라 주세요.');return}for(const ym of ks){const d=by[ym];d.top=Object.values(d.top).sort((a,b)=>b.amt-a.amt).slice(0,400);d.at=new Date().toISOString();await put('sales',br+'-'+ym,d,true)}
     toast(`${ks.length}개월 판매를 저장했습니다${bad?` (읽지 못한 줄 ${bad})`:''}`)}
-  else{const its=I.rows.map(r=>{const o={t:String(g(r,'t')).trim(),stock:numv(g(r,'stock')),isbn:String(g(r,'isbn')||'').replace(/\D/g,''),a:String(g(r,'a')||''),p:String(g(r,'p')||''),cat:String(g(r,'cat')||''),price:numv(g(r,'price'))};if(I.map.sold30>=0)o.sold30=numv(g(r,'sold30'));return o}).filter(o=>o.t);
+  else{const its=I.rows.map(r=>{const o={t:String(g(r,'t')).trim(),stock:numv(g(r,'stock')),isbn:String(g(r,'isbn')||'').replace(/\D/g,''),a:String(g(r,'a')||''),p:String(g(r,'p')||''),cat:String(g(r,'cat')||''),price:numv(g(r,'price'))};if(I.map.sold30>=0)o.sold30=numv(g(r,'sold30'));if(I.map.ld>=0){const v=toDate(g(r,'ld'));if(v)o.ld=v}return o}).filter(o=>o.t);
     if(!its.length){toast('책 이름을 읽지 못했습니다');return}const n=Math.ceil(its.length/1000);for(let i=0;i<n;i++)await put('stock',br+'-'+i,{br,part:i,asOf:TODAY,items:its.slice(i*1000,(i+1)*1000)},true);
     for(const d of S.db.stock.filter(d=>d.br===br&&d.part>=n))await del('stock',d.id);toast(`재고 ${its.length}종을 저장했습니다`)}
   S.ui.imp=null;S.demoPref=null;render()};

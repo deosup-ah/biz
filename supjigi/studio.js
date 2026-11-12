@@ -7,7 +7,7 @@ V.store.cur=()=>{const br=S.br,U=S.ui,hk=hooks(60),saved=S.db.curations.filter(c
   return `<div class="sec"><h2>큐레이션</h2><p>지금 이때, 이 목적에 맞는 매대 주제를 추천받고 바로 POP · 띠지 · 주문으로 잇습니다</p></div>
   <div class="grid g2"><div class="card form"><h3>무엇을 위한 매대인가요</h3>
     <div class="fld"><label>목적 (하나 고르기)</label><div class="chips">${PURP.map(p=>`<button class="chip" data-a="ui" data-k="purp" data-v="${p}" aria-pressed="${(U.purp||PURP[0])===p}">${p}</button>`).join('')}</div></div>
-    <div class="f2"><div class="fld"><label for="cuT">누구에게</label><input type="text" id="cuT" data-c="uiv" data-k="cuT" value="${esc(U.cuT||'')}" placeholder="예: 숙박 손님, 산책 나온 동네 주민"></div>
+    <div class="f2"><div class="fld"><label for="cuT">누구에게</label><input type="text" id="cuT" data-c="uiv" data-k="cuT" value="${esc(U.cuT||'')}" placeholder="예: 숙박 고객, 산책 나온 동네 주민"></div>
      <div class="fld"><label for="cuN">매대에 올릴 책 수</label><select id="cuN" data-c="uiv" data-k="cuN">${[5,8,12].map(n=>`<option ${(+U.cuN||8)===n?'selected':''}>${n}</option>`).join('')}</select></div></div>
     <div class="fld"><label for="cuM">더 알려 줄 것</label><textarea id="cuM" rows="3" data-c="uiv" data-k="cuM" placeholder="예: 11/14 영화 상영과 이어지게, 입구 평대 하나">${esc(U.cuM||'')}</textarea></div>
     <div class="btns">${busyBtn('cur',br==='all'?'지점을 먼저 고르세요':`${brN(br)} 매대 주제 3개 추천받기`,'curGen',br==='all'?'disabled':'')}</div>
@@ -47,7 +47,7 @@ ${rk||'자료 없음'}
 - 주제마다 "왜 지금인지"(날짜·계절·행사와 이어지는 구체적 까닭)와 "무엇을 얻으려는지"(목적)를 분명히 씁니다. 막연한 주제(예: 가을에 읽기 좋은 책)는 안 됩니다.
 - 책은 위 재고 목록과 순위 목록에서 먼저 고릅니다(src "재고" 또는 "순위"). 목록 밖 책은 실제로 한국에 출간된 것이 확실한 책만, 주제마다 3권 이하로 넣고 src "추천"으로 표시합니다. 책을 지어내지 마세요.
 - 목적이 "재고 줄이기"면 재고가 많고 판매가 적은 책을, "매출 올리기"면 잘 팔리는데 재고가 있는 책을 중심에 둡니다.
-- POP 문구는 손님에게 건네는 말로, 과장 없이. head 18자 이내, body 60자 이내. 띠지 문구 22자 이내.
+- POP 문구는 고객에게 건네는 말로, 과장 없이. head 18자 이내, body 60자 이내. 띠지 문구 22자 이내.
 - place 는 "입구 앞 평대", "계산대 옆", "창가 서가 눈높이 칸"처럼 직원이 바로 알아듣는 자리로.
 - check 는 진열까지의 할 일 3~4개.
 JSON 배열로만 답하세요:

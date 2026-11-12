@@ -53,7 +53,7 @@ function dpTop(P){const W=P.W,D=P.D,F='font-family:Pretendard,sans-serif';let s=
     if(i.k==='show')s+=G(`<rect x="${i.x}" y="${i.y}" width="105" height="30" fill="#fffdf6" stroke="#7d3a2b" stroke-width="3"/><text x="${i.x+52}" y="${i.y+22}" text-anchor="middle" style="${F};font-size:17px;font-weight:700;fill:#7d3a2b">쇼카드</text>`);
     if(i.k==='vase')s+=G(`<circle cx="${i.x+30}" cy="${i.y+30}" r="34" fill="#cfd8d2" stroke="#6f8a6c" stroke-width="3"/><text x="${i.x+30}" y="${i.y+38}" text-anchor="middle" style="${F};font-size:20px;font-weight:700;fill:#3f5a3c">꽃병</text>`);
     if(i.k==='note')s+=G(`<rect x="${i.x-46}" y="${i.y-30}" width="92" height="60" fill="#fffdf6" stroke="#d8cfb8" stroke-width="3"/><text x="${i.x}" y="${i.y+8}" text-anchor="middle" style="${F};font-size:18px;font-weight:700;fill:#9a8760">쪽지</text>`)});
-  s+=`<text x="${W/2}" y="${D+50}" text-anchor="middle" style="${F};font-size:28px;font-weight:700;fill:#5b6a61">손님 쪽 · ${W/10}×${D/10}cm</text>`;
+  s+=`<text x="${W/2}" y="${D+50}" text-anchor="middle" style="${F};font-size:28px;font-weight:700;fill:#5b6a61">고객 쪽 · ${W/10}×${D/10}cm</text>`;
   return `<svg id="dpTop" xmlns="http://www.w3.org/2000/svg" viewBox="-20 -20 ${W+40} ${D+90}" style="width:100%;height:auto;touch-action:none;display:block">${s}</svg>`}
 
 (()=>{const f=A.dpOpen;A.dpOpen=d=>{S.ui.dp3=false;f(d);const b3=document.querySelector('#sheetBox [data-a="dp3"]');if(b3)b3.remove();const st=$('dpStage');if(!st)return;const t=(S.ui.cor||[])[S.ui.dp.i];if(!t)return;const fx=S.ui.dpF||0,md=S.ui.dpM||0,all=(t.books||[]).slice(0,10),pk=dpPick(t),P=fx?null:dpPlan(t,md);

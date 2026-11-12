@@ -13,7 +13,7 @@ function profText(br,P){const L=[],p=v=>Math.round(v*100),g1=P.order[0],g2=P.ord
   L.push(`${g1} ${p(P.sh[g1])}%, ${g2} ${p(P.sh[g2])}% (최근 ${P.months}개월 매출).`);
   const up=GR.filter(g=>g!=='기타'&&P.sh[g]-P.avg[g]>=.04).map(g=>`${g} +${p(P.sh[g]-P.avg[g])}%p`),dn=GR.filter(g=>g!=='기타'&&P.avg[g]-P.sh[g]>=.04).map(g=>`${g} −${p(P.avg[g]-P.sh[g])}%p`);
   if(up.length||dn.length)L.push(`다른 지점보다 ${[up.length?'강한 곳: '+up.join(', '):'',dn.length?'약한 곳: '+dn.join(', '):''].filter(Boolean).join(' / ')}.`);
-  const t=[];if(P.classic>=3)t.push(`고전 ${P.classic}종`);if(P.mini>=2)t.push(`미니북 · 키링북 ${P.mini}종`);if(P.poem>=2)t.push(`시집 ${P.poem}종`);if(t.length)L.push(`많이 팔린 30종 안에 ${t.join(', ')} — ${P.mini>=2?'가볍게 집어 가는 선물용 책이 통합니다.':P.classic>=3?'이름을 아는 고전이 꾸준히 나갑니다.':'시를 찾는 손님이 있습니다.'}`);
+  const t=[];if(P.classic>=3)t.push(`고전 ${P.classic}종`);if(P.mini>=2)t.push(`미니북 · 키링북 ${P.mini}종`);if(P.poem>=2)t.push(`시집 ${P.poem}종`);if(t.length)L.push(`많이 팔린 30종 안에 ${t.join(', ')} — ${P.mini>=2?'가볍게 집어 가는 선물용 책이 통합니다.':P.classic>=3?'이름을 아는 고전이 꾸준히 나갑니다.':'시를 찾는 고객이 있습니다.'}`);
   if(P.price)L.push(`권당 평균 ${won(P.price)}원${P.wke!=null?` · 주말 매출 ${p(P.wke)}%`:''}${P.peak!=null?` · 붐비는 때 ${TLAB[P.peak]}`:''}.`);
   if(br==='aka')L.push('인물도서관과 「이 평대의 책」처럼, 한 사람 · 한 생각을 따라 읽게 하는 결.');return L}
 function recs(br){const P=profile(br),R=window.RECS||{new:{},steady:{}},its=items(br),has=b=>its.find(x=>(b.isbn&&x.isbn===b.isbn)||nt(x.t)===nt(b.t)),w={};

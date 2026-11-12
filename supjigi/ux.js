@@ -51,8 +51,8 @@ function uxPost(){const mn=document.querySelector('main');if(!mn)return;const m=
 /* ── 곳 고르기 하나: 아카데미 · 노원 · 초소 · 소전 · 본점 · 중계. 「서점 / 전체」는 없다. 아카데미는 공간 일과 책 일을 한 묶음으로 ── */
 const PLACES=[['aka','아카데미'],['nowon','노원'],['choso','초소'],['sojeon','소전'],['nmain','본점'],['njung','중계']];
 const akaCtx=()=>S.mode==='aka'||S.br==='aka';
-function navList(){if(!akaCtx())return [['cur','큐레이션','store','기획'],['design','만들기','store',''],['biz','지원사업','store',''],['stock','주문/반품/순위','store','실제'],['ana','매출','store','']];
-  return [['cur','큐레이션','store','기획'],['space','공간','aka',''],['design','만들기','aka',''],['insta','홍보','aka',''],['biz','지원사업','store',''],['today','일정','aka','실제'],['stock','주문/반품/순위','store',''],['ana','매출','store','']]}
+function navList(){if(!akaCtx())return [['cur','큐레이션','store','기획'],['design','만들기','store',''],['stock','주문/반품/순위','store','실제'],['ana','매출','store','']];
+  return [['cur','큐레이션','store','기획'],['space','공간','aka',''],['design','만들기','aka',''],['insta','홍보','aka',''],['today','일정','aka','실제'],['stock','주문/반품/순위','store',''],['ana','매출','store','']]}
 function navCur(){const L=navList(),m=S.mode,v=S.view[m];let t=L.find(x=>x[2]===m&&x[0]===v);if(!t&&m==='aka'&&typeof GRP!=='undefined'&&GRP[v])t=L.find(x=>x[2]==='aka'&&x[0]===GRP[v]);if(!t&&m==='store'&&/^(design|dp)$/.test(v))t=L.find(x=>x[2]==='store'&&x[0]==='design')||L.find(x=>x[2]==='store'&&x[0]==='cur');if(!t&&m==='aka'&&v==='cal')t=L.find(x=>x[0]==='today');if(!t&&v==='talk')t=L.find(x=>x[0]==='design');if(!t)return 'none:none';return t[2]+':'+t[0]}
 A.place=d=>{const k=d.k;if(k==='aka'){if(!akaCtx()){S.mode='store';S.view.store='cur'}}else{if(S.mode!=='store'){S.mode='store'}}A.br({k});window.scrollTo(0,0)};
 (()=>{const h=A.home;A.home=d=>{if(akaCtx()){S.mode='store';S.br='aka';S.view.store='cur';try{ss.set('view',S.view)}catch(e){}window.scrollTo(0,0);render();return}return h(d)}})();
@@ -183,5 +183,5 @@ A.mkTab=d=>{S.ui.mkTab=d.t;render()};A.anaTab=d=>{S.ui.anaTab=d.t;render()};
   return g(d)}})();
 (()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn)return;
   const ot=mn.querySelector('.ordt');if(ot&&!ot.querySelector('[data-t="k"]'))ot.insertAdjacentHTML('beforeend','<button data-a="ordTab" data-t="k" aria-pressed="false">순위</button>');
-  if(S.mode==='store'&&S.view.store==='more'){mn.querySelectorAll('button.mrow[data-a="go"]').forEach(b=>{if(['club','rank','space','today','biz','ret','trend'].includes(b.dataset.v))b.remove()});const h=mn.querySelector('.sec h2');if(h&&/전체 메뉴/.test(h.textContent))h.firstChild.textContent='설정'}}catch(e){console.warn(e)}}})();
+  if(S.mode==='store'&&S.view.store==='more'){mn.querySelectorAll('button.mrow[data-a="go"]').forEach(b=>{if(['club','rank','space','today','ret','trend'].includes(b.dataset.v))b.remove()});const h=mn.querySelector('.sec h2');if(h&&/전체 메뉴/.test(h.textContent))h.firstChild.textContent='설정'}}catch(e){console.warn(e)}}})();
 try{HELP.store.design='POP · 띠지 · 쇼카드 같은 인쇄물과 북토크 · 책모임 · 배치도를 만듭니다.';HELP.aka.design=HELP.store.design;HELP.aka.today='한 줄로 일정을 넣고, 오늘 할 일과 다가오는 일정을 한 화면에서 봅니다.';HELP.store.stock='주문을 준비하고, 같은 자리에서 반품 목록과 순위 비교를 봅니다. 확정은 사람이 합니다.';HELP.store.ana='매출을 읽고 이번 주 할 일을 뽑아 줍니다. 「오늘 점검」에 어제 매출과 살펴볼 것이 있습니다.';HELP.store.more='자료 올리기와 화면 설정입니다.'}catch(e){}

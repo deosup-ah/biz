@@ -17,7 +17,7 @@ A.akaDo=d=>{if(d.t==='go'){A.go({v:d.id});return}if(d.t==='ig'){A.igFrom({id:d.i
 /* ── 인스타 인사이트 (계정의 프로페셔널 대시보드에서 읽어 온 값) ── */
 function igCard(){const g=(SEED||{}).ig;if(!g)return `<div class="card empty">인스타 인사이트를 아직 읽어 오지 못했습니다.</div>`;
   const er=pc(g.inter,g.reach),vr=pc(g.visits,g.reach),lr=pc(g.link,g.visits),tips=[];
-  tips.push(`본 사람 ${won(g.reach)}명 가운데 <b>${g.viewsNon}%가 팔로워가 아닌 사람</b>입니다. 새 손님에게 닿고 있습니다.`);
+  tips.push(`본 사람 ${won(g.reach)}명 가운데 <b>${g.viewsNon}%가 팔로워가 아닌 사람</b>입니다. 새 고객에게 닿고 있습니다.`);
   tips.push(`본 사람 100명 중 <b>${Math.round(vr)}명이 프로필까지</b> 들어왔고, 프로필에 온 사람 100명 중 ${Math.round(lr)}명이 링크를 눌렀습니다.`);
   if(g.mix.reels<15)tips.push(`조회의 ${g.mix.post}%가 게시물, 릴스는 ${g.mix.reels}%뿐입니다. 숲 · 공간 영상을 릴스로 한두 편 올려 볼 만합니다.`);
   if(g.top&&g.top.length)tips.push(`반응이 가장 컸던 글은 ${g.top[0].d}(${g.top[0].n}건)입니다. 그날 올린 소재를 다시 써 보세요.`);

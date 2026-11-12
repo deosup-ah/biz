@@ -64,7 +64,7 @@ A.dpRec=d=>{try{const v=d&&d.v!=null?+d.v:0,t=S.ui.cor[S.ui.dp.i];if(!t)return;c
 function dpChkBox(r){const d=document.createElement('div');d.className='dpchkr';const li=(n,a,c)=>a&&a.length?`<li class="${c}"><b>${n}</b> ${a.map(esc).join(' · ')}</li>`:'';d.innerHTML=`<h4>점검 결과</h4><ul>${li('빠진 책',r.missing,'bad')}${li('표지가 가려진 책',r.covered,'warn')}${li('잘 놓인 책',r.found,'ok')}<li class="${r.main_ok?'ok':'warn'}"><b>메인</b> ${esc(r.main||'')}</li>${(r.tips||[]).slice(0,3).map(x=>`<li><b>고칠 점</b> ${esc(x)}</li>`).join('')}</ul>`;return d}
 C.dpChk=async el=>{const f=el.files&&el.files[0];el.value='';if(!f)return;const t=(S.ui.cor||[])[S.ui.dp.i];if(!t)return;const all=(t.books||[]).slice(0,10),pk=dpPick(t),mi=(S.ui.dpMain||{})[dpKey(t)];
   const lab=document.querySelector('#sheetBox .dpchk span');if(lab)lab.textContent='사진을 보는 중… (30초쯤)';
-  const out=await ask('dpchk',`서점 평대 진열 사진입니다. 계획과 견주어 점검해 주세요.\n계획한 책(번호 · 제목 · 저자):\n${pk.map((i,n)=>`${n+1}. ${all[i].t}${all[i].a?' · '+all[i].a:''}`).join('\n')}\n메인 책: ${mi!=null&&all[mi]?all[mi].t:'(정하지 않음)'}\n사진에서 표지 제목이 읽히는 책을 계획과 맞춰 보고, 사람 얼굴이나 손님은 말하지 마세요. 확실하지 않으면 found 에 넣지 마세요.\nJSON 으로만: {"found":["제목"],"missing":["제목"],"covered":["제목"],"main":"메인 책이 눈에 띄는지 한 문장","main_ok":true,"tips":["고칠 점 한 문장, 최대 3개"]}`,{images:[f]});
+  const out=await ask('dpchk',`서점 평대 진열 사진입니다. 계획과 견주어 점검해 주세요.\n계획한 책(번호 · 제목 · 저자):\n${pk.map((i,n)=>`${n+1}. ${all[i].t}${all[i].a?' · '+all[i].a:''}`).join('\n')}\n메인 책: ${mi!=null&&all[mi]?all[mi].t:'(정하지 않음)'}\n사진에서 표지 제목이 읽히는 책을 계획과 맞춰 보고, 사람 얼굴이나 고객은 말하지 마세요. 확실하지 않으면 found 에 넣지 마세요.\nJSON 으로만: {"found":["제목"],"missing":["제목"],"covered":["제목"],"main":"메인 책이 눈에 띄는지 한 문장","main_ok":true,"tips":["고칠 점 한 문장, 최대 3개"]}`,{images:[f]});
   if(out){S.ui.dpChkR={...out,k:dpKey(t)};A.dpOpen({i:S.ui.dp.i});const c=document.querySelector('#sheetBox .dpchkr');if(c)c.scrollIntoView({block:'center',behavior:'smooth'})}else{if(lab)lab.textContent='읽지 못했습니다. 평대 전체가 보이게 다시 찍어 주세요.'}};
 
 /* ── 직원에게 보내기: 3D 장면 + 평면 + 놓는 순서 + 메인 표시 ── */
@@ -78,7 +78,7 @@ A.dpSend=async()=>{try{const t=S.ui.cor[S.ui.dp.i],P=dpPlan(t,S.ui.dpM||0),el=$(
   const H=250+(ih3?ih3+40:0)+th+60+RL.reduce((a,r)=>a+58+r.p.length*36+18,0)+30+TL.length*38+(NL.length?24+NL.length*38:0)+110,c=document.createElement('canvas'),x=c.getContext('2d');c.width=W;c.height=H;
   x.fillStyle='#f7f5ef';x.fillRect(0,0,W,H);x.fillStyle='#003128';x.fillRect(0,0,W,200);x.fillStyle='#c9a24a';x.fillRect(0,200,W,10);
   x.fillStyle='#d9b45b';x.font=`600 28px ${F}`;x.fillText('오늘의 진열 · 더숲 '+brN(P.br||S.br)+(t.until?' · '+mdw(t.until)+'까지':''),80,78);x.fillStyle='#f2eee3';x.font=`800 56px ${F}`;x.fillText(wrapW(x,t.title,920,1)[0],80,152);
-  let y=250;if(c3){x.drawImage(c3,80,y,920,ih3);x.fillStyle='rgba(0,49,40,.82)';x.fillRect(80,y,150,44);x.fillStyle='#fff';x.font=`700 22px ${F}`;x.fillText('손님 눈높이',96,y+30);y+=ih3+40}
+  let y=250;if(c3){x.drawImage(c3,80,y,920,ih3);x.fillStyle='rgba(0,49,40,.82)';x.fillRect(80,y,150,44);x.fillStyle='#fff';x.font=`700 22px ${F}`;x.fillText('고객 눈높이',96,y+30);y+=ih3+40}
   x.drawImage(top,c3?80+(920-tw)/2:80,y,tw,th);y+=th+60;
   RL.forEach(r=>{x.fillStyle=r.m?'#c9a24a':'#003128';x.beginPath();x.arc(104,y+22,24,0,7);x.fill();x.fillStyle=r.m?'#1c1c1a':'#fff';x.font=`800 26px ${F}`;x.textAlign='center';x.fillText(r.n,104,y+31);x.textAlign='left';x.fillStyle='#1c1c1a';x.font=`800 34px ${F}`;x.fillText(r.t,150,y+34);
     if(r.m){const w=x.measureText(r.t).width;x.fillStyle='#c9a24a';x.fillRect(166+w,y+6,92,36);x.fillStyle='#1c1c1a';x.font=`800 22px ${F}`;x.fillText('메인',186+w,y+32)}
@@ -126,7 +126,7 @@ function igDraw(){const G=S.ui.igG;if(!G)return;const T=(S.ui.cor||[]).slice(0,8
     <div class="grid g2"><div class="fld"><label>표지 제목</label><input id="igCT" data-c="igCT" value="${esc(o.ct||'')}"></div><div class="fld"><label>표지 한 줄</label><input id="igCS" data-c="igCS" value="${esc(o.cs||'')}"></div></div>
     <div class="btns"><button class="btn pri" data-a="igSave">이미지 ${(o.urls||[]).length}장 저장</button></div>
     ${(o.caps||[]).map((c,i)=>`<div class="igcap"><span>${esc(c.tone||'')}</span><p>${esc(c.caption||'')}</p><small>${esc(o.tags||'')}</small><button class="btn sm" data-a="igCp" data-i="${i}">글 복사</button></div>`).join('')}
-    ${o.alt?`<p class="note">사진 설명(대체 텍스트): ${esc(o.alt)}</p>`:''}<p class="note">날짜 · 시간 · 사실은 올리기 전에 확인하고, 올리는 것은 직접 합니다. 손님 얼굴이 크게 나온 사진은 동의를 받고 씁니다.</p>`:''}
+    ${o.alt?`<p class="note">사진 설명(대체 텍스트): ${esc(o.alt)}</p>`:''}<p class="note">날짜 · 시간 · 사실은 올리기 전에 확인하고, 올리는 것은 직접 합니다. 고객 얼굴이 크게 나온 사진은 동의를 받고 씁니다.</p>`:''}
    <div class="btns"><button class="btn" data-a="close">닫기</button></div></div>`;
   const sb=$('sheetBox');if(sb&&$('sheet').classList.contains('on')&&sb.querySelector('.igs')){const sc=sb.scrollTop;sb.innerHTML=h;sb.scrollTop=sc}else openSheet(h)}
 const spine=t=>{const B=(t.books||[]).slice(0,4).map(b=>String(b.t).replace(/\s*[\(\[:].*$/,'').trim()).filter(Boolean);return B.length>=2?B.join(',\n')+'.':''};

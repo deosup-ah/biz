@@ -1,5 +1,5 @@
 /* 더숲 워크룸 — 「가로세로 숲」 퍼즐(옛 이름: 책 가로세로 퍼즐) (11/12 밤, 참부장 요청)
-   손님에게 출력해 건네 풀어 보게 하는 용도. 난이도 5단계 · 주제(장르 · 명문장 · 영화와 책 · 동화) · 나이대 · 한 장 완성 · 여러 형태 · 출력(PDF) · 공유(이미지).
+   고객에게 출력해 건네 풀어 보게 하는 용도. 난이도 5단계 · 주제(장르 · 명문장 · 영화와 책 · 동화) · 나이대 · 한 장 완성 · 여러 형태 · 출력(PDF) · 공유(이미지).
    정식 이름은 공통 「가로세로 숲」, 판마다 주제 제목(이야기의 숲 · 과학의 숲 …), 지점 이름은 바꿀 수 있고 기본은 사유의숲.
    단어 [단어, 힌트, 난이도 1~5, 나이대(k 어린이 · t 청소년 · a 어른 · s 어르신)]. 시 구절은 1929년 전에 나온 시만, 산문 인용은 짧게. */
 const PZB={
@@ -142,7 +142,7 @@ function pzDraw(keepInput){const P=S.ui.pz,Z=P.Z,BRS=[...new Set(['사유의숲'
   const h=`<div class="pzs"><h3>${PZT} <small>책 · 영화 · 생각을 잇는 퍼즐</small></h3><div class="chips pzmd"><button class="chip" data-a="pzMd" data-v="t" aria-pressed="${P.md!=='p'}">주제 퍼즐</button><button class="chip" data-a="pzMd" data-v="p" aria-pressed="${P.md==='p'}">인물도서관 퍼즐</button></div>
    ${P.md==='p'?`<p class="note">한 사람의 책과 삶에서 답을 찾는 퍼즐입니다. 답은 모두 그 사람의 책으로 확인할 수 있고, 금색 칸에는 그 사람을 대표하는 말이 들어갑니다.</p>
    <div class="fld"><label>인물</label><div class="chips">${Object.keys(PZP).map(n=>{const sh=PZPSH(n);return `<button class="chip" data-a="pzWho" data-v="${n}" aria-pressed="${P.who===n}">${n}${sh&&sh.no?` <small>${sh.no}</small>`:''}</button>`}).join('')}</div></div>
-   <div class="fld"><label>단계</label><div class="chips">${['입문','보통','깊이'].map((n,i)=>`<button class="chip" data-a="pzPlv" data-v="${i+1}" aria-pressed="${(P.plv||1)===i+1}">${i+1} ${n}</button>`).join('')}</div></div>`:`<p class="note">손님께 출력해 드리는 퍼즐입니다. 다 풀면 금색 칸에 그 주제의 열쇠 단어가 나타납니다.</p>
+   <div class="fld"><label>단계</label><div class="chips">${['입문','보통','깊이'].map((n,i)=>`<button class="chip" data-a="pzPlv" data-v="${i+1}" aria-pressed="${(P.plv||1)===i+1}">${i+1} ${n}</button>`).join('')}</div></div>`:`<p class="note">고객께 출력해 드리는 퍼즐입니다. 다 풀면 금색 칸에 그 주제의 열쇠 단어가 나타납니다.</p>
    <div class="fld"><label>주제</label><div class="chips">${PZTH.map(t=>`<button class="chip" data-a="pzTh" data-v="${esc(t)}" aria-pressed="${P.th===t}">${esc(t)}</button>`).join('')}</div></div>
    <div class="fld"><label>누가 풀까요</label><div class="chips">${PZAGE.map(([n,v])=>`<button class="chip" data-a="pzAge" data-v="${v}" aria-pressed="${(P.age||'')===v}">${n}</button>`).join('')}</div></div>
    <div class="fld"><label>난이도</label><div class="chips">${[1,2,3,4,5].map(n=>`<button class="chip" data-a="pzLv" data-v="${n}" aria-pressed="${P.lv===n}">${n} ${PZL[n].n}</button>`).join('')}</div></div>`}
@@ -155,4 +155,4 @@ function pzDraw(keepInput){const P=S.ui.pz,Z=P.Z,BRS=[...new Set(['사유의숲'
 
 /* ── 버튼: 「만들기」 맨 위 · 「공간」(인물도서관) 맨 위 · AI 에이전트 ── */
 (()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn||S.locked||S.mode!=='aka'||S.view.aka!=='space'||mn.querySelector('.pztop2'))return;const d=document.createElement('div');d.className='pztop pztop2';d.innerHTML=`<div><b>인물도서관 퍼즐</b><span>한 사람의 책과 삶에서 답을 찾는 가로세로 숲 · 3단계</span></div><button class="btn" data-a="pzPerson">만들기</button>`;const a=mn.querySelector('.subnav')||mn.querySelector('.sec');if(a)a.after(d);else mn.prepend(d)}catch(e){}}})();
-(()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn||S.locked||S.view[S.mode]!=='design'||mn.querySelector('.pztop'))return;const d=document.createElement('div');d.className='pztop';d.innerHTML=`<div><b>${PZT}</b><span>책 · 영화 · 생각을 잇는 퍼즐 · 손님께 출력해 드리기</span></div><button class="btn" data-a="pzOpen">만들기</button>`;const a=mn.querySelector('.ulab')||mn.querySelector('.qbar')||mn.querySelector('.sec');if(a)a.before(d);else mn.prepend(d)}catch(e){}}})();
+(()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn||S.locked||S.view[S.mode]!=='design'||mn.querySelector('.pztop'))return;const d=document.createElement('div');d.className='pztop';d.innerHTML=`<div><b>${PZT}</b><span>책 · 영화 · 생각을 잇는 퍼즐 · 고객께 출력해 드리기</span></div><button class="btn" data-a="pzOpen">만들기</button>`;const a=mn.querySelector('.ulab')||mn.querySelector('.qbar')||mn.querySelector('.sec');if(a)a.before(d);else mn.prepend(d)}catch(e){}}})();
