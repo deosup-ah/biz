@@ -95,7 +95,7 @@ function goodsCard(){const m=S.mode,L=[...(S.ui.gd||[]),...GOODS.filter(g=>g.mod
 
 /* ── 다른 공간 읽기: 잘하는 것 · 약한 것 · 더숲은 언제 따르고 언제 달리할지 ── */
 
-function spaceCard(){return `<div class="sec"><h2>다른 공간 읽기</h2></div>
+function spaceCard(){return '';return `<div class="sec"><h2>다른 공간 읽기</h2></div>
  <div class="card rule"><b>달리하는 것은 목적이 아닙니다.</b><ol><li>고객이 책을 찾는 데 방해가 되면 하지 않습니다. 기본 서가는 그대로 둡니다.</li><li>평대 하나, 2주 단위로 되돌릴 수 있을 때만 시험합니다.</li><li>시작 전에 볼 숫자를 정합니다. 그 평대의 판매 권수와, 없던 문의가 생겼는지.</li></ol></div>
  <div class="grid g2">${SPACES.map(s=>`<div class="card gd"><h3>${s.n}</h3><dl><dt>강점</dt><dd>${s.good}</dd><dt>약점</dt><dd>${s.weak}</dd><dt>그대로</dt><dd>${s.keep}</dd><dt>달리</dt><dd>${s.diff}</dd></dl><a class="lnk" href="${s.u}" target="_blank" rel="noopener">출처</a></div>`).join('')}</div>`}
 (()=>{const f=V.store.trend,g=()=>f()+spaceCard();V.store.trend=g;V.aka.trend=g})();

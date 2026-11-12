@@ -11,23 +11,25 @@ const G2=[
   {k:'wd',img:'wd.jpg',n:'말로 찾는 서가',t:'마음에 걸린 말이 책으로 안내합니다',why:'직원이 바쁠 때도 고객이 스스로 책이 있는 곳을 찾습니다. 「잠이 안 올 때」 옆 QR 하나면 됩니다.',how:['말 · 장소 고치기','A4로 뽑아 붙이기','진열 바뀌면 다시 뽑기'],go:'wd'},
   {k:'ag',mock:'ag',n:'AI 에이전트',t:'메뉴를 몰라도 시키면 됩니다',why:'어디 있는지 찾지 않아도 「가득 채우는 진열」 「두 번째 POP」처럼 말하면 그 화면을 열고 만들어 줍니다.',how:['도움말 → AI 에이전트','하고 싶은 일 한 줄','결과 확인'],go:'ag'},
   {k:'cal',img:'b.gif',n:'일정',t:'한 줄이면 일정이 됩니다',why:'「내일 2시 30명 대화의 집」처럼 적으면 날짜 · 인원 · 장소가 나뉘어 들어갑니다. 겹치는 일정은 먼저 알려 줍니다.',how:['한 줄 적기','확인','오늘 화면에서 보기'],go:'today',adm:1},
-  {k:'talk',img:'c.gif',n:'북토크',t:'준비 · 진행표 · 질문을 한 번에',why:'처음 맡아도 빠지는 게 없습니다. 진행표와 질문 카드가 함께 나옵니다.',how:['작가 · 책 적기','진행표 받기','질문 카드 뽑기'],go:'design',adm:1},
   {k:'ana',img:'d.gif',n:'매출',t:'숫자가 다음 할 일을 말합니다',why:'표를 읽는 대신 이번 주에 할 일 세 가지로 바꿔 보여 줍니다.',how:['지점 고르기','할 일 세 가지','지난달과 견주기'],go:'ana',adm:1},
   {k:'soon',n:'곧 열립니다',t:'안정화 중인 기능',soon:1}
 ];
-const G2SOON=[['찍기 · 마지막 판매일','바코드나 제목을 찍으면 책마다 마지막으로 팔린 날과 1개월~3년 구간이 나오고, 오래 안 팔린 책을 반품 목록에 담습니다.',1],['주문 · 반품','팔린 만큼 셈해 주문에 담고, 확정은 사람이 합니다.',0],['매출','숫자 대신 이번 주 할 일로 알려 줍니다.',0],['지원사업','공모 일정과 신청 기록을 한곳에 모읍니다.',0]];
+const G2SOON=[['북토크 · 프로그램','북토크와 프로그램을 기획부터 비용 정산까지 자동으로 이어 줍니다.',1],['찍기 · 마지막 판매일','바코드나 제목을 찍으면 책마다 마지막으로 팔린 날과 1개월~3년 구간이 나오고, 오래 안 팔린 책을 반품 목록에 담습니다.',1],['주문 · 반품','팔린 만큼 셈해 주문에 담고, 확정은 사람이 합니다.',0],['매출','숫자 대신 이번 주 할 일로 알려 줍니다.',0],['지원사업','공모 일정과 신청 기록을 한곳에 모읍니다.',0]];
+function g2Head(t){return `<div class="g2top"><b>도움말</b><button class="g2x" data-a="gdClose">닫기</button></div>
+  <button class="g2ai" data-a="agOpen"><span class="g2ai1">AI 에이전트</span><span class="g2ai2">하고 싶은 일을 말하면 앱이 직접 해 줍니다</span><i aria-hidden="true">›</i></button>
+  <div class="g2seg" role="tablist"><button data-a="gdTab" data-t="a" aria-pressed="${t==='a'}">화면 안내</button><button data-a="gdTab" data-t="b" aria-pressed="${t==='b'}">서점 기초</button>${typeof A.lvFromGd==='function'?'<button data-a="lvFromGd">내 단계</button>':''}</div>`}
 const g2List=()=>{const ad=typeof isAdmin==='function'&&isAdmin();return G2.filter(s=>!s.adm||ad)};
 const g2Soon=()=>{const ad=typeof isAdmin==='function'&&isAdmin();return G2SOON.filter(x=>x[2]||!ad)};
 (()=>{const prev=gdDraw;
-  gdDraw=function(){const tab=S.ui.gdTab==='b'?'b':'a';if(tab==='b'){const G=$('guide');if(G)G.classList.remove('g2');return prev.apply(this,arguments)}
+  gdDraw=function(){const tab=S.ui.gdTab==='b'?'b':'a';if(tab==='b'){let G=$('guide');if(!G){prev.apply(this,arguments);G=$('guide')}G.className='g2 g2bs';G.innerHTML=`<div class="g2b">${g2Head('b')}<div class="bshead g2sh"><div class="bsnav">${BASICS.map(s=>`<button data-a="bsGo" data-id="${s.id}">${s.t}</button>`).join('')}</div></div><div class="bsp g2bsp"><p class="bsl">처음 서점 일을 하는 사람이 먼저 알아 둘 것들입니다. 위 이름을 누르면 그 장으로 갑니다.</p>${bsHTML()}</div></div>`;return}
     let G=$('guide');if(!G){G=document.createElement('div');G.id='guide';document.body.append(G);let sx=0;G.addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});G.addEventListener('touchend',e=>{if(!G.classList.contains('g2'))return;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>60&&!e.target.closest('.g2tabs'))A.gdGo({d:dx<0?1:-1})},{passive:true})}
     G.className='g2';const L=g2List(),i=Math.min(S.ui.gd|0,L.length-1),s=L[i],last=i===L.length-1;
-    const tabs=`<div class="g2tabs" role="tablist"><button data-a="agOpen">AI 에이전트</button><button data-a="gdTab" data-t="a" aria-pressed="true">화면 안내</button><button data-a="gdTab" data-t="b">서점 기초</button>${typeof A.lvFromGd==='function'?'<button data-a="lvFromGd">내 단계</button>':''}</div>`;
+    const tabs='';
     const bar=`<div class="g2bar">${L.map((x,j)=>`<button data-a="gdTo" data-i="${j}" class="${j<i?'done':j===i?'on':''}" aria-label="${x.n}"></button>`).join('')}</div>`;
     const media=s.soon?`<div class="g2soon">${g2Soon().map(([a,b])=>`<div><span><b>${a}</b><em>안정화 중</em></span><p>${b}</p></div>`).join('')}</div>`
       :s.mock==='ag'?`<div class="g2m g2ag"><p class="me">진열 가득 채워 줘</p><p class="it">첫 번째 평대를 「가득 채우기」로 놓았습니다. 메인은 앞줄 가운데에 세웠어요.</p><p class="me">두 번째 POP 짙은 바탕으로</p><p class="it">POP를 「짙은 바탕」으로 만들었습니다.</p></div>`
       :`<div class="g2m"><img src="guide/${s.img}?v=13" alt="${esc(s.t)}" loading="eager"></div>`;
-    G.innerHTML=`<div class="g2b"><div class="g2top"><b>도움말</b><button class="g2x" data-a="gdClose">닫기</button></div>${tabs}${bar}
+    G.innerHTML=`<div class="g2b">${g2Head('a')}${bar}
       <div class="g2c"><div class="g2h"><span class="g2n">${String(i+1).padStart(2,'0')}<i>/ ${String(L.length).padStart(2,'0')}</i></span><span class="g2f">${s.n}</span></div>
       <h2>${s.t}</h2>${media}
       ${s.soon?`<p class="g2note">시스템 안정화 테스트 중입니다. 며칠 안에 차례로 열립니다.</p>`:`<div class="g2why"><b>왜 도움이 되나</b><p>${s.why}</p></div><ol class="g2how">${s.how.map(h=>`<li>${h}</li>`).join('')}</ol>`}</div>
@@ -35,3 +37,13 @@ const g2Soon=()=>{const ad=typeof isAdmin==='function'&&isAdmin();return G2SOON.
 A.gdGo=d=>{const n=S.ui.gdTab==='b'?GDS.length:g2List().length;S.ui.gd=Math.max(0,Math.min(n-1,(S.ui.gd|0)+(+d.d)));gdDraw()};
 A.gdTo=d=>{S.ui.gd=+d.i;gdDraw()};
 A.g2Try=d=>{const k=d.k;A.gdClose();try{if(k==='cur')A.go({v:'cur',m:'store'});else if(k==='design')A.go({v:'design'});else if(k==='today')A.go({v:'today',m:'aka'});else if(k==='ana')A.go({v:'ana',m:'store'});else if(k==='ig')A.igOpen({});else if(k==='pz')A.pzOpen();else if(k==='wd')A.wdOpen();else if(k==='ag')A.agOpen()}catch(e){}};
+
+/* 서점 기초: 「북토크와 행사」는 숨기고(안정화 중), 「지원사업」 장을 더한다 */
+(()=>{const i=BASICS.findIndex(b=>b.id==='event');if(i>=0)BASICS.splice(i,1);
+  if(!BASICS.some(b=>b.id==='biz'))BASICS.push({id:'biz',t:'지원사업',lead:'서점과 문화 공간이 공공 기관의 공모에 신청해 프로그램 비용을 지원받는 일입니다. 공고 → 신청 → 심사 → 협약 → 운영 → 정산 순서로 갑니다.',
+   items:[['어디서 나오나','문화체육관광부와 그 아래 기관(한국문화예술위원회, 한국출판문화산업진흥원 등), 그리고 서울시 같은 지방자치단체가 해마다 공모를 냅니다.'],
+    ['무엇을 지원하나','작가가 서점에 머물며 프로그램을 여는 일, 서점의 강연 · 북토크 · 독서 모임 같은 문화 활동, 지역 서점을 알리는 일 등입니다.'],
+    ['신청서에 들어가는 것','시설 소개, 프로그램 계획(횟수 · 대상 · 일정), 예산(비목별 금액과 산출 근거), 지난 실적과 사진입니다.'],
+    ['돈은 정해진 대로만','지원금은 신청서에 적은 비목에만 씁니다. 영수증 · 세금계산서 · 카드 내역을 남겨 두어야 끝에 정산할 수 있습니다.'],
+    ['더숲의 기록','더숲 아카데미하우스는 2027 문학상주작가 지원사업(한국문화예술위원회)에 신청했습니다(2026년 11월). 씨네북토크 · 침묵의 독서처럼 이 공간에서만 할 수 있는 프로그램을 앞에 두었습니다.'],
+    ['앱에서','「더보기 → 지원사업」에 다가오는 공모와 신청 기록을 모읍니다.']]})})();
