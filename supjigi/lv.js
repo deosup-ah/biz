@@ -26,7 +26,9 @@ if(!isAdmin()){for(let i=GDS.length-1;i>=0;i--)if(GDS[i][0]==='b'||GDS[i][0]==='
 if(!isAdmin())GDS.push(['z','곧 열립니다','주문 · 반품 · 매출 · 지원사업']);
 let gdTy=0;
 (()=>{const g=gdDraw;gdDraw=function(){g.apply(this,arguments);try{const G=$('guide');if(!G)return;const gt=G.querySelector('.gdtab');if(gt&&!gt.querySelector('[data-a=lvFromGd]'))gt.insertAdjacentHTML('beforeend','<button data-a="lvFromGd">내 단계</button>');G.classList.toggle('gdfit',!G.classList.contains('bs'));if(G.classList.contains('bs'))return;const gi=S.ui.gd|0,k=(GDS[gi]||[])[0],last=gi===GDS.length-1;
-  const B=G.querySelector('.gdb');if(B&&!B.querySelector('.gdnx')){const im0=G.querySelector('.gdi img');if(im0){im0.dataset.a=last?'gdClose':'gdGo';im0.dataset.d='1'}const nx=document.createElement('div');nx.className='gdnx';nx.innerHTML=(gi?'<button class="gdpv" data-a="gdGo" data-d="-1" aria-label="이전">‹</button>':'')+(last?'<button class="gdgo" data-a="gdClose">시작하기</button>':'<button class="gdgo" data-a="gdGo" data-d="1">다음 ›</button>');B.append(nx)}
+  const B=G.querySelector('.gdb'),im0=G.querySelector('.gdi img');if(im0){im0.dataset.a=last?'gdClose':'gdGo';im0.dataset.d='1'}
+  if(B&&k==='f'&&!B.querySelector('.gdwhy')){const p=B.querySelector('p');if(p)p.insertAdjacentHTML('afterend','<div class="gdwhy"><b>왜 3D인가</b> 평면 그림은 자리만 보입니다. 높이, 서로 가리는 표지, 손님 눈에 먼저 닿는 책은 돌려 봐야 보입니다. 놓기 전에 보면 두 번 옮기지 않습니다.</div>')}
+  if(B&&last&&!B.querySelector('.gdnx')){const nx=document.createElement('div');nx.className='gdnx';nx.innerHTML='<button class="gdgo" data-a="gdClose">시작하기</button>';B.append(nx)}
   if(k==='z'){const im=G.querySelector('.gdi img');if(im)im.outerHTML=`<div class="gdz">${[['주문 · 반품','팔린 만큼 셈해 주문에 담고, 반품할 책은 사진만 찍으면 자동으로 반품 등록'],['매출','숫자 대신 이번 주 할 일 세 가지로 알려 줍니다'],['지원사업','공모 일정과 신청 기록을 한곳에 모읍니다']].map(([a,b])=>`<div><b>${a}</b><span>${b}</span><em>안정화 중</em></div>`).join('')}<p>시스템 안정화 테스트 중입니다. 며칠만 기다려 주세요.</p></div>`}
   const h=G.querySelector('.gdb h2');if(h){const t=h.textContent,id=++gdTy;h.textContent='';h.classList.add('gdty');let n=0;const st=()=>{if(id!==gdTy||!h.isConnected)return;h.textContent=t.slice(0,++n);if(n<t.length)setTimeout(st,28);else setTimeout(()=>h.classList.add('done'),600)};st()}}catch(e){}}})();
 
@@ -67,7 +69,7 @@ A.lvFromGd=()=>{A.gdClose();A.lvOpen()};A.dpEx=d=>{const el=$('dpCmd');if(!el)re
   const how=box.querySelector('.dphow'),cmd=box.querySelector('.dpcmd'),v=box.querySelector('.dpv'),bk=$('dpBks'),chs=[...box.querySelectorAll(':scope>.chips')];if(!v||!cmd||!bk)return;
   box.prepend(v);v.after(bk);bk.after(cmd);const ci=$('dpCmd');if(ci)ci.placeholder='말로 옮기기';
   const ex=document.createElement('div');ex.className='dpex';ex.innerHTML=['1번 맨 앞으로','1번이랑 2번 바꿔','한 바퀴','위에서','처음 배치로'].map(c=>`<button class="chip" data-a="dpEx" data-c="${c}">${c}</button>`).join('');cmd.after(ex);
-  const m=document.createElement('details');m.className='fold dpmore';m.open=!!S.ui.dpMo;m.innerHTML='<summary>더 보기 · 오브제 · 놓는 결 · 사용법</summary>';m.append(...chs,...(how?[how]:[]));m.addEventListener('toggle',()=>{S.ui.dpMo=m.open});ex.after(m);const sb=$('sheetBox');m.append(...sb.querySelectorAll(':scope>.tw,:scope>ol.steps,:scope>p.note'));const bt=sb.querySelector(':scope>.btns');if(bt){if(!isAdmin()){const o=bt.querySelector('[data-a="dpOrder"]');if(o)o.remove()}const pg=bt.querySelector('[data-a="dpPng"]');if(pg){pg.textContent='그림 저장';pg.classList.remove('pri')}if(!bt.querySelector('[data-a="dpSend"]'))bt.insertAdjacentHTML('afterbegin','<button class="btn pri" data-a="dpSend">직원에게 보내기</button>')}}catch(e){}}})();
+  const m=document.createElement('details');m.className='fold dpmore';m.open=!!S.ui.dpMo;m.innerHTML='<summary>더 보기 · 오브제 · 놓는 결 · 사용법</summary>';m.append(...chs,...(how?[how]:[]));m.addEventListener('toggle',()=>{S.ui.dpMo=m.open});ex.after(m);const sb=$('sheetBox');m.append(...sb.querySelectorAll(':scope>.tw,:scope>ol.steps,:scope>p.note'));const bt=sb.querySelector(':scope>.btns');if(bt){if(!isAdmin()){const o=bt.querySelector('[data-a="dpOrder"]');if(o)o.remove()}const pg=bt.querySelector('[data-a="dpPng"]');if(pg){pg.textContent='그림 저장';pg.classList.remove('pri')}if(!bt.querySelector('[data-a="dpSend"]'))bt.insertAdjacentHTML('afterbegin','<button class="btn pri" data-a="dpSend">직원에게 보내기</button>')}const v0=box.querySelector('.dpv');if(v0&&!box.querySelector('.dprec'))v0.insertAdjacentHTML('beforebegin','<button class="dprec" data-a="dpRec"><b>추천 배치</b><span>재고 · 판매 · 종수를 보고 알아서 놓습니다</span></button>');}catch(e){}}})();
 
 /* ── 단계에 따라 열리는 진열 기능 ── */
 const lvLock=n=>{toast(`${n}단계 「${LVN[n]}」에서 열립니다`);return false};
@@ -125,9 +127,7 @@ const popMach=(w,n)=>[`> ${w}_`,`「${w}」 → ?`,`${w} + 책 = ___`,`if (${w})
 (()=>{try{const i=DPOBJ.findIndex(x=>x[0]==='card');if(i>=0)DPOBJ.splice(i,1)}catch(e){}const cut=P=>{if(P&&P.it)P.it=P.it.filter(i=>i.k!=='card');if(P&&P.need)P.need=P.need.filter(x=>!/이름표/.test(x));if(P&&P.tips)P.tips=P.tips.filter(x=>!/이름표/.test(x));return P};const g=dpPlan;dpPlan=function(){return cut(g.apply(this,arguments))}})();
 
 /* ── 11/12 단순화: 아래 고정 메뉴 · 카드 빠른 버튼 · 홈 단계 한 줄 · 직원에게 보내기 ── */
-function lvBot(){let b=$('bnav');const off=isAdmin()||S.locked||!S.loaded;document.body.classList.toggle('hasbn',!off);if(off){if(b)b.remove();return}if(!b){b=document.createElement('nav');b.id='bnav';document.body.append(b)}
-  let c='';try{c=navCur()}catch(e){}b.innerHTML=navList().map(([v,n,m])=>`<button data-a="go" data-v="${v}" data-m="${m}" ${c===m+':'+v?'aria-current="page"':''}>${n}</button>`).join('')+'<button data-a="gdOpen">도움말</button>'}
-(()=>{const r=render;render=function(){r.apply(this,arguments);try{lvBot();const mn=document.querySelector('main');if(!mn||S.locked)return;
+(()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn||S.locked)return;
   if(S.mode==='store'&&S.view.store==='cur'){
     const sn=mn.querySelector(':scope>.subnav:not(.subt)');if(sn){const on=sn.querySelector('[aria-pressed="true"]');if(!on||/전체/.test(on.textContent))sn.style.display='none'}
     const pcs=[...mn.querySelectorAll('.pcard')];mn.querySelectorAll('.wall>.cv').forEach(cv=>{const pc=pcs[+cv.dataset.i];if(!pc)return;const bs=[[pc.querySelector('[data-a="dpOpen"]'),'진열 보기'],[[...pc.querySelectorAll('[data-a="toDesign"][data-kind="pop"]')].pop(),'POP 만들기']].filter(x=>x[0]);if(!bs.length)return;const w=document.createElement('div');w.className='cvw';cv.replaceWith(w);const q=document.createElement('div');q.className='cvq';bs.forEach(([o,n])=>{const x=document.createElement('button');Object.assign(x.dataset,o.dataset);x.textContent=n;q.append(x)});w.append(cv,q)});
@@ -150,3 +150,13 @@ A.dpSend=async()=>{try{const t=S.ui.cor[S.ui.dp.i],P=dpPlan(t,S.ui.dpM||0),el=$(
   const blob=await new Promise(r=>c.toBlob(r,'image/png'));if(!blob)return;const name=`더숲_진열안내_${t.title.replace(/[\\/:*?"<>|\s,]+/g,'_').slice(0,20)}.png`;
   try{const f=new File([blob],name,{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:t.title});return}}catch(e){if(e&&e.name==='AbortError')return}
   await saveFile(name,blob);toast('그림을 저장했습니다. 카카오톡으로 직원에게 보내 주세요.')}catch(e){console.warn(e);toast('그림을 만들지 못했습니다')}};
+
+/* 추천 진열 배치: 재고 있는 책 먼저, 잘 나가는 책을 메인으로, 종수에 맞는 놓는 법 */
+A.dpRec=()=>{try{const t=S.ui.cor[S.ui.dp.i];if(!t)return;const k=dpKey(t),all=(t.books||[]).slice(0,10),cap=lvNow()>=2?8:6;
+  const sc=b=>((b.here>0||b.src==='재고')?100:0)+(b.mine||0)*3+(b.sold||0)+(b.role==='중심'?5:0);
+  const ord=all.map((b,i)=>[i,sc(b)]).sort((a,b)=>b[1]-a[1]||a[0]-b[0]),ins=ord.filter(x=>x[1]>=100).length,n=Math.max(Math.min(3,all.length),Math.min(cap,all.length,ins>=3?ins:cap)),pk=ord.slice(0,n).map(x=>x[0]).sort((a,b)=>a-b),main=ord[0][0];
+  const md=n<=3?2:/star|cup|candle|moon|snow/.test(t.sym||'')?1:0;
+  S.ui.dpPick={...(S.ui.dpPick||{}),[k]:pk};S.ui.dpMain={...(S.ui.dpMain||{}),[k]:main};S.ui.dpObj={...(S.ui.dpObj||{}),show:true};S.ui.dpFree=md!==2;S.ui.dpM=md;S.ui.dpF=0;
+  try{const ps=S.ui.dpAbs||{};Object.keys(ps).forEach(x=>{if(x.indexOf(k)===0)delete ps[x]});S.ui.dpAbs=ps}catch(e){}
+  A.dpOpen({i:S.ui.dp.i});const nm=String(all[main].t).replace(/\s*[\(\[].*$/,''),inn=pk.filter(i=>all[i].here>0||all[i].src==='재고').length;
+  const box=document.querySelector('#sheetBox .dprec');if(box)box.insertAdjacentHTML('afterend',`<p class="dprw"><b>이렇게 놓았습니다</b> ${n}종을 「${DMOOD[md]}」로 · 메인은 「${esc(nm)}」, 쇼카드와 함께 · 재고 있는 책 ${inn}종을 먼저${md===2?' · 종수가 적어 한 권씩 또렷하게':md===1?' · 주제가 포근해 부드러운 결로':' · 방금 읽다 둔 듯 살짝 흐트러지게'}. 마음에 안 들면 끌어서 고치세요.</p>`)}catch(e){console.warn(e);toast('추천 배치를 만들지 못했습니다')}};
