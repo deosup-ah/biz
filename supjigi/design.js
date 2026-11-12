@@ -151,13 +151,18 @@ function layout(D){const pr=[],brand=BRN(!D.br||D.br==='all'?'aka':D.br);
       let ly=ay+u*.062;bs.slice(0,ld?3:6).forEach((b,i)=>{if(ly<y1-u*.12){T(x0+u*.03,ly,String(i+1).padStart(2,'0'),u*.02,{fill:AC,weight:700});T(x0+u*.085,ly,wrap(`${b.t}${b.a?'  ·  '+b.a:''}`,SANS,u*.023,x1-x0-u*.12,1,500)[0],u*.023,{fill:FG,weight:500});ly+=u*.043}})}
     const fy=y1-u*.035;if(D.body){const bl=fit('∴  '+D.body.replace(/\n/g,' '),SANS,u*.026,x1-x0-u*.06,2,u*.02,500);bl.l.forEach((l,k)=>T(x0+u*.03,fy-u*.05-(bl.l.length-1-k)*bl.s*1.5,k===bl.l.length-1?wrap(l,SANS,bl.s,x1-x0-u*.06,1,500)[0]:l,bl.s,{fill:FG,weight:500}))};
     T(x0+u*.03,fy,(D.br==='aka'?'N 37.64  E 127.01':'CURATION  ·  '+stamp),u*.017,{fill:FG,weight:500,ls:u*.003});T(x1-u*.03,fy,brand,u*.021,{fill:FG,weight:600,anchor:'end'});BADGE();return{w,h,pr}}
-  if(st===0||st===1){/* 조용한 안내문: 작은 제목, 넓은 여백, 글 한 문단. 장식은 점 하나와 가는 선 */const dk=st===1||!!P.dark,BG=st===1?(P.dark?P.bg:P.fg):P.bg,FG=st===1?(P.dark?P.fg:P.bg):P.fg,AC=st===1?P.hl:P.ac,M=u*.115,tw=Math.min(w-M*2,u*(ld?1.1:.72));pr.length=0;R(0,0,w,h,BG);
-    LOGO(M,M+u*.035,u*.04,dk,'start');T(w-M,M+u*.03,stamp,u*.02,{fill:FG,weight:500,anchor:'end',ls:u*.003});
-    let y=h*(ld?.3:.34);O(M+u*.008,y-u*.008,u*.008,u*.008,AC);if(tagOn)T(M+u*.03,y,D.tag,u*.022,{fill:FG,weight:600,ls:u*.0025});y+=u*.085;
-    let ts=u*.064*hs,TL=BAL(hd,SANS,ts,tw,0,600);while(TL.length>3&&ts>u*.04){ts*=.94;TL=BAL(hd,SANS,ts,tw,0,600)}TL.slice(0,3).forEach(l=>{T(M,y,l,ts,{fill:FG,weight:600,ls:-ts*.018});y+=ts*1.32});
-    y+=u*.03;BAL(D.body||'',SANS,u*.032,ld?tw:Math.min(tw,u*.6),ld?4:6,400).forEach(l=>{if(y<h-M-u*.16){T(M,y,l,u*.032,{fill:FG,weight:400});y+=u*.032*1.72}});
-    const by=h-M-u*.05;R(M,by-u*.045,w-M*2,u*.001,FG,{op:.45});const bg=D.symBig&&ICON[D.sym]?Math.min(u*.36,by-u*.1-y):0;if(bg>u*.13)pr.push({k:'p',d:ICON[D.sym],x:w-M-bg,y:by-u*.085-bg,s:bg/24,stroke:D.symBig===2?FG:AC,sw:u*(D.symBig===2?.0022:.0034)});else if(ICON[D.sym]&&D.sym!=='none')pr.push({k:'p',d:ICON[D.sym],x:M,y:by-u*.135,s:u*.028/12*1.6,stroke:FG,sw:u*.0022});
-    if(D.book){const cw=w-M*2-mw(brand,SANS,u*.021,600)-u*.05,full=`『${D.book}』${D.author?'  '+D.author:''}`,c=fit(mw(full,SANS,u*.021,500)<=cw?full:`『${D.book}』`,SANS,u*.024,cw,1,u*.016,500);T(M,by,wrap(c.l[0]||'',SANS,c.s,cw,1,500)[0],c.s,{fill:FG,weight:500})}T(w-M,by,brand,u*.021,{fill:FG,weight:600,anchor:'end',ls:u*.001});BADGE();return{w,h,pr}}
+  if(st===0||st===1){/* 11/12 다시: 0 「기본」은 잡지 표제처럼 큰 세리프 제목, 1 「짙은 바탕」은 깊은 색 위에 큰 따옴표와 제목. 장식은 짧은 금색 선 하나 */
+    const dk=st===1||!!P.dark,BG=st===1?(P.dark?P.bg:P.fg):P.bg,FG=st===1?(P.dark?P.fg:P.bg):P.fg,AC=st===1?P.hl:P.ac,M=u*.1,tw=w-M*2;pr.length=0;R(0,0,w,h,BG);
+    LOGO(M,M+u*.035,u*.042,dk,'start');T(w-M,M+u*.03,[tagOn?D.tag:'',stamp].filter(Boolean).join('   '),u*.022,{fill:FG,weight:600,anchor:'end',ls:u*.002});R(M,M+u*.075,tw,u*.0012,FG,{op:.35});
+    let y=M+u*.075;if(st===1){const qs=u*(ld?.3:.36);T(M-qs*.04,y+qs*.86,'“',qs,{font:SERIF,fill:AC,weight:700});y+=qs*.62}else y+=u*(ld?.09:.13);
+    let ts=u*(ld?.1:.118)*hs,TL=BAL(hd,SERIF,ts,tw,0,700);while(TL.length>4&&ts>u*.05){ts*=.94;TL=BAL(hd,SERIF,ts,tw,0,700)}TL=TL.slice(0,4);y+=ts*.9;
+    TL.forEach(l=>{T(M,y,l,ts,{font:SERIF,fill:FG,weight:700,ls:-ts*.025});y+=ts*1.24});
+    y+=-ts*.24+u*.05;R(M,y,u*.07,u*.006,AC);y+=u*.075;
+    const fy=h-M-u*.06,bookH=D.book?u*.17:0,bs=u*(ld?.034:.038);let BL=BAL(D.body||'',SERIF,bs,Math.min(tw,u*(ld?.9:.78)),0,400);while(y+BL.length*bs*1.7>fy-bookH-u*.04&&BL.length>1)BL=BL.slice(0,-1);
+    BL.forEach(l=>{T(M,y,l,bs,{font:SERIF,fill:FG,weight:400});y+=bs*1.7});
+    if(D.symBig&&ICON[D.sym]){const bg=Math.min(u*.3,fy-bookH-y-u*.04);if(bg>u*.12)pr.push({k:'p',d:ICON[D.sym],x:w-M-bg,y:fy-bookH-u*.03-bg,s:bg/24,stroke:AC,sw:u*.003})}
+    if(D.book)CREDIT(M,fy-bookH+u*.02,FG,AC,'start',tw);
+    R(M,fy,tw,u*.0012,FG,{op:.35});T(M,fy+u*.05,brand,u*.024,{fill:FG,weight:700,ls:u*.001});if(D.price)T(w-M,fy+u*.05,D.price,u*.026,{fill:FG,weight:800,anchor:'end'});BADGE();return{w,h,pr}}
   const ST=st===2?4:st;
   if(ST===91){/* (쓰지 않음) 포스터 */const B=P.dark?P.bg:P.fg,F=P.dark?P.fg:P.bg,G=P.dark?P.ac:P.hl,cx=w/2,r=u*(ld?.082:.118),cy=h*(ld?.2:.2);R(0,0,w,h,B);R(m*.5,m*.5,w-m,h-m,B,{stroke:G,sw:u*.0018,op:.9});
     O(cx,cy,r*1.62,r*1.62,B,{stroke:G,sw:u*.0016,dash:`${u*.004} ${u*.012}`});O(cx,cy,r*1.18,r*1.18,B,{stroke:G,sw:u*.003});PIC(cx,cy,r*.7,F,r*.05);
@@ -174,7 +179,7 @@ function layout(D){const pr=[],brand=BRN(!D.br||D.br==='all'?'aka':D.br);
     R(x0,h-m-u*.058,w-x0-m,u*.0016,P.fg,{op:.35});LOGO(x0,h-m,u*.04,P.dark,'start');T(w-m,h-m,brand,u*.024,{fill:P.fg,weight:800,anchor:'end'});BADGE();return{w,h,pr}}
   if(ST===4){/* 세로: 제목을 세워 쓴다 */let cols=hd.split('\n').slice(0,3);if(cols.length===1&&cols[0].replace(/\s/g,'').length>7){const t=cols[0],sp=[...t].map((c,i)=>c===' '?i:-1).filter(i=>i>0).sort((a,b)=>Math.abs(a-t.length/2)-Math.abs(b-t.length/2))[0];if(sp)cols=[t.slice(0,sp),t.slice(sp+1)]}const mx=Math.max(...cols.map(c=>[...c.replace(/\s/g,'')].length),1),top=m+u*(D.badge?.3:.16),cs=Math.min(u*.125*hs,(h*(ld?.5:(D.badge?.5:.58)))/mx/1.14);let cx=w-m-cs*.55;HEAD(P.fg,P.dark,false);
     cols.forEach(c=>{let cy=top+cs;[...c].forEach(ch=>{if(/\s/.test(ch)){cy+=cs*.45;return}if(/[,.，、。]/.test(ch)){T(cx+cs*.4,cy-cs*.62,'、',cs*.66,{font:SERIF,fill:P.ac,weight:700,anchor:'middle'});cy+=cs*.32;return}T(cx,cy,ch,cs,{font:SERIF,fill:P.fg,weight:700,anchor:'middle'});cy+=cs*1.14});cx-=cs*1.4});
-    R(cx+cs*.6,top+cs*.15,u*.0022,h*(ld?.5:.48),P.ac);const r=u*.12,tw=Math.max(u*.3,cx-m-cs*.1),bl=BAL(D.body||'',SERIF,u*.035,Math.min(tw,u*.58),6,400),py=h*(ld?.42:.37);if(!ld){O(m+r,py,r*1.2,r*1.2,P.b1,{op:.65});PIC(m+r,py,r*.74,P.ac,r*.04)}
+    R(cx+cs*.6,top+cs*.15,u*.0022,h*(ld?.5:.48),P.ac);const r=u*.12,tw=Math.max(u*.3,cx-m-cs*.1),bl=BAL(D.body||'',SERIF,u*.035,Math.min(tw,u*.58),6,400),py=h*(ld?.42:.37);
     let y=h-m-u*.12-bl.length*u*.061-(D.book?u*.17:0)+u*.03;OVER(m,y-u*.055,stamp,P.ac);bl.forEach(l=>{T(m,y,l,u*.035,{font:SERIF,fill:P.fg,weight:400});y+=u*.061});if(D.book)CREDIT(m,y+u*.035,P.fg,P.ac,'start',Math.max(tw,u*.6));FOOT(P.fg,false,P.dark);BADGE();return{w,h,pr}}
   /* 기본: 굵은 제목에 형광 밑줄 · 오른쪽에 걸친 원 하나 */{const r=u*.33,tw=w-m*2-(ld?u*.34:u*.1);O(w+r*.18,h*(ld?.44:.345),r,r,P.b1);PIC(w-m-u*.1,h*(ld?.44:.345),u*.085,P.fg,u*.0045);HEAD(P.fg,P.dark);
     const H=TITLE(SANS,800,u*.112,tw,3);let y=h*(ld?.2:.215)+H.s;H.l.forEach((l,i)=>{if(i===H.l.length-1)R(m-u*.004,y-H.s*.2,mw(l,SANS,H.s,800)*.97+u*.008,H.s*.24,P.hl,{op:.85});T(m,y,l,H.s,{fill:P.fg,weight:800,ls:-H.s*.022});y+=H.s*1.17});
