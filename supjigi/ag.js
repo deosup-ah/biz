@@ -39,31 +39,44 @@ function agRun(acts){let closed=false;const close=()=>{if(!closed){closed=true;A
   }catch(e){console.warn(e)}}}
 
 /* ── 공개 주소에서도 되는 규칙 에이전트 ── */
-function agFind(q){const T=S.ui.cor||[];const m=q.match(/(\d+)\s*(번째|번)/);if(m&&T[+m[1]-1])return +m[1]-1;if(/첫\s*번째|첫째|맨\s*위/.test(q))return 0;
-  const toks=q.replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(w=>w.length>=2&&!/진열|평대|배치|보여|만들|인스타|피드|큐레이션|주제|해줘|줘|이번|지점|가득|채우|눈에|띄게|무난|이야기|포근|영상|릴스|인쇄물|쇼카드|띠지|목록/.test(w));
-  let best=-1,bs=0;T.forEach((t,i)=>{const hay=(t.title+' '+t.hook+' '+(t.books||[]).map(b=>b.t+' '+(b.a||'')).join(' ')).replace(/\s/g,'');const s=toks.reduce((a,w)=>a+(hay.includes(w)?w.length:0),0);if(s>bs){bs=s;best=i}});return best}
+const AGORD={'첫':1,'첫째':1,'한':1,'두':2,'둘째':2,'세':3,'셋째':3,'네':4,'넷째':4,'다섯':5,'여섯':6,'일곱':7,'여덟':8,'아홉':9,'열':10};
+const AGSTOP=/^(진열|평대|배치|보여|보여줘|만들|만들어|만들어줘|인스타|피드|큐레이션|주제|해줘|해|줘|좀|이번|이번주|지점|가득|채우|채워|눈에|띄게|무난|무난하게|이야기|포근|영상|릴스|인쇄물|쇼카드|띠지|목록|책|거|것|열어|열어줘|하고|싶어|싶은데|그리고|에서|으로|해볼래|볼래|어떻게|뭐|좀더|더|번째|번)$/;
+function agFind(q){const T=S.ui.cor||[];if(!T.length)return -1;const m=q.match(/(\d+)\s*(번째|번|째)/);if(m&&T[+m[1]-1])return +m[1]-1;
+  const o=q.match(/(첫|첫째|두|둘째|세|셋째|네|넷째|다섯|여섯|일곱|여덟|아홉|열)\s*(번째|번|째)/);if(o&&T[AGORD[o[1]]-1])return AGORD[o[1]]-1;if(/첫\s*(번째|주제|카드)|맨\s*(위|앞|처음)|제일\s*위/.test(q))return 0;if(/마지막|맨\s*끝|맨\s*아래/.test(q))return T.length-1;
+  if(/(이거|이것|그거|지금\s*(거|것|보는))/.test(q)&&S.ui.dp)return S.ui.dp.i;if(/(이거|이것|그거|아까)/.test(q)&&S.ui.cOpen!=null)return S.ui.cOpen;
+  const toks=agTok(q).filter(w=>!AGSTOP.test(w));let best=-1,bs=0;T.forEach((t,i)=>{const hay=(t.title+' '+(t.tg||'')+' '+t.tone+' '+t.hook+' '+(t.books||[]).map(b=>b.t+' '+(b.a||'')).join(' ')).replace(/\s/g,'');const s=toks.reduce((a,w)=>a+(hay.includes(w)?(t.title.replace(/\s/g,'').includes(w)?w.length*3:w.length):0),0);if(s>bs){bs=s;best=i}});return bs>=2?best:-1}
 const agTok=q=>{const o=[];q.replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).forEach(w=>{const b=w.replace(/(이란|이라는|이야|이에요|예요|에서|으로|이란|란|야|은|는|이|가|을|를|에|의|로|와|과|도|요)$/,'');[w,b].forEach(x=>{if(x.length>=2&&!/어떻게|뭐야|무엇|알려|해줘|하나요|인가요|뭔가요/.test(x))o.push(x)})});return [...new Set(o)]};
 function agBasics(q){const toks=agTok(q);let best=null,bs=0;
   BASICS.forEach(b=>{const hay=(b.t+' '+(b.lead||'')+' '+(b.items||[]).map(x=>x.join(' ')).join(' ')).replace(/\s/g,'');const s=toks.reduce((a,w)=>a+(hay.includes(w)?(b.t.includes(w)?w.length*3:w.length):0),0);if(s>bs){bs=s;best=b}});
   if(!best||bs<2)return null;const it=(best.items||[]).find(x=>toks.some(w=>(x[0]+x[1]).includes(w)))||(best.items||[])[0];return{b:best,it}}
-function agLocal(q0){const q=q0.replace(/\s+/g,' ').trim(),acts=[],T=S.ui.cor||[];let say=[];
+function agLocal(q0){const q=q0.replace(/\s+/g,' ').trim(),qs=q.replace(/\s/g,''),acts=[],T=S.ui.cor||[],say=[];const has=re=>re.test(qs);
+  if(/^(안녕|하이|ㅎㅇ|hello|hi)/i.test(qs))return{t:'안녕하세요. 무엇을 할까요? 「가득 채우는 진열」, 「겨울 주제로 큐레이션」, 「두 번째 POP」처럼 편하게 말해 주세요.'};
+  if(has(/^(고마|감사|땡큐|ㄱㅅ|좋아|좋네|굿|오케이|ok)/i))return{t:'네, 더 필요한 게 있으면 말해 주세요.'};
+  if(has(/뭐할수있|뭘할수있|기능|할줄|도와줄|사용법|어떻게써|뭐해|무엇을할/)&&!has(/진열|pop|POP|인스타|피드/))return{t:'이런 걸 직접 합니다.\n· 지점 바꾸기 — 「초소로」\n· 진열 — 「가득 채우게 놔줘」 「눈에 띄게」 「한 바퀴 영상」\n· 인쇄물 — 「두 번째 POP」 「쇼카드」 「띠지」\n· 인스타 — 「피드 만들어줘」\n· 새 큐레이션 — 「겨울 주제로 만들어줘」\n· 서점 기초 — 「도서정가제가 뭐야?」\n· 단계 — 「2단계 어떻게 올라가?」',btn:[{n:'화면 안내 보기',a:[{do:'guide'}]}]};
   const br=AGBR.find(([,re])=>re.test(q));if(br&&br[0]!==S.br){acts.push({do:'place',br:br[0]});say.push(`${brN(br[0])}(으)로 바꿨습니다.`)}
-  const hid=/매출|주문|반품|지원사업|정산|일정|북센|이지정보/.test(q);
-  if(hid&&!isAdmin()&&!/큐레이션|진열|pop|POP|인스타/.test(q)){const bb=agBasics(q);return{t:`매출 · 주문 · 반품 · 지원사업 화면은 지금 안정화 테스트 중이라 열 수 없습니다.${/반품/.test(q)?' 반품은 사진으로 찍어 후보를 만들고, 확인한 뒤에만 이지정보에 넣는 방식으로 준비하고 있습니다.':''}${bb?`\n\n서점 기초 「${bb.b.t}」: ${bb.it?bb.it[1]:bb.b.lead}`:''}`,btn:bb?[{n:`「${bb.b.t}」 자세히`,a:[{do:'basics',id:bb.b.id}]}]:[]}}
-  const ti=agFind(q),tn=ti>=0&&T[ti]?`「${T[ti].title}」`:'';
-  const quoted=(q.match(/[「『"'“](.+?)[」』"'”]/)||[])[1],word=quoted||(q.match(/^(.{1,12}?)(?:으로|로|에 대한|에 관한)\s*(?:큐레이션|주제|평대)/)||[])[1];
-  if(/단계|레벨|승급|열쇠/.test(q)){const L=lvNow();acts.push({do:'level'});return{t:`지금 ${L}단계 「${LVN[L]}」입니다.${L<3?` 큐레이션 · 인쇄물 · 진열안을 쓸수록 ${L+1}단계 조건이 채워지고, 채우면 승급 신청 카드를 참부장께 보내면 됩니다.`:''} 단계 화면을 열었습니다.`,a:acts}}
-  if(/가이드|사용법|처음|어떻게 써/.test(q)&&!/진열|인스타|pop|POP/.test(q)){acts.push({do:'guide'});return{t:'화면 안내를 열었습니다. 좌우 화살표로 넘겨 보세요.',a:acts}}
-  if(word&&/(만들|짜|해\s*줘|추천)/.test(q)&&!/진열|인스타|피드|pop|POP/.test(q)){acts.push({do:'make',word:word.trim()});return{t:`「${word.trim()}」(으)로 큐레이션을 만듭니다. 위 입력 칸에 넣고 바로 실행했습니다.`,a:acts}}
-  if(/인스타|피드|sns|SNS|릴스(?!.*진열)/.test(q)&&!/진열|영상/.test(q)){acts.push({do:'insta',theme:ti>=0?ti:null});return{t:`${tn?tn+'로 ':''}인스타 피드 만들기를 열었습니다. 사진을 넣고 「피드 만들기」를 누르면 표지 이미지와 글 세 가지가 나옵니다.`,a:acts}}
-  if(/한\s*벌|한번에|한 번에|전부/.test(q)){const i=ti>=0?ti:0;acts.push({do:'set',theme:i});return{t:`「${T[i].title}」 한 번에 받기를 열었습니다. POP · 쇼카드 · 띠지 PDF와 인스타 이미지를 한 번에 받습니다.`,a:acts}}
-  if(/pop|POP|팝|포스터|쇼카드|띠지|인쇄|책\s*목록/.test(q)){const i=ti>=0?ti:0,k=/쇼카드/.test(q)?'card':/띠지/.test(q)?'band':/목록/.test(q)?'list':'pop';acts.push({do:'pop',theme:i});acts[acts.length-1].kind=k;return{t:`「${T[i].title}」 ${k==='card'?'쇼카드':k==='band'?'띠지':k==='list'?'책 목록':'POP'}를 열었습니다. 느낌을 고르고 PDF · PNG로 받으면 됩니다.`,a:acts}}
-  if(/진열|평대|배치|3d|3D|가득|채우|영상|한\s*바퀴/.test(q)){const i=ti>=0?ti:0,rec=/가득|채우|빈틈/.test(q)?3:/눈에|돋보|강조/.test(q)?1:/이야기|포근|감성/.test(q)?2:/무난|기본|재고/.test(q)?0:null;acts.push({do:'dp',theme:i,rec,video:/영상|릴스|한\s*바퀴/.test(q)});
-    return{t:`「${T[i].title}」 진열을 열었습니다.${rec!=null?` 추천 배치 「${DPREC[rec][0]}」로 놓았습니다.`:' 맨 위 추천 배치 네 가지 중 하나를 눌러 보세요.'}${/영상|릴스/.test(q)?' 영상 크기를 고르면 한 바퀴 돌며 저장합니다.':''}`,a:acts}}
-  if(/큐레이션|주제|카드/.test(q)&&ti>=0){acts.push({do:'open',theme:ti});return{t:`${tn} 카드를 열었습니다. 진열 → 인쇄물 → 인스타 순서로 누르면 됩니다.`,a:acts}}
-  const bb=agBasics(q);if(bb)return{t:`서점 기초 「${bb.b.t}」에서 찾았습니다.\n${bb.it?bb.it[0]+' — '+bb.it[1]:bb.b.lead}`,btn:[{n:`「${bb.b.t}」 펼쳐 보기`,a:[{do:'basics',id:bb.b.id}]}],a:acts};
-  if(acts.length)return{t:say.join(' '),a:acts};
-  return{t:'이렇게 시켜 보세요.\n· 「가득 채우는 진열 보여줘」\n· 「겨울로 큐레이션 만들어줘」\n· 「두 번째 주제 POP」\n· 「초소로 바꿔줘」\n· 「도서정가제가 뭐야?」'}}
+  const W={dp:/진열|평대|배치|매대|디스플레이|놓아|놔|놓기|깔아|3d|입체|돌려|한바퀴|영상|동영상|녹화|릴스영상|가득|꽉|빼곡|빈틈|채워|채우/,pop:/pop|팝|포스터|홍보물|인쇄|출력|프린트|쇼카드|띠지|책목록|목록|리스트|안내문/i,ig:/인스타|피드|sns|게시물|업로드|올릴|올리|캡션|해시태그|스토리|릴스/i,set:/한번에|한꺼번에|전부|다받|모두받|일괄|세트/,make:/만들|짜|추천|골라|뽑아|구성|기획|해줘|해볼래|해봐/,lv:/단계|레벨|승급|등급|열쇠|잠김|잠겨|안열려|왜안돼|못써/,go:/화면|메뉴|페이지|가줘|가자|이동|열어/};
+  const hid=has(/매출|주문|반품|지원사업|정산|북센|이지정보|발주|재고조사/);
+  if(hid&&!isAdmin()&&!has(W.dp)&&!has(W.pop)&&!has(W.ig)){const bb=agBasics(q);return{t:`매출 · 주문 · 반품 · 지원사업은 지금 안정화 테스트 중이라 열 수 없습니다.${has(/반품/)?' 반품은 서가 사진으로 후보를 만들고, 확인한 뒤에만 이지정보에 넣는 방식으로 준비 중입니다.':''}${bb?`\n\n서점 기초 「${bb.b.t}」: ${bb.it?bb.it[1]:bb.b.lead}`:''}`,btn:bb?[{n:`「${bb.b.t}」 자세히`,a:[{do:'basics',id:bb.b.id}]}]:[]}}
+  if(has(W.lv)){const L=lvNow();acts.push({do:'level'});return{t:`${say.join(' ')} 지금 ${L}단계 「${LVN[L]}」입니다.${L<3?` 큐레이션 · 인쇄물 · 진열안을 쓸수록 ${L+1}단계 조건이 채워지고, 다 채우면 신청 카드를 참부장께 보내면 열쇠를 받습니다.`:''} 단계 화면을 열었습니다.`.trim(),a:acts}}
+  const ti=agFind(q),pickT=()=>ti>=0?ti:(S.ui.dp?S.ui.dp.i:(S.ui.cOpen!=null?S.ui.cOpen:0)),tt=i=>T[i]?`「${T[i].title}」`:'';
+  /* 새 큐레이션 단어 뽑기: 「겨울」, 겨울 주제로, 겨울 관련 책, 겨울 느낌으로, 겨울로 만들어줘 */
+  const quoted=(q.match(/[「『"'“‘](.+?)[」』"'”’]/)||[])[1];
+  const pat=q.match(/^(.{1,14}?)\s*(?:을|를|으로|로|에\s*대한|에\s*관한|관련|느낌|분위기|테마|주제|키워드)\s*(?:으로|로)?\s*(?:된|한|의)?\s*(?:큐레이션|주제|평대|책|추천|만들|짜|골라|기획|구성)/);
+  let word=(quoted||(pat&&pat[1])||'').replace(/^(이번주|이번|새로|새|좀)\s*/,'').trim();if(word&&(AGSTOP.test(word)||AGBR.some(([,re])=>re.test(word))))word='';
+  if(word&&(has(W.make)||quoted)&&!has(W.dp)&&!has(W.pop)&&!has(W.ig)&&(ti<0||pat||quoted)){acts.push({do:'make',word});return{t:`${say.join(' ')} 「${word}」(으)로 큐레이션을 만들었습니다. 맨 앞 카드입니다.`.trim(),a:acts}}
+  if(has(W.set)&&!has(/영상/)){const i=pickT();if(T[i]){acts.push({do:'set',theme:i});return{t:`${say.join(' ')} ${tt(i)} 인쇄물 PDF와 인스타 이미지를 한 번에 받는 창을 열었습니다. 필요 없는 건 눌러서 빼세요.`.trim(),a:acts}}}
+  if(has(W.ig)&&!has(/진열|평대|영상/)){const i=ti>=0?ti:null;acts.push({do:'insta',theme:i});return{t:`${say.join(' ')} ${i!=null?tt(i)+'(으)로 ':''}인스타 피드 만들기를 열었습니다. 사진을 넣고 「피드 만들기」를 누르세요. 사진 없이도 표지가 나옵니다.`.trim(),a:acts}}
+  if(has(W.pop)){const i=pickT(),k=has(/쇼카드/)?'card':has(/띠지/)?'band':has(/목록|리스트/)?'list':'pop',KN={pop:'POP',card:'쇼카드',band:'띠지',list:'책 목록'};if(T[i]){acts.push({do:'pop',theme:i,kind:k});return{t:`${say.join(' ')} ${tt(i)} ${KN[k]}를 열었습니다. 느낌을 고르고 PDF · PNG로 받으면 됩니다. 문구는 「글 · 색 · 크기 고치기」에서 말로도 바꿀 수 있습니다.`.trim(),a:acts}}}
+  if(has(W.dp)){const i=pickT(),rec=has(/가득|꽉|빼곡|빈틈|많이|풍성|채워|채우/)?3:has(/눈에|돋보|강조|임팩트|크게|메인|확/)?1:has(/이야기|감성|포근|따뜻|분위기|아기자기|사랑스|예쁘/)?2:has(/무난|기본|평범|깔끔|심플|재고/)?0:null,vid=has(/영상|동영상|녹화|릴스|한바퀴|돌려/);
+    if(T[i]){acts.push({do:'dp',theme:i,rec,video:vid});return{t:`${say.join(' ')} ${tt(i)} 진열을 열었습니다.${rec!=null?` 「${DPREC[rec][0]}」로 놓았습니다.`:' 맨 위 추천 배치 네 가지 중 하나를 누르면 알아서 놓습니다.'}${vid?' 영상 크기(릴스 · 피드)를 고르면 한 바퀴 돌며 저장합니다.':' 책을 끌어 옮기거나, 「3번 맨 앞으로」처럼 말로도 옮깁니다.'}`.trim(),a:acts}}}
+  if(has(W.go)||has(/공간|인물도서관|씨앗숲|사이서가|만들기|홍보|큐레이션/)){const v=has(/공간|인물도서관|씨앗숲|사이서가/)?'space':has(/만들기/)?'design':has(/홍보/)?'insta':has(/큐레이션/)&&ti<0?'cur':null;
+    if(v&&!navList().some(x=>x[0]===v)&&(v==='space'||v==='insta')&&S.br!=='aka'){acts.push({do:'place',br:'aka'});say.push('아카데미로 바꿨습니다.')}
+    const VN={space:'공간',design:'만들기',insta:'홍보',cur:'큐레이션'};if(v&&(navList().some(x=>x[0]===v)||acts.some(x=>x.do==='place'&&x.br==='aka'))){acts.push({do:'go',view:v});return{t:`${say.join(' ')} ${VN[v]} 화면을 열었습니다.`.trim(),a:acts}}}
+  if(ti>=0){acts.push({do:'open',theme:ti});return{t:`${say.join(' ')} ${tt(ti)} 카드를 열었습니다. 진열 → 인쇄물 → 인스타 순서로 누르면 됩니다.`.trim(),a:acts}}
+  const bb=agBasics(q);if(bb)return{t:`${say.join(' ')}\n서점 기초 「${bb.b.t}」에서 찾았습니다.\n${bb.it?bb.it[0]+' — '+bb.it[1]:bb.b.lead}`.trim(),btn:[{n:`「${bb.b.t}」 펼쳐 보기`,a:[{do:'basics',id:bb.b.id}]}],a:acts};
+  if(acts.length)return{t:say.join(' ')+' 이어서 무엇을 할까요?',a:acts};
+  const w2=(word||agTok(q).filter(w=>!AGSTOP.test(w))[0]||'').slice(0,12);
+  return{t:`정확히 알아듣지 못했습니다.${w2?` 「${w2}」(으)로 큐레이션을 만들까요?`:''}\n이렇게도 말할 수 있어요: 「가득 채우는 진열」 「두 번째 POP」 「피드 만들어줘」 「초소로 바꿔」`,btn:w2?[{n:`「${w2}」 큐레이션 만들기`,a:[{do:'make',word:w2}]}]:[]}}
 
 /* ── Claude 안에서는 AI 가 뜻을 읽고 같은 동작을 고릅니다 ── */
 async function agAI(q){const T=(S.ui.cor||[]).slice(0,20).map((t,i)=>`${i}: ${t.title} — ${t.hook}`).join('\n'),L=agLog().slice(-6).map(m=>`${m.who==='me'?'사용자':'에이전트'}: ${m.t}`).join('\n');
