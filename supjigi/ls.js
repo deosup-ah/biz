@@ -1,3 +1,5 @@
+/* 11/13 참부장: 판매일 확인은 안정화 중 → 화면에서 숨김(LSON). 켜려면 true */
+const LSON=false;
 /* 마지막 판매일 · 반품 고르기 (11/13, 참부장)
    책 제목이나 바코드를 찍으면 여러 권이라도 책마다 마지막으로 팔린 날과 「1개월 · 3개월 · 6개월 · 9개월 · 1년 · 2년 · 3년」 구간을 보여 준다.
    반품 기준을 고르면 재고가 있고 그보다 오래 안 팔린 책을 골라 ISBN 과 함께 반품 목록에 담는다. 이지정보에는 쓰지 않는다.
@@ -49,10 +51,10 @@ function lsDraw(){const G=S.ui.ls;if(!G)return;const R=G.rows.slice().sort((a,b)
   scanPaint=function(){if(S.ui.scanTo!=='ls')return sp();const e=$('scanList');if(!e)return;const L=(S.ui.ls&&S.ui.ls.rows)||[];e.innerHTML=L.length?L.slice(0,6).map(r=>`<div><b>${esc(r.t)}</b> <small>${esc(lsGrp(r.n))}${r.ld?' · '+r.ld:''}</small></div>`).join(''):'<div><small>바코드를 하나씩 비춰 주세요. 여러 권 이어서 됩니다</small></div>';const n=$('scanN');if(n)n.textContent=L.length?`${L.length}권 읽음 · 닫기`:'닫기'};
   A.scanClose=function(){const ls=S.ui.scanTo==='ls';S.ui.scanTo=null;sc();if(ls)lsDraw()}})();
 /* 반품 화면 위에 들어가는 길 */
-(()=>{const f=V.store.ret;V.store.ret=()=>{const h=f();if(S.br==='all')return h;const i=h.indexOf('<div class="card form">');const box=`<button class="card lsgo" data-a="lsOpen"><b>마지막 판매일로 고르기</b><span>찍으면 책마다 언제 마지막으로 팔렸는지</span></button>`;return i>0?h.slice(0,i)+box+h.slice(i):box+h}})();
+(()=>{const f=V.store.ret;V.store.ret=()=>{const h=f();if(!LSON||S.br==='all')return h;const i=h.indexOf('<div class="card form">');const box=`<button class="card lsgo" data-a="lsOpen"><b>마지막 판매일로 고르기</b><span>찍으면 책마다 언제 마지막으로 팔렸는지</span></button>`;return i>0?h.slice(0,i)+box+h.slice(i):box+h}})();
 
 /* 위쪽 「찍기」 버튼 하나: 어느 화면에서든 바코드 → 책 카드 */
-(()=>{const r=render;render=function(){r.apply(this,arguments);try{const bar=document.querySelector('header .bar');if(!bar||S.locked||bar.querySelector('.snapb'))return;const b=document.createElement('button');b.className='snapb';b.dataset.a='snap';b.setAttribute('aria-label','찍기');b.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>찍기</span>';const br0=bar.querySelector('.brand');if(br0)br0.after(b);else bar.prepend(b)}catch(e){}}})();
+(()=>{const r=render;render=function(){r.apply(this,arguments);try{const bar=document.querySelector('header .bar');if(!LSON||!bar||S.locked||bar.querySelector('.snapb'))return;const b=document.createElement('button');b.className='snapb';b.dataset.a='snap';b.setAttribute('aria-label','찍기');b.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>찍기</span>';const br0=bar.querySelector('.brand');if(br0)br0.after(b);else bar.prepend(b)}catch(e){}}})();
 A.snap=()=>{if(S.br==='all'){toast('위에서 지점을 먼저 고르세요');return}A.lsOpen();A.lsScan()};
 /* 인쇄물 종류: POP · 띠지 · 목록만 보이고 나머지는 「더 보기」 */
 (()=>{const r=render;render=function(){r.apply(this,arguments);try{if(S.view[S.mode]!=='design')return;const k=document.querySelector('main .ukind');if(!k||k.querySelector('.kmore'))return;const MAIN=S.mode==='aka'?['pop','band','rent']:['pop','band','list'];let n=0;
@@ -60,10 +62,10 @@ A.snap=()=>{if(S.br==='all'){toast('위에서 지점을 먼저 고르세요');re
 A.kMore=()=>{S.ui.kMore=1;render()};
 /* 홈 「오늘」: 관리자에게 숫자 넷. 누르면 그 화면으로 */
 function todayNums(br){const K=br+TODAY+(S.db.stock.length)+(S.db.sales.length);if(S.ui._td&&S.ui._td.k===K)return S.ui._td;let rt=0,od=0,ev=0,ch='';
-  try{const its=items(br).filter(x=>(x.stock|0)>0);const since=lsSince(br);its.forEach(x=>{const r=lsFind(br,{isbn:x.isbn,t:x.t});if((r.n==null&&since)||(r.n!=null&&r.n>=180))rt++})}catch(e){}
+  try{if(!LSON)throw 0;const its=items(br).filter(x=>(x.stock|0)>0);const since=lsSince(br);its.forEach(x=>{const r=lsFind(br,{isbn:x.isbn,t:x.t});if((r.n==null&&since)||(r.n!=null&&r.n>=180))rt++})}catch(e){}
   try{od=items(br).filter(x=>need(x)>0).length}catch(e){}try{ev=(S.db.events||[]).filter(e=>e.date===TODAY).length}catch(e){}
   try{const T=corners(br).all||[];const u=T.map(t=>t.until).filter(Boolean).sort()[0];if(u)ch=u}catch(e){}return S.ui._td={k:K,rt,od,ev,ch}}
 (()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn||S.locked||S.br==='all'||S.view[S.mode]!=='cur'||mn.querySelector('.tdy')||typeof isAdmin!=='function'||!isAdmin())return;const T=todayNums(S.br);const d=document.createElement('div');d.className='tdy';
-  d.innerHTML=`<button data-a="tdRet"><b>${T.rt}</b><span>반품 후보</span></button><button data-a="go" data-v="stock" data-m="store"><b>${T.od}</b><span>주문 필요</span></button><button data-a="go" data-v="today" data-m="aka"><b>${T.ev}</b><span>오늘 일정</span></button><button data-a="tdCur"><b>${T.ch?mdw(T.ch).replace(/\(.\)/,''):'-'}</b><span>평대 바꿀 날</span></button>`;
+  d.innerHTML=`${LSON?`<button data-a="tdRet"><b>${T.rt}</b><span>반품 후보</span></button>`:''}<button data-a="go" data-v="stock" data-m="store"><b>${T.od}</b><span>주문 필요</span></button><button data-a="go" data-v="today" data-m="aka"><b>${T.ev}</b><span>오늘 일정</span></button><button data-a="tdCur"><b>${T.ch?mdw(T.ch).replace(/\(.\)/,''):'-'}</b><span>평대 바꿀 날</span></button>`;
   const a=mn.querySelector('.gdtop');if(a)a.after(d);else mn.prepend(d)}catch(e){}}})();
 A.tdRet=()=>{A.lsOpen();A.lsTh({v:180});A.lsAll()};A.tdCur=()=>{const e=document.querySelector('main .pcard,main .card');if(e)e.scrollIntoView({behavior:'smooth',block:'start'})};
