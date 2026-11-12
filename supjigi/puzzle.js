@@ -1,6 +1,6 @@
-/* 더숲 워크룸 — 책 가로세로 퍼즐 (11/12 밤, 참부장 요청)
+/* 더숲 워크룸 — 「가로세로 숲」 퍼즐(옛 이름: 책 가로세로 퍼즐) (11/12 밤, 참부장 요청)
    손님에게 출력해 건네 풀어 보게 하는 용도. 난이도 5단계 · 주제(장르 · 명문장 · 영화와 책 · 동화) · 나이대 · 한 장 완성 · 여러 형태 · 출력(PDF) · 공유(이미지).
-   제목은 공통 「책 가로세로 퍼즐」, 지점 이름은 바꿀 수 있고 기본은 사유의숲.
+   정식 이름은 공통 「가로세로 숲」, 판마다 주제 제목(이야기의 숲 · 과학의 숲 …), 지점 이름은 바꿀 수 있고 기본은 사유의숲.
    단어 [단어, 힌트, 난이도 1~5, 나이대(k 어린이 · t 청소년 · a 어른 · s 어르신)]. 시 구절은 1929년 전에 나온 시만, 산문 인용은 짧게. */
 const PZB={
 '책과 서점':[['서점','책을 파는 가게',1,'ktas'],['도서관','책을 빌려 읽는 곳',1,'ktas'],['작가','글을 쓰는 사람',1,'ktas'],['독자','책을 읽는 사람',1,'ktas'],['시집','시를 모아 펴낸 책',1,'ktas'],['그림책','그림이 이야기를 이끄는 책',1,'ktas'],['만화책','칸과 말풍선으로 이야기하는 책',1,'ktas'],['표지','책의 겉을 싸는 두꺼운 종이',1,'ktas'],['책갈피','읽던 곳에 끼워 두는 것',1,'ktas'],['책장','책을 꽂아 두는 가구',1,'ktas'],['제목','책의 이름',1,'ktas'],['차례','책 앞에 내용 순서를 적은 쪽',1,'ktas'],['사전','단어의 뜻을 모아 풀이한 책',1,'ktas'],['잡지','주나 달마다 펴내는 책',1,'ktas'],['신문','날마다 소식을 싣는 인쇄물',1,'ktas'],['독서','책을 읽음',1,'ktas'],['낭독','소리 내어 읽음',1,'ktas'],['서가','책을 꽂아 두는 선반',1,'ktas'],['이야기','있었던 일이나 지어낸 일을 들려주는 말',1,'ktas'],['책상','앉아서 읽고 쓰는 상',1,'ktas'],['책방','작은 서점을 정답게 부르는 말',1,'ktas'],['책가방','책을 넣어 메는 가방',1,'ktas'],['책벌레','책을 무척 좋아하는 사람',1,'ktas'],['사서','도서관에서 책을 맡아 관리하는 사람',1,'ktas'],['문학','말과 글로 나타낸 예술',1,'ktas'],['작품','만들어 낸 글이나 예술',1,'ktas'],['글자','말을 적는 기호',1,'ktas'],['글쓰기','생각을 글로 적는 일',1,'ktas'],['동화책','동화를 담은 책',1,'ktas'],['문구점','필기구와 공책을 파는 가게',1,'ktas'],['공책','글을 적는 빈 종이 묶음',1,'ktas'],['책꽂이','책을 세워 꽂아 두는 물건',1,'ktas'],['독서대','책을 펼쳐 세워 두는 받침',1,'ktas'],['동네서점','동네에 있는 작은 서점',1,'ktas'],['서재','책을 두고 읽고 쓰는 방',1,'ktas'],['서명','자기 이름을 손으로 씀',1,'ktas'],['문장','마침표로 끝나는 글의 한 덩어리',1,'ktas'],
@@ -20,7 +20,7 @@ const PZTH=Object.keys(PZB).concat(['섞어서']);
 const PZAGE=[['모든 나이',''],['어린이','k'],['청소년','t'],['어른','a'],['어르신','s']];
 const PZL=[null,{n:'쉬움',sz:8,want:6},{n:'조금 쉬움',sz:9,want:8},{n:'보통',sz:10,want:10},{n:'어려움',sz:11,want:12},{n:'아주 어려움',sz:12,want:14}];
 const PZF=[['A4 인쇄',1240,1754],['A5 인쇄',874,1240],['인스타 4:5',1080,1350],['정사각 1:1',1080,1080]];
-const PZT='책 가로세로 퍼즐';
+const PZT='가로세로 숲';
 const pzRng=s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
 const pzSyl=w=>[...w.replace(/\s/g,'')];
 function pzPool(th,age,lv,R){const all=Object.entries(PZB),mix=th==='섞어서'||!PZB[th],ok=e=>!age||e[3].includes(age),seen=new Set(),out=[];
@@ -45,22 +45,55 @@ function pzMake(o){const lv=o.lv,seed=o.seed,R=pzRng(seed*7+lv*131+(PZTH.indexOf
 const pzSub=Z=>[Z.th==='책과 서점'?'':Z.th,(PZAGE.find(a=>a[1]===Z.age)||['',''])[0]].filter(x=>x&&x!=='모든 나이').join(' · ');
 
 /* ── 그리기 ── */
-async function pzCanvas(Z,f,ans,part){await (typeof upFont==='function'?upFont():0);const [,W,H]=PZF[f],c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),F='Pretendard,"Malgun Gothic",sans-serif',U=W/1080;
-  let lg=null;try{lg=await upImg('logo-g.png')}catch(e){}const brn=S.ui.pz.br||'사유의숲',stars='★'.repeat(Z.lv)+'☆'.repeat(5-Z.lv);
-  x.fillStyle='#f7f5ef';x.fillRect(0,0,W,H);x.fillStyle='#003128';x.fillRect(0,0,W,Math.round(16*U));
-  const head=(y)=>{x.fillStyle='#003128';x.font=`800 ${Math.round(64*U)}px ${F}`;x.fillText(PZT,64*U,y);x.font=`600 ${Math.round(28*U)}px ${F}`;x.fillStyle='#8a6a10';x.fillText(`${stars}  ${PZL[Z.lv].n}${pzSub(Z)?'  ·  '+pzSub(Z):''}${ans?'  ·  정답':''}`,64*U,y+48*U);
-    x.fillStyle='#55554f';x.font=`500 ${Math.round(26*U)}px ${F}`;const t=`더숲 ${brn}`;x.fillText(t,W-64*U-x.measureText(t).width,y+48*U);return y+80*U};
-  const grid=(top,maxW,maxH)=>{const cs=Math.floor(Math.min(maxW/Z.W,maxH/Z.H,130*U)),gw=cs*Z.W,gh=cs*Z.H,ox=(W-gw)/2;
-    Object.entries(Z.cells).forEach(([k,ch])=>{const[r,cc]=k.split(',').map(Number),px=ox+cc*cs,py=top+r*cs;x.fillStyle='#fff';x.fillRect(px,py,cs,cs);x.strokeStyle='#1c1c1a';x.lineWidth=Math.max(2,3*U);x.strokeRect(px,py,cs,cs);
-      if(Z.num[k]){x.fillStyle='#003128';x.font=`700 ${Math.round(cs*.24)}px ${F}`;x.fillText(Z.num[k],px+cs*.08,py+cs*.27)}if(ans){x.fillStyle='#1c1c1a';x.font=`700 ${Math.round(cs*.5)}px ${F}`;x.textAlign='center';x.fillText(ch,px+cs/2,py+cs*.7);x.textAlign='left'}});return top+gh};
-  const clues=(top,left,w,fs,dry)=>{const col=(t,L,cx,cw)=>{let yy=top;x.fillStyle='#003128';x.font=`800 ${fs*1.15}px ${F}`;if(!dry)x.fillText(t,cx,yy);yy+=fs*1.7;L.forEach(p=>{x.font=`700 ${fs}px ${F}`;x.fillStyle='#003128';if(!dry)x.fillText(`${p.n}`,cx,yy);x.fillStyle='#1c1c1a';x.font=`500 ${fs}px ${F}`;const lines=wrapW(x,`${p.h}  (${p.s.length}글자)`,cw-fs*1.8);if(!dry)lines.forEach((s,i)=>{x.fillText(s,cx+fs*1.6,yy+i*fs*1.4)});yy+=lines.length*fs*1.4+fs*.5});return yy};
-    const g=40*U,cw=(w-g)/2;return Math.max(col('가로 →',Z.across,left,cw),col('세로 ↓',Z.down,left+cw+g,cw))};
-  const foot=()=>{if(lg){const lw=120*U;x.drawImage(lg,64*U,H-60*U-lw*lg.height/lg.width,lw,lw*lg.height/lg.width)}x.fillStyle='#8a8a80';x.font=`500 ${Math.round(20*U)}px ${F}`;const t=`${TODAY} · 퍼즐 ${Z.lv}-${Z.seed}`;x.fillText(t,W-64*U-x.measureText(t).width,H-64*U)};
-  let y=head(130*U);
-  if(f<=1){if(ans){grid(y+20*U,W-128*U,H-y-200*U)}else{const avail=H-y-20*U-150*U;let fs=Math.round(25*U),gh=0;for(let k=0;k<8;k++){const ch=clues(0,64*U,W-128*U,fs,true);gh=avail-ch-110*U;if(gh>=avail*.42||fs<=15*U)break;fs-=Math.max(1,Math.round(1.5*U))}gh=Math.max(gh,avail*.3);
-    const gb=grid(y+20*U,W-128*U,Math.min(gh,H*.55));x.strokeStyle='#c9a24a';x.lineWidth=4*U;x.beginPath();x.moveTo(64*U,gb+40*U);x.lineTo(W-64*U,gb+40*U);x.stroke();clues(gb+100*U,64*U,W-128*U,fs)}foot()}
-  else if(part===1){let fs=Math.round(28*U);while(fs>16*U&&clues(y+50*U,64*U,W-128*U,fs,true)>H-130*U)fs-=2;clues(y+50*U,64*U,W-128*U,fs);foot()}
-  else{grid(y+30*U,W-128*U,H-y-170*U);foot()}
+/* 판마다 붙는 정식 제목(주제별) */
+const PZED={'책과 서점':['서점의 숲','책이 태어나 서가에 오르기까지'],'소설':['이야기의 숲','주인공과 작가를 찾아서'],'수필':['산문의 숲','일기와 편지, 오래 남은 마음'],'과학':['과학의 숲','별과 세포 사이를 건너는 말'],'철학':['생각의 숲','묻고 또 묻는 사람들'],'시':['시의 숲','짧은 말, 긴 울림'],'명문장':['문장의 숲','한 줄로 기억되는 작품'],'영화와 책':['스크린의 숲','책에서 영화로 건너간 이야기'],'동화 · 그림책':['동화의 숲','한 번쯤 들어 본 그 이야기'],'섞어서':['모두의 숲','책 · 영화 · 생각을 한데 모아']};
+const pzEd=Z=>PZED[Z.th]||PZED['섞어서'];
+function pzIcon(x,th,cx,cy,r,col){x.save();x.strokeStyle=col;x.fillStyle=col;x.lineWidth=Math.max(2,r*.09);x.lineCap='round';x.lineJoin='round';x.beginPath();
+  if(th==='과학'){x.arc(cx,cy,r*.16,0,7);x.fill();x.beginPath();[0,60,120].forEach(a=>{x.save();x.translate(cx,cy);x.rotate(a*Math.PI/180);x.beginPath();x.ellipse(0,0,r*.9,r*.34,0,0,7);x.stroke();x.restore()})}
+  else if(th==='영화와 책'){x.strokeRect(cx-r*.85,cy-r*.6,r*1.7,r*1.2);for(let k=0;k<4;k++){x.fillRect(cx-r*.75+k*r*.42,cy-r*.52,r*.2,r*.18);x.fillRect(cx-r*.75+k*r*.42,cy+r*.34,r*.2,r*.18)}x.beginPath();x.moveTo(cx-r*.2,cy-r*.22);x.lineTo(cx+r*.3,cy);x.lineTo(cx-r*.2,cy+r*.22);x.closePath();x.fill()}
+  else if(th==='철학'){x.font=`800 ${r*1.7}px Pretendard,sans-serif`;x.textAlign='center';x.textBaseline='middle';x.fillText('?',cx,cy+r*.05)}
+  else if(th==='명문장'){x.font=`800 ${r*2.1}px Pretendard,sans-serif`;x.textAlign='center';x.textBaseline='middle';x.fillText('“',cx,cy+r*.45)}
+  else if(th==='시'){x.moveTo(cx+r*.75,cy-r*.85);x.quadraticCurveTo(cx-r*.6,cy-r*.4,cx-r*.6,cy+r*.85);x.moveTo(cx+r*.75,cy-r*.85);x.quadraticCurveTo(cx+r*.4,cy+r*.4,cx-r*.6,cy+r*.85);x.stroke();x.beginPath();x.moveTo(cx-r*.1,cy-r*.05);x.lineTo(cx-r*.6,cy+r*.85);x.stroke()}
+  else if(th==='동화 · 그림책'){for(let k=0;k<5;k++){const a=-Math.PI/2+k*2*Math.PI/5,b=a+Math.PI/5;x.lineTo(cx+Math.cos(a)*r*.9,cy+Math.sin(a)*r*.9);x.lineTo(cx+Math.cos(b)*r*.38,cy+Math.sin(b)*r*.38)}x.closePath();x.stroke()}
+  else if(th==='수필'){x.strokeRect(cx-r*.8,cy-r*.55,r*1.6,r*1.1);x.beginPath();x.moveTo(cx-r*.8,cy-r*.55);x.lineTo(cx,cy+r*.1);x.lineTo(cx+r*.8,cy-r*.55);x.stroke()}
+  else if(th==='소설'){x.moveTo(cx,cy-r*.55);x.quadraticCurveTo(cx-r*.45,cy-r*.8,cx-r*.9,cy-r*.6);x.lineTo(cx-r*.9,cy+r*.6);x.quadraticCurveTo(cx-r*.45,cy+r*.4,cx,cy+r*.65);x.quadraticCurveTo(cx+r*.45,cy+r*.4,cx+r*.9,cy+r*.6);x.lineTo(cx+r*.9,cy-r*.6);x.quadraticCurveTo(cx+r*.45,cy-r*.8,cx,cy-r*.55);x.lineTo(cx,cy+r*.65);x.stroke()}
+  else{x.moveTo(cx,cy+r*.9);x.lineTo(cx,cy-r*.1);x.stroke();x.beginPath();x.moveTo(cx,cy-r*.9);x.bezierCurveTo(cx+r*.95,cy-r*.6,cx+r*.7,cy+r*.35,cx,cy+r*.45);x.bezierCurveTo(cx-r*.7,cy+r*.35,cx-r*.95,cy-r*.6,cx,cy-r*.9);x.stroke()}
+  x.restore()}
+async function pzCanvas(Z,f,ans,part){await (typeof upFont==='function'?upFont():0);const [,W,H]=PZF[f],c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),F='Pretendard,"Malgun Gothic",sans-serif',U=W/1080,PN='#003128',GD='#c9a24a',CR='#f2eee3',INK='#1c1c1a';
+  let lg=null,lw=null;try{lg=await upImg('logo-g.png');lw=await upImg('logo-w.png')}catch(e){}const brn=S.ui.pz.br||'사유의숲',[ed,eds]=pzEd(Z),no=`No.${TODAY.slice(5).replace('-','')}-${Z.seed}`;
+  const rr=(X,Y,w,h,r)=>{x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+w,Y,X+w,Y+h,r);x.arcTo(X+w,Y+h,X,Y+h,r);x.arcTo(X,Y+h,X,Y,r);x.arcTo(X,Y,X+w,Y,r);x.closePath()};
+  x.fillStyle='#f7f5ef';x.fillRect(0,0,W,H);
+  /* 머리: 이름 · 판 제목 · 지점 */
+  const HB=Math.round((f<=1?300:270)*U);x.fillStyle=PN;x.fillRect(0,0,W,HB);x.globalAlpha=.08;x.strokeStyle=CR;x.lineWidth=2*U;for(let k=0;k<7;k++){x.beginPath();x.arc(W-90*U,HB*.5,(40+k*34)*U,0,7);x.stroke()}x.globalAlpha=1;
+  pzIcon(x,Z.th,W-150*U,HB*.47,62*U,GD);
+  x.fillStyle=GD;x.font=`600 ${Math.round(24*U)}px ${F}`;x.fillText(`더숲 ${brn}  ·  ${no}`,64*U,72*U);
+  x.fillStyle=CR;x.font=`800 ${Math.round(92*U)}px ${F}`;x.fillText(PZT,60*U,170*U);
+  x.fillStyle=GD;x.font=`700 ${Math.round(34*U)}px ${F}`;x.fillText(ed,64*U,224*U);const ew=x.measureText(ed).width;x.fillStyle='rgba(242,238,227,.75)';x.font=`500 ${Math.round(24*U)}px ${F}`;x.fillText(`— ${eds}`,64*U+ew+16*U,224*U);
+  x.fillStyle=GD;x.fillRect(0,HB,W,8*U);
+  /* 정보 줄: 난이도 · 대상 · 이름 칸 */
+  let y=HB+64*U;const dots=(X,Y)=>{for(let k=0;k<5;k++){x.beginPath();x.arc(X+k*26*U,Y,9*U,0,7);x.fillStyle=k<Z.lv?PN:'#d9d3c3';x.fill()}};
+  x.fillStyle=INK;x.font=`700 ${Math.round(24*U)}px ${F}`;x.fillText('난이도',64*U,y);dots(160*U,y-8*U);x.fillStyle=INK;x.font=`600 ${Math.round(24*U)}px ${F}`;x.fillText(`${PZL[Z.lv].n}${(PZAGE.find(a=>a[1]===Z.age)||[])[0]&&Z.age?' · '+PZAGE.find(a=>a[1]===Z.age)[0]:''}`,300*U,y);
+  if(ans){x.save();x.translate(W-150*U,y-10*U);x.rotate(-.12);x.strokeStyle='#9b2c1f';x.lineWidth=4*U;rr(-80*U,-30*U,160*U,60*U,10*U);x.stroke();x.fillStyle='#9b2c1f';x.font=`800 ${Math.round(34*U)}px ${F}`;x.textAlign='center';x.fillText('정 답',0,12*U);x.restore()}
+  else if(f<=1){x.fillStyle='#55554f';x.font=`500 ${Math.round(22*U)}px ${F}`;const t1='이름',t2='푼 날';x.fillText(t1,W-470*U,y);x.fillText(t2,W-230*U,y);x.strokeStyle='#8a8a80';x.lineWidth=1.5*U;x.beginPath();x.moveTo(W-420*U,y+6*U);x.lineTo(W-260*U,y+6*U);x.moveTo(W-176*U,y+6*U);x.lineTo(W-64*U,y+6*U);x.stroke()}
+  y+=36*U;
+  /* 격자 */
+  const grid=(top,maxW,maxH)=>{const cs=Math.floor(Math.min(maxW/Z.W,maxH/Z.H,128*U)),gw=cs*Z.W,gh=cs*Z.H,ox=Math.round((W-gw)/2),sh=Math.max(3,5*U);
+    Object.keys(Z.cells).forEach(k=>{const[r,cc]=k.split(',').map(Number);x.fillStyle='rgba(0,49,40,.13)';x.fillRect(ox+cc*cs+sh,top+r*cs+sh,cs,cs)});
+    Object.entries(Z.cells).forEach(([k,ch])=>{const[r,cc]=k.split(',').map(Number),px=ox+cc*cs,py=top+r*cs;x.fillStyle='#fff';x.fillRect(px,py,cs,cs);x.strokeStyle=PN;x.lineWidth=Math.max(2,2.6*U);x.strokeRect(px,py,cs,cs);
+      if(Z.num[k]){x.fillStyle=GD;x.fillRect(px+1,py+1,cs*.32,cs*.3);x.fillStyle=PN;x.font=`800 ${Math.round(cs*.21)}px ${F}`;x.textAlign='center';x.fillText(Z.num[k],px+cs*.16+1,py+cs*.23);x.textAlign='left'}
+      if(ans){x.fillStyle=PN;x.font=`700 ${Math.round(cs*.48)}px ${F}`;x.textAlign='center';x.fillText(ch,px+cs/2,py+cs*.7);x.textAlign='left'}});return top+gh};
+  /* 힌트 */
+  const clues=(top,left,w,fs,dry)=>{const col=(t,L,cx,cw)=>{let yy=top;if(!dry){rr(cx,yy-fs*1.05,fs*4.6,fs*1.55,fs*.3);x.fillStyle=PN;x.fill();x.fillStyle=CR;x.font=`800 ${fs*.95}px ${F}`;x.fillText(t,cx+fs*.55,yy)}yy+=fs*1.9;
+      L.forEach(p=>{x.font=`500 ${fs}px ${F}`;const lines=wrapW(x,`${p.h}`,cw-fs*2.1);if(!dry){x.beginPath();x.arc(cx+fs*.7,yy-fs*.35,fs*.68,0,7);x.fillStyle=GD;x.fill();x.fillStyle=PN;x.font=`800 ${fs*.78}px ${F}`;x.textAlign='center';x.fillText(p.n,cx+fs*.7,yy-fs*.08);x.textAlign='left';
+        x.fillStyle=INK;x.font=`500 ${fs}px ${F}`;lines.forEach((s,i)=>x.fillText(s,cx+fs*1.75,yy+i*fs*1.42));x.fillStyle='#8a8a80';x.font=`500 ${fs*.78}px ${F}`;x.fillText(`${p.s.length}글자`,cx+fs*1.75,yy+lines.length*fs*1.42-fs*.15)}yy+=(lines.length+.75)*fs*1.42});return yy};
+    const g=44*U,cw=(w-g)/2;return Math.max(col('가로 →',Z.across,left,cw),col('세로 ↓',Z.down,left+cw+g,cw))};
+  /* 바닥 */
+  const foot=()=>{x.fillStyle=PN;x.fillRect(0,H-96*U,W,96*U);if(lw){const w0=110*U;x.drawImage(lw,64*U,H-48*U-w0*lw.height/lw.width/2,w0,w0*lw.height/lw.width)}x.fillStyle=CR;x.font=`500 ${Math.round(21*U)}px ${F}`;const t=`책 · 영화 · 생각을 잇는 더숲의 퍼즐  ·  ${TODAY}`;x.fillText(t,W-64*U-x.measureText(t).width,H-40*U)};
+  const bottom=H-96*U-40*U;
+  if(f<=1){if(ans){grid(y+20*U,W-128*U,bottom-y-30*U)}else{const avail=bottom-y-20*U;let fs=Math.round(24*U),gh=0;for(let k=0;k<9;k++){const ch=clues(0,64*U,W-128*U,fs,true);gh=avail-ch-120*U;if(gh>=avail*.5||fs<=13*U)break;fs-=Math.max(1,Math.round(1.5*U))}gh=Math.max(gh,avail*.4);
+    const gb=grid(y+20*U,W-128*U,Math.min(gh,H*.5));x.strokeStyle=GD;x.lineWidth=3*U;x.setLineDash([10*U,8*U]);x.beginPath();x.moveTo(64*U,gb+48*U);x.lineTo(W-64*U,gb+48*U);x.stroke();x.setLineDash([]);clues(gb+118*U,64*U,W-128*U,fs)}foot()}
+  else if(part===1){let fs=Math.round(27*U);while(fs>16*U&&clues(y+50*U,64*U,W-128*U,fs,true)>bottom)fs-=2;clues(y+50*U,64*U,W-128*U,fs);foot()}
+  else{grid(y+20*U,W-128*U,bottom-y-30*U);foot()}
   return c}
 async function pzCanvases(){const P=S.ui.pz,Z=P.Z,f=P.f|0,out=[];if(f<=1){out.push(await pzCanvas(Z,f,false));if(P.ans)out.push(await pzCanvas(Z,f,true))}else{out.push(await pzCanvas(Z,f,false,0));out.push(await pzCanvas(Z,f,false,1));if(P.ans)out.push(await pzCanvas(Z,f,true,0))}return out}
 
@@ -70,23 +103,23 @@ A.pzOpen=()=>{S.ui.pz=S.ui.pz||{lv:2,f:0,br:'사유의숲',ans:true,th:'책과 �
 A.pzLv=d=>{S.ui.pz.lv=+d.v;pzNewZ();pzDraw()};A.pzTh=d=>{S.ui.pz.th=d.v;pzNewZ();pzDraw()};A.pzAge=d=>{S.ui.pz.age=d.v;pzNewZ();pzDraw()};
 A.pzNew=()=>{pzNewZ();pzDraw()};
 A.pzF=d=>{S.ui.pz.f=+d.v;pzDraw()};A.pzAns=()=>{S.ui.pz.ans=!S.ui.pz.ans;pzDraw()};A.pzBr=d=>{S.ui.pz.br=d.v;pzDraw()};C.pzBr=el=>{S.ui.pz.br=el.value.trim()||'사유의숲';pzDraw(true)};
-A.pzSave=async()=>{try{const cs=await pzCanvases();await upSaveMany(cs,`더숲_책퍼즐_${upName(S.ui.pz.th)}_${S.ui.pz.lv}단계_${upName(S.ui.pz.br)}`)}catch(e){console.warn(e);toast('만들지 못했습니다')}};
+A.pzSave=async()=>{try{const cs=await pzCanvases();await upSaveMany(cs,`더숲_가로세로숲_${upName(S.ui.pz.th)}_${S.ui.pz.lv}단계_${upName(S.ui.pz.br)}`)}catch(e){console.warn(e);toast('만들지 못했습니다')}};
 A.pzPdf=async()=>{const J=window.jspdf&&window.jspdf.jsPDF;if(!J){toast('PDF 도구를 불러오지 못했습니다. 이미지로 저장해 주세요.');return}const P=S.ui.pz,f=P.f<=1?P.f:0,mm=f?[148,210]:[210,297];
   try{const cs=[await pzCanvas(P.Z,f,false)];if(P.ans)cs.push(await pzCanvas(P.Z,f,true));const doc=new J({unit:'mm',format:mm,compress:true});cs.forEach((c,i)=>{if(i)doc.addPage(mm);doc.addImage(c.toDataURL('image/jpeg',.95),'JPEG',0,0,mm[0],mm[1])});
-    await saveFile(`더숲_책퍼즐_${P.lv}단계_${f?'A5':'A4'}.pdf`,doc.output('blob'));toast(P.ans?'퍼즐과 정답 두 쪽을 PDF로 받았습니다':'PDF로 받았습니다')}catch(e){console.warn(e);toast('PDF를 만들지 못했습니다')}};
+    await saveFile(`더숲_가로세로숲_${P.lv}단계_${f?'A5':'A4'}.pdf`,doc.output('blob'));toast(P.ans?'퍼즐과 정답 두 쪽을 PDF로 받았습니다':'PDF로 받았습니다')}catch(e){console.warn(e);toast('PDF를 만들지 못했습니다')}};
 function pzDraw(keepInput){const P=S.ui.pz,Z=P.Z,BRS=[...new Set(['사유의숲',...Object.values(typeof BRAND!=='undefined'?BRAND:{})])];
   const g=`<div class="pzg" style="grid-template-columns:repeat(${Z.W},1fr)">${Array.from({length:Z.H*Z.W},(_,i)=>{const r=Math.floor(i/Z.W),c=i%Z.W,k=r+','+c;return Z.cells[k]?`<i>${Z.num[k]?`<sup>${Z.num[k]}</sup>`:''}${P.ans?`<span>${Z.cells[k]}</span>`:''}</i>`:'<b></b>'}).join('')}</div>`;
   const cl=(t,L)=>`<div><h4>${t}</h4><ol>${L.map(p=>`<li value="${p.n}">${esc(p.h)} <small>(${p.s.length})</small></li>`).join('')}</ol></div>`;
-  const h=`<div class="pzs"><h3>${PZT}</h3><p class="note">손님께 출력해 드리는 퍼즐입니다. 주제 · 나이 · 난이도를 고르면 한 장이 바로 완성됩니다. 마음에 안 들면 「다른 퍼즐」.</p>
+  const h=`<div class="pzs"><h3>${PZT} <small>책 · 영화 · 생각을 잇는 퍼즐</small></h3><p class="note">손님께 출력해 드리는 퍼즐입니다. 주제 · 나이 · 난이도를 고르면 한 장이 바로 완성됩니다. 마음에 안 들면 「다른 퍼즐」.</p>
    <div class="fld"><label>주제</label><div class="chips">${PZTH.map(t=>`<button class="chip" data-a="pzTh" data-v="${esc(t)}" aria-pressed="${P.th===t}">${esc(t)}</button>`).join('')}</div></div>
    <div class="fld"><label>누가 풀까요</label><div class="chips">${PZAGE.map(([n,v])=>`<button class="chip" data-a="pzAge" data-v="${v}" aria-pressed="${(P.age||'')===v}">${n}</button>`).join('')}</div></div>
    <div class="fld"><label>난이도</label><div class="chips">${[1,2,3,4,5].map(n=>`<button class="chip" data-a="pzLv" data-v="${n}" aria-pressed="${P.lv===n}">${n} ${PZL[n].n}</button>`).join('')}</div></div>
    <div class="fld"><label>지점 이름</label><div class="chips">${BRS.map(b=>`<button class="chip" data-a="pzBr" data-v="${esc(b)}" aria-pressed="${P.br===b}">${esc(b)}</button>`).join('')}</div><input id="pzBrIn" data-c="pzBr" placeholder="직접 적기" value="${BRS.includes(P.br)?'':esc(P.br)}"></div>
    <div class="fld"><label>형태</label><div class="chips">${PZF.map(([n],i)=>`<button class="chip" data-a="pzF" data-v="${i}" aria-pressed="${(P.f|0)===i}">${n}</button>`).join('')}<button class="chip" data-a="pzAns" aria-pressed="${!!P.ans}">정답 함께</button></div></div>
-   <div class="pzhd"><b>${PZT}</b><span>${'★'.repeat(Z.lv)}${'☆'.repeat(5-Z.lv)} ${PZL[Z.lv].n}${pzSub(Z)?' · '+esc(pzSub(Z)):''} · 더숲 ${esc(P.br)}</span></div>${g}<div class="pzc">${cl('가로 →',Z.across)}${cl('세로 ↓',Z.down)}</div>
+   <div class="pzhd"><b>${PZT} · ${pzEd(Z)[0]}</b><span>${'★'.repeat(Z.lv)}${'☆'.repeat(5-Z.lv)} ${PZL[Z.lv].n}${pzSub(Z)?' · '+esc(pzSub(Z)):''} · 더숲 ${esc(P.br)}</span></div>${g}<div class="pzc">${cl('가로 →',Z.across)}${cl('세로 ↓',Z.down)}</div>
    <div class="btns"><button class="btn" data-a="pzNew">다른 퍼즐</button><button class="btn pri" data-a="pzSave">이미지 저장 · 공유</button><button class="btn" data-a="pzPdf">인쇄용 PDF</button></div>
    <p class="note">${(P.f|0)<=1?'A4 · A5는 한 장에 퍼즐과 힌트가 함께 들어갑니다.':'인스타 형태는 퍼즐 · 힌트를 따로 한 장씩 만듭니다.'}${P.ans?' 정답 장이 하나 더 붙습니다.':''} 미리보기에서는 정답이 ${P.ans?'보입니다':'가려집니다'}.</p></div>`;
   const sb=$('sheetBox');if(sb&&$('sheet').classList.contains('on')&&sb.querySelector('.pzs')){const sc=sb.scrollTop;sb.innerHTML=h;sb.scrollTop=sc}else openSheet(h)}
 
 /* ── 버튼: 「만들기」 맨 위 · AI 에이전트 ── */
-(()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn||S.locked||S.view[S.mode]!=='design'||mn.querySelector('.pztop'))return;const d=document.createElement('div');d.className='pztop';d.innerHTML=`<div><b>${PZT}</b><span>손님께 출력해 드리는 퍼즐 · 장르 · 나이 · 난이도 5단계</span></div><button class="btn" data-a="pzOpen">만들기</button>`;const a=mn.querySelector('.ulab')||mn.querySelector('.qbar')||mn.querySelector('.sec');if(a)a.before(d);else mn.prepend(d)}catch(e){}}})();
+(()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn||S.locked||S.view[S.mode]!=='design'||mn.querySelector('.pztop'))return;const d=document.createElement('div');d.className='pztop';d.innerHTML=`<div><b>${PZT}</b><span>책 · 영화 · 생각을 잇는 퍼즐 · 손님께 출력해 드리기</span></div><button class="btn" data-a="pzOpen">만들기</button>`;const a=mn.querySelector('.ulab')||mn.querySelector('.qbar')||mn.querySelector('.sec');if(a)a.before(d);else mn.prepend(d)}catch(e){}}})();
