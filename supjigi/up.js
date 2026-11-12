@@ -1,5 +1,5 @@
 /* 더숲 워크룸 — 고도화 (11/12 밤, 참부장 승인)
-   카드 세 걸음 · POP 화면 단순화 · 위쪽 정리 · 한 벌 받기 · 추천 배치 3안 · 사진으로 진열 점검 ·
+   카드 세 걸음 · POP 화면 단순화 · 위쪽 정리 · 한 번에 받기 · 추천 배치 3안 · 사진으로 진열 점검 ·
    POP 질문 문구 · 직원에게 보내기(3D 포함) · 한 바퀴 영상(자막 · 세로) · 인스타 피드(사진에 맞춘 이미지와 글) */
 
 /* ── 공통 ── */
@@ -14,7 +14,7 @@ async function upSaveMany(cs,base){const bl=await Promise.all(cs.map(c=>new Prom
   for(const f of fs){await saveFile(f.name,f);await new Promise(r=>setTimeout(r,250))}toast(`${fs.length}장을 저장했습니다`);return true}
 
 /* ── POP 문구: 주제마다 다른 질문 하나 (공통 질문 대신) ── */
-const POPQX={'새벽 세 시에 깨어 있는 사람':'당신이 잠든 사이, 누가 깨어 있었나요?','죽음 곁에서 일한 사람들':'마지막 장을 먼저 읽으면 무엇이 달라질까요?','사는 곳이 사는 법을 정한다':'당신의 방은 어떤 하루를 만드나요?','낱말 하나를 사흘 고민하는 일':'「괜찮아」를 다른 말로 옮긴다면?','숲이 주어인 문장들':'나무가 당신을 본다면 뭐라고 쓸까요?','낫지 않는 채로 사는 법':'다 낫지 않아도 괜찮은 하루가 있을까요?','방과 500파운드, 그 다음':'방이 생기면 무엇을 쓰겠습니까?','두 나라 말로 꿈꾸는 사람':'꿈은 어느 나라 말로 꾸나요?','평균인 사람은 0명이었다':'당신은 평균입니까?','요리책 코너에 못 간 책':'가장 오래 기억나는 밥은 무엇인가요?','시속 4킬로미터의 생각':'오늘은 몇 걸음만큼 생각했나요?','분류표를 의심하는 과학':'물고기는 정말 있을까요?','소설 속 작은 가게들':'당신 동네에도 이런 가게가 있나요?','물음표로 끝나는 제목':'오늘 당신의 질문은 무엇입니까?','1949년에 쓴 1984':'다음 숫자는 무엇일까요?','한 가지를 오래 좋아한 사람들':'아무튼, 당신은 무엇을 오래 좋아했나요?','나는 아니라고 생각했는데':'정말, 나는 아닐까요?','먹히는 쪽에서 본 식탁':'오늘 접시 건너편에는 누가 있었나요?','명함에 없는 일의 뒷면':'오늘 당신을 위해 일한 사람은 몇 명일까요?','겨울에 읽는 뜨거워지는 지구':'올겨울은 왜 덜 춥게 느껴질까요?','한 점 앞에 오래 서는, 보는 법':'마지막으로 오래 바라본 것은 무엇인가요?','제목에 색이 묻은 책':'이 평대는 무슨 색으로 보이나요?','건물 이름이 제목인 책':'어느 문부터 열어 보시겠어요?','실패한 쪽이 오래 읽힌다':'잘 안 된 일, 다시 읽어 볼까요?','조용한 제목, 소란한 속':'조용한 사람의 머릿속은 어떨까요?','달리는 사람, 앉아 있는 사람':'오늘은 달릴까요, 앉을까요?','시옷으로 시작하는 책':'ㅅ 다음엔 무엇이 올까요?','긴 밤에는, 긴 소설':'이번 겨울, 어떤 긴 이야기와 지낼까요?','문제집을 치운 자리에':'정답 없는 책, 무엇부터 펼까요?','비 오는 날, 서서 읽는 시':'비 그칠 때까지 몇 편 읽을까요?','첫눈 오는 날 펼 책':'첫눈 오는 날, 무엇을 읽겠습니까?','코트 주머니에 들어가는 책':'누구의 주머니에 넣어 줄까요?','차가 식기 전에, 철학 한 쪽':'한 잔이 식는 동안 무엇을 생각할까요?','겨울눈을 만든 나무들':'나무는 지금 무엇을 준비하고 있을까요?','한 장면 앞에 오래 머물기':'빨리 감지 않고 본 장면이 있나요?','맑고 찬 날의 산책자':'찬 공기 속을 얼마나 걸어 보셨나요?','올해 밑줄 그은 문장들':'올해 가장 오래 남은 문장은 무엇인가요?','서점의 날, 이 책방의 책':'이 책방에서 당신이 고른 책은 무엇이었나요?','다른 더숲이 먼저 알아본 책':'다른 동네에서는 무엇을 읽을까요?'};
+const POPQX={'새벽 세 시에 깨어 있는 사람':'당신이 잠든 사이, 누가 깨어 있었나요?','죽음 곁에서 일한 사람들':'마지막 장을 먼저 읽으면 무엇이 달라질까요?','사는 곳이 사는 법을 정한다':'당신의 방은 어떤 하루를 만드나요?','단어 하나를 사흘 고민하는 일':'「괜찮아」를 다른 말로 옮긴다면?','숲이 주어인 문장들':'나무가 당신을 본다면 뭐라고 쓸까요?','낫지 않는 채로 사는 법':'다 낫지 않아도 괜찮은 하루가 있을까요?','방과 500파운드, 그 다음':'방이 생기면 무엇을 쓰겠습니까?','두 나라 말로 꿈꾸는 사람':'꿈은 어느 나라 말로 꾸나요?','평균인 사람은 0명이었다':'당신은 평균입니까?','요리책 코너에 못 간 책':'가장 오래 기억나는 밥은 무엇인가요?','시속 4킬로미터의 생각':'오늘은 몇 걸음만큼 생각했나요?','분류표를 의심하는 과학':'물고기는 정말 있을까요?','소설 속 작은 가게들':'당신 동네에도 이런 가게가 있나요?','물음표로 끝나는 제목':'오늘 당신의 질문은 무엇입니까?','1949년에 쓴 1984':'다음 숫자는 무엇일까요?','한 가지를 오래 좋아한 사람들':'아무튼, 당신은 무엇을 오래 좋아했나요?','나는 아니라고 생각했는데':'정말, 나는 아닐까요?','먹히는 쪽에서 본 식탁':'오늘 접시 건너편에는 누가 있었나요?','명함에 없는 일의 뒷면':'오늘 당신을 위해 일한 사람은 몇 명일까요?','겨울에 읽는 뜨거워지는 지구':'올겨울은 왜 덜 춥게 느껴질까요?','한 점 앞에 오래 서는, 보는 법':'마지막으로 오래 바라본 것은 무엇인가요?','제목에 색이 묻은 책':'이 평대는 무슨 색으로 보이나요?','건물 이름이 제목인 책':'어느 문부터 열어 보시겠어요?','실패한 쪽이 오래 읽힌다':'잘 안 된 일, 다시 읽어 볼까요?','조용한 제목, 소란한 속':'조용한 사람의 머릿속은 어떨까요?','달리는 사람, 앉아 있는 사람':'오늘은 달릴까요, 앉을까요?','시옷으로 시작하는 책':'ㅅ 다음엔 무엇이 올까요?','긴 밤에는, 긴 소설':'이번 겨울, 어떤 긴 이야기와 지낼까요?','문제집을 치운 자리에':'정답 없는 책, 무엇부터 펼까요?','비 오는 날, 서서 읽는 시':'비 그칠 때까지 몇 편 읽을까요?','첫눈 오는 날 펼 책':'첫눈 오는 날, 무엇을 읽겠습니까?','코트 주머니에 들어가는 책':'누구의 주머니에 넣어 줄까요?','차가 식기 전에, 철학 한 쪽':'한 잔이 식는 동안 무엇을 생각할까요?','겨울눈을 만든 나무들':'나무는 지금 무엇을 준비하고 있을까요?','한 장면 앞에 오래 머물기':'빨리 감지 않고 본 장면이 있나요?','맑고 찬 날의 산책자':'찬 공기 속을 얼마나 걸어 보셨나요?','올해 밑줄 그은 문장들':'올해 가장 오래 남은 문장은 무엇인가요?','서점의 날, 이 책방의 책':'이 책방에서 당신이 고른 책은 무엇이었나요?','다른 더숲이 먼저 알아본 책':'다른 동네에서는 무엇을 읽을까요?'};
 const popQ=t=>{const s=(t&&t.title)||'';return POPQX[s]||(/월에 막 들어온 책/.test(s)?'아직 아무도 펴 보지 않은 책, 먼저 펴 보시겠어요?':/오래 자리를 지킨/.test(s)?'십 년 뒤에도 읽힐 책은 무엇일까요?':'')};
 (()=>{const f=mkD;mkD=function(t,k){const D=f(t,k);try{if(k!=='pop'||!t)return D;const q=popQ(t);if(q&&typeof POPQ!=='undefined'){const g=POPQ.find(x=>(D.body||'').includes(x));if(g)D.body=D.body.replace(g,q)}}catch(e){}return D}})();
 
@@ -22,10 +22,10 @@ const popQ=t=>{const s=(t&&t.title)||'';return POPQX[s]||(/월에 막 들어온 
 function upPost(){const mn=document.querySelector('main');if(!mn||S.locked)return;
   document.querySelectorAll('.navb [data-a="nhGo"]').forEach(b=>b.style.display='none');
   if(!isAdmin())document.querySelectorAll('.navb [data-v="more"]').forEach(b=>b.style.display='none');
-  /* 큐레이션 카드: 진열 → 인쇄물 → 인스타, 그리고 한 벌 받기 */
+  /* 큐레이션 카드: 진열 → 인쇄물 → 인스타, 그리고 한 번에 받기 */
   mn.querySelectorAll('.pcard>.btns').forEach(bt=>{if(bt.dataset.up)return;bt.dataset.up=1;const dp=bt.querySelector('[data-a="dpOpen"]');if(!dp)return;const i=dp.dataset.i;
     const st=document.createElement('div');st.className='ust';st.innerHTML=`<button data-a="dpOpen" data-i="${i}"><em>1</em><b>진열</b><small>3D로 놓아 보기</small></button><button data-a="toDesign" data-kind="pop" data-s="c" data-i="${i}"><em>2</em><b>인쇄물</b><small>POP · 쇼카드 · 띠지</small></button><button data-a="igOpen" data-i="${i}"><em>3</em><b>인스타</b><small>피드 이미지 · 글</small></button>`;
-    const all=document.createElement('button');all.className='btn usetall';all.dataset.a='setAll';all.dataset.i=i;all.textContent='한 벌 받기 — 인쇄물 PDF와 인스타 이미지를 한 번에';
+    const all=document.createElement('button');all.className='btn usetall';all.dataset.a='setAll';all.dataset.i=i;all.textContent='한 번에 받기 — 인쇄물 PDF와 인스타 이미지를 한 번에';
     bt.before(st);st.after(all);[...bt.querySelectorAll(':scope>button')].forEach(b=>b.remove())});
   mn.querySelectorAll('.cvq').forEach(q=>{if(q.querySelector('[data-a="igOpen"]'))return;const d=q.querySelector('[data-a="dpOpen"]');if(!d)return;const b=document.createElement('button');b.dataset.a='igOpen';b.dataset.i=d.dataset.i;b.textContent='인스타';q.append(b);const p=q.querySelector('[data-a="toDesign"]');if(p)p.textContent='인쇄물';d.textContent='진열'});
   /* POP 만들기: 종류 → 미리보기 → 느낌 3개 → 저장, 나머지는 「글 · 색 고치기」 */
@@ -42,16 +42,16 @@ function upPost(){const mn=document.querySelector('main');if(!mn||S.locked)retur
   if(S.mode==='aka'&&S.view.aka==='insta'&&!mn.querySelector('.igtop')){const sec=mn.querySelector('.sec');const c=document.createElement('div');c.className='igtop';c.innerHTML=`<div><b>피드 만들기</b><span>사진을 넣으면 사진에 맞춰 표지 이미지와 글 세 가지를 만듭니다. 사진이 없으면 큐레이션으로 표지를 만듭니다.</span></div><button class="btn pri" data-a="igOpen">시작</button>`;if(sec)sec.after(c);else mn.prepend(c);const old=$('igT');if(old){const cd=old.closest('.card');if(cd)cd.style.display='none'}}}
 (()=>{const r=render;render=function(){r.apply(this,arguments);try{upPost()}catch(e){console.warn(e)}}})();
 
-/* ── 한 벌 받기: POP · 쇼카드 · 띠지 PDF + 인스타 이미지 ── */
+/* ── 한 번에 받기: POP · 쇼카드 · 띠지 PDF + 인스타 이미지 ── */
 try{if(!SETK.some(x=>x[0]==='ig'))SETK.push(['ig','인스타 이미지'])}catch(e){}
 A.setAll=d=>{S.ui.setK={pop:1,card:1,list:0,band:1,ig:1};A.setOpen(d)};
 (()=>{const sp=A.setPdf;A.setPdf=async()=>{const K=S.ui.setK||{},ig=!!K.ig,i=S.ui.setI,t=(S.ui.cor||[])[i];K.ig=0;const other=SETK.some(([k])=>k!=='ig'&&K[k]);try{if(other)await sp()}finally{K.ig=ig?1:0}
   if(ig&&t){try{const cs=await igCanvases({t,ph:[],fmt:0,ct:t.title,cs:t.hook});await upSaveMany(cs,'더숲_인스타_'+upName(t.title));A.setClose()}catch(e){console.warn(e);toast('인스타 이미지를 만들지 못했습니다')}}else if(!other)toast('하나 이상 골라 주세요')}})();
 
 /* ── 추천 배치 3안 ── */
-const DPREC=[['무난하게','재고 위주'],['눈에 띄게','4종 · 메인 크게'],['이야기 있게','포근하게'],['가득 채우기','빈틈없이']];
+const DPREC=[['무난하게','재고 위주'],['눈에 띄게','4종 · 메인 크게'],['이야기 있게','따뜻하게'],['가득 채우기','빈틈없이']];
 (()=>{const f=A.dpOpen;A.dpOpen=d=>{f(d);try{const b=document.querySelector('#sheetBox .dprec');if(b){const w=document.createElement('div');w.className='dprec3';w.innerHTML=`<b>추천 배치</b><div>${DPREC.map(([n,s],i)=>`<button data-a="dpRec" data-v="${i}" aria-pressed="${S.ui.dpRv===i}"><b>${n}</b><small>${s}</small></button>`).join('')}</div>`;b.replaceWith(w)}
-  const sb=$('sheetBox');if(sb&&AI&&!sb.querySelector('.dpchk')&&sb.querySelector('.dpv')){const c=document.createElement('label');c.className='dpchk';c.innerHTML=`<b>사진으로 점검</b><span>진열을 마친 평대를 찍으면 빠진 책 · 가려진 표지 · 메인 자리를 짚어 줍니다</span><input type="file" accept="image/*" capture="environment" hidden data-c="dpChk">`;const bt=sb.querySelector(':scope>.btns');(bt||sb.lastElementChild).before(c);if(S.ui.dpChkR&&S.ui.dpChkR.k===dpKey((S.ui.cor||[])[S.ui.dp.i]))c.after(dpChkBox(S.ui.dpChkR))}}catch(e){console.warn(e)}}})();
+  const sb=$('sheetBox');if(sb&&AI&&!sb.querySelector('.dpchk')&&sb.querySelector('.dpv')){const c=document.createElement('label');c.className='dpchk';c.innerHTML=`<b>사진으로 점검</b><span>진열을 마친 평대를 찍으면 빠진 책 · 가려진 표지 · 메인 자리를 알려 줍니다</span><input type="file" accept="image/*" capture="environment" hidden data-c="dpChk">`;const bt=sb.querySelector(':scope>.btns');(bt||sb.lastElementChild).before(c);if(S.ui.dpChkR&&S.ui.dpChkR.k===dpKey((S.ui.cor||[])[S.ui.dp.i]))c.after(dpChkBox(S.ui.dpChkR))}}catch(e){console.warn(e)}}})();
 A.dpRec=d=>{try{const v=d&&d.v!=null?+d.v:0,t=S.ui.cor[S.ui.dp.i];if(!t)return;const k=dpKey(t),all=(t.books||[]).slice(0,10),L=lvNow(),cap=L>=2?8:6;
   const sc=b=>((b.here>0||b.src==='재고')?100:0)+(b.mine||0)*3+(b.sold||0)+(b.role==='중심'?5:0),ord=all.map((b,i)=>[i,sc(b)]).sort((a,b)=>b[1]-a[1]||a[0]-b[0]),ins=ord.filter(x=>x[1]>=100).length;
   S.ui.dpFull=v===3;const n=v===3?Math.min(cap,all.length):v===1?Math.min(4,all.length):Math.max(Math.min(3,all.length),Math.min(cap,all.length,v===0&&ins>=3?ins:cap)),pk=ord.slice(0,n).map(x=>x[0]).sort((a,b)=>a-b),main=ord[0][0],md=v===1?2:v===2?1:0;S.ui.dpOrd=ord.map(x=>x[0]);
