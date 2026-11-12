@@ -191,3 +191,20 @@ A.dpReset=(f=>d=>{S.ui.dpFull=false;return f(d)})(A.dpReset);
 
 /* 가득 채우기: 세운 칸이 아닌 같은 책 칸에 「세움」 표시가 붙지 않게 */
 (()=>{const f=dpTop;dpTop=function(P){let h=f(P);try{if(!P||!P.full)return h;const fids=new Set(P.it.filter(i=>i.k==='face'&&i.fid).map(i=>i.fid));P.it.forEach(i=>{if(i.k!=='stack'||fids.has(i.id))return;const k=h.indexOf(`data-id="${i.id}"`);if(k<0)return;const e=h.indexOf('<title>',k);if(e<0)return;let seg=h.slice(k,e);seg=seg.replace(' · 세움</text>','</text>').replace(new RegExp(`<rect x="${i.x}" y="${i.y-26}" width="150" height="22"[^>]*/>`),'');h=h.slice(0,k)+seg+h.slice(e)})}catch(e){}return h}})();
+
+/* ── 전수 점검(11/12 밤) ── */
+/* 서점 기초: 닫기 · 탭 · 장 목록을 위에 고정, 장으로 가면 제목이 가리지 않게 */
+(()=>{const g=gdDraw;gdDraw=function(){g.apply(this,arguments);try{const G=$('guide');if(!G||!G.classList.contains('bs'))return;const B=G.querySelector('.gdb.bsb');if(!B||B.querySelector('.bshead'))return;
+  const h=document.createElement('div');h.className='bshead';const x=B.querySelector('.gdx'),t=B.querySelector('.gdtab'),n=B.querySelector('.bsnav');if(t)h.append(t);if(x)h.append(x);if(n)h.append(n);B.prepend(h)}catch(e){console.warn(e)}}})();
+A.bsGo=d=>{const e=document.getElementById('bs-'+d.id),G=$('guide'),h=G&&G.querySelector('.bshead');if(!e||!G)return;G.scrollTo({top:e.getBoundingClientRect().top-G.getBoundingClientRect().top+G.scrollTop-(h?h.offsetHeight:0)-8,behavior:'smooth'});
+  document.querySelectorAll('.bsnav button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.id===d.id))};
+/* 아래에서 올라오는 창: 맨 위에 늘 보이는 닫기 */
+(()=>{const sb=$('sheetBox');if(!sb||!window.MutationObserver)return;const put=()=>{if(sb.firstElementChild&&sb.firstElementChild.classList.contains('shx'))return;const b=document.createElement('button');b.className='shx';b.dataset.a='close';b.setAttribute('aria-label','닫기');b.textContent='닫기 ✕';sb.prepend(b)};new MutationObserver(m=>{if(!m.some(r=>[...r.addedNodes].some(n=>n.classList&&n.classList.contains('shx'))))put()}).observe(sb,{childList:true})})();
+/* 직원 화면에서 쓸 일 없는 칸 숨기기 · 이름 붙이기 */
+(()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn||S.locked)return;
+  mn.querySelectorAll('.pcard .blist em').forEach(e=>{if(e.textContent.trim()==='?'){e.textContent='없음';e.title='이 지점 재고에 없음'}});
+  if(!isAdmin()&&S.mode==='aka'&&S.view.aka==='insta'){mn.querySelectorAll('.card').forEach(c=>{const h=c.querySelector('h3');if(h&&/인사이트|운영 숫자/.test(h.textContent))c.style.display='none'});mn.querySelectorAll('.empty,.note').forEach(e=>{if(/인사이트를 아직/.test(e.textContent))e.style.display='none'});mn.querySelectorAll('.subnav [data-v="naver"],.subnav [data-t="naver"]').forEach(b=>b.style.display='none')}
+  const dz=mn.querySelector('.grid.dz'),cp=dz&&dz.previousElementSibling;
+  if(dz){const form=dz.querySelector(':scope>.card.form'),box=dz.querySelector('.uedb');if(form&&box){[...form.children].forEach(c=>{if(!c.classList.contains('ukind')&&!(c.classList.contains('chips')&&c.offsetHeight===0))box.append(c)});form.style.display='none'}
+    const qb=mn.querySelector('.qbar');if(qb&&qb.querySelector('[data-k="akTn"]')&&!mn.querySelector('.ulab'))qb.insertAdjacentHTML('beforebegin','<p class="ulab">어떤 주제로 만들까요 — 고르면 아래 인쇄물에 바로 들어갑니다</p>')}
+  }catch(e){console.warn(e)}}})();
