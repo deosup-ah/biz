@@ -34,6 +34,7 @@ function agRun(acts){let closed=false;const close=()=>{if(!closed){closed=true;A
     else if(a.do==='make'&&a.word){close();if(S.view[S.mode]!=='cur')A.go({v:'cur',m:'store'});const el=$('gIn');if(el)el.value=String(a.word).slice(0,30);A.gGo({v:String(a.word).slice(0,30)})}
     else if(a.do==='basics'&&BASICS.some(b=>b.id===a.id)){A.agClose();A.gdOpen();A.gdTab({t:'b'});setTimeout(()=>A.bsGo({id:a.id}),120)}
     else if(a.do==='guide'){A.agClose();A.gdOpen()}
+    else if(a.do==='puzzle'){close();A.pzOpen();const P=S.ui.pz;if(a.lv>=1&&a.lv<=5)P.lv=+a.lv;if(a.th&&PZTH.includes(a.th))P.th=a.th;if(a.age!=null&&PZAGE.some(x=>x[1]===a.age))P.age=a.age;if(a.lv||a.th||a.age!=null){pzNewZ();pzDraw()}}
     else if(a.do==='level'){close();A.lvOpen()}
     else if(a.do==='cmd'&&a.text&&S.ui.dp){const el=$('dpCmd');if(el){el.value=a.text;A.dpCmd()}}
   }catch(e){console.warn(e)}}}
@@ -57,6 +58,7 @@ function agLocal(q0){const q=q0.replace(/\s+/g,' ').trim(),qs=q.replace(/\s/g,''
   const W={dp:/진열|평대|배치|매대|디스플레이|놓아|놔|놓기|깔아|3d|입체|돌려|한바퀴|영상|동영상|녹화|릴스영상|가득|꽉|빼곡|빈틈|채워|채우/,pop:/pop|팝|포스터|홍보물|인쇄|출력|프린트|쇼카드|띠지|책목록|목록|리스트|안내문/i,ig:/인스타|피드|sns|게시물|업로드|올릴|올리|캡션|해시태그|스토리|릴스/i,set:/한번에|한꺼번에|전부|다받|모두받|일괄|세트/,make:/만들|짜|추천|골라|뽑아|구성|기획|해줘|해볼래|해봐/,lv:/단계|레벨|승급|등급|열쇠|잠김|잠겨|안열려|왜안돼|못써/,go:/화면|메뉴|페이지|가줘|가자|이동|열어/};
   const hid=has(/매출|주문|반품|지원사업|정산|북센|이지정보|발주|재고조사/);
   if(hid&&!isAdmin()&&!has(W.dp)&&!has(W.pop)&&!has(W.ig)){const bb=agBasics(q);return{t:`매출 · 주문 · 반품 · 지원사업은 지금 안정화 테스트 중이라 열 수 없습니다.${has(/반품/)?' 반품은 서가 사진으로 후보를 만들고, 확인한 뒤에만 이지정보에 넣는 방식으로 준비 중입니다.':''}${bb?`\n\n서점 기초 「${bb.b.t}」: ${bb.it?bb.it[1]:bb.b.lead}`:''}`,btn:bb?[{n:`「${bb.b.t}」 자세히`,a:[{do:'basics',id:bb.b.id}]}]:[]}}
+  if(has(/퍼즐|가로세로|크로스워드|낱말퀴즈|단어퀴즈|십자말/)){const m=qs.match(/([1-5])단계|난이도([1-5])/),lv=m?+(m[1]||m[2]):has(/쉬운|쉽게/)?1:has(/어려운|어렵게|전문|고수/)?5:null,th=(PZTH.find(t=>qs.includes(t.replace(/\s|·/g,'').slice(0,2)))||null),age=has(/어린이|아이|초등|꼬마/)?'k':has(/청소년|중학|고등|학생/)?'t':has(/어르신|노인|시니어|할머니|할아버지/)?'s':has(/어른|성인/)?'a':null;acts.push({do:'puzzle',lv,th,age});return{t:`${say.join(' ')} 책 가로세로 퍼즐을 열었습니다.${lv?` 난이도 ${lv}단계로 만들었습니다.`:''} 지점 이름 · 형태를 고르고 저장하거나 PDF로 인쇄하세요.`.trim(),a:acts}}
   if(has(W.lv)){const L=lvNow();acts.push({do:'level'});return{t:`${say.join(' ')} 지금 ${L}단계 「${LVN[L]}」입니다.${L<3?` 큐레이션 · 인쇄물 · 진열안을 쓸수록 ${L+1}단계 조건이 채워지고, 다 채우면 신청 카드를 참부장께 보내면 열쇠를 받습니다.`:''} 단계 화면을 열었습니다.`.trim(),a:acts}}
   const ti=agFind(q),pickT=()=>ti>=0?ti:(S.ui.dp?S.ui.dp.i:(S.ui.cOpen!=null?S.ui.cOpen:0)),tt=i=>T[i]?`「${T[i].title}」`:'';
   /* 새 큐레이션 단어 뽑기: 「겨울」, 겨울 주제로, 겨울 관련 책, 겨울 느낌으로, 겨울로 만들어줘 */
@@ -92,7 +94,7 @@ ${L}
 사용자: ${q}
 
 허용 동작(필요한 것만, 순서대로):
-{"do":"place","br":"코드"} {"do":"go","view":"cur|design|space|insta"} {"do":"open","theme":번호} {"do":"dp","theme":번호,"rec":0~3 또는 null,"video":false} {"do":"pop","theme":번호,"kind":"pop|card|band|list"} {"do":"insta","theme":번호 또는 null} {"do":"set","theme":번호} {"do":"make","word":"단어"} {"do":"basics","id":"장 id"} {"do":"guide"} {"do":"level"} {"do":"cmd","text":"진열 말 명령(진열 화면이 열려 있을 때)"}
+{"do":"place","br":"코드"} {"do":"go","view":"cur|design|space|insta"} {"do":"open","theme":번호} {"do":"dp","theme":번호,"rec":0~3 또는 null,"video":false} {"do":"pop","theme":번호,"kind":"pop|card|band|list"} {"do":"insta","theme":번호 또는 null} {"do":"set","theme":번호} {"do":"make","word":"단어"} {"do":"basics","id":"장 id"} {"do":"guide"} {"do":"level"} {"do":"puzzle","lv":1~5 또는 null,"th":"책과 서점|소설|수필|과학|철학|시|명문장|영화와 책|동화 · 그림책|섞어서","age":"|k|t|a|s"} {"do":"cmd","text":"진열 말 명령(진열 화면이 열려 있을 때)"}
 답은 존댓말로 2~4문장, 무엇을 했는지와 다음에 누를 것. 모르는 사실은 지어내지 않습니다. 앱 밖 질문(서점 일반 지식)은 짧게 답하고, 서점 기초 장이 맞으면 basics 버튼을 붙입니다.
 JSON 으로만: {"t":"답","a":[동작],"btn":[{"n":"버튼 이름","a":[동작]}]}`,{cache:false});
   if(!out||!out.t)return null;const ok=x=>x&&typeof x.do==='string';return{t:String(out.t),a:(out.a||[]).filter(ok).slice(0,4),btn:(out.btn||[]).filter(b=>b&&b.n&&Array.isArray(b.a)).slice(0,3).map(b=>({n:String(b.n).slice(0,20),a:b.a.filter(ok).slice(0,3)}))}}
