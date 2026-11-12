@@ -11,7 +11,8 @@ function lsFind(br,q){const all=items(br),d=String(q.isbn||'').replace(/\D/g,'')
   const it=(d&&all.find(x=>x.isbn===d))||(k2&&all.find(x=>nt(x.t)===k2))||(k2&&k2.length>=3&&all.find(x=>nt(x.t).includes(k2)))||null;
   const isbn=d||(it&&it.isbn)||'',keys=[isbn,nt((it&&it.t)||q.t||'')].filter(Boolean);let ld=(it&&it.ld)||'',ap=false;
   sales().filter(s=>s.br===br).forEach(s=>{keys.forEach(k=>{const v=s.last&&s.last[k];if(v&&v>ld){ld=v;ap=false}else if(!v&&!(s.last)&&(s.top||[]).some(x=>(x.isbn||nt(x.t))===k)){const e=s.ym+'-28';if(e>ld){ld=e;ap=true}}})});
-  return{t:(it&&it.t)||q.t||'(제목 확인 중)',a:(it&&it.a)||q.a||'',p:(it&&it.p)||q.p||'',isbn,stock:it?it.stock|0:null,ld,ap,n:lsDays(ld),src:q.src||''}}
+  const oth=items('all').filter(x=>x.br!==br&&(x.stock|0)>0&&((isbn&&x.isbn===isbn)||nt(x.t)===nt((it&&it.t)||q.t||''))).map(x=>[x.br,x.stock|0]);
+  return{oth,t:(it&&it.t)||q.t||'(제목 확인 중)',a:(it&&it.a)||q.a||'',p:(it&&it.p)||q.p||'',isbn,stock:it?it.stock|0:null,ld,ap,n:lsDays(ld),src:q.src||''}}
 function lsAdd(q){const L=S.ui.ls.rows,r=lsFind(S.br,q),key=r.isbn||nt(r.t);if(L.some(x=>(x.isbn||nt(x.t))===key))return false;r.pick=lsPickable(r);L.unshift(r);
   if(!r.stock&&r.stock!==0&&r.isbn&&r.t==='(제목 확인 중)'){const BK=window.BOOKS||{},h=[...(BK.yes24||[]),...(BK.aladin||[]),...(BK.kyobo||[])].find(b=>b.isbn===r.isbn);if(h){r.t=h.t;r.a=h.a||'';r.p=h.p||''}else fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:'+r.isbn).then(x=>x.json()).then(j=>{const v=j&&j.items&&j.items[0]&&j.items[0].volumeInfo;r.t=v&&v.title?v.title:'(매장 자료에 없는 책)';lsDraw()}).catch(()=>{r.t='(매장 자료에 없는 책)';lsDraw()})}
   return true}
@@ -29,18 +30,19 @@ C.lsPh=async el=>{const fs=[...el.files].slice(0,6);el.value='';if(!fs.length)re
   G.busy=0;if(!n)toast(AI?'책을 찾지 못했습니다. 더 가까이, 밝게 찍어 보세요.':'바코드를 찾지 못했습니다. 제목은 아래 칸에 적어 주세요.');lsDraw()};
 A.lsScan=()=>{S.ui.scanTo='ls';closeSheet();A.scanOpen()};
 A.lsRet=()=>{const P=S.ui.ls.rows.filter(r=>r.pick);if(!P.length){toast('반품할 책을 골라 주세요');return}S.ui.ret=(S.ui.ret||[]).concat(P.map(r=>({t:r.t,a:r.a,p:r.p,isbn:r.isbn,qty:Math.max(1,r.stock|0)})));toast(`반품 목록에 ${P.length}종을 담았습니다`);closeSheet();A.go({v:'ret'})};
+A.lsOrd=()=>{const P=S.ui.ls.rows.filter(r=>r.pick);if(!P.length){toast('주문할 책을 골라 주세요');return}let n=0;P.forEach(r=>{if(addCart(S.br,{t:r.t,a:r.a,p:r.p,isbn:r.isbn},1,'찍어서 담음'))n++});toast(`주문에 ${n}종을 담았습니다`);lsDraw()};
 A.lsCp=()=>copyText(`${brN(S.br)} 마지막 판매일 ${TODAY}\nISBN\t제목\t재고\t마지막 판매\t구간\n`+S.ui.ls.rows.map(r=>`${r.isbn}\t${r.t}\t${r.stock==null?'':r.stock}\t${r.ld?(r.ap?r.ld.slice(0,7):r.ld):'기록 없음'}\t${lsGrp(r.n)}`).join('\n'));
 function lsDraw(){const G=S.ui.ls;if(!G)return;const R=G.rows.slice().sort((a,b)=>(b.n==null?1e9:b.n)-(a.n==null?1e9:a.n)),since=lsSince(S.br),pk=G.rows.filter(r=>r.pick).length,noData=!sales().some(d=>d.br===S.br)&&!items(S.br).some(x=>x.ld);
   const cnt={};G.rows.forEach(r=>{const g=lsGrp(r.n);cnt[g]=(cnt[g]||0)+1});const GO=[...LSG.map(g=>g[1]),'기록 없음'].filter(g=>cnt[g]);
   const age=r=>r.n==null?(since?`${+since.slice(0,4)}년 ${+since.slice(5)}월 이후 판매 기록 없음`:'판매 기록 없음'):r.n<1?'오늘':r.n<60?`${r.n}일 전`:r.n<730?`${Math.floor(r.n/30.4)}개월 전`:`${(r.n/365).toFixed(1).replace('.0','')}년 전`;
-  openSheet(`<div class="lsx"><div class="igxh"><b>마지막 판매일</b>${R.length?`<button class="lsclr" data-a="lsClr">비우기</button>`:`<span>${esc(brN(S.br))}</span>`}</div>
+  openSheet(`<div class="lsx"><div class="igxh"><b>찍은 책</b>${R.length?`<button class="lsclr" data-a="lsClr">비우기</button>`:`<span>${esc(brN(S.br))}</span>`}</div>
    ${noData?`<p class="lsw">이지정보 판매 · 재고 자료가 아직 없습니다. 「더보기 → 자료 · 설정」에서 이지정보 엑셀을 올리면 날짜가 나옵니다.</p>`:''}
    <div class="lsin"><button class="btn pri" data-a="lsScan">바코드 스캔</button><label class="btn">${G.busy?'읽는 중…':'사진'}<input type="file" accept="image/*" multiple data-c="lsPh" hidden></label><button class="btn" data-a="lsAll">재고 전체</button></div>
    <div class="lst"><input id="lsT" type="text" placeholder="제목 · ISBN (여러 개는 쉼표로)" onkeydown="if(event.key==='Enter')A.lsTx()"><button class="btn" data-a="lsTx">넣기</button></div>
    <div class="lsth"><span>반품 기준</span><div class="seg">${LSTH.map(([v,n])=>`<button data-a="lsTh" data-v="${v}" aria-pressed="${G.th===v}">${n}</button>`).join('')}</div></div>
    ${GO.length?`<div class="lsg">${GO.map(g=>`<span class="${g==='1개월 안'?'ok':g==='기록 없음'?'na':''}"><b>${cnt[g]}</b>${g}</span>`).join('')}</div>`:''}
-   ${R.length?`<div class="lsl">${R.map(r=>{const i=G.rows.indexOf(r),old=r.n==null||r.n>=G.th;return`<div class="lsr${r.pick?' on':''}"><button class="lsk" data-a="lsPk" data-i="${i}" aria-pressed="${!!r.pick}" aria-label="반품 고르기">${r.pick?'✓':''}</button><div class="lsb"><b>${esc(r.t)}</b><small>${r.isbn||'ISBN 없음'}${r.stock!=null?` · 재고 ${r.stock}`:''}</small></div><div class="lsd${old?' old':''}"><b>${esc(lsGrp(r.n))}</b><small>${r.ld?(r.ap?r.ld.slice(0,7).replace('-','. ')+'월':r.ld.replace(/-/g,'. ')):age(r)}</small></div><button class="lsrm" data-a="lsRm" data-i="${i}" aria-label="빼기">×</button></div>`}).join('')}</div>`:`<p class="lse">바코드를 비추거나 사진을 넣으면 여기에 책마다 나옵니다.</p>`}
-   ${R.length?`<div class="igxa"><button class="btn pri" data-a="lsRet">반품 목록에 담기 · ${pk}종</button><button class="btn" data-a="lsCp">복사</button></div>`:''}</div>`)}
+   ${R.length?`<div class="lsl">${R.map(r=>{const i=G.rows.indexOf(r),old=r.n==null||r.n>=G.th;return`<div class="lsr${r.pick?' on':''}"><button class="lsk" data-a="lsPk" data-i="${i}" aria-pressed="${!!r.pick}" aria-label="반품 고르기">${r.pick?'✓':''}</button><div class="lsb"><b>${esc(r.t)}</b><small>${r.isbn||'ISBN 없음'}${r.stock!=null?` · 재고 ${r.stock}`:''}${r.oth&&r.oth.length?`<br>다른 곳 ${r.oth.map(([b,n])=>brN(b).replace('노원문고 ','')+' '+n).join(' · ')}`:''}</small></div><div class="lsd${old?' old':''}"><b>${esc(lsGrp(r.n))}</b><small>${r.ld?(r.ap?r.ld.slice(0,7).replace('-','. ')+'월':r.ld.replace(/-/g,'. ')):age(r)}</small></div><button class="lsrm" data-a="lsRm" data-i="${i}" aria-label="빼기">×</button></div>`}).join('')}</div>`:`<p class="lse">바코드를 비추거나 사진을 넣으면 여기에 책마다 나옵니다.</p>`}
+   ${R.length?`<div class="igxa"><button class="btn pri" data-a="lsRet">반품에 담기 · ${pk}</button><button class="btn" data-a="lsOrd">주문에 담기 · ${pk}</button><button class="btn ghost" data-a="lsCp">복사</button></div>`:''}</div>`)}
 /* 스캐너가 이 창을 위해 열렸으면 읽은 바코드를 여기로 */
 (()=>{const sa=scanAdd,sp=scanPaint,sc=A.scanClose;
   scanAdd=function(code){if(S.ui.scanTo!=='ls')return sa(code);const i=isbnOk(code);if(!i)return false;lsAdd({isbn:i,src:'바코드'});return true};
@@ -48,3 +50,20 @@ function lsDraw(){const G=S.ui.ls;if(!G)return;const R=G.rows.slice().sort((a,b)
   A.scanClose=function(){const ls=S.ui.scanTo==='ls';S.ui.scanTo=null;sc();if(ls)lsDraw()}})();
 /* 반품 화면 위에 들어가는 길 */
 (()=>{const f=V.store.ret;V.store.ret=()=>{const h=f();if(S.br==='all')return h;const i=h.indexOf('<div class="card form">');const box=`<button class="card lsgo" data-a="lsOpen"><b>마지막 판매일로 고르기</b><span>찍으면 책마다 언제 마지막으로 팔렸는지</span></button>`;return i>0?h.slice(0,i)+box+h.slice(i):box+h}})();
+
+/* 위쪽 「찍기」 버튼 하나: 어느 화면에서든 바코드 → 책 카드 */
+(()=>{const r=render;render=function(){r.apply(this,arguments);try{const bar=document.querySelector('header .bar');if(!bar||S.locked||bar.querySelector('.snapb'))return;const b=document.createElement('button');b.className='snapb';b.dataset.a='snap';b.setAttribute('aria-label','찍기');b.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>찍기</span>';const br0=bar.querySelector('.brand');if(br0)br0.after(b);else bar.prepend(b)}catch(e){}}})();
+A.snap=()=>{if(S.br==='all'){toast('위에서 지점을 먼저 고르세요');return}A.lsOpen();A.lsScan()};
+/* 인쇄물 종류: POP · 띠지 · 목록만 보이고 나머지는 「더 보기」 */
+(()=>{const r=render;render=function(){r.apply(this,arguments);try{if(S.view[S.mode]!=='design')return;const k=document.querySelector('main .ukind');if(!k||k.querySelector('.kmore'))return;const MAIN=S.mode==='aka'?['pop','band','rent']:['pop','band','list'];let n=0;
+  k.querySelectorAll('[data-a="dKind"]').forEach(b=>{if(!MAIN.includes(b.dataset.k)&&b.getAttribute('aria-pressed')!=='true'&&!S.ui.kMore){b.style.display='none';n++}});if(n){const m=document.createElement('button');m.className='chip kmore';m.dataset.a='kMore';m.innerHTML=`<span>더 보기</span>`;k.querySelector('[data-a="dKind"]').parentElement.append(m)}}catch(e){}}})();
+A.kMore=()=>{S.ui.kMore=1;render()};
+/* 홈 「오늘」: 관리자에게 숫자 넷. 누르면 그 화면으로 */
+function todayNums(br){const K=br+TODAY+(S.db.stock.length)+(S.db.sales.length);if(S.ui._td&&S.ui._td.k===K)return S.ui._td;let rt=0,od=0,ev=0,ch='';
+  try{const its=items(br).filter(x=>(x.stock|0)>0);const since=lsSince(br);its.forEach(x=>{const r=lsFind(br,{isbn:x.isbn,t:x.t});if((r.n==null&&since)||(r.n!=null&&r.n>=180))rt++})}catch(e){}
+  try{od=items(br).filter(x=>need(x)>0).length}catch(e){}try{ev=(S.db.events||[]).filter(e=>e.date===TODAY).length}catch(e){}
+  try{const T=corners(br).all||[];const u=T.map(t=>t.until).filter(Boolean).sort()[0];if(u)ch=u}catch(e){}return S.ui._td={k:K,rt,od,ev,ch}}
+(()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn||S.locked||S.br==='all'||S.view[S.mode]!=='cur'||mn.querySelector('.tdy')||typeof isAdmin!=='function'||!isAdmin())return;const T=todayNums(S.br);const d=document.createElement('div');d.className='tdy';
+  d.innerHTML=`<button data-a="tdRet"><b>${T.rt}</b><span>반품 후보</span></button><button data-a="go" data-v="stock" data-m="store"><b>${T.od}</b><span>주문 필요</span></button><button data-a="go" data-v="today" data-m="aka"><b>${T.ev}</b><span>오늘 일정</span></button><button data-a="tdCur"><b>${T.ch?mdw(T.ch).replace(/\(.\)/,''):'-'}</b><span>평대 바꿀 날</span></button>`;
+  const a=mn.querySelector('.gdtop');if(a)a.after(d);else mn.prepend(d)}catch(e){}}})();
+A.tdRet=()=>{A.lsOpen();A.lsTh({v:180});A.lsAll()};A.tdCur=()=>{const e=document.querySelector('main .pcard,main .card');if(e)e.scrollIntoView({behavior:'smooth',block:'start'})};

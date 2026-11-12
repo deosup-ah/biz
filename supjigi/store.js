@@ -158,7 +158,7 @@ A.retSave=async()=>{await put('returns',nid(),{br:S.br,date:TODAY,items:clone(S.
 
 /* ── 자료 · 설정 ── */
 const FIELDS={sales:[['date','판매일',/일자|날짜|판매일|거래일/,1],['t','도서명',/도서명|상품명|서명|제목|품명|책/,1],['qty','수량',/수량|권수/,1],['amt','판매금액',/금액|매출|판매가|실판매/,1],['isbn','ISBN',/isbn|바코드|코드/i],['a','저자',/저자|지은이|작가/],['p','출판사',/출판|발행/],['cat','분야',/분류|분야|카테고리|장르|부문/]],
-  stock:[['t','도서명',/도서명|상품명|서명|제목|품명|책/,1],['stock','재고',/재고/,1],['isbn','ISBN',/isbn|바코드|코드/i],['a','저자',/저자|지은이|작가/],['p','출판사',/출판|발행/],['cat','분야',/분류|분야|카테고리|장르|부문/],['price','정가',/정가|가격|판매가/],['sold30','30일 판매',/30일|월판매|한달/],['ld','마지막 판매일',/최종.*판매|마지막.*판매|최근.*판매|최종.*출고|판매일/]]};
+  stock:[['t','도서명',/도서명|상품명|서명|제목|품명|책/,1],['stock','재고',/재고/,1],['isbn','ISBN',/isbn|바코드|코드/i],['a','저자',/저자|지은이|작가/],['p','출판사',/출판|발행/],['cat','분야',/분류|분야|카테고리|장르|부문/],['price','정가',/정가|가격|판매가/],['sold30','30일 판매',/30일|월판매|한달/],['ld','마지막 판매일',/최종.*판매|마지막.*판매|최근.*판매|최종.*출고|판매일/],['brc','지점코드',/지점|매장코드|점코드/]]};
 V.store.data=()=>{const br=S.br,I=S.ui.imp,rows=k=>S.db[k].filter(d=>d.br).reduce((m,d)=>(m[d.br]=(m[d.br]||0)+1,m),{});const cnt=a=>a.reduce((m,d)=>(m[d.br]=(m[d.br]||0)+1,m),{}),sm=cnt(realSales()),st=cnt(realStock());
   return `<div class="sec"><h2>자료 · 설정</h2><p>자료가 어디서 오고 지금 어디까지 연결됐는지</p></div>
   <div class="card"><h3>연결 상태</h3><div class="tw"><table><tr><th>자료</th><th>상태</th><th>방법</th></tr>
@@ -191,6 +191,11 @@ A.impSave=async()=>{const I=S.ui.imp,br=S.br,g=(r,k)=>I.map[k]>=0?r[I.map[k]]:''
       d.days[ds.slice(8)]=(d.days[ds.slice(8)]||0)+amt;const c=d.cats[cat]=d.cats[cat]||{qty:0,amt:0};c.qty+=qty;c.amt+=amt;const k=isbn||nt(t),o=d.top[k]=d.top[k]||{t,a:String(g(r,'a')||''),p:String(g(r,'p')||''),isbn,cat,qty:0,amt:0};o.qty+=qty;o.amt+=amt;const L=d.last=d.last||{};if(!L[k]||L[k]<ds)L[k]=ds});
     const ks=Object.keys(by);if(!ks.length){toast('날짜와 책 이름을 읽지 못했습니다. 칸을 다시 골라 주세요.');return}for(const ym of ks){const d=by[ym];d.top=Object.values(d.top).sort((a,b)=>b.amt-a.amt).slice(0,400);d.at=new Date().toISOString();await put('sales',br+'-'+ym,d,true)}
     toast(`${ks.length}개월 판매를 저장했습니다${bad?` (읽지 못한 줄 ${bad})`:''}`)}
+  else if(I.map.brc>=0){/* 이지정보 여러 지점이 한 파일에: 지점코드로 나눈다(우리 6곳만) */const BC={'17':'aka','15':'choso','16':'sojeon','13':'nowon','01':'nmain','1':'nmain','06':'njung','6':'njung'},by={};let skip=0;
+    I.rows.forEach(r=>{const code=String(g(r,'brc')||'').match(/\d+/),k=code&&BC[code[0].replace(/^0+(?=\d\d)/,'')]||(code&&BC[String(+code[0])]);if(!k){skip++;return}const o={t:String(g(r,'t')).trim(),stock:numv(g(r,'stock')),isbn:String(g(r,'isbn')||'').replace(/\D/g,''),a:String(g(r,'a')||''),p:String(g(r,'p')||''),cat:String(g(r,'cat')||''),price:numv(g(r,'price'))};if(I.map.ld>=0){const v=toDate(g(r,'ld'));if(v)o.ld=v}if(o.t)(by[k]=by[k]||[]).push(o)});
+    const ks=Object.keys(by);if(!ks.length){toast('우리 지점(17·15·16·13·01·06) 줄을 찾지 못했습니다');return}
+    for(const k of ks){const its=by[k],n=Math.ceil(its.length/1000);for(let i=0;i<n;i++)await put('stock',k+'-'+i,{br:k,part:i,asOf:TODAY,items:its.slice(i*1000,(i+1)*1000)},true);for(const d of S.db.stock.filter(d=>d.br===k&&d.part>=n))await del('stock',d.id)}
+    toast(ks.map(k=>`${brN(k)} ${by[k].length}종`).join(' · ')+' 저장'+(skip?` (다른 지점 ${skip}줄 뺌)`:''))}
   else{const its=I.rows.map(r=>{const o={t:String(g(r,'t')).trim(),stock:numv(g(r,'stock')),isbn:String(g(r,'isbn')||'').replace(/\D/g,''),a:String(g(r,'a')||''),p:String(g(r,'p')||''),cat:String(g(r,'cat')||''),price:numv(g(r,'price'))};if(I.map.sold30>=0)o.sold30=numv(g(r,'sold30'));if(I.map.ld>=0){const v=toDate(g(r,'ld'));if(v)o.ld=v}return o}).filter(o=>o.t);
     if(!its.length){toast('책 이름을 읽지 못했습니다');return}const n=Math.ceil(its.length/1000);for(let i=0;i<n;i++)await put('stock',br+'-'+i,{br,part:i,asOf:TODAY,items:its.slice(i*1000,(i+1)*1000)},true);
     for(const d of S.db.stock.filter(d=>d.br===br&&d.part>=n))await del('stock',d.id);toast(`재고 ${its.length}종을 저장했습니다`)}

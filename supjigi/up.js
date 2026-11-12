@@ -50,7 +50,7 @@ A.setAll=d=>{S.ui.setK={pop:1,card:1,list:0,band:1,ig:1};A.setOpen(d)};
 
 /* ── 추천 배치 3안 ── */
 const DPREC=[['무난하게','재고 위주'],['눈에 띄게','4종 · 메인 크게'],['이야기 있게','따뜻하게'],['가득 채우기','빈틈없이']];
-(()=>{const f=A.dpOpen;A.dpOpen=d=>{f(d);try{const b=document.querySelector('#sheetBox .dprec');if(b){const w=document.createElement('div');w.className='dprec3';w.innerHTML=`<b>추천 배치</b><div>${DPREC.map(([n,s],i)=>`<button data-a="dpRec" data-v="${i}" aria-pressed="${S.ui.dpRv===i}"><b>${n}</b><small>${s}</small></button>`).join('')}</div>`;b.replaceWith(w)}
+(()=>{const f=A.dpOpen;A.dpOpen=d=>{f(d);try{const b=document.querySelector('#sheetBox .dprec');if(b){const w=document.createElement('div');w.className='dprec3';w.innerHTML=`<b>추천 배치</b><div>${DPREC.map(([n,s],i)=>(i===0||i===3||S.ui.dpRm||S.ui.dpRv===i)?`<button data-a="dpRec" data-v="${i}" aria-pressed="${S.ui.dpRv===i}"><b>${n}</b><small>${s}</small></button>`:'').join('')}${S.ui.dpRm?'':'<button class="dprm" data-a="dpRm"><b>더 보기</b><small>2가지</small></button>'}</div>`;b.replaceWith(w)}
   const sb=$('sheetBox');if(sb&&AI&&!sb.querySelector('.dpchk')&&sb.querySelector('.dpv')){const c=document.createElement('label');c.className='dpchk';c.innerHTML=`<b>사진으로 점검</b><span>진열을 마친 평대를 찍으면 빠진 책 · 가려진 표지 · 메인 자리를 알려 줍니다</span><input type="file" accept="image/*" capture="environment" hidden data-c="dpChk">`;const bt=sb.querySelector(':scope>.btns');(bt||sb.lastElementChild).before(c);if(S.ui.dpChkR&&S.ui.dpChkR.k===dpKey((S.ui.cor||[])[S.ui.dp.i]))c.after(dpChkBox(S.ui.dpChkR))}}catch(e){console.warn(e)}}})();
 A.dpRec=d=>{try{const v=d&&d.v!=null?+d.v:0,t=S.ui.cor[S.ui.dp.i];if(!t)return;const k=dpKey(t),all=(t.books||[]).slice(0,10),L=lvNow(),cap=L>=2?8:6;
   const sc=b=>((b.here>0||b.src==='재고')?100:0)+(b.mine||0)*3+(b.sold||0)+(b.role==='중심'?5:0),ord=all.map((b,i)=>[i,sc(b)]).sort((a,b)=>b[1]-a[1]||a[0]-b[0]),ins=ord.filter(x=>x[1]>=100).length;
@@ -208,3 +208,5 @@ A.bsGo=d=>{const e=document.getElementById('bs-'+d.id),G=$('guide'),h=G&&G.query
   if(dz){const form=dz.querySelector(':scope>.card.form'),box=dz.querySelector('.uedb');if(form&&box){[...form.children].forEach(c=>{if(!c.classList.contains('ukind')&&!(c.classList.contains('chips')&&c.offsetHeight===0))box.append(c)});form.style.display='none'}
     const qb=mn.querySelector('.qbar');if(qb&&qb.querySelector('[data-k="akTn"]')&&!mn.querySelector('.ulab'))qb.insertAdjacentHTML('beforebegin','<p class="ulab">어떤 주제로 만들까요 — 고르면 아래 인쇄물에 바로 들어갑니다</p>')}
   }catch(e){console.warn(e)}}})();
+
+A.dpRm=()=>{S.ui.dpRm=1;A.dpOpen({i:S.ui.dp.i})};
