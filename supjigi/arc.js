@@ -1,4 +1,4 @@
-/* 별실 기록 — 아카데미 아카이브 (11/13)
+/* 더숲 아카이브 — 아카데미 아카이브 (11/13)
    실물은 사유의숲 별실에, 그 물건이 지나온 날은 여기에.
    공유 저장(Claude 앱 안): db  arc/<id> 기록, arcimg/<id> 사진 원본
    그 밖(공개 주소): 이 기기 안에만 (localStorage 기록 · IndexedDB 사진) */
@@ -47,7 +47,7 @@ V.aka.arc=()=>{if(ARC.st==='idle')setTimeout(arcStart,0);const U=S.ui,f=U.arcF||
   const where=arcShared()?(ARC.live?'함께 보는 기록 · 실시간':'함께 보는 기록 · 잇는 중'):'이 기기에만 남는 기록';
   const draft=U.arcT||'',shots=U.arcTh||[];
   return `<div class="arcw">
-  <div class="archd"><h1>별실 기록</h1><p class="arcm">물건은 사유의숲 별실에, 그 물건이 지나온 날은 여기에.</p>
+  <div class="archd"><h1>더숲 아카이브</h1><p class="arcm">실물은 사유의숲 별실에, 그 물건이 지나온 날은 여기에.</p>
    <div class="arcst"><span><b>${ARC.L.length}</b>기록</span><span><b>${ph}</b>사진</span><span><b>${iss.length}</b>묶음</span><span><b>${today}</b>오늘</span><em class="${arcShared()&&ARC.live?'on':''}">${where}</em></div></div>
   <div class="arcin">
    <textarea id="arcT" rows="2" placeholder="지금 있었던 일 한 줄 — 무엇이, 어떻게" aria-label="기록 한 줄">${esc(draft)}</textarea>
@@ -113,6 +113,6 @@ A.arcSelAll=()=>{const F=arcLeft(),s=S.ui.arcSel=S.ui.arcSel||{},all=F.every(f=>
 A.arcHide=d=>{const h=arcHid();h.push(d.id);ls.set('arcHide',h);if(S.ui.arcSel)delete S.ui.arcSel[d.id];render()};
 A.arcTake=async()=>{const s=S.ui.arcSel||{},F=arcLeft().filter(f=>s[f.id]);let n=0;for(const f of F){const o={id:arcId(),from:f.id,date:f.d,p:f.p,time:'',t:f.t,k:f.k,iss:'',box:'',th:[],img:[],url:f.url,src:f.src,note:f.note||'',at:new Date().toISOString()};if(await arcSave(o))n++}S.ui.arcSel={};toast(n+'건을 기록으로 담았습니다.');render()};
 
-/* 아카데미 메뉴에 「별실」 */
-TABS.aka.push(['arc','별실']);
-(()=>{const f=navList;navList=function(){const L=f();if(!L.some(x=>x[0]==='arc')){let i=L.findIndex(x=>x[0]==='today');if(i<0)i=L.findIndex(x=>x[0]==='insta');if(i>=0)L.splice(i+1,0,['arc','별실','aka',''])}return L}})();
+/* 아카데미 메뉴에 「아카이브」 */
+TABS.aka.push(['arc','아카이브']);
+(()=>{const f=navList;navList=function(){const L=f();if(!L.some(x=>x[0]==='arc')){let i=L.findIndex(x=>x[0]==='today');if(i<0)i=L.findIndex(x=>x[0]==='insta');if(i>=0)L.splice(i+1,0,['arc','아카이브','aka',''])}return L}})();
