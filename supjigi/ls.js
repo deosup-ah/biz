@@ -14,9 +14,9 @@ function lsFind(br,q){const all=items(br),d=String(q.isbn||'').replace(/\D/g,'')
   const isbn=d||(it&&it.isbn)||'',keys=[isbn,nt((it&&it.t)||q.t||'')].filter(Boolean);let ld=(it&&it.ld)||'',ap=false;
   sales().filter(s=>s.br===br).forEach(s=>{keys.forEach(k=>{const v=s.last&&s.last[k];if(v&&v>ld){ld=v;ap=false}else if(!v&&!(s.last)&&(s.top||[]).some(x=>(x.isbn||nt(x.t))===k)){const e=s.ym+'-28';if(e>ld){ld=e;ap=true}}})});
   const oth=items('all').filter(x=>x.br!==br&&(x.stock|0)>0&&((isbn&&x.isbn===isbn)||nt(x.t)===nt((it&&it.t)||q.t||''))).map(x=>[x.br,x.stock|0]);
-  return{oth,t:(it&&it.t)||q.t||'(제목 확인 중)',a:(it&&it.a)||q.a||'',p:(it&&it.p)||q.p||'',isbn,stock:it?it.stock|0:null,ld,ap,n:lsDays(ld),src:q.src||''}}
+  return{oth,t:(it&&it.t)||q.t||'(제목 찾는 중)',a:(it&&it.a)||q.a||'',p:(it&&it.p)||q.p||'',isbn,stock:it?it.stock|0:null,ld,ap,n:lsDays(ld),src:q.src||''}}
 function lsAdd(q){const L=S.ui.ls.rows,r=lsFind(S.br,q),key=r.isbn||nt(r.t);if(L.some(x=>(x.isbn||nt(x.t))===key))return false;r.pick=lsPickable(r);L.unshift(r);
-  if(!r.stock&&r.stock!==0&&r.isbn&&r.t==='(제목 확인 중)'){const BK=window.BOOKS||{},h=[...(BK.yes24||[]),...(BK.aladin||[]),...(BK.kyobo||[])].find(b=>b.isbn===r.isbn);if(h){r.t=h.t;r.a=h.a||'';r.p=h.p||''}else fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:'+r.isbn).then(x=>x.json()).then(j=>{const v=j&&j.items&&j.items[0]&&j.items[0].volumeInfo;r.t=v&&v.title?v.title:'(매장 자료에 없는 책)';lsDraw()}).catch(()=>{r.t='(매장 자료에 없는 책)';lsDraw()})}
+  if(!r.stock&&r.stock!==0&&r.isbn&&r.t==='(제목 찾는 중)'){const BK=window.BOOKS||{},h=[...(BK.yes24||[]),...(BK.aladin||[]),...(BK.kyobo||[])].find(b=>b.isbn===r.isbn);if(h){r.t=h.t;r.a=h.a||'';r.p=h.p||''}else fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:'+r.isbn).then(x=>x.json()).then(j=>{const v=j&&j.items&&j.items[0]&&j.items[0].volumeInfo;r.t=v&&v.title?v.title:'(매장 자료에 없는 책)';lsDraw()}).catch(()=>{r.t='(매장 자료에 없는 책)';lsDraw()})}
   return true}
 const lsPickable=r=>(r.stock==null||r.stock>0)&&(r.n==null?!!lsSince(S.br):r.n>=S.ui.ls.th);
 A.lsOpen=()=>{if(S.br==='all'){toast('위에서 지점을 먼저 고르세요');return}S.ui.ls=S.ui.ls&&S.ui.ls.br===S.br?S.ui.ls:{br:S.br,rows:[],th:180};lsDraw()};

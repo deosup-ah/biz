@@ -10,10 +10,10 @@ A.agClose=()=>{const g=$('agent');if(g)g.remove()};
 A.agSug=d=>{const i=$('agIn');if(i)i.value=d.t;A.agSend()};
 A.agDo=d=>{try{agRun(JSON.parse(d.j))}catch(e){}};
 function agDraw(busy){let g=$('agent');if(!g){g=document.createElement('div');g.id='agent';document.body.append(g)}const L=agLog();
-  g.innerHTML=`<div class="agb"><div class="agh"><div><b>AI 에이전트</b><small>묻기만 하는 챗봇이 아니라, 시키면 앱에서 직접 해 주는 도구</small></div><button class="agx" data-a="agClose">닫기 ✕</button></div>
+  g.innerHTML=`<div class="agb"><div class="agh"><div><b>AI 에이전트</b><small>시키면 앱에서 직접 해 주는 도구</small></div><button class="agx" data-a="agClose">닫기 ✕</button></div>
    <div class="agm" id="agM">${L.map(m=>`<div class="ag-${m.who}"><p>${esc(m.t).replace(/\n/g,'<br>')}</p>${(m.btn||[]).map(b=>`<button class="chip" data-a="agDo" data-j='${esc(JSON.stringify(b.a))}'>${esc(b.n)}</button>`).join('')}</div>`).join('')}${busy?'<div class="ag-ai"><p>생각하는 중…</p></div>':''}</div>
    <div class="ags">${AGSUG.map(t=>`<button class="chip" data-a="agSug" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div>
-   <div class="agf"><input id="agIn" placeholder="예: 초소 큐레이션 진열을 눈에 띄게" autocomplete="off" enterkeyhint="send">${typeof micBtn==='function'?micBtn('agIn'):''}<button class="btn pri" data-a="agSend" ${busy?'disabled':''}>보내기</button></div></div>`;
+   <div class="agf"><input id="agIn" placeholder="하고 싶은 일을 한 줄로" autocomplete="off" enterkeyhint="send">${typeof micBtn==='function'?micBtn('agIn'):''}<button class="btn pri" data-a="agSend" ${busy?'disabled':''}>보내기</button></div></div>`;
   const m=$('agM');if(m)m.scrollTop=m.scrollHeight}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target&&e.target.id==='agIn'&&!e.isComposing){e.preventDefault();A.agSend()}});
 A.agSend=async()=>{const i=$('agIn'),q=(i&&i.value||'').trim();if(!q)return;const L=agLog();L.push({who:'me',t:q});i.value='';agDraw(true);
