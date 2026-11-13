@@ -47,7 +47,7 @@ function pl3OneAdd(){if(S.br!=='aka'||!Array.isArray(S.ui.cor))return;PL3ONE.for
   S.ui.cor.push({tone:'꾸준한',tg:'인물도서관 코너',title,hook:why,sym:'book',bpal:4+k,ppal:1,until:'2026-12-31',place:'인물도서관',books:[{t:bt,a:who==='이어령'?'김지수 · 이어령':who,p:pub,role:'중심',src:''}],pop:{head:`${who},\n『${bt}』`,body:why},band:`${who} 『${bt}』`,br:'aka'})})}
 const pl3Ix=t=>{try{return (S.ui.cor||[]).findIndex(x=>x&&x.title===t)}catch(e){return -1}};
 function pl3Corner(){if(S.br!=='aka')return '';pl3OneAdd();const j=pl3Ix(PL3K.jang),a=pl3Ix(PL3K.shin),b=pl3Ix(PL3K.lee),J=j>=0?S.ui.cor[j]:null;
-  const one=(i,n)=>{if(i<0)return '';const t=S.ui.cor[i],bk=(t.books||[])[0]||{};return `<div class="pl3one"><em>${n}</em><b>『${esc(bk.t||'')}』</b><i>${esc(bk.a||'')}</i><span><button class="btn sm" data-a="toDesign" data-kind="pop" data-s="c" data-i="${i}">POP</button><button class="btn sm" data-a="setOpen" data-i="${i}">인쇄물 한 번에</button></span></div>`};
+  const one=(i,n)=>{if(i<0)return '';const t=S.ui.cor[i],bk=(t.books||[])[0]||{};return `<div class="pl3one"><em>${n}</em><b>『${esc(bk.t||'')}』</b>${bk.a&&bk.a!==n?`<i>${esc(bk.a)}</i>`:''}<span><button class="btn sm" data-a="toDesign" data-kind="pop" data-s="c" data-i="${i}">POP</button><button class="btn sm" data-a="setOpen" data-i="${i}">인쇄물 한 번에</button></span></div>`};
   return `${J?`<section class="pl3pc" aria-label="기획 코너"><header><em>기획 코너 · 다음 주 전시</em><span>사유의숲 인물도서관 · ${J.books.length}권</span></header>
    <b>장일순</b><p>${esc(J.hook||'')}</p><ul>${J.books.map(x=>`<li>『${esc(x.t)}』</li>`).join('')}</ul>
    <div class="pl3pcb"><button class="btn" data-a="setOpen" data-i="${j}">인쇄물 한 번에 (POP · 쇼카드 · 목록 · 띠지)</button><button class="btn ghost" data-a="dpOpen" data-i="${j}">진열 보기</button></div></section>`:''}
