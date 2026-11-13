@@ -34,21 +34,22 @@ A.plOpen=d=>{if(d&&d.all!==undefined)S.ui.plAll=!!d.all;const all=!!S.ui.plAll,L
    ${L.length?Object.entries(by).slice(0,24).map(([d,es])=>`<div class="pld"><b>${mdw(d)}</b>${es.map(e=>`<div class="plr pl3r">${e.th?`<img src="${e.th}" alt="">`:''}<span><b>${esc(e.t)}</b><i>${all?esc(brN(e.br))+' · ':''}${esc(e.k)}${e.books&&e.books.length?` · 책 ${e.books.length}권`:''}</i>${e.books&&e.books.length?`<small>${e.books.slice(0,6).map(esc).join(' · ')}</small>`:''}</span></div>`).join('')}</div>`).join(''):'<p class="lse">아직 기록이 없습니다. 큐레이션 카드에서 진열을 보내거나, 평대를 사진으로 남기면 쌓입니다.</p>'}
    <div class="igxa"><button class="btn pri" data-a="plMix">기록 섞어 새 평대</button><button class="btn" data-a="close">닫기</button></div></div>`)};
 
-/* 아카 기획 코너 · 인물도서관 코너 (11/14 참부장): 장일순은 다음 주 전시용 기획 코너(여러 권 · 인쇄물 한 번에),
+/* 아카 기획 코너 · 인물도서관 코너 (11/14 참부장): 장일순은 11/14 시작 전시용 기획 코너(여러 권 · 인쇄물 한 번에),
    신영복 · 이어령은 한 권씩. 주제는 BANK 에 넣어 큐레이션 벽과 같은 과정으로 만든다. */
 const PL3K={jang:'장일순, 밥 한 그릇의 우주',shin:'신영복 한 권 — 감옥으로부터의 사색',lee:'이어령 한 권 — 마지막 수업'};
 try{const akaOn=()=>S.br==='aka'&&TODAY<='2026-12-31';
-  BANK.push({tone:'제철',t:PL3K.jang,tg:'기획 코너 · 전시',why:'원주의 스승 무위당 장일순. 생명과 협동을 말한 그의 책과, 그와 이어진 책들을 한자리에 놓습니다.',sym:'leaf',bp:2,pp:1,k:/^$/,end:'2026-12-31',sc:c=>akaOn()?99:0,
+  BANK.push({tone:'제철',t:PL3K.jang,tg:'기획 코너 · 전시',why:'원주의 스승 무위당 장일순. 생명과 협동을 말한 그의 책과, 그와 이어진 책들을 한자리에 놓습니다.',sym:'leaf',bp:2,pp:1,k:/^$/,end:'2026-12-31',noDue:true,sc:c=>akaOn()?99:0,
    fixed:[['나락 한 알 속의 우주','장일순','녹색평론사'],['좁쌀 한 알','최성현','도솔'],['무위당 장일순의 노자 이야기','장일순 · 이현주',''],['장일순 평전','김삼웅',''],['밥','김지하',''],['스핑크스의 코','리영희','까치'],['도덕경','노자',''],['월든','헨리 데이비드 소로','']]});
 }catch(e){console.warn(e)}
 /* 한 권 코너: 큐레이션 벽 주제(3권 이상)와 따로, 화면을 그릴 때마다 S.ui.cor 끝에 붙여 POP · 인쇄물을 같은 과정으로 만든다 */
-const PL3ONE=[[PL3K.shin,'신영복','감옥으로부터의 사색','돌베개','갇힌 자리에서 쓴 편지가 가장 넓은 생각이 되었습니다.'],[PL3K.lee,'이어령','이어령의 마지막 수업','열림원','세상을 떠나기 전, 묻고 답하며 남긴 마지막 이야기.']];
-function pl3OneAdd(){if(S.br!=='aka'||!Array.isArray(S.ui.cor))return;PL3ONE.forEach(([title,who,bt,pub,why],k)=>{if(S.ui.cor.some(x=>x&&x.title===title))return;
-  S.ui.cor.push({tone:'꾸준한',tg:'인물도서관 코너',title,hook:why,sym:'book',bpal:4+k,ppal:1,until:'2026-12-31',place:'인물도서관',books:[{t:bt,a:who==='이어령'?'김지수 · 이어령':who,p:pub,role:'중심',src:''}],pop:{head:`${who},\n『${bt}』`,body:why},band:`${who} 『${bt}』`,br:'aka'})})}
+const PL3ONE=[[PL3K.shin,'신영복','감옥으로부터의 사색','돌베개','20년 20일, 갇힌 자리에서 쓴 편지들. 1988년 햇빛출판사에서 나온 첫 책(초판)이 사유의숲 인물도서관 서가에 있습니다. 그 책을 펼쳐 보고, 지금 판을 한 권 가져가세요.','비를 함께\n맞는 것입니다.','초판 1988 · 인물도서관 서가'],[PL3K.lee,'이어령','이어령의 마지막 수업','열림원','세상을 떠나기 전, 묻고 답하며 남긴 마지막 이야기.']];
+function pl3OneAdd(){if(S.br!=='aka'||!Array.isArray(S.ui.cor))return;PL3ONE.forEach(([title,who,bt,pub,why,hd,nt0],k)=>{if(S.ui.cor.some(x=>x&&x.title===title))return;
+  S.ui.cor.push({tone:'꾸준한',tg:'인물도서관 코너',title,hook:why,sym:'book',bpal:4+k,ppal:1,until:'2026-12-31',place:'인물도서관',books:[{t:bt,a:who==='이어령'?'김지수 · 이어령':who,p:pub,role:'중심',src:''}],pop:{head:hd||`${who},\n『${bt}』`,body:hd?`${who} 『${bt}』 — ${why}`:why},note:nt0||'',line:hd?hd.replace(/\n/g,' '):'',band:`${who} 『${bt}』`,br:'aka'})})}
+try{POPQX[PL3K.shin]='신영복 『감옥으로부터의 사색』 1988년 초판이 인물도서관 서가에 있습니다. 펼쳐 보세요.'}catch(e){}
 const pl3Ix=t=>{try{return (S.ui.cor||[]).findIndex(x=>x&&x.title===t)}catch(e){return -1}};
 function pl3Corner(){if(S.br!=='aka')return '';pl3OneAdd();const j=pl3Ix(PL3K.jang),a=pl3Ix(PL3K.shin),b=pl3Ix(PL3K.lee),J=j>=0?S.ui.cor[j]:null;
-  const one=(i,n)=>{if(i<0)return '';const t=S.ui.cor[i],bk=(t.books||[])[0]||{};return `<div class="pl3one"><em>${n}</em><b>『${esc(bk.t||'')}』</b>${bk.a&&bk.a!==n?`<i>${esc(bk.a)}</i>`:''}<span><button class="btn sm" data-a="toDesign" data-kind="pop" data-s="c" data-i="${i}">POP</button><button class="btn sm" data-a="setOpen" data-i="${i}">인쇄물 한 번에</button></span></div>`};
-  return `${J?`<section class="pl3pc" aria-label="기획 코너"><header><em>기획 코너 · 다음 주 전시</em><span>사유의숲 인물도서관 · ${J.books.length}권</span></header>
+  const one=(i,n)=>{if(i<0)return '';const t=S.ui.cor[i],bk=(t.books||[])[0]||{};return `<div class="pl3one"><em>${n}</em><b>『${esc(bk.t||'')}』</b>${bk.a&&bk.a!==n?`<i>${esc(bk.a)}</i>`:''}${t.line?`<i class="pl3q">「${esc(t.line)}」${t.note?` · ${esc(t.note)}`:''}</i>`:''}<span><button class="btn sm" data-a="toDesign" data-kind="pop" data-s="c" data-i="${i}">POP</button><button class="btn sm" data-a="setOpen" data-i="${i}">인쇄물 한 번에</button></span></div>`};
+  return `${J?`<section class="pl3pc" aria-label="기획 코너"><header><em>기획 코너 · ${TODAY==='2026-11-14'?'오늘 전시 시작':'전시 중'}</em><span>사유의숲 인물도서관 · ${J.books.length}권</span></header>
    <b>장일순</b><p>${esc(J.hook||'')}</p><ul>${J.books.map(x=>`<li>『${esc(x.t)}』</li>`).join('')}</ul>
    <div class="pl3pcb"><button class="btn" data-a="setOpen" data-i="${j}">인쇄물 한 번에 (POP · 쇼카드 · 목록 · 띠지)</button><button class="btn ghost" data-a="dpOpen" data-i="${j}">진열 보기</button></div></section>`:''}
    ${a>=0||b>=0?`<section class="pl3ones" aria-label="인물도서관 코너"><h3>인물도서관 코너 · 한 권씩</h3>${one(a,'신영복')}${one(b,'이어령')}</section>`:''}`}
