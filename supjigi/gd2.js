@@ -1,6 +1,6 @@
 /* 가이드 다시 만들기 (11/13 참부장 「고도화 · 디자인화 · 집중화 · 설명화, 기능마다 도움 되는 이유, 심플하고 의미 있게, 프로 앱처럼」)
    한 장에 기능 하나: 이름 · 한 줄 제목 · 화면 · 왜 도움이 되나 · 이렇게 씁니다 · 「열어 보기」.
-   위에는 이야기 넘기듯 진행 막대, 아래는 이전 · 다음. 아직 여는 중인 기능은 마지막 장에 「안정화 중」으로 모은다. */
+   위에는 이야기 넘기듯 진행 막대, 아래는 이전 · 다음. 아직 여는 중인 기능은 마지막 장에 「테스트 중」으로 모은다. */
 const G2=[
   {k:'cur',img:'a.gif',n:'큐레이션',t:'단어 하나면 평대 하나',why:'「이번 주 무엇을 앞에 둘까」를 고민하는 시간이 줄어듭니다. 매장에 있는 책으로만 묶여서 바로 진열할 수 있습니다.',how:['단어 하나 적기','카드 고르기','진열 · POP로'],go:'cur'},
   {k:'dp',img:'f.gif',n:'진열 3D',t:'놓기 전에 먼저 봅니다',why:'평면 그림으로는 높이와 서로 가리는 표지가 보이지 않습니다. 돌려 보고 놓으면 두 번 옮기지 않습니다.',how:['카드에서 「진열 보기」','끌어서 자리 바꾸기','「직원에게 보내기」'],go:'cur'},
@@ -10,7 +10,7 @@ const G2=[
   {k:'pz',img:'pz.jpg',n:'가로세로 숲',t:'풀다 보면 서가 앞에 서 있습니다',why:'고객이 머무는 시간이 길어지고, 막히면 답이 담긴 책을 찾아 서가로 갑니다. 출력해서 건네기만 하면 됩니다.',how:['주제 · 난이도 고르기','인쇄 PDF','정답 장은 계산대에'],go:'pz'},
   {k:'ag',mock:'ag',n:'AI 에이전트',t:'메뉴를 몰라도 시키면 됩니다',why:'어디 있는지 찾지 않아도 「가득 채우는 진열」 「두 번째 POP」처럼 말하면 그 화면을 열고 만들어 줍니다.',how:['도움말 → AI 에이전트','하고 싶은 일 한 줄','결과 확인'],go:'ag'},
   {k:'cal',img:'b.gif',n:'일정',t:'한 줄이면 일정이 됩니다',why:'「내일 2시 30명 대화의 집」처럼 적으면 날짜 · 인원 · 장소가 나뉘어 들어갑니다. 겹치는 일정은 먼저 알려 줍니다.',how:['한 줄 적기','확인','오늘 화면에서 보기'],go:'today',adm:1},
-  {k:'soon',n:'곧 열립니다',t:'안정화 중인 기능',soon:1},
+  {k:'soon',n:'곧 열립니다',t:'테스트 중인 기능',soon:1},
   {k:'rule',n:'원칙',t:'앱과 큐레이팅 설계 원칙',rule:1}
 ];
 /* 참부장이 직접 정한 문장(11/13). 글자를 바꾸지 않는다 */
@@ -27,19 +27,19 @@ const g2Soon=()=>{const ad=typeof isAdmin==='function'&&isAdmin();return G2SOON.
     const L=g2List(),i=Math.min(S.ui.gd|0,L.length-1),s=L[i],last=i===L.length-1;G.className='g2'+(s.soon||s.rule?' g2free':'');
     const tabs='';
     const bar=`<div class="g2bar">${L.map((x,j)=>`<button data-a="gdTo" data-i="${j}" class="${j<i?'done':j===i?'on':''}" aria-label="${x.n}"></button>`).join('')}</div>`;
-    const media=s.soon?`<div class="g2tiles">${g2Soon().map(([a,b],j)=>`<div class="g2t"><i aria-hidden="true"><b></b><b></b></i><b>${a}</b><p>${b}</p><em>안정화 중</em></div>`).join('')}</div>`:s.rule?`<div class="g2rule"><i aria-hidden="true"><b></b><b></b><b></b></i>${G2RULE.map(([a,b])=>`<section><h3>${a}</h3><p>${b}</p></section>`).join('')}<p class="g2sig">참부장</p></div>`:s.soon?`<div class="g2soon">${g2Soon().map(([a,b])=>`<div><span><b>${a}</b><em>안정화 중</em></span><p>${b}</p></div>`).join('')}</div>`
+    const media=s.soon?`<div class="g2tiles">${g2Soon().map(([a,b],j)=>`<div class="g2t"><i aria-hidden="true"><b></b><b></b></i><b>${a}</b><p>${b}</p><em>테스트 중</em></div>`).join('')}</div>`:s.rule?`<div class="g2rule"><i aria-hidden="true"><b></b><b></b><b></b></i>${G2RULE.map(([a,b])=>`<section><h3>${a}</h3><p>${b}</p></section>`).join('')}<p class="g2sig">참부장</p></div>`:s.soon?`<div class="g2soon">${g2Soon().map(([a,b])=>`<div><span><b>${a}</b><em>테스트 중</em></span><p>${b}</p></div>`).join('')}</div>`
       :s.mock==='ag'?`<div class="g2m g2ag"><p class="me">진열 가득 채워 줘</p><p class="it">첫 번째 평대를 「가득 채우기」로 놓았습니다. 메인은 앞줄 가운데에 세웠어요.</p><p class="me">두 번째 POP 짙은 바탕으로</p><p class="it">POP를 「짙은 바탕」으로 만들었습니다.</p></div>`
       :`<div class="g2m"><img src="guide/${s.img}?v=13" alt="${esc(s.t)}" loading="eager"></div>`;
     G.innerHTML=`<div class="g2b">${g2Head('a')}${bar}
       <div class="g2c"><div class="g2h"><span class="g2n">${String(i+1).padStart(2,'0')}<i>/ ${String(L.length).padStart(2,'0')}</i></span><span class="g2f">${s.n}</span></div>
       <h2>${s.t}</h2>${media}
-      ${s.rule?'':s.soon?`<p class="g2note">시스템 안정화 테스트 중입니다. 며칠 안에 차례로 열립니다.</p>`:`<div class="g2why"><b>왜 도움이 되나</b><p>${s.why}</p></div><ol class="g2how">${s.how.map(h=>`<li>${h}</li>`).join('')}</ol>`}</div>
+      ${s.rule?'':s.soon?`<p class="g2note">시스템 테스트 중입니다. 며칠 안에 차례로 열립니다.</p>`:`<div class="g2why"><b>왜 도움이 되나</b><p>${s.why}</p></div><ol class="g2how">${s.how.map(h=>`<li>${h}</li>`).join('')}</ol>`}</div>
       <div class="g2nav"><button class="btn" data-a="gdGo" data-d="-1" ${i===0?'disabled':''}>이전</button>${s.go?`<button class="btn" data-a="g2Try" data-k="${s.go}">열어 보기</button>`:''}${last?`<button class="btn pri" data-a="gdClose">시작하기</button>`:`<button class="btn pri" data-a="gdGo" data-d="1">다음</button>`}</div></div>`}})();
 A.gdGo=d=>{const n=S.ui.gdTab==='b'?GDS.length:g2List().length;S.ui.gd=Math.max(0,Math.min(n-1,(S.ui.gd|0)+(+d.d)));gdDraw()};
 A.gdTo=d=>{S.ui.gd=+d.i;gdDraw()};
 A.g2Try=d=>{const k=d.k;A.gdClose();try{if(k==='cur')A.go({v:'cur',m:'store'});else if(k==='design')A.go({v:'design'});else if(k==='today')A.go({v:'today',m:'aka'});else if(k==='ana')A.go({v:'ana',m:'store'});else if(k==='ig')A.igOpen({});else if(k==='pz')A.pzOpen();else if(k==='wd')A.wdOpen();else if(k==='ag')A.agOpen()}catch(e){}};
 
-/* 서점 기초: 「북토크와 행사」는 숨기고(안정화 중), 「지원사업」 장을 더한다 */
+/* 서점 기초: 「북토크와 행사」는 숨기고(테스트 중), 「지원사업」 장을 더한다 */
 (()=>{const i=BASICS.findIndex(b=>b.id==='event');if(i>=0)BASICS.splice(i,1);
   if(!BASICS.some(b=>b.id==='biz'))BASICS.push({id:'biz',t:'지원사업',lead:'서점과 문화 공간이 공공 기관의 공모에 신청해 프로그램 비용을 지원받는 일입니다. 공고 → 신청 → 심사 → 협약 → 운영 → 정산 순서로 갑니다.',
    items:[['어디서 나오나','문화체육관광부와 그 아래 기관(한국문화예술위원회, 한국출판문화산업진흥원 등), 그리고 서울시 같은 지방자치단체가 해마다 공모를 냅니다.'],

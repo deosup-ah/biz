@@ -18,9 +18,9 @@ const keyHash=async(kind,v)=>[...new Uint8Array(await crypto.subtle.digest('SHA-
 /* ── 관리자만 보는 화면 ── */
 const HID={store:['ana','stock','today','rank','ret','data','biz','talk','club'],aka:['today','cal','talk']};
 (()=>{const f=navList;navList=function(){const L=f();return isAdmin()?L:L.filter(t=>!(HID[t[2]]||[]).includes(t[0]))}})();
-(()=>{const r=render;render=function(){if(!S.locked&&!isAdmin()){if(S.ui.mkTab&&S.ui.mkTab!=='p')S.ui.mkTab='p';const m=S.mode,v=S.view[m];if((HID[m]||[]).includes(v)){if(m==='aka'){S.mode='store';S.br='aka'}S.view.store='cur';if(S.loaded&&!S.ui.hidT){S.ui.hidT=1;setTimeout(()=>{S.ui.hidT=0;toast('이 화면은 안정화 테스트 중입니다. 며칠만 기다려 주세요.')},50)}}}
+(()=>{const r=render;render=function(){if(!S.locked&&!isAdmin()){if(S.ui.mkTab&&S.ui.mkTab!=='p')S.ui.mkTab='p';const m=S.mode,v=S.view[m];if((HID[m]||[]).includes(v)){if(m==='aka'){S.mode='store';S.br='aka'}S.view.store='cur';if(S.loaded&&!S.ui.hidT){S.ui.hidT=1;setTimeout(()=>{S.ui.hidT=0;toast('이 화면은 테스트 중입니다. 며칠만 기다려 주세요.')},50)}}}
   r.apply(this,arguments);try{if(isAdmin())return;const mn=document.querySelector('main');if(mn)mn.querySelectorAll('.subt [data-a="mkTab"]').forEach(b=>{const s=b.parentElement;if(s)s.remove()});if(mn)mn.querySelectorAll('[data-a="dKind"][data-k="rent"],[data-a="dKind"][data-k="sign"],[data-a="curOrder"],[data-a="go"][data-v="club"]').forEach(b=>b.remove());if(mn&&S.mode==='store'&&S.view.store==='cur')mn.querySelectorAll(':scope>details.fold:not(.hmore)').forEach(b=>b.remove());if(mn)mn.querySelectorAll('button.mrow[data-a="go"]').forEach(b=>{if(HID.store.includes(b.dataset.v))b.remove()})}catch(e){}}})();
-(()=>{const g=A.gGo;A.gGo=async d=>{const el=$('gIn'),v=((d&&d.v)||(el&&el.value)||'').trim();if(v&&!isAdmin()&&typeof G_SCHED!=='undefined'&&G_SCHED.test(v)&&!(typeof G_NOTE!=='undefined'&&G_NOTE.test(v))){toast('일정 넣기는 안정화 테스트 중입니다. 며칠만 기다려 주세요.');return}if(v)lvAdd('cur',v);return g(d)}})();
+(()=>{const g=A.gGo;A.gGo=async d=>{const el=$('gIn'),v=((d&&d.v)||(el&&el.value)||'').trim();if(v&&!isAdmin()&&typeof G_SCHED!=='undefined'&&G_SCHED.test(v)&&!(typeof G_NOTE!=='undefined'&&G_NOTE.test(v))){toast('일정 넣기는 테스트 중입니다. 며칠만 기다려 주세요.');return}if(v)lvAdd('cur',v);return g(d)}})();
 /* 가이드: 관리자가 아니면 일정 · 매출 장을 빼고 안내 한 줄 */
 if(!isAdmin()){for(let i=GDS.length-1;i>=0;i--)if(GDS[i][0]==='b'||GDS[i][0]==='d'||GDS[i][0]==='c')GDS.splice(i,1)}
 if(!isAdmin())GDS.push(['z','곧 열립니다','주문 · 반품 · 매출 · 지원사업']);
@@ -29,7 +29,7 @@ let gdTy=0;
   const B=G.querySelector('.gdb'),im0=G.querySelector('.gdi img');if(im0){im0.dataset.a=last?'gdClose':'gdGo';im0.dataset.d='1'}
   if(B&&k==='f'&&!B.querySelector('.gdwhy')){const p=B.querySelector('p');if(p)p.insertAdjacentHTML('afterend','<div class="gdwhy"><b>왜 3D인가</b> 평면 그림은 자리만 보입니다. 높이, 서로 가리는 표지, 고객 눈에 먼저 닿는 책은 돌려 봐야 보입니다. 놓기 전에 보면 두 번 옮기지 않습니다.</div>')}
   if(B&&last&&!B.querySelector('.gdnx')){const nx=document.createElement('div');nx.className='gdnx';nx.innerHTML='<button class="gdgo" data-a="gdClose">시작하기</button>';B.append(nx)}
-  if(k==='z'){const im=G.querySelector('.gdi img');if(im)im.outerHTML=`<div class="gdz">${[['주문 · 반품','팔린 만큼 셈해 주문에 담고, 반품할 책은 사진만 찍으면 자동으로 반품 등록'],['매출','숫자 대신 이번 주 할 일 세 가지로 알려 줍니다'],['지원사업','공모 일정과 신청 기록을 한곳에 모읍니다']].map(([a,b])=>`<div><b>${a}</b><span>${b}</span><em>안정화 중</em></div>`).join('')}<p>시스템 안정화 테스트 중입니다. 며칠만 기다려 주세요.</p></div>`}
+  if(k==='z'){const im=G.querySelector('.gdi img');if(im)im.outerHTML=`<div class="gdz">${[['주문 · 반품','팔린 만큼 셈해 주문에 담고, 반품할 책은 사진만 찍으면 자동으로 반품 등록'],['매출','숫자 대신 이번 주 할 일 세 가지로 알려 줍니다'],['지원사업','공모 일정과 신청 기록을 한곳에 모읍니다']].map(([a,b])=>`<div><b>${a}</b><span>${b}</span><em>테스트 중</em></div>`).join('')}<p>시스템 테스트 중입니다. 며칠만 기다려 주세요.</p></div>`}
   const h=G.querySelector('.gdb h2');if(h){const t=h.textContent,id=++gdTy;h.textContent='';h.classList.add('gdty');let n=0;const st=()=>{if(id!==gdTy||!h.isConnected)return;h.textContent=t.slice(0,++n);if(n<t.length)setTimeout(st,28);else setTimeout(()=>h.classList.add('done'),600)};st()}}catch(e){}}})();
 
 /* ── 쓴 만큼 세기 ── */
