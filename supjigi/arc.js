@@ -61,7 +61,6 @@ V.aka.arc=()=>{if(ARC.st==='idle')setTimeout(arcStart,0);const U=S.ui,f=U.arcF||
     <label class="arcdt"><span>${dt===TODAY?'오늘':arcMD(dt)}</span><input type="date" value="${dt}" max="${TODAY}" data-c="arcD" aria-label="날짜"></label>
     <select data-c="arcIssSel" aria-label="묶음"><option value="">묶음 없음</option>${iss.map(g=>`<option ${g.n===cur?'selected':''}>${esc(g.n)}</option>`).join('')}<option value="+">새 묶음…</option></select>
     <input type="text" id="arcBox" value="${esc(U.arcBox||'')}" placeholder="별실 자리 (예: 상자 3)" aria-label="별실 보관 자리">
-    <input type="text" id="arcSrc" class="arcsrcin" value="${esc(U.arcSrc||'')}" placeholder="출처 · 링크 (있으면)" aria-label="출처 또는 링크">
     <button class="btn pri" data-a="arcAdd">남기기</button>
    </div>
    ${U.arcBusy?`<p class="arcbusy">사진을 줄이는 중…</p>`:''}
@@ -97,7 +96,7 @@ A.arcShotX=d=>{(S.ui.arcTh||[]).splice(+d.i,1);render()};
 A.arcAdd=async()=>{const U=S.ui,t=(($('arcT')||{}).value||U.arcT||'').trim(),sh=U.arcTh||[];if(!t&&!sh.length){toast('한 줄이나 사진 한 장은 있어야 남깁니다.');const x=$('arcT');if(x)x.focus();return}
   if(U.arcBusy)return;const now=arcNow(),dt=U.arcD||TODAY,id=arcId(),img=[];
   for(const s of sh){const k=id+'-'+img.length;if(await arcImgPut(k,s.full))img.push(k)}
-  const o={id,date:dt,time:dt===TODAY?now.time:'',t:t||'사진 기록',k:arcKind(t+' '+(U.arcIss||'')),iss:U.arcIss||'',box:(($('arcBox')||{}).value||U.arcBox||'').trim(),...arcSrcParse(($('arcSrc')||{}).value||U.arcSrc),th:sh.slice(0,img.length).map(s=>s.th),img,at:new Date().toISOString()};
+  const o={id,date:dt,time:dt===TODAY?now.time:'',t:t||'사진 기록',k:arcKind(t+' '+(U.arcIss||'')),iss:U.arcIss||'',box:(($('arcBox')||{}).value||U.arcBox||'').trim(),th:sh.slice(0,img.length).map(s=>s.th),img,at:new Date().toISOString()};
   if(await arcSave(o)){U.arcT='';U.arcTh=[];U.arcSrc='';ARC.pend=false;toast(dt===TODAY?'남겼습니다.':arcMD(dt)+' 기록으로 남겼습니다.');render()}};
 A.arcF=d=>{S.ui.arcF=S.ui.arcF===d.n&&d.n?'':d.n;render();window.scrollTo(0,0)};
 A.arcMore=d=>{const o=ARC.L.find(x=>x.id===d.id);if(!o)return;if(!o.iss){const n=(prompt('이 기록을 어떤 묶음으로 이어 갈까요?',o.t.slice(0,20))||'').trim().slice(0,40);if(!n)return;o.iss=n;arcSave({...o})}
