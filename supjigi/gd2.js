@@ -18,6 +18,8 @@ const G2RULE=[['덜어 내기','기능을 더하기 전에 먼저 덜어 내고,
 const G2RULES=[{h:'앱',p:'도구는 덜어 내고, 실제 공간을 옮깁니다.',L:G2RULE},
  {h:'큐레이팅',p:'지금, 사회와 사람을 향해.',L:[['공간에서 시작합니다','같은 책도 놓이는 자리에 따라 다르게 읽힙니다. 주제는 이 공간과, 여기 오는 사람들에게서 찾습니다.'],['사회와 사람을 향해','나 혹은 일부만 아는 이야기를 고르지 않습니다. 큐레이팅은 사회와 사람을 향해 있어야 합니다.']]},
  {h:'셀렉션',p:'변하는 것과 변하지 않는 것을 함께.',L:[['읽는 일 자체','책을 좋고 나쁨으로 가르지 않습니다. 읽는 일 자체가 소중해진 시대입니다.'],['변하는 것과 변하지 않는 것','책이 지속되려면 책의 개념도 바뀌어야 합니다. 그 변화와, 변하지 않는 것을 함께 담습니다.']]}];
+/* 공통 원칙(앱 · 큐레이팅, 11/14 참부장): 세 상자 위에 한 줄로 */
+const G2COMMON=['쓰는 사람이 고칠 수 있게','앱도 큐레이팅도, 쓰는 사람이 바로 알아보고 직접 고칠 수 있어야 합니다. 그에 맞춰 계속 빼고 더하며 진화합니다. 모든 화면과 결과물은 이미지 · 파일로 저장하고 공유할 수 있습니다.'];
 const G2SOON=[['말로 찾는 서가','감정 · 물건 · 상황 말마다 QR을 붙여, 고객이 찍으면 그런 느낌의 책이 있는 곳으로 안내합니다.',1],['북토크 · 프로그램','북토크와 프로그램을 기획부터 비용 정산까지 자동으로 이어 줍니다.',1],['찍기 · 마지막 판매일','바코드나 제목을 찍으면 책마다 마지막으로 팔린 날과 1개월~3년 구간이 나오고, 오래 안 팔린 책을 반품 목록에 담습니다.',1]];
 function g2Head(t){return `<div class="g2top"><b>도움말</b><button class="g2x" data-a="gdClose">닫기</button></div>
   <button class="g2ai" data-a="agOpen"><span class="g2ai1">AI 에이전트</span><span class="g2ai2">말하면 앱이 직접 해 줍니다</span><i aria-hidden="true">›</i></button>
@@ -30,7 +32,7 @@ const g2Soon=()=>{const ad=typeof isAdmin==='function'&&isAdmin();return G2SOON.
     const L=g2List(),i=Math.min(S.ui.gd|0,L.length-1),s=L[i],last=i===L.length-1;G.className='g2'+(s.soon||s.rule?' g2free':'');
     const tabs='';
     const bar=`<div class="g2bar">${L.map((x,j)=>`<button data-a="gdTo" data-i="${j}" class="${j<i?'done':j===i?'on':''}" aria-label="${x.n}"></button>`).join('')}</div>`;
-    const media=s.soon?`<div class="g2tiles">${g2Soon().map(([a,b],j)=>`<div class="g2t"><i aria-hidden="true"><b></b><b></b></i><b>${a}</b><p>${b}</p><em>테스트 중</em></div>`).join('')}</div>`:s.rule?`<div class="g2rule">${G2RULES.map((g,j)=>`<div class="g2rbox"><header><b>${g.h}</b><span>${g.p}</span></header>${g.L.map(([a,b])=>`<section><h3>${a}</h3><p>${b}</p></section>`).join('')}</div>`).join('')}</div>`:s.soon?`<div class="g2soon">${g2Soon().map(([a,b])=>`<div><span><b>${a}</b><em>테스트 중</em></span><p>${b}</p></div>`).join('')}</div>`
+    const media=s.soon?`<div class="g2tiles">${g2Soon().map(([a,b],j)=>`<div class="g2t"><i aria-hidden="true"><b></b><b></b></i><b>${a}</b><p>${b}</p><em>테스트 중</em></div>`).join('')}</div>`:s.rule?`<div class="g2rc"><em>공통 · 앱과 큐레이팅</em><h3>${G2COMMON[0]}</h3><p>${G2COMMON[1]}</p></div><div class="g2rule">${G2RULES.map((g,j)=>`<div class="g2rbox"><header><b>${g.h}</b><span>${g.p}</span></header>${g.L.map(([a,b])=>`<section><h3>${a}</h3><p>${b}</p></section>`).join('')}</div>`).join('')}</div>`:s.soon?`<div class="g2soon">${g2Soon().map(([a,b])=>`<div><span><b>${a}</b><em>테스트 중</em></span><p>${b}</p></div>`).join('')}</div>`
       :s.mock==='ag'?`<div class="g2m g2ag"><p class="me">진열 가득 채워 줘</p><p class="it">첫 번째 평대를 「가득 채우기」로 놓았습니다. 메인은 앞줄 가운데에 세웠어요.</p><p class="me">두 번째 POP 짙은 바탕으로</p><p class="it">POP를 「짙은 바탕」으로 만들었습니다.</p></div>`
       :`<div class="g2m"><img src="guide/${s.img}?v=13" alt="${esc(s.t)}" loading="eager"></div>`;
     G.innerHTML=`<div class="g2b">${g2Head('a')}${bar}
