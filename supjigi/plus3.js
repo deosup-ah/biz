@@ -57,15 +57,25 @@ document.addEventListener('keydown',e=>{if(e.target&&e.target.id==='lifeQ'&&e.ke
 C.pl3LifeBc=async el=>{const f=el.files&&el.files[0];el.value='';if(!f)return;let c=[];try{c=await bcFromFile(f)}catch(e){}if(c[0])A.pl3LifeOpen({q:c[0]});else toast('바코드를 읽지 못했습니다. 크게 찍거나 제목을 적어 주세요')};
 
 /* ── 3 1년 전 오늘 · 5 지점 릴레이 · 6 인물도서관의 사람 ── */
-/* 인물 고르기: 12월 대비 장일순(12월 31일까지), 그 뒤는 인지도 순으로 한 주씩 */
-const PL3ORD=['장일순','김수환','법륜','이어령','신영복','최재천','김지하','백낙청','강원용','김탁환','나희덕','최열','안상수'];
-function pl3Person(){if(typeof PZP!=='object')return null;const L=PL3ORD.filter(n=>PZP[n]);if(!L.length)return null;
-  let n=L[0];if(TODAY>'2026-12-31'){const w=Math.floor(dayDiff('2027-01-04',TODAY)/7);n=L[1+((Math.max(0,w)%(L.length-1))+(L.length-1))%(L.length-1)]}return{n,...PZP[n]}}
 const pl3Btn=(v,l)=>`<button class="btn sm" data-a="gGo" data-v="${esc(v)}">${l}</button>`;
-function pl3Corner(){if(S.br!=='aka')return '';const p=pl3Person();if(!p)return '';
-  return `<section class="pl3pc" aria-label="인물도서관 코너"><header><em>인물도서관 코너</em><span>사유의숲 인물도서관 한 사람의 책으로 여는 평대</span></header>
-   <b>${esc(p.n)}</b><p>${esc(p.msg||'')}</p>${p.books&&p.books.length?`<ul>${p.books.slice(0,5).map(b=>`<li>『${esc(b)}』</li>`).join('')}</ul>`:''}
-   ${pl3Btn(p.n+' '+(p.books||[]).slice(0,2).join(' '),'이 사람의 책으로 큐레이션')}</section>`}
+/* 아카 기획 코너 · 인물도서관 코너 (11/14 참부장): 장일순은 다음 주 전시용 기획 코너(여러 권 · 인쇄물 한 번에),
+   신영복 · 이어령은 한 권씩. 주제는 BANK 에 넣어 큐레이션 벽과 같은 과정으로 만든다. */
+const PL3K={jang:'장일순, 밥 한 그릇의 우주',shin:'신영복 한 권 — 감옥으로부터의 사색',lee:'이어령 한 권 — 마지막 수업'};
+try{const akaOn=()=>S.br==='aka'&&TODAY<='2026-12-31';
+  BANK.push({tone:'제철',t:PL3K.jang,tg:'기획 코너 · 전시',why:'원주의 스승 무위당 장일순. 생명과 협동을 말한 그의 책과, 그와 이어진 책들을 한자리에 놓습니다.',sym:'leaf',bp:2,pp:1,k:/^$/,end:'2026-12-31',sc:c=>akaOn()?99:0,
+   fixed:[['나락 한 알 속의 우주','장일순','녹색평론사'],['좁쌀 한 알','최성현','도솔'],['무위당 장일순의 노자 이야기','장일순 · 이현주',''],['장일순 평전','김삼웅',''],['밥','김지하',''],['스핑크스의 코','리영희','까치'],['도덕경','노자',''],['월든','헨리 데이비드 소로','']]});
+}catch(e){console.warn(e)}
+/* 한 권 코너: 큐레이션 벽 주제(3권 이상)와 따로, 화면을 그릴 때마다 S.ui.cor 끝에 붙여 POP · 인쇄물을 같은 과정으로 만든다 */
+const PL3ONE=[[PL3K.shin,'신영복','감옥으로부터의 사색','돌베개','갇힌 자리에서 쓴 편지가 가장 넓은 생각이 되었습니다.'],[PL3K.lee,'이어령','이어령의 마지막 수업','열림원','세상을 떠나기 전, 묻고 답하며 남긴 마지막 이야기.']];
+function pl3OneAdd(){if(S.br!=='aka'||!Array.isArray(S.ui.cor))return;PL3ONE.forEach(([title,who,bt,pub,why],k)=>{if(S.ui.cor.some(x=>x&&x.title===title))return;
+  S.ui.cor.push({tone:'꾸준한',tg:'인물도서관 코너',title,hook:why,sym:'book',bpal:4+k,ppal:1,until:'2026-12-31',place:'인물도서관',books:[{t:bt,a:who==='이어령'?'김지수 · 이어령':who,p:pub,role:'중심',src:''}],pop:{head:`${who},\n『${bt}』`,body:why},band:`${who} 『${bt}』`,br:'aka'})})}
+const pl3Ix=t=>{try{return (S.ui.cor||[]).findIndex(x=>x&&x.title===t)}catch(e){return -1}};
+function pl3Corner(){if(S.br!=='aka')return '';pl3OneAdd();const j=pl3Ix(PL3K.jang),a=pl3Ix(PL3K.shin),b=pl3Ix(PL3K.lee),J=j>=0?S.ui.cor[j]:null;
+  const one=(i,n)=>{if(i<0)return '';const t=S.ui.cor[i],bk=(t.books||[])[0]||{};return `<div class="pl3one"><em>${n}</em><b>『${esc(bk.t||'')}』</b><i>${esc(bk.a||'')}</i><span><button class="btn sm" data-a="toDesign" data-kind="pop" data-s="c" data-i="${i}">POP</button><button class="btn sm" data-a="setOpen" data-i="${i}">인쇄물 한 번에</button></span></div>`};
+  return `${J?`<section class="pl3pc" aria-label="기획 코너"><header><em>기획 코너 · 다음 주 전시</em><span>사유의숲 인물도서관 · ${J.books.length}권</span></header>
+   <b>장일순</b><p>${esc(J.hook||'')}</p><ul>${J.books.map(x=>`<li>『${esc(x.t)}』</li>`).join('')}</ul>
+   <div class="pl3pcb"><button class="btn" data-a="setOpen" data-i="${j}">인쇄물 한 번에 (POP · 쇼카드 · 목록 · 띠지)</button><button class="btn ghost" data-a="dpOpen" data-i="${j}">진열 보기</button></div></section>`:''}
+   ${a>=0||b>=0?`<section class="pl3ones" aria-label="인물도서관 코너"><h3>인물도서관 코너 · 한 권씩</h3>${one(a,'신영복')}${one(b,'이어령')}</section>`:''}`}
 
 /* ── 7 오늘 한 장 (매장 직원용 1080×1350) ── */
 async function pl3Sheet(){const W=1080,H=1350,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
@@ -81,7 +91,7 @@ async function pl3Sheet(){const W=1080,H=1350,c=document.createElement('canvas')
   if(cor[1])sec('다음 후보',`「${cor[1].title}」`,(cor[1].books||[]).slice(0,3).map(b=>b.t).join(' · '));
   try{const n=(window.NEWS&&NEWS.items||[])[0];if(n)sec('오늘 아침 소식',n.t,n.src||'')}catch(e){}
   try{if(typeof gcDay==='function'&&GC&&GC.st==='ok'){const g=gcDay(TODAY).slice(0,3);if(g.length)sec('아카데미 오늘',g.map(z=>`${z.time?z.time+' ':''}${z.org}`).join(' / '),'')}}catch(e){}
-  const p=S.br==='aka'&&pl3Person();if(p&&y<H-240)sec('인물도서관 코너',p.n,(p.books||[]).slice(0,3).map(b=>'『'+b+'』').join(' '));
+  if(S.br==='aka'&&y<H-240){const j=pl3Ix(PL3K.jang);if(j>=0)sec('기획 코너 · 장일순',`『${(S.ui.cor[j].books[0]||{}).t||''}』 외 ${S.ui.cor[j].books.length-1}권`,'다음 주 전시')}
   x.font=F(500,22);x.fillStyle='#9a958a';x.fillText('더숲 워크룸 · Planned by 쿼부장',72,H-56);
   return new Promise(ok=>c.toBlob(b=>ok(b),'image/png'))}
 A.pl3Day=async()=>{if(S.br==='all'){toast('지점을 먼저 고르세요');return}toast('한 장을 만드는 중…');const b=await pl3Sheet();if(!b){toast('만들지 못했습니다');return}
