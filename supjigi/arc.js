@@ -61,6 +61,7 @@ V.aka.arc=()=>{if(ARC.st==='idle')setTimeout(arcStart,0);const U=S.ui,f=U.arcF||
     <label class="arcdt"><span>${dt===TODAY?'오늘':arcMD(dt)}</span><input type="date" value="${dt}" max="${TODAY}" data-c="arcD" aria-label="날짜"></label>
     <select data-c="arcIssSel" aria-label="묶음"><option value="">묶음 없음</option>${iss.map(g=>`<option ${g.n===cur?'selected':''}>${esc(g.n)}</option>`).join('')}<option value="+">새 묶음…</option></select>
     <input type="text" id="arcBox" value="${esc(U.arcBox||'')}" placeholder="별실 자리 (예: 상자 3)" aria-label="별실 보관 자리">
+    <input type="text" id="arcSrc" class="arcsrcin" value="${esc(U.arcSrc||'')}" placeholder="출처 · 링크 (있으면)" aria-label="출처 또는 링크">
     <button class="btn pri" data-a="arcAdd">남기기</button>
    </div>
    ${U.arcBusy?`<p class="arcbusy">사진을 줄이는 중…</p>`:''}
@@ -74,7 +75,7 @@ V.aka.arc=()=>{if(ARC.st==='idle')setTimeout(arcStart,0);const U=S.ui,f=U.arcF||
   ${!ARC.L.length?`<div class="arcnone"><b>첫 기록을 남겨 보세요.</b><p>포스터 한 장, 상영 회차, 기증 받은 책 한 상자. 사진 한 장과 한 줄이면 됩니다. 실물은 별실에 두고, 어느 상자에 넣었는지만 적어 두면 나중에 찾을 수 있어요.</p></div>`:''}
   <div class="arctl">${ds.map(d=>`<section><h3><span>${arcMD(d,days[d][0].p)}</span><i>${days[d][0].p&&days[d][0].p!=='d'?'':arcWk(d)}${d===TODAY?' · 오늘':d>TODAY?' · 예정':''}</i></h3>${days[d].map(x=>`<article class="arce">
     <div class="arcmeta"><span class="arck">${esc(x.k)}</span>${x.time?`<span>${x.time}</span>`:''}${x.iss?`<button data-a="arcF" data-n="${esc(x.iss)}">${esc(x.iss)}</button>`:''}</div>
-    <p>${esc(x.t)}</p>${x.note?`<p class="arcnote">${esc(x.note)}</p>`:''}${x.url?`<a class="arcsrc" href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.src||'출처')} ↗</a>`:''}
+    <p>${esc(x.t)}</p>${x.note?`<p class="arcnote">${esc(x.note)}</p>`:''}${x.url?`<a class="arcsrc" href="${esc(x.url)}" target="_blank" rel="noopener">출처 · ${esc(x.src||'링크')} ↗</a>`:x.src?`<span class="arcsrc">출처 · ${esc(x.src)}</span>`:''}
     ${(x.th||[]).length?`<div class="arcimg">${x.th.map((t,i)=>`<button data-a="arcView" data-id="${x.id}" data-i="${i}"><img src="${t}" alt="${esc(x.t)} 사진 ${i+1}" loading="lazy"></button>`).join('')}</div>`:''}
     <div class="arcft">${x.box?`<span class="arcbox">별실 · ${esc(x.box)}</span>`:'<span></span>'}<span><button data-a="arcMore" data-id="${x.id}">이어 쓰기</button><button data-a="arcEdit" data-id="${x.id}">고치기</button></span></div>
   </article>`).join('')}</section>`).join('')}</div>
@@ -82,7 +83,8 @@ V.aka.arc=()=>{if(ARC.st==='idle')setTimeout(arcStart,0);const U=S.ui,f=U.arcF||
   </div>`};
 
 /* 입력 */
-document.addEventListener('input',e=>{if(e.target.id==='arcT')S.ui.arcT=e.target.value;else if(e.target.id==='arcBox')S.ui.arcBox=e.target.value});
+document.addEventListener('input',e=>{if(e.target.id==='arcT')S.ui.arcT=e.target.value;else if(e.target.id==='arcBox')S.ui.arcBox=e.target.value;else if(e.target.id==='arcSrc')S.ui.arcSrc=e.target.value});
+const arcSrcParse=v=>{v=(v||'').trim();if(!v)return {src:'',url:''};const m=v.match(/https?:\/\/\S+/);if(!m)return {src:v.slice(0,60),url:''};const url=m[0],rest=v.replace(url,'').trim();let host='';try{host=new URL(url).hostname.replace(/^www\.|^m\./,'')}catch(e){}return {src:(rest||host||'링크').slice(0,60),url}};
 document.addEventListener('keydown',e=>{if(e.target.id==='arcT'&&e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();A.arcAdd()}});
 document.addEventListener('focusout',e=>{if(e.target.closest&&e.target.closest('.arcw')&&ARC.pend){setTimeout(()=>{const a=document.activeElement;if(!(a&&a.closest&&a.closest('.arcw')&&(a.value||'').trim())){ARC.pend=false;render()}},50)}});
 C.arcD=el=>{S.ui.arcD=el.value&&el.value<=TODAY?el.value:TODAY;render()};
@@ -95,16 +97,16 @@ A.arcShotX=d=>{(S.ui.arcTh||[]).splice(+d.i,1);render()};
 A.arcAdd=async()=>{const U=S.ui,t=(($('arcT')||{}).value||U.arcT||'').trim(),sh=U.arcTh||[];if(!t&&!sh.length){toast('한 줄이나 사진 한 장은 있어야 남깁니다.');const x=$('arcT');if(x)x.focus();return}
   if(U.arcBusy)return;const now=arcNow(),dt=U.arcD||TODAY,id=arcId(),img=[];
   for(const s of sh){const k=id+'-'+img.length;if(await arcImgPut(k,s.full))img.push(k)}
-  const o={id,date:dt,time:dt===TODAY?now.time:'',t:t||'사진 기록',k:arcKind(t+' '+(U.arcIss||'')),iss:U.arcIss||'',box:(($('arcBox')||{}).value||U.arcBox||'').trim(),th:sh.slice(0,img.length).map(s=>s.th),img,at:new Date().toISOString()};
-  if(await arcSave(o)){U.arcT='';U.arcTh=[];ARC.pend=false;toast(dt===TODAY?'남겼습니다.':arcMD(dt)+' 기록으로 남겼습니다.');render()}};
+  const o={id,date:dt,time:dt===TODAY?now.time:'',t:t||'사진 기록',k:arcKind(t+' '+(U.arcIss||'')),iss:U.arcIss||'',box:(($('arcBox')||{}).value||U.arcBox||'').trim(),...arcSrcParse(($('arcSrc')||{}).value||U.arcSrc),th:sh.slice(0,img.length).map(s=>s.th),img,at:new Date().toISOString()};
+  if(await arcSave(o)){U.arcT='';U.arcTh=[];U.arcSrc='';ARC.pend=false;toast(dt===TODAY?'남겼습니다.':arcMD(dt)+' 기록으로 남겼습니다.');render()}};
 A.arcF=d=>{S.ui.arcF=S.ui.arcF===d.n&&d.n?'':d.n;render();window.scrollTo(0,0)};
 A.arcMore=d=>{const o=ARC.L.find(x=>x.id===d.id);if(!o)return;if(!o.iss){const n=(prompt('이 기록을 어떤 묶음으로 이어 갈까요?',o.t.slice(0,20))||'').trim().slice(0,40);if(!n)return;o.iss=n;arcSave({...o})}
   S.ui.arcIss=o.iss;S.ui.arcBox=o.box||S.ui.arcBox||'';render();window.scrollTo(0,0);const t=$('arcT');if(t)t.focus()};
 A.arcEdit=d=>{const o=ARC.L.find(x=>x.id===d.id);if(!o)return;openSheet(`<h3>기록 고치기</h3><div class="arced">
   <label>날짜<input type="date" id="aeD" value="${o.date}"></label><label>내용<textarea id="aeT" rows="3">${esc(o.t)}</textarea></label>
-  <label>묶음<input id="aeI" value="${esc(o.iss||'')}" placeholder="없음"></label><label>별실 자리<input id="aeB" value="${esc(o.box||'')}" placeholder="예: 상자 3"></label>
+  <label>묶음<input id="aeI" value="${esc(o.iss||'')}" placeholder="없음"></label><label>별실 자리<input id="aeB" value="${esc(o.box||'')}" placeholder="예: 상자 3"></label><label>출처 · 링크<input id="aeS" value="${esc([o.src,o.url].filter(Boolean).join(' '))}" placeholder="예: 국민일보 https://…"></label>
   <div class="arcedb"><button class="btn" data-a="arcRm" data-id="${o.id}">지우기</button><button class="btn" data-a="closeSheet">닫기</button><button class="btn pri" data-a="arcEdSave" data-id="${o.id}">저장</button></div></div>`)};
-A.arcEdSave=async d=>{const o=ARC.L.find(x=>x.id===d.id);if(!o)return;const t=$('aeT').value.trim()||o.t,n={...o,date:$('aeD').value||o.date,t,iss:$('aeI').value.trim().slice(0,40),box:$('aeB').value.trim()};if(n.date!==o.date)n.p='d';n.k=arcKind(t+' '+n.iss);if(await arcSave(n)){closeSheet();render()}};
+A.arcEdSave=async d=>{const o=ARC.L.find(x=>x.id===d.id);if(!o)return;const t=$('aeT').value.trim()||o.t,n={...o,date:$('aeD').value||o.date,t,iss:$('aeI').value.trim().slice(0,40),box:$('aeB').value.trim(),...arcSrcParse($('aeS').value)};if(n.date!==o.date)n.p='d';n.k=arcKind(t+' '+n.iss);if(await arcSave(n)){closeSheet();render()}};
 A.arcRm=async d=>{const b=document.querySelector('[data-a="arcRm"]');if(b&&!b.dataset.ok){b.dataset.ok=1;b.textContent='한 번 더 누르면 지웁니다';return}await arcDel(d.id);closeSheet();toast('지웠습니다. 별실의 실물은 그대로입니다.');render()};
 A.arcView=async d=>{const o=ARC.L.find(x=>x.id===d.id);if(!o)return;const i=+d.i,k=(o.img||[])[i];openSheet(`<div class="arcvw"><img src="${(o.th||[])[i]||''}" alt="" id="arcVi"><p>${arcMD(o.date,o.p)}${o.time?' '+o.time:''} · ${esc(o.t)}</p><div class="arcedb">${(o.th||[]).length>1?`<button class="btn" data-a="arcView" data-id="${o.id}" data-i="${(i+1)%o.th.length}">다음 사진</button>`:''}<button class="btn" data-a="arcDl" data-id="${o.id}" data-i="${i}">원본 저장</button><button class="btn pri" data-a="closeSheet">닫기</button></div></div>`);
   if(k){const f=await arcImgGet(k);const im=$('arcVi');if(f&&im)im.src=f}};
