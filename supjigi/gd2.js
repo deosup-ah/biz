@@ -50,3 +50,9 @@ A.g2Try=d=>{const k=d.k;A.gdClose();try{if(k==='cur')A.go({v:'cur',m:'store'});e
     ['앱에서','「더보기 → 지원사업」에 다가오는 공모와 신청 기록을 모읍니다.']]})})();
 /* 큐레이션과 POP: 참부장의 큐레이팅 원칙 한 문장(11/13) */
 (()=>{const c=BASICS.find(b=>b.id==='curation');if(c&&!(c.items||[]).some(x=>x[0]==='정답은 없습니다'))c.items.unshift(['정답은 없습니다','해 보면서 이 공간에 맞는 목적과 방향을 정하되, 누구에게 어떤 방식으로 건넬지는 늘 분명해야 하고, 그것이 쌓였을 때 비로소 우연한 만남을 낳는 기획을 해 볼 수 있습니다.'])})();
+/* 서점 기초: 내려도 장 이름 줄은 위에 고정, 지금 읽는 장을 표시 */
+(()=>{const g=gdDraw;gdDraw=function(){g.apply(this,arguments);try{const G=$('guide');if(!G||!G.classList.contains('g2bs')||G.dataset.bsw)return;G.dataset.bsw='1';
+  const mark=()=>{if(!G.classList.contains('g2bs'))return;const nav=G.querySelector('.bsnav'),h=G.querySelector('.g2sh');if(!nav)return;const top=(h?h.getBoundingClientRect().bottom:0)+24;let cur=null;
+    G.querySelectorAll('section[id^="bs-"]').forEach(s=>{if(s.getBoundingClientRect().top<=top)cur=s.id.slice(3)});
+    nav.querySelectorAll('button').forEach(b=>{const on=b.dataset.id===cur;if(on&&b.getAttribute('aria-current')!=='true'){b.scrollIntoView({inline:'center',block:'nearest'})}b.setAttribute('aria-current',on?'true':'false')})};
+  G.addEventListener('scroll',()=>requestAnimationFrame(mark),{passive:true});mark()}catch(e){}}})();
