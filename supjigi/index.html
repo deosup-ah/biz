@@ -940,6 +940,20 @@ header.top{border-bottom-color:var(--brc,var(--ink))!important}
 .arcedb{display:flex;gap:8px;margin-top:6px}.arcedb .btn{flex:1;min-height:44px}
 .arcvw img{width:100%;max-height:70vh;object-fit:contain;background:#efebe0;display:block}.arcvw p{font-size:14px;color:#55554f;margin:10px 0}
 @media(max-width:520px){.arctl section{grid-template-columns:1fr;row-gap:10px}.arctl h3{position:static;grid-auto-flow:column;justify-content:start;align-items:baseline;gap:8px}.arce{grid-column:1}.arcrow .btn.pri{flex:1 1 100%}.arcimg img{width:92px;height:92px}}
+/* 원칙 세 상자 (11/13 23:16) */
+#guide.g2 .g2c h2 .g2by{display:inline-block;margin-left:10px;vertical-align:middle;font:500 12px/1 Pretendard,sans-serif;letter-spacing:.02em;color:#6b6b63;border:1px solid #d8d3c4;border-radius:2px;padding:5px 8px;white-space:nowrap}
+#guide.g2 .g2rule{display:grid;gap:12px;padding-top:4px}
+#guide.g2 .g2rule>i{display:none}
+#guide.g2 .g2rbox{background:#fff;border:1px solid #d8d3c4;border-top:3px solid #003128;border-radius:3px;padding:4px 16px 6px}
+#guide.g2 .g2rbox:nth-child(2){border-top-color:#c9a24a}#guide.g2 .g2rbox:nth-child(3){border-top-color:#7a3b2e}
+#guide.g2 .g2rbox header{display:grid;gap:2px;padding:12px 0 10px;border-bottom:1px solid #e6e1d4}
+#guide.g2 .g2rbox header b{font:700 20px "Gowun Batang","Noto Serif CJK KR",serif;color:#1c1c1a}
+#guide.g2 .g2rbox header span{font-size:13px;color:#6b6b63;word-break:keep-all}
+#guide.g2 .g2rbox section{padding:11px 0 12px;border:0;border-bottom:1px solid #f0ebde}#guide.g2 .g2rbox section:last-child{border-bottom:0}
+#guide.g2 .g2rbox h3{margin:0 0 4px;font:700 15.5px Pretendard,sans-serif;color:#003128}
+#guide.g2 .g2rbox:nth-child(2) h3{color:#7a5a08}#guide.g2 .g2rbox:nth-child(3) h3{color:#7a3b2e}
+#guide.g2 .g2rbox p{margin:0;font-size:14px;line-height:1.65;color:#1c1c1a;word-break:keep-all}
+@media(min-width:900px) and (min-aspect-ratio:5/4){#guide.g2free .g2rule{grid-template-columns:repeat(3,1fr);gap:16px;align-items:start;padding-top:8px}#guide.g2 .g2rbox{padding:4px 20px 8px}#guide.g2 .g2rbox p{font-size:14.5px}}
 </style>
 </head>
 <body>
@@ -967,7 +981,7 @@ header.top{border-bottom-color:var(--brc,var(--ink))!important}
 <script src="qr.js"></script>
 <script src="ls.js"></script>
 <script src="wd.js"></script>
-<script src="gd2.js"></script>
+<script src="gd2.js?v=14"></script>
 <script src="polish.js"></script>
 <script src="plus2.js"></script><script src="arcfound.js?v=1"></script><script src="arc.js?v=2"></script>
 <script src="ag.js"></script>

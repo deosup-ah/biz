@@ -11,10 +11,13 @@ const G2=[
   {k:'ag',mock:'ag',n:'AI 에이전트',t:'메뉴를 몰라도 시키면 됩니다',why:'어디 있는지 찾지 않아도 「가득 채우는 진열」 「두 번째 POP」처럼 말하면 그 화면을 열고 만들어 줍니다.',how:['도움말 → AI 에이전트','하고 싶은 일 한 줄','결과 확인'],go:'ag'},
   {k:'cal',img:'b.gif',n:'일정',t:'한 줄이면 일정이 됩니다',why:'「내일 2시 30명 대화의 집」처럼 적으면 날짜 · 인원 · 장소가 나뉘어 들어갑니다. 겹치는 일정은 먼저 알려 줍니다.',how:['한 줄 적기','확인','오늘 화면에서 보기'],go:'today',adm:1},
   {k:'soon',n:'곧 열립니다',t:'테스트 중인 기능',soon:1},
-  {k:'rule',n:'원칙',t:'앱과 큐레이팅 설계 원칙',rule:1}
+  {k:'rule',n:'원칙',t:'앱 · 큐레이팅 · 셀렉션의 원칙',rule:1}
 ];
 /* 참부장이 직접 정한 문장(11/13). 글자를 바꾸지 않는다 */
 const G2RULE=[['덜어 내기','기능을 더하기 전에 먼저 덜어 내고, 장식보다 명료하게 만듭니다.'],['공간과 기억','화면에 실제 공간의 치수와 결을 그대로 옮기고, 정보는 얇게 겹쳐 무겁게 가리지 않게 합니다. 여섯 지점 어디서나 그 지점의 집처럼 느껴지게 하고, 작은 정렬까지 정확하게 맞춥니다.'],['누구에게 · 어떤 방식으로','애매하고 실체 없는 주제를 겨냥하는 기능과 문구는 만들지 않습니다. 모든 기능은 「누구에게 · 어떤 방식으로」가 정해져 있어야 하고, 그 기록이 쌓이면 우연한 만남을 낳는 기획을 할 수 있게 합니다.']];
+const G2RULES=[{h:'앱',p:'도구는 덜어 내고, 실제 공간을 옮깁니다.',L:G2RULE},
+ {h:'큐레이팅',p:'지금, 사회와 사람을 향해.',L:[['정답은 없습니다','해 보면서 이 공간에 맞는 목적과 방향을 정하되, 누구에게 어떤 방식으로 건넬지는 늘 분명해야 하고, 그것이 쌓였을 때 비로소 우연한 만남을 낳는 기획을 해 볼 수 있습니다.'],['시의성','시의성 없는 큐레이팅은 없습니다. 지금 사회에서 일어나는 일과 계절, 사람들의 하루에 닿아 있어야 합니다.'],['사회와 사람을 향해','나 혹은 일부만 아는 이야기를 고르지 않습니다. 큐레이팅은 사회와 사람을 향해 있어야 합니다.']]},
+ {h:'셀렉션',p:'변하는 것과 변하지 않는 것을 함께.',L:[['읽는 일 자체','책을 좋고 나쁨으로 가르지 않습니다. 읽는 일 자체가 소중해진 시대입니다.'],['변하는 것과 변하지 않는 것','책이 지속되려면 책의 개념도 바뀌어야 합니다. 그 변화와, 변하지 않는 것을 함께 담습니다.'],['다양한 시선','많이 읽는 것과는 다른 일입니다. 사회와 사람을 향해 다양한 시선을 가지려고 애씁니다.']]}];
 const G2SOON=[['말로 찾는 서가','감정 · 물건 · 상황 말마다 QR을 붙여, 고객이 찍으면 그런 느낌의 책이 있는 곳으로 안내합니다.',1],['북토크 · 프로그램','북토크와 프로그램을 기획부터 비용 정산까지 자동으로 이어 줍니다.',1],['찍기 · 마지막 판매일','바코드나 제목을 찍으면 책마다 마지막으로 팔린 날과 1개월~3년 구간이 나오고, 오래 안 팔린 책을 반품 목록에 담습니다.',1],['주문 · 반품','팔린 만큼 셈해 주문에 담고, 확정은 사람이 합니다.',0],['매출','숫자 대신 이번 주 할 일로 알려 줍니다.',1],['지원사업','공모 일정과 신청 기록을 한곳에 모읍니다.',0]];
 function g2Head(t){return `<div class="g2top"><b>도움말</b><button class="g2x" data-a="gdClose">닫기</button></div>
   <button class="g2ai" data-a="agOpen"><span class="g2ai1">AI 에이전트</span><span class="g2ai2">말하면 앱이 직접 해 줍니다</span><i aria-hidden="true">›</i></button>
@@ -27,12 +30,12 @@ const g2Soon=()=>{const ad=typeof isAdmin==='function'&&isAdmin();return G2SOON.
     const L=g2List(),i=Math.min(S.ui.gd|0,L.length-1),s=L[i],last=i===L.length-1;G.className='g2'+(s.soon||s.rule?' g2free':'');
     const tabs='';
     const bar=`<div class="g2bar">${L.map((x,j)=>`<button data-a="gdTo" data-i="${j}" class="${j<i?'done':j===i?'on':''}" aria-label="${x.n}"></button>`).join('')}</div>`;
-    const media=s.soon?`<div class="g2tiles">${g2Soon().map(([a,b],j)=>`<div class="g2t"><i aria-hidden="true"><b></b><b></b></i><b>${a}</b><p>${b}</p><em>테스트 중</em></div>`).join('')}</div>`:s.rule?`<div class="g2rule"><i aria-hidden="true"><b></b><b></b><b></b></i>${G2RULE.map(([a,b])=>`<section><h3>${a}</h3><p>${b}</p></section>`).join('')}<p class="g2sig">참부장</p></div>`:s.soon?`<div class="g2soon">${g2Soon().map(([a,b])=>`<div><span><b>${a}</b><em>테스트 중</em></span><p>${b}</p></div>`).join('')}</div>`
+    const media=s.soon?`<div class="g2tiles">${g2Soon().map(([a,b],j)=>`<div class="g2t"><i aria-hidden="true"><b></b><b></b></i><b>${a}</b><p>${b}</p><em>테스트 중</em></div>`).join('')}</div>`:s.rule?`<div class="g2rule">${G2RULES.map((g,j)=>`<div class="g2rbox"><header><b>${g.h}</b><span>${g.p}</span></header>${g.L.map(([a,b])=>`<section><h3>${a}</h3><p>${b}</p></section>`).join('')}</div>`).join('')}</div>`:s.soon?`<div class="g2soon">${g2Soon().map(([a,b])=>`<div><span><b>${a}</b><em>테스트 중</em></span><p>${b}</p></div>`).join('')}</div>`
       :s.mock==='ag'?`<div class="g2m g2ag"><p class="me">진열 가득 채워 줘</p><p class="it">첫 번째 평대를 「가득 채우기」로 놓았습니다. 메인은 앞줄 가운데에 세웠어요.</p><p class="me">두 번째 POP 짙은 바탕으로</p><p class="it">POP를 「짙은 바탕」으로 만들었습니다.</p></div>`
       :`<div class="g2m"><img src="guide/${s.img}?v=13" alt="${esc(s.t)}" loading="eager"></div>`;
     G.innerHTML=`<div class="g2b">${g2Head('a')}${bar}
       <div class="g2c"><div class="g2h"><span class="g2n">${String(i+1).padStart(2,'0')}<i>/ ${String(L.length).padStart(2,'0')}</i></span><span class="g2f">${s.n}</span></div>
-      <h2>${s.t}</h2>${media}
+      <h2>${s.t}${s.rule?'<small class="g2by">Planned by 최형근</small>':''}</h2>${media}
       ${s.rule?'':s.soon?`<p class="g2note">시스템 테스트 중입니다. 며칠 안에 차례로 열립니다.</p>`:`<div class="g2why"><b>왜 도움이 되나</b><p>${s.why}</p></div><ol class="g2how">${s.how.map(h=>`<li>${h}</li>`).join('')}</ol>`}</div>
       <div class="g2nav"><button class="btn" data-a="gdGo" data-d="-1" ${i===0?'disabled':''}>이전</button>${s.go?`<button class="btn" data-a="g2Try" data-k="${s.go}">열어 보기</button>`:''}${last?`<button class="btn pri" data-a="gdClose">시작하기</button>`:`<button class="btn pri" data-a="gdGo" data-d="1">다음</button>`}</div></div>`}})();
 A.gdGo=d=>{const n=S.ui.gdTab==='b'?GDS.length:g2List().length;S.ui.gd=Math.max(0,Math.min(n-1,(S.ui.gd|0)+(+d.d)));gdDraw()};
