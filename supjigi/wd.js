@@ -1,6 +1,6 @@
 /* 「말로 찾는 서가」 POP (11/13, 참부장)
    감정 · 물건 · 상황 같은 말이 여러 개 적힌 POP 를 붙인다. 고객이 마음에 걸리는 말 옆의 QR 하나를 휴대폰으로 찍으면
-   그 말에 맞는 책이 있는 서가(장소)와 주제를 보여 주는 공개 안내 화면(w.html)이 열린다.
+   그 말과 같은 느낌의 책이 있는 서가(장소)와 주제를 보여 주는 공개 안내 화면(w.html)이 열린다.
    안내 화면에는 말 · 장소 · 주제 · 지점만 들어간다(재고 · 매출 · 개인정보 없음). 진열을 바꾸면 POP 를 다시 뽑는다. */
 const WDURL='https://deosup-ah.github.io/biz/supjigi/w.html';
 /* 주제 제목의 낱말 → 고객이 떠올릴 만한 말(감정 · 물건 · 상황) */
@@ -26,7 +26,7 @@ async function wdCanvas(){const G=S.ui.wd,[,W,H]=WDF[G.f|0],c=document.createEle
   x.fillStyle=PA;x.fillRect(0,0,W,H);const brn='더숲 '+(G.br||'사유의숲');
   let y=M+64*U;x.fillStyle=INK;x.font=`700 ${Math.round(74*U)}px ${SR}`;x.fillText('말로 찾는 서가',M,y);x.textAlign='right';x.font=`600 ${Math.round(20*U)}px ${SS}`;x.fillStyle=GR;x.fillText(brn,W-M,y-12*U);x.textAlign='left';
   y+=22*U;x.fillStyle=INK;x.fillRect(M,y,W-2*M,3*U);x.fillRect(M,y+7*U,W-2*M,1*U);y+=56*U;
-  x.font=`500 ${Math.round(25*U)}px ${SS}`;x.fillStyle=INK;wrapW(x,'지금 마음에 걸리는 말 하나를 골라, 옆의 네모를 휴대폰 카메라로 찍어 보세요. 그 말에 어울리는 책이 있는 곳을 알려 드립니다.',W-2*M,2).forEach((s,i)=>x.fillText(s,M,y+i*38*U));y+=100*U;
+  x.font=`500 ${Math.round(25*U)}px ${SS}`;x.fillStyle=INK;wrapW(x,'지금 마음에 걸리는 말 하나를 골라, 옆의 네모를 휴대폰 카메라로 찍어 보세요. 그런 느낌의 책이 있는 곳을 알려 드립니다.',W-2*M,2).forEach((s,i)=>x.fillText(s,M,y+i*38*U));y+=100*U;
   const L=G.list.filter(o=>o.w),n=L.length,cols=n<=6?2:3,rows=Math.ceil(n/cols),gap=Math.round(20*U),foot=110*U,cw=(W-2*M-gap*(cols-1))/cols,ch=Math.min((H-M-foot-y-gap*(rows-1))/rows,cw*.72);
   L.forEach((o,i)=>{const cx=M+(i%cols)*(cw+gap),cy=y+Math.floor(i/cols)*(ch+gap),pd=Math.round(16*U),qs=Math.min(ch-pd*2,cw*.36),tw=cw-qs-pd*3;x.fillStyle='#fff';x.fillRect(cx,cy,cw,ch);x.strokeStyle='#d8d3c4';x.lineWidth=1.5*U;x.strokeRect(cx,cy,cw,ch);
     x.fillStyle=o.k==='감정'?'#9b2c1f':o.k==='물건'?PN:'#8a6a10';x.font=`600 ${Math.round(15*U)}px ${SS}`;x.fillText(o.k||'',cx+pd,cy+pd+15*U);
@@ -50,4 +50,4 @@ async function wdDraw(re){const G=S.ui.wd;if(!G)return;if(re){try{G.url=(await w
    <div class="pzxa"><button class="btn pri" data-a="wdSave">저장 · 공유</button><button class="btn" data-a="wdPdf">인쇄 PDF</button></div></div>`)}
 /* 「만들기」 화면: 출력물 둘(가로세로 숲 · 말로 찾는 서가)을 한 줄 타일로 */
 (()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn||S.locked||S.view[S.mode]!=='design'||mn.querySelector('.ptwo'))return;const p=mn.querySelector('.pztop:not(.pztop2)');const d=document.createElement('div');d.className='ptwo';
-  d.innerHTML=`<button data-a="pzOpen"><b>가로세로 숲</b><span>뽑아서 건네는 퍼즐</span></button><button data-a="wdOpen"><b>말로 찾는 서가</b><span>말을 찍으면 서가로 안내</span></button>`;if(p){p.before(d);p.style.display='none'}else{const s=mn.querySelector('.ulab')||mn.querySelector('.sec');if(s)s.before(d);else mn.prepend(d)}}catch(e){}}})();
+  d.innerHTML=`<button data-a="pzOpen"><b>가로세로 숲</b><span>뽑아서 건네는 퍼즐</span></button><button data-a="wdOpen"><b>말로 찾는 서가</b><span>말을 찍으면 그런 느낌의 책으로</span></button>`;if(p){p.before(d);p.style.display='none'}else{const s=mn.querySelector('.ulab')||mn.querySelector('.sec');if(s)s.before(d);else mn.prepend(d)}}catch(e){}}})();
