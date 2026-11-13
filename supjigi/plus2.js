@@ -1,11 +1,10 @@
 /* 11/13 저녁 참부장 승인: 소식은 크기가 아니라 다른 것으로 더 강조(시의성 없는 큐레이팅은 없다) · 「내 단계」 숨김 ·
    평대 기록(누구에게 · 어떤 방식으로 쌓이게) · 한 장으로 받기(지점에 보내는 지시서) · 지점마다 그 지점의 집처럼 */
 
-/* ── 지점마다 집처럼: 위쪽 선 색과 첫 줄 ── */
+/* ── 지점마다 집처럼: 지점 색(11/13 19:29 한 줄 소개는 뺌) ── */
 const BRHOME={aka:['사유의숲','북한산 자락, 아카데미하우스의 서가'],choso:['초소책방','인왕산 옛 초소 자리의 책방'],sojeon:['소전미술관','시흥, 미술관 안의 서가'],nowon:['노원더숲','노원, 동네의 더숲'],nmain:['노원문고 본점','노원문고 본점'],njung:['노원문고 중계점','노원문고 중계점']};
 (()=>{const r=render;render=function(){r.apply(this,arguments);try{const b=BR.find(x=>x.k===S.br),mn=document.querySelector('main');document.body.style.setProperty('--brc',b?b.c:'var(--ink)');
-  if(!mn||S.locked)return;let l=mn.querySelector(':scope>.brhome');const h=BRHOME[S.br];if(!h){if(l)l.remove();return}
-  if(!l){l=document.createElement('p');l.className='brhome';mn.prepend(l)}l.innerHTML=`<i aria-hidden="true"></i>${esc(h[1])}`}catch(e){}}})();
+}catch(e){}}})();
 
 /* ── 소식: 크기는 그대로, 「지금」이 느껴지게(빛나는 점 · 날짜 · 넘어가는 시간 줄 · 바로 평대로) ── */
 (()=>{const deck=t=>{const N=(window.NEWS&&NEWS.items)||[],fresh=window.NEWS&&NEWS.asOf===TODAY,i=(S.ui.tki|0)%Math.max(1,N.length),em=t.querySelector('em');
