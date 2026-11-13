@@ -3,6 +3,10 @@
    공유 저장(Claude 앱 안): db  arc/<id> 기록, arcimg/<id> 사진 원본
    그 밖(공개 주소): 이 기기 안에만 (localStorage 기록 · IndexedDB 사진) */
 const ARC={L:[],st:'idle',db:null,live:false,pend:false};
+/* 11/13 23:36 참부장: 담은 기록을 한 번 비우고 찾은 소식(검색 상태)만 남긴다 — 기기마다 한 번 */
+const ARC_RST='1113-2336';
+function arcWipeLocal(){try{localStorage.removeItem('sj.arc');localStorage.removeItem('sj.arcHide');indexedDB.deleteDatabase('sjarc')}catch(e){}ARC.L=[];if(S&&S.ui){S.ui.arcSel={};S.ui.arcF='';S.ui.arcIss='';S.ui.arcBox='';S.ui.arcT='';S.ui.arcTh=[]}}
+try{if(localStorage.getItem('sj.arcRst')!==ARC_RST){arcWipeLocal();localStorage.setItem('sj.arcRst',ARC_RST)}}catch(e){}
 const ARC_K=[['영화',/영화|상영|시네마|cinema/i],['북토크',/북토크|작가|저자|낭독/],['전시',/전시|작품|씨앗숲|설치/],['프로그램',/프로그램|강의|워크숍|모임|수업|클래스/],['공간',/공간|가구|서가|배치|별실|인물도서관|사유의숲/],['기증',/기증|기부|받은 책|나눔/],['손상 · 수리',/파손|손상|수리|고장|누수|찢/],['방문',/방문|단체|대관|투어/]];
 const arcKind=t=>{for(const [k,r] of ARC_K)if(r.test(t))return k;return '기록'};
 const arcId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -74,6 +78,7 @@ V.aka.arc=()=>{if(ARC.st==='idle')setTimeout(arcStart,0);const U=S.ui,f=U.arcF||
     ${(x.th||[]).length?`<div class="arcimg">${x.th.map((t,i)=>`<button data-a="arcView" data-id="${x.id}" data-i="${i}"><img src="${t}" alt="${esc(x.t)} 사진 ${i+1}" loading="lazy"></button>`).join('')}</div>`:''}
     <div class="arcft">${x.box?`<span class="arcbox">별실 · ${esc(x.box)}</span>`:'<span></span>'}<span><button data-a="arcMore" data-id="${x.id}">이어 쓰기</button><button data-a="arcEdit" data-id="${x.id}">고치기</button></span></div>
   </article>`).join('')}</section>`).join('')}</div>
+  ${ARC.L.length?`<div class="arcrst"><button data-a="arcReset">기록 모두 비우기</button></div>`:''}
   </div>`};
 
 /* 입력 */
@@ -106,6 +111,8 @@ A.arcView=async d=>{const o=ARC.L.find(x=>x.id===d.id);if(!o)return;const i=+d.i
 A.arcDl=async d=>{const o=ARC.L.find(x=>x.id===d.id);if(!o)return;const k=(o.img||[])[+d.i],f=k&&await arcImgGet(k);if(!f){toast('원본을 찾지 못했습니다.');return}const b=await (await fetch(f)).blob();saveFile(`별실기록_${o.date}_${+d.i+1}.jpg`,b)};
 if(typeof A.closeSheet!=='function')A.closeSheet=()=>closeSheet();
 
+A.arcReset=async(d,el)=>{if(el&&!el.dataset.ok){el.dataset.ok=1;el.textContent=`${ARC.L.length}건을 지웁니다. 한 번 더 누르세요`;return}
+  if(arcShared()){for(const o of ARC.L.slice())await arcDel(o.id)}arcWipeLocal();toast('비웠습니다. 찾은 소식만 남았습니다. 별실의 실물은 그대로입니다.');render();window.scrollTo(0,0)};
 /* 찾은 소식 고르기 */
 C.arcSel=el=>{const s=S.ui.arcSel=S.ui.arcSel||{};if(el.checked)s[el.dataset.id]=1;else delete s[el.dataset.id];render()};
 A.arcFdT=(d,el,e)=>{e&&e.preventDefault();S.ui.arcFdC=!S.ui.arcFdC;render()};
