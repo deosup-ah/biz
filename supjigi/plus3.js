@@ -1,5 +1,5 @@
 /* 11/14 더하기 (참부장 00:09 「더하기는 전부」)
-   1 사진이 곧 기록 · 2 책의 일생 · 3 1년 전 오늘 · 5 지점 릴레이 · 6 인물도서관 → 평대 · 7 오늘 한 장
+   1 사진이 곧 기록 · 2 책의 일생 · 6 인물도서관 코너(아카) · 7 오늘 한 장
    (4 느낌 지도는 QR이 찍힌 횟수를 받을 서버가 없어 보류) */
 
 /* ── 평대 기록을 지점끼리 함께 (Claude 앱 안에서만: db plog/<id>) ── */
@@ -26,13 +26,12 @@ C.pl3Ph=async el=>{const f=el.files&&el.files[0];el.value='';if(!f)return;if(S.b
     await arcSave({id,date:TODAY,time:arcNow().time,t:`평대 「${e.t}」`+(books.length?` — ${books.slice(0,5).join(', ')}${books.length>5?' 외':''}`:''),k:'공간',iss:'평대',box:'',th:th?[th]:[],img,at:e.at})}catch(err){}}
   toast(books.length?`「${e.t}」 · 책 ${books.length}권을 남겼습니다`:`「${e.t}」를 남겼습니다`);render()};
 
-/* ── 평대 기록 창 (사진 · 책 · 반응 · 다른 지점) ── */
-A.pl3Good=async d=>{const L=pl3Get(),e=L.find(x=>x.id===d.id);if(!e)return;e.g=e.g?0:1;pl3Set(L);await pl3Push(e);A.plOpen({all:S.ui.plAll?1:''})};
+/* ── 평대 기록 창 (사진 · 책 · 다른 지점) ── */
 A.plOpen=d=>{if(d&&d.all!==undefined)S.ui.plAll=!!d.all;const all=!!S.ui.plAll,L=pl3Get().filter(e=>all||e.br===S.br),by={};L.forEach(e=>{(by[e.d]=by[e.d]||[]).push(e)});
   openSheet(`<div class="plx"><div class="igxh"><b>평대 기록</b><span>${all?'모든 지점':esc(brN(S.br))} · ${L.length}건</span></div>
    <div class="pl3seg"><button data-a="plOpen" data-all="" aria-pressed="${!all}">이 지점</button><button data-a="plOpen" data-all="1" aria-pressed="${all}">모든 지점</button></div>
-   <p class="note">진열 · 인쇄물 · 인스타 · 평대 사진을 남길 때마다 쌓입니다. 고객 반응이 좋았던 평대에 표시하면 다른 지점에 다음 후보로 넘어갑니다.${typeof DB!=='undefined'&&DB?'':' (이 화면에서는 이 기기에만 남습니다)'}</p>
-   ${L.length?Object.entries(by).slice(0,24).map(([d,es])=>`<div class="pld"><b>${mdw(d)}</b>${es.map(e=>`<div class="plr pl3r">${e.th?`<img src="${e.th}" alt="">`:''}<span><b>${esc(e.t)}</b><i>${all?esc(brN(e.br))+' · ':''}${esc(e.k)}${e.books&&e.books.length?` · 책 ${e.books.length}권`:''}</i>${e.books&&e.books.length?`<small>${e.books.slice(0,6).map(esc).join(' · ')}</small>`:''}</span>${e.id?`<button class="pl3g" data-a="pl3Good" data-id="${e.id}" aria-pressed="${!!e.g}">${e.g?'반응 좋았음':'반응 좋았나요'}</button>`:''}</div>`).join('')}</div>`).join(''):'<p class="lse">아직 기록이 없습니다. 큐레이션 카드에서 진열을 보내거나, 평대를 사진으로 남기면 쌓입니다.</p>'}
+   <p class="note">진열 · 인쇄물 · 인스타 · 평대 사진을 남길 때마다 쌓입니다.${typeof DB!=='undefined'&&DB?'':' (이 화면에서는 이 기기에만 남습니다)'}</p>
+   ${L.length?Object.entries(by).slice(0,24).map(([d,es])=>`<div class="pld"><b>${mdw(d)}</b>${es.map(e=>`<div class="plr pl3r">${e.th?`<img src="${e.th}" alt="">`:''}<span><b>${esc(e.t)}</b><i>${all?esc(brN(e.br))+' · ':''}${esc(e.k)}${e.books&&e.books.length?` · 책 ${e.books.length}권`:''}</i>${e.books&&e.books.length?`<small>${e.books.slice(0,6).map(esc).join(' · ')}</small>`:''}</span></div>`).join('')}</div>`).join(''):'<p class="lse">아직 기록이 없습니다. 큐레이션 카드에서 진열을 보내거나, 평대를 사진으로 남기면 쌓입니다.</p>'}
    <div class="igxa"><button class="btn pri" data-a="plMix">기록 섞어 새 평대</button><button class="btn" data-a="close">닫기</button></div></div>`)};
 
 /* ── 2 책의 일생 ── */
@@ -51,25 +50,22 @@ A.pl3LifeOpen=d=>{const q=(d&&d.q)||S.ui.lifeQ||'',r=q?pl3Life(q):null;S.ui.life
    :`<h3 class="pl3n">${esc(r.name)}</h3>
    ${r.rank.length?`<p class="pl3k">${r.rank.join(' · ')}</p>`:''}
    ${r.stock.length?`<div class="pl3st">${r.stock.map(s=>`<span><b>${esc(s.br)}</b>${s.n?`${s.n}권`:'없음'}</span>`).join('')}</div>`:''}
-   ${r.ev.length?`<ol class="pl3tl">${r.ev.slice(0,30).map(e=>`<li><b>${mdw(e.d)}</b><span>${esc(e.w)}</span><i>${esc(e.k||'')}${e.g?' · 반응 좋았음':''}</i></li>`).join('')}</ol>`:'<p class="lse">아직 평대 · 아카이브 기록에 이 책이 없습니다. 이 책이 든 평대를 사진으로 남기면 여기부터 일생이 쌓입니다.</p>'}`}
+   ${r.ev.length?`<ol class="pl3tl">${r.ev.slice(0,30).map(e=>`<li><b>${mdw(e.d)}</b><span>${esc(e.w)}</span><i>${esc(e.k||'')}</i></li>`).join('')}</ol>`:'<p class="lse">아직 평대 · 아카이브 기록에 이 책이 없습니다. 이 책이 든 평대를 사진으로 남기면 여기부터 일생이 쌓입니다.</p>'}`}
    <div class="igxa"><button class="btn" data-a="close">닫기</button></div></div>`);setTimeout(()=>{const i=$('lifeQ');if(i&&!q)i.focus()},50)};
 A.pl3LifeGo=()=>{const v=(($('lifeQ')||{}).value||'').trim();if(!v){toast('제목이나 ISBN을 적어 주세요');return}A.pl3LifeOpen({q:v})};
 document.addEventListener('keydown',e=>{if(e.target&&e.target.id==='lifeQ'&&e.key==='Enter'&&!e.isComposing){e.preventDefault();A.pl3LifeGo()}});
 C.pl3LifeBc=async el=>{const f=el.files&&el.files[0];el.value='';if(!f)return;let c=[];try{c=await bcFromFile(f)}catch(e){}if(c[0])A.pl3LifeOpen({q:c[0]});else toast('바코드를 읽지 못했습니다. 크게 찍거나 제목을 적어 주세요')};
 
 /* ── 3 1년 전 오늘 · 5 지점 릴레이 · 6 인물도서관의 사람 ── */
-function pl3Ago(){const md=d=>{const x=pd(d);return x.getMonth()*31+x.getDate()},t=md(TODAY),y=+TODAY.slice(0,4),out=[];
-  const near=d=>{if(!d||+d.slice(0,4)>=y)return false;const m=md(d);return Math.abs(m-t)<=7};
-  try{(ARC.L||[]).forEach(x=>{if(x.p==='y'||x.p==='m')return;if(near(x.date))out.push({y:y-+x.date.slice(0,4),t:x.t,k:x.k,w:'아카이브'})})}catch(e){}
-  pl3Get().forEach(e=>{if(near(e.d))out.push({y:y-+e.d.slice(0,4),t:e.t,k:e.k,w:brN(e.br)+' 평대'})});return out.slice(0,3)}
-function pl3Relay(){const L=pl3Get().filter(e=>e.g&&e.br!==S.br&&dayDiff(e.d,TODAY)<=21);const seen=new Set();return L.filter(e=>{if(seen.has(e.t))return false;seen.add(e.t);return true}).slice(0,3)}
-function pl3Person(){const K=typeof PZP==='object'?Object.keys(PZP):[];if(!K.length)return null;const d=pd(TODAY),w=Math.floor((d-new Date(d.getFullYear(),0,1))/864e5/7);const n=K[w%K.length];return{n,...PZP[n]}}
+/* 인물 고르기: 12월 대비 장일순(12월 31일까지), 그 뒤는 인지도 순으로 한 주씩 */
+const PL3ORD=['장일순','김수환','법륜','이어령','신영복','최재천','김지하','백낙청','강원용','김탁환','나희덕','최열','안상수'];
+function pl3Person(){if(typeof PZP!=='object')return null;const L=PL3ORD.filter(n=>PZP[n]);if(!L.length)return null;
+  let n=L[0];if(TODAY>'2026-12-31'){const w=Math.floor(dayDiff('2027-01-04',TODAY)/7);n=L[1+((Math.max(0,w)%(L.length-1))+(L.length-1))%(L.length-1)]}return{n,...PZP[n]}}
 const pl3Btn=(v,l)=>`<button class="btn sm" data-a="gGo" data-v="${esc(v)}">${l}</button>`;
-function pl3Cards(){const ag=pl3Ago(),rl=pl3Relay(),p=pl3Person(),rows=[];
-  ag.forEach(a=>rows.push(`<div class="pl3c"><em>${a.y}년 전 오늘</em><b>${esc(a.t)}</b><i>${esc(a.w)}${a.k?' · '+esc(a.k):''}</i>${pl3Btn(a.t,'이 기억으로 평대')}</div>`));
-  rl.forEach(e=>rows.push(`<div class="pl3c"><em>${esc(brN(e.br))}에서 반응 좋았던</em><b>${esc(e.t)}</b><i>${mdw(e.d)}${e.books&&e.books.length?' · '+e.books.slice(0,3).map(esc).join(' · '):''}</i>${pl3Btn(e.t,'우리 지점에서도')}</div>`));
-  if(p)rows.push(`<div class="pl3c"><em>이번 주 인물도서관의 사람</em><b>${esc(p.n)}</b><i>${esc(p.msg||'')}${p.books&&p.books.length?' · '+p.books.slice(0,3).map(b=>'『'+esc(b)+'』').join(' '):''}</i>${pl3Btn(p.n+' '+(p.books||[]).slice(0,2).join(' '),'이 사람의 책으로 평대')}</div>`);
-  return rows.length?`<section class="pl3cs" aria-label="이어지는 것">${rows.join('')}</section>`:''}
+function pl3Corner(){if(S.br!=='aka')return '';const p=pl3Person();if(!p)return '';
+  return `<section class="pl3pc" aria-label="인물도서관 코너"><header><em>인물도서관 코너</em><span>사유의숲 인물도서관 한 사람의 책으로 여는 평대</span></header>
+   <b>${esc(p.n)}</b><p>${esc(p.msg||'')}</p>${p.books&&p.books.length?`<ul>${p.books.slice(0,5).map(b=>`<li>『${esc(b)}』</li>`).join('')}</ul>`:''}
+   ${pl3Btn(p.n+' '+(p.books||[]).slice(0,2).join(' '),'이 사람의 책으로 큐레이션')}</section>`}
 
 /* ── 7 오늘 한 장 (매장 직원용 1080×1350) ── */
 async function pl3Sheet(){const W=1080,H=1350,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
@@ -85,8 +81,7 @@ async function pl3Sheet(){const W=1080,H=1350,c=document.createElement('canvas')
   if(cor[1])sec('다음 후보',`「${cor[1].title}」`,(cor[1].books||[]).slice(0,3).map(b=>b.t).join(' · '));
   try{const n=(window.NEWS&&NEWS.items||[])[0];if(n)sec('오늘 아침 소식',n.t,n.src||'')}catch(e){}
   try{if(typeof gcDay==='function'&&GC&&GC.st==='ok'){const g=gcDay(TODAY).slice(0,3);if(g.length)sec('아카데미 오늘',g.map(z=>`${z.time?z.time+' ':''}${z.org}`).join(' / '),'')}}catch(e){}
-  const ag=pl3Ago()[0];if(ag&&y<H-260)sec(`${ag.y}년 전 오늘`,ag.t,ag.w);
-  const p=pl3Person();if(p&&y<H-240)sec('이번 주 인물도서관의 사람',p.n,(p.books||[]).slice(0,3).map(b=>'『'+b+'』').join(' '));
+  const p=S.br==='aka'&&pl3Person();if(p&&y<H-240)sec('인물도서관 코너',p.n,(p.books||[]).slice(0,3).map(b=>'『'+b+'』').join(' '));
   x.font=F(500,22);x.fillStyle='#9a958a';x.fillText('더숲 워크룸 · Planned by 쿼부장',72,H-56);
   return new Promise(ok=>c.toBlob(b=>ok(b),'image/png'))}
 A.pl3Day=async()=>{if(S.br==='all'){toast('지점을 먼저 고르세요');return}toast('한 장을 만드는 중…');const b=await pl3Sheet();if(!b){toast('만들지 못했습니다');return}
@@ -97,5 +92,5 @@ A.pl3Day=async()=>{if(S.br==='all'){toast('지점을 먼저 고르세요');retur
 (()=>{const r=render;render=function(){r.apply(this,arguments);try{if(S.locked)return;pl3Sub();if(typeof arcStart==='function'&&ARC.st==='idle')arcStart();
   const mn=document.querySelector('main');if(!mn||S.mode!=='store'||S.view.store!=='cur'||S.br==='all'||mn.querySelector('.pl3t'))return;
   const anchor=mn.querySelector('.plbar')||mn.querySelector('.wall');if(!anchor)return;
-  const w=document.createElement('div');w.innerHTML=`<div class="pl3t" role="group" aria-label="평대 도구"><label class="pl3b"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>평대 사진 남기기<input type="file" accept="image/*" capture="environment" data-c="pl3Ph" hidden></label><button class="pl3b" data-a="pl3LifeOpen">책의 일생</button><button class="pl3b" data-a="pl3Day">오늘 한 장</button></div>${pl3Cards()}`;
+  const w=document.createElement('div');w.innerHTML=`<div class="pl3t" role="group" aria-label="평대 도구"><label class="pl3b"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>평대 사진 남기기<input type="file" accept="image/*" capture="environment" data-c="pl3Ph" hidden></label><button class="pl3b" data-a="pl3LifeOpen">책의 일생</button><button class="pl3b" data-a="pl3Day">오늘 한 장</button></div>${pl3Corner()}`;
   anchor.after(...w.childNodes)}catch(e){console.warn(e)}}})();
