@@ -860,6 +860,29 @@ header.top{border-bottom-color:var(--brc,var(--ink))!important}
 .plx{display:grid;gap:10px;padding-bottom:12px}.plx .igxa{margin-top:0}.pld{display:grid;gap:4px;padding:8px 0;border-top:1px solid #e6e1d4}.pld>b{font-size:13px;color:#6b6b63}.plr{display:flex;justify-content:space-between;gap:10px;font-size:14px}.plr em{font-style:normal;font-size:12px;color:#8a6a10;white-space:nowrap}
 #guide.g2{align-items:flex-start}#guide.g2bs .g2b{min-height:100dvh;height:auto}
 #guide.g2bs .bsnav button[aria-current=true]{background:#003128;color:#fff;border-color:#003128}
+/* 데스크톱: 도움말 자리 · 가이드 넓은 화면 (11/13) */
+@media(min-width:721px){header .bar{flex-wrap:wrap!important;row-gap:8px}header .bar .lvbar{order:9;flex:1 0 100%;margin:0!important;justify-content:center;min-height:32px}}
+@media(min-width:900px) and (min-aspect-ratio:5/4){
+#guide.g2 .g2b{max-width:1180px;padding:22px 48px 24px}
+#guide.g2 .g2top b{font-size:20px}
+#guide.g2 .g2ai{margin-top:14px;padding:12px 18px}#guide.g2 .g2ai1{font-size:16px}#guide.g2 .g2ai2{font-size:14px}
+#guide.g2 .g2seg{max-width:420px}#guide.g2 .g2seg button{padding:10px 4px;font-size:14.5px}
+#guide.g2 .g2bar{margin-top:16px}
+#guide.g2:not(.g2free):not(.g2bs) .g2c{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr);grid-template-rows:auto auto auto 1fr;grid-template-areas:"m h" "m t" "m w" "m o";column-gap:48px;row-gap:14px;align-content:stretch;padding:26px 0 18px}
+#guide.g2:not(.g2free) .g2c>.g2h{grid-area:h;align-self:end}
+#guide.g2:not(.g2free) .g2c>h2{grid-area:t;font-size:clamp(28px,2.6vw,38px)}
+#guide.g2:not(.g2free) .g2c>.g2m{grid-area:m;max-height:none;height:100%;min-height:0}
+#guide.g2:not(.g2free) .g2c>.g2why{grid-area:w;margin-top:10px}
+#guide.g2:not(.g2free) .g2c>.g2how{grid-area:o;align-self:start;flex-direction:column;align-items:flex-start;gap:8px}
+#guide.g2 .g2why b{font-size:14px}#guide.g2 .g2why p{font-size:16.5px;line-height:1.75}
+#guide.g2 .g2how li{font-size:14px;padding:8px 12px}
+#guide.g2 .g2ag{padding:28px;gap:10px}#guide.g2 .g2ag p{font-size:15px;max-width:70%}
+#guide.g2 .g2nav{max-width:520px;margin-left:auto;width:100%}
+#guide.g2free .g2c h2{font-size:clamp(28px,2.6vw,38px)}
+#guide.g2free .g2tiles{grid-template-columns:repeat(3,1fr);gap:12px}#guide.g2free .g2t{padding:18px 16px}#guide.g2free .g2t>b{font-size:17px}#guide.g2free .g2t p{font-size:14px}
+#guide.g2free .g2rule{grid-template-columns:repeat(3,1fr);column-gap:32px;padding-top:34px}#guide.g2free .g2rule section{padding:16px 0 18px;border-bottom:1px solid #d8d3c4}#guide.g2free .g2rule h3{font-size:19px}#guide.g2free .g2rule p{font-size:15.5px;line-height:1.75}#guide.g2free .g2rule .g2sig{grid-column:1/-1}
+#guide.g2bs .g2b{max-width:880px}#guide.g2bs .bsnav{flex-wrap:wrap!important;overflow:visible}#guide.g2bs .g2bsp h3{font-size:26px}#guide.g2bs .g2bsp p,#guide.g2bs .g2bsp li{font-size:16px;line-height:1.75}
+}
 </style>
 </head>
 <body>
