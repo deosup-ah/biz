@@ -15,10 +15,6 @@ const G2=[
 ];
 /* 참부장이 직접 정한 문장(11/13). 글자를 바꾸지 않는다 */
 const G2RULE=[['덜어 내기','기능을 더하기 전에 먼저 덜어 내고, 장식보다 명료하게 만듭니다.'],['공간과 기억','화면에 실제 공간의 치수와 결을 그대로 옮기고, 정보는 얇게 겹쳐 무겁게 가리지 않게 합니다. 여섯 지점 어디서나 그 지점의 집처럼 느껴지게 하고, 작은 정렬까지 정확하게 맞춥니다.'],['누구에게 · 어떤 방식으로','애매하고 실체 없는 주제를 겨냥하는 기능과 문구는 만들지 않습니다. 모든 기능은 「누구에게 · 어떤 방식으로」가 정해져 있어야 하고, 그 기록이 쌓이면 우연한 만남을 낳는 기획을 할 수 있게 합니다.']];
-const G2SHORT={'덜어 내기':['덜어 내기','더하기 전에 덜고, 장식보다 명료하게'],'공간과 기억':['공간과 기억','실제 공간의 치수와 결을 화면에'],'누구에게 · 어떤 방식으로':['누구에게 · 어떻게','실체 없는 주제는 만들지 않는다'],
- '정답은 없습니다':['정답은 없다','해 보며 공간의 방향을 정한다'],'시의성':['시의성','지금 · 계절 · 사람들의 하루에 닿게'],'사회와 사람을 향해':['사회와 사람','일부만 아는 이야기는 고르지 않는다'],
- '읽는 일 자체':['읽는 일 자체','좋고 나쁨으로 가르지 않는다'],'변하는 것과 변하지 않는 것':['변화와 불변','바뀌는 책과 변하지 않는 것을 함께'],'다양한 시선':['다양한 시선','많이 읽기보다 넓게 보기']};
-A.g2R=d=>{const j=+d.j,k=+d.k;S.ui.g2r=S.ui.g2r&&S.ui.g2r[0]===j&&S.ui.g2r[1]===k?null:[j,k];gdDraw()};
 const G2RULES=[{h:'앱',p:'도구는 덜어 내고, 실제 공간을 옮깁니다.',L:G2RULE},
  {h:'큐레이팅',p:'지금, 사회와 사람을 향해.',L:[['정답은 없습니다','해 보면서 이 공간에 맞는 목적과 방향을 정하되, 누구에게 어떤 방식으로 건넬지는 늘 분명해야 하고, 그것이 쌓였을 때 비로소 우연한 만남을 낳는 기획을 해 볼 수 있습니다.'],['시의성','시의성 없는 큐레이팅은 없습니다. 지금 사회에서 일어나는 일과 계절, 사람들의 하루에 닿아 있어야 합니다.'],['사회와 사람을 향해','나 혹은 일부만 아는 이야기를 고르지 않습니다. 큐레이팅은 사회와 사람을 향해 있어야 합니다.']]},
  {h:'셀렉션',p:'변하는 것과 변하지 않는 것을 함께.',L:[['읽는 일 자체','책을 좋고 나쁨으로 가르지 않습니다. 읽는 일 자체가 소중해진 시대입니다.'],['변하는 것과 변하지 않는 것','책이 지속되려면 책의 개념도 바뀌어야 합니다. 그 변화와, 변하지 않는 것을 함께 담습니다.'],['다양한 시선','많이 읽는 것과는 다른 일입니다. 사회와 사람을 향해 다양한 시선을 가지려고 애씁니다.']]}];
@@ -34,7 +30,7 @@ const g2Soon=()=>{const ad=typeof isAdmin==='function'&&isAdmin();return G2SOON.
     const L=g2List(),i=Math.min(S.ui.gd|0,L.length-1),s=L[i],last=i===L.length-1;G.className='g2'+(s.soon||s.rule?' g2free':'');
     const tabs='';
     const bar=`<div class="g2bar">${L.map((x,j)=>`<button data-a="gdTo" data-i="${j}" class="${j<i?'done':j===i?'on':''}" aria-label="${x.n}"></button>`).join('')}</div>`;
-    const media=s.soon?`<div class="g2tiles">${g2Soon().map(([a,b],j)=>`<div class="g2t"><i aria-hidden="true"><b></b><b></b></i><b>${a}</b><p>${b}</p><em>테스트 중</em></div>`).join('')}</div>`:s.rule?`<div class="g2rule">${G2RULES.map((g,j)=>{const on=S.ui.g2r&&S.ui.g2r[0]===j?S.ui.g2r[1]:-1;return `<div class="g2rbox"><header><b>${g.h}</b><span>${g.p}</span></header><div class="g2rk">${g.L.map(([a],k)=>`<button data-a="g2R" data-j="${j}" data-k="${k}" aria-pressed="${on===k}"><b>${(G2SHORT[a]||[a])[0]}</b><span>${(G2SHORT[a]||[])[1]||''}</span></button>`).join('')}</div>${on>=0?`<p class="g2rt">${g.L[on][1]}</p>`:''}</div>`}).join('')}</div>`:s.soon?`<div class="g2soon">${g2Soon().map(([a,b])=>`<div><span><b>${a}</b><em>테스트 중</em></span><p>${b}</p></div>`).join('')}</div>`
+    const media=s.soon?`<div class="g2tiles">${g2Soon().map(([a,b],j)=>`<div class="g2t"><i aria-hidden="true"><b></b><b></b></i><b>${a}</b><p>${b}</p><em>테스트 중</em></div>`).join('')}</div>`:s.rule?`<div class="g2rule">${G2RULES.map((g,j)=>`<div class="g2rbox"><header><b>${g.h}</b><span>${g.p}</span></header>${g.L.map(([a,b])=>`<section><h3>${a}</h3><p>${b}</p></section>`).join('')}</div>`).join('')}</div>`:s.soon?`<div class="g2soon">${g2Soon().map(([a,b])=>`<div><span><b>${a}</b><em>테스트 중</em></span><p>${b}</p></div>`).join('')}</div>`
       :s.mock==='ag'?`<div class="g2m g2ag"><p class="me">진열 가득 채워 줘</p><p class="it">첫 번째 평대를 「가득 채우기」로 놓았습니다. 메인은 앞줄 가운데에 세웠어요.</p><p class="me">두 번째 POP 짙은 바탕으로</p><p class="it">POP를 「짙은 바탕」으로 만들었습니다.</p></div>`
       :`<div class="g2m"><img src="guide/${s.img}?v=13" alt="${esc(s.t)}" loading="eager"></div>`;
     G.innerHTML=`<div class="g2b">${g2Head('a')}${bar}
