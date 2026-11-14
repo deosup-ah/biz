@@ -1,4 +1,5 @@
-/* 더숲 워크룸 공용 저장소 (구글 시트 + 앱스 스크립트)
+/* 주의: 주소 쿼리에 c · sid 는 앱스 스크립트가 따로 쓰는 이름이라 col 을 쓴다.
+   더숲 워크룸 공용 저장소 (구글 시트 + 앱스 스크립트)
    붙여 넣기만 하고 고치지 않습니다. 기록 이름표: arc(아카이브) · plog(평대 기록) · fb(의견) · arcimg(사진).
    사진은 드라이브 「워크룸 사진」 폴더에, 기록은 이 시트의 「기록」 탭에 쌓입니다.
    기사 찾기: 구글 뉴스 · 빙 뉴스 RSS를 대신 읽어 줍니다(30분 저장). */
@@ -60,8 +61,8 @@ function news_(q) {
 function doGet(e) {
   var p = (e && e.parameter) || {};
   try {
-    if (p.a === 'list') { if (OK.indexOf(p.c) < 0) return out_({ err: 'c' }); return out_({ docs: list_(p.c) }); }
-    if (p.a === 'get') { var L = list_(p.c).filter(function (x) { return x.id === p.id; }); return out_({ doc: L[0] || null }); }
+    if (p.a === 'list') { if (OK.indexOf(p.col) < 0) return out_({ err: 'col' }); return out_({ docs: list_(p.col) }); }
+    if (p.a === 'get') { var L = list_(p.col).filter(function (x) { return x.id === p.id; }); return out_({ doc: L[0] || null }); }
     if (p.a === 'news') return out_({ items: news_(p.q) });
     return out_({ ok: 1 });
   } catch (x) { return out_({ err: String(x) }); }

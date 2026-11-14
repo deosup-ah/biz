@@ -13,9 +13,9 @@ const GSDB={
     async set(data){const img=c==='arcimg'&&data&&String(data.d||'').startsWith('data:');const r=await gsPost({a:img?'img':'put',c,id,data});if(!r||r.err)throw gsErr(r);gsKick(c)},
     async update(data){const s=await me.get();await me.set({...(s.exists?s.data():{}),...data})},
     async delete(){const r=await gsPost({a:'del',c,id});if(!r||r.err)throw gsErr(r);gsKick(c)},
-    async get(){const r=await gsGet({a:'get',c,id});return r&&r.doc?{id,exists:true,data:()=>r.doc.data,metadata:{fromCache:false}}:{id,exists:false,data:()=>undefined,metadata:{fromCache:false}}}};return me},
+    async get(){const r=await gsGet({a:'get',col:c,id});return r&&r.doc?{id,exists:true,data:()=>r.doc.data,metadata:{fromCache:false}}:{id,exists:false,data:()=>undefined,metadata:{fromCache:false}}}};return me},
   collection(c){return{path:c,doc:id=>GSDB.doc(c+'/'+id),
-    onSnapshot(next,err){let stop=false,ok=false;const run=async()=>{try{const r=await gsGet({a:'list',c});if(!r||r.err)throw r;ok=true;if(!stop)next({docs:r.docs.map(d=>({id:d.id,exists:true,data:()=>d.data,metadata:{fromCache:false}})),size:r.docs.length,empty:!r.docs.length,metadata:{fromCache:false,hasPendingWrites:false},docChanges:()=>[]})}catch(e){if(!stop&&!ok&&err){stop=true;err({code:'unavailable'})}}};
+    onSnapshot(next,err){let stop=false,ok=false;const run=async()=>{try{const r=await gsGet({a:'list',col:c});if(!r||r.err)throw r;ok=true;if(!stop)next({docs:r.docs.map(d=>({id:d.id,exists:true,data:()=>d.data,metadata:{fromCache:false}})),size:r.docs.length,empty:!r.docs.length,metadata:{fromCache:false,hasPendingWrites:false},docChanges:()=>[]})}catch(e){if(!stop&&!ok&&err){stop=true;err({code:'unavailable'})}}};
       (GSSUB[c]=GSSUB[c]||[]).push(run);run();const t=setInterval(()=>{if(!stop&&!document.hidden)run()},60000);return()=>{stop=true;clearInterval(t)}}}}};
 /* 함께 쓰는 저장소 고르기: Claude 앱이면 db, 공개 주소면 시트 */
 const shDB=()=>(typeof DB!=='undefined'&&DB)||(gsOn()?GSDB:null);
