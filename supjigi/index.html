@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head><script>/*새 판 자동 받기*/(function(){var B='11142232';try{fetch('version.txt?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():''}).then(function(v){v=(v||'').trim();if(v&&v!==B&&sessionStorage.getItem('sj.vr')!==v){sessionStorage.setItem('sj.vr',v);var u=new URL(location.href);u.searchParams.set('v',v);location.replace(u.toString())}}).catch(function(){})}catch(e){}})();</script>
+<head><script>/*새 판 자동 받기*/(function(){var B='11142311';try{fetch('version.txt?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():''}).then(function(v){v=(v||'').trim();if(v&&v!==B&&sessionStorage.getItem('sj.vr')!==v){sessionStorage.setItem('sj.vr',v);var u=new URL(location.href);u.searchParams.set('v',v);location.replace(u.toString())}}).catch(function(){})}catch(e){}})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>더숲 워크룸</title>
@@ -1016,6 +1016,38 @@ main>.hero h2{font-size:44px!important}}
 .cvw.hint::after{content:"눌러서 시작";position:absolute;top:-10px;right:8px;background:#c9a24a;color:#1c1c1a;font:700 12px Pretendard,sans-serif;padding:3px 8px}
 .cvw{position:relative}
 .kbd{display:none}@media(min-width:900px){.kbd{display:block;font-size:12px;color:#8a8577;margin:8px 0 0}}
+
+/* 11/14 23시 리뉴얼: 색 하나로 · 휴대폰 아래 탭 · 위 한 줄 · 만들기 단계 */
+.dial button,nav.tabs button{--bk:#003128!important;--bt:#f2eee3!important}
+.dial button:not(.cur),nav.tabs button:not([aria-current="page"]){--bk:#f2eee3!important;--bt:#1c1c1a!important}
+body.dialon .dialw{top:auto!important;bottom:0!important;padding-top:0!important;padding-bottom:env(safe-area-inset-bottom)!important;border-bottom:0!important;border-top:1px solid #1c1c1a!important;background:#fbfaf6!important;pointer-events:auto}
+body.dialon .dialm{display:none!important}
+body.dialon .dial{display:flex!important;overflow:visible!important;-webkit-mask-image:none!important;mask-image:none!important;scroll-snap-type:none!important;gap:0!important;padding:0!important}
+body.dialon .dial .dpad{display:none!important}
+body.dialon .dial button{flex:1 1 0!important;transform:none!important;opacity:1!important;font:600 15px Pretendard,sans-serif!important;padding:14px 2px 13px!important;background:none!important;color:#5a5a55!important;border-top:3px solid transparent!important;border-radius:0!important;box-shadow:none!important}
+body.dialon .dial{align-items:stretch!important;height:56px!important}body.dialon .dial button{height:56px!important;min-height:0!important;max-height:none!important;line-height:1!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0 2px!important;top:auto!important;bottom:auto!important}body.dialon .dial button.cur{color:#003128!important;font-weight:800!important;border-top-color:#003128!important}
+body.dialon #app{padding-top:env(safe-area-inset-top)!important}
+body.dialon main{padding-bottom:86px!important}
+body.dialon #toast{bottom:76px!important}
+body.dialon::after{bottom:64px!important}
+@media(max-width:720px){header .row2.places{display:none!important}header .bar .brand span{display:none}
+ header .bar{gap:8px}}
+.brpick{display:none}
+@media(max-width:720px){.brpick{display:inline-flex;align-items:center;gap:5px;border:1px solid #1c1c1a;background:#fff;padding:7px 10px;font:700 14px Pretendard,sans-serif;color:#1c1c1a;min-height:36px}}
+.brpk{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 16px}.brpk button{padding:16px 8px;border:1px solid #1c1c1a;background:#fff;font:700 16px Pretendard,sans-serif}.brpk button[aria-pressed="true"]{background:#003128;color:#f2eee3}
+.dsteps{position:sticky;top:0;z-index:30;display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:#fbfaf6;border-bottom:2px solid #1c1c1a;margin:0 0 14px}
+.dsteps button{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:7px;align-items:center;text-align:left;border:0;background:none;padding:10px 6px;cursor:pointer;color:#5a5a55}
+.dsteps em{grid-row:1/3;font:800 13px Pretendard,sans-serif;width:22px;height:22px;display:grid;place-items:center;border:1.5px solid currentColor;border-radius:50%;font-style:normal}
+.dsteps b{font-size:15px}.dsteps small{font-size:11.5px;color:#8a8577}
+.dsteps button[aria-pressed="true"]{color:#003128}.dsteps button[aria-pressed="true"] em{background:#003128;color:#f2eee3;border-color:#003128}
+.flash{animation:fl 1.2s ease 1}@keyframes fl{30%{box-shadow:0 0 0 4px #c9a24a}}
+
+@media(min-width:721px){nav.tabs>span.tg{display:none!important}
+nav.tabs button{margin:0 0 2px 0!important;width:100%!important;box-shadow:none!important;border:0!important;border-left:4px solid transparent!important;background:none!important;color:#5a5a55!important;text-align:left!important;padding:13px 16px!important;font:600 17px Pretendard,sans-serif!important;border-radius:0!important}
+nav.tabs button:hover{background:#f2eee3!important;color:#1c1c1a!important}
+nav.tabs button[aria-current="page"]{border-left-color:#003128!important;background:#ece8dc!important;color:#003128!important;font-weight:800!important}
+nav.tabs::before,nav.tabs::after,nav.tabs button::before,nav.tabs button::after{display:none!important}nav.tabs{display:flex!important;flex-direction:column!important;gap:2px!important;padding:0!important}nav.tabs button{transform:none!important;translate:none!important;height:48px!important;min-height:0!important;margin:0!important;display:flex!important;align-items:center!important}
+.kbd{padding:0 16px;line-height:1.5}}
 </style>
 </head>
 <body>
@@ -1025,29 +1057,29 @@ main>.hero h2{font-size:44px!important}}
 <div id="tip"></div><div id="toast" role="status"></div>
 <script>const POSTR=[];function afterRender(f){POSTR.push(f)}</script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="news.js?v=11142232"></script><script src="books.js?v=11142232"></script>
-<script src="core.js?v=11142232"></script><script>(()=>{const r=render;render=function(){r.apply(this,arguments);for(const f of POSTR){try{f()}catch(e){console.warn(e)}}}})();</script>
-<script src="know.js?v=11142232"></script>
-<script src="store.js?v=11142232"></script>
-<script src="recs.js?v=11142232"></script>
-<script src="status.js?v=11142232"></script>
-<script src="studio.js?v=11142232"></script>
-<script src="cur.js?v=11142232"></script>
-<script src="design.js?v=11142232"></script>
-<script src="dp.js?v=11142232"></script>
-<script src="academy.js?v=11142232"></script><script src="auto.js?v=11142232"></script><script src="aka2.js?v=11142232"></script><script src="trend.js?v=11142232"></script><script src="dp2.js?v=11142232"></script><script src="order2.js?v=11142232"></script><script src="quick.js?v=11142232"></script><script src="talk.js?v=11142232"></script><script src="space.js?v=11142232"></script><script src="nav.js?v=11142232"></script><script src="ux.js?v=11142232"></script><script src="apply.js?v=11142232"></script><script src="dp4.js?v=11142232"></script><script src="dp5.js?v=11142232"></script><script src="lv.js?v=11142232"></script>
-<script src="up.js?v=11142232"></script>
-<script src="puzzle.js?v=11142232"></script>
-<script src="igx.js?v=11142232"></script>
-<script src="pzx.js?v=11142232"></script>
-<script src="qr.js?v=11142232"></script>
-<script src="ls.js?v=11142232"></script>
-<script src="wd.js?v=11142232"></script>
-<script src="gd2.js?v=11142232"></script>
-<script src="polish.js?v=11142232"></script>
-<script src="plus2.js?v=11142232"></script><script src="gs.js?v=11142232"></script><script src="arcfound.js?v=11142232"></script><script src="arc.js?v=11142232"></script><script src="arcimg.js?v=11142232"></script><script src="plus3.js?v=11142232"></script>
-<script src="plus4.js?v=11142232"></script><script src="back.js?v=11142232"></script><script src="simp.js?v=11142232"></script>
-<script src="ag.js?v=11142232"></script>
+<script src="news.js?v=11142311"></script><script src="books.js?v=11142311"></script>
+<script src="core.js?v=11142311"></script><script>(()=>{const r=render;render=function(){r.apply(this,arguments);for(const f of POSTR){try{f()}catch(e){console.warn(e)}}}})();</script>
+<script src="know.js?v=11142311"></script>
+<script src="store.js?v=11142311"></script>
+<script src="recs.js?v=11142311"></script>
+<script src="status.js?v=11142311"></script>
+<script src="studio.js?v=11142311"></script>
+<script src="cur.js?v=11142311"></script>
+<script src="design.js?v=11142311"></script>
+<script src="dp.js?v=11142311"></script>
+<script src="academy.js?v=11142311"></script><script src="auto.js?v=11142311"></script><script src="aka2.js?v=11142311"></script><script src="trend.js?v=11142311"></script><script src="dp2.js?v=11142311"></script><script src="order2.js?v=11142311"></script><script src="quick.js?v=11142311"></script><script src="talk.js?v=11142311"></script><script src="space.js?v=11142311"></script><script src="nav.js?v=11142311"></script><script src="ux.js?v=11142311"></script><script src="apply.js?v=11142311"></script><script src="dp4.js?v=11142311"></script><script src="dp5.js?v=11142311"></script><script src="lv.js?v=11142311"></script>
+<script src="up.js?v=11142311"></script>
+<script src="puzzle.js?v=11142311"></script>
+<script src="igx.js?v=11142311"></script>
+<script src="pzx.js?v=11142311"></script>
+<script src="qr.js?v=11142311"></script>
+<script src="ls.js?v=11142311"></script>
+<script src="wd.js?v=11142311"></script>
+<script src="gd2.js?v=11142311"></script>
+<script src="polish.js?v=11142311"></script>
+<script src="plus2.js?v=11142311"></script><script src="gs.js?v=11142311"></script><script src="arcfound.js?v=11142311"></script><script src="arc.js?v=11142311"></script><script src="arcimg.js?v=11142311"></script><script src="plus3.js?v=11142311"></script>
+<script src="plus4.js?v=11142311"></script><script src="back.js?v=11142311"></script><script src="nav2.js?v=11142311"></script><script src="simp.js?v=11142311"></script>
+<script src="ag.js?v=11142311"></script>
 <script>boot();</script>
 </body>
 </html>

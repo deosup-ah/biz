@@ -24,3 +24,6 @@ window.addEventListener('popstate',()=>{const L=bkLayers();if(L.length){BK.busy=
 setInterval(()=>{const n=bkLayers().length;if(n>BK.lay){for(let i=BK.lay;i<n;i++)try{history.pushState({bk:'l'},'')}catch(e){}}else if(n<BK.lay&&!BK.busy)BK.stale+=BK.lay-n;BK.lay=n},300);
 A.bkGo=()=>{try{history.back()}catch(e){bkRestore()}};
 afterRender(()=>{setTimeout(bkCheck,0)});
+/* 화면 버튼으로 창을 닫을 때도 뒤로 한 칸을 쓴다 → 뒤로 버튼이 헛돌지 않게 */
+(()=>{const viaBack=fn=>function(){if(arguments.length&&BK.lay>0&&!BK.busy){try{history.back();return}catch(e){}}return fn.apply(this,arguments)};
+  A.close=viaBack(A.close);const g=A.gdClose;if(g)A.gdClose=viaBack(g);const a=A.agClose;if(a)A.agClose=viaBack(a)})();
