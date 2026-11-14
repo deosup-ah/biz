@@ -1,5 +1,5 @@
 /* 11/13 저녁 전수 점검에서 고친 것: 빈 칸이 만드는 큰 틈, 겹친 제목, 도움말 자리 */
-(()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn)return;
+afterRender(()=>{try{const mn=document.querySelector('main');if(!mn)return;
   /* 높이 0인 칸도 grid 간격을 먹어서 큰 틈이 생긴다 → 숨김 */
   [...mn.children].forEach(e=>{if(e.offsetHeight===0&&!e.matches('script,style'))e.style.display='none'});
   /* 도움말은 위쪽 막대로(아래로 한 줄을 통째로 쓰던 것) */
@@ -11,4 +11,4 @@
   const h=mn.querySelector('.hero h2'),sn=mn.querySelector('.subnav [data-a="spPick"][aria-pressed="true"]');if(h&&sn&&h.firstChild&&h.firstChild.nodeType===3&&h.firstChild.textContent.trim()===sn.textContent.trim())h.firstChild.textContent='공간';
   /* 홍보(직원): 운영 숫자는 없으니 설명을 하는 일로 */
   if(S.mode==='aka'&&S.view.aka==='insta'&&typeof isAdmin==='function'&&!isAdmin()){const p=mn.querySelector('.sec p');if(p&&/운영 숫자/.test(p.textContent))p.textContent='사진으로 피드 이미지와 글 만들기'}
-}catch(e){}}})();
+}catch(e){}});

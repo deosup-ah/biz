@@ -40,7 +40,7 @@ function upPost(){const mn=document.querySelector('main');if(!mn||S.locked)retur
     (bts||stage).after(ed);if(form&&![...form.children].some(c=>c.offsetHeight>0))form.style.display='none'}
   /* 인스타 화면: 맨 위에 「피드 만들기」, 예전 초안 칸은 접기 */
   if(S.mode==='aka'&&S.view.aka==='insta'&&!mn.querySelector('.igtop')){const sec=mn.querySelector('.sec');const c=document.createElement('div');c.className='igtop';c.innerHTML=`<div><b>피드 만들기</b><span>사진을 넣으면 사진에 맞춰 표지 이미지와 글 세 가지를 만듭니다. 사진이 없으면 큐레이션으로 표지를 만듭니다.</span></div><button class="btn pri" data-a="igOpen">시작</button>`;if(sec)sec.after(c);else mn.prepend(c);const old=$('igT');if(old){const cd=old.closest('.card');if(cd)cd.style.display='none'}}}
-(()=>{const r=render;render=function(){r.apply(this,arguments);try{upPost()}catch(e){console.warn(e)}}})();
+afterRender(()=>{try{upPost()}catch(e){console.warn(e)}});
 
 /* ── 한 번에 받기: POP · 쇼카드 · 띠지 PDF + 인스타 이미지 ── */
 try{if(!SETK.some(x=>x[0]==='ig'))SETK.push(['ig','인스타 이미지'])}catch(e){}
@@ -201,12 +201,12 @@ A.bsGo=d=>{const e=document.getElementById('bs-'+d.id),G=$('guide'),h=G&&G.query
 /* 아래에서 올라오는 창: 맨 위에 늘 보이는 닫기 */
 (()=>{const sb=$('sheetBox');if(!sb||!window.MutationObserver)return;const put=()=>{if(sb.firstElementChild&&sb.firstElementChild.classList.contains('shx'))return;const b=document.createElement('button');b.className='shx';b.dataset.a='close';b.setAttribute('aria-label','닫기');b.textContent='닫기 ✕';sb.prepend(b)};new MutationObserver(m=>{if(!m.some(r=>[...r.addedNodes].some(n=>n.classList&&n.classList.contains('shx'))))put()}).observe(sb,{childList:true})})();
 /* 직원 화면에서 쓸 일 없는 칸 숨기기 · 이름 붙이기 */
-(()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn||S.locked)return;
+afterRender(()=>{try{const mn=document.querySelector('main');if(!mn||S.locked)return;
   mn.querySelectorAll('.pcard .blist em').forEach(e=>{if(e.textContent.trim()==='?'){e.textContent='없음';e.title='이 지점 재고에 없음'}});
   if(!isAdmin()&&S.mode==='aka'&&S.view.aka==='insta'){mn.querySelectorAll('.card').forEach(c=>{const h=c.querySelector('h3');if(h&&/인사이트|운영 숫자/.test(h.textContent))c.style.display='none'});mn.querySelectorAll('.empty,.note').forEach(e=>{if(/인사이트를 아직/.test(e.textContent))e.style.display='none'});mn.querySelectorAll('.subnav [data-v="naver"],.subnav [data-t="naver"]').forEach(b=>b.style.display='none')}
   const dz=mn.querySelector('.grid.dz'),cp=dz&&dz.previousElementSibling;
   if(dz){const form=dz.querySelector(':scope>.card.form'),box=dz.querySelector('.uedb');if(form&&box){[...form.children].forEach(c=>{if(!c.classList.contains('ukind')&&!(c.classList.contains('chips')&&c.offsetHeight===0))box.append(c)});form.style.display='none'}
     const qb=mn.querySelector('.qbar');if(qb&&qb.querySelector('[data-k="akTn"]')&&!mn.querySelector('.ulab'))qb.insertAdjacentHTML('beforebegin','<p class="ulab">어떤 주제로 만들까요 — 고르면 아래 인쇄물에 바로 들어갑니다</p>')}
-  }catch(e){console.warn(e)}}})();
+  }catch(e){console.warn(e)}});
 
 A.dpRm=()=>{S.ui.dpRm=1;A.dpOpen({i:S.ui.dp.i})};

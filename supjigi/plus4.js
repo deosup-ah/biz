@@ -33,7 +33,7 @@ A.shGo=async d=>{const p=$('shp');if(p)p.remove();const{el}=sh4Target();if(!el)r
 const SH4IC='<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4M8 8l4-4 4 4"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg>';
 function sh4Put(){try{const nb=document.querySelector('header.top .navb');if(nb&&!nb.querySelector('.shb')){const b=document.createElement('button');b.className='shb';b.dataset.a='shOpen';b.title='저장 · 공유';b.setAttribute('aria-label','저장 · 공유');b.innerHTML=SH4IC;const h=nb.querySelector('[data-a="home"]');h?nb.insertBefore(b,h):nb.prepend(b)}
   const bx=$('sheetBox'),sh=$('sheet');if(bx&&sh&&sh.classList.contains('on')&&!bx.querySelector('.shb2')){const b=document.createElement('button');b.className='shb2';b.dataset.a='shOpen';b.setAttribute('aria-label','이 창 저장 · 공유');b.innerHTML=SH4IC+'<span>저장 · 공유</span>';bx.prepend(b)}}catch(e){}}
-(()=>{const r=render;render=function(){r.apply(this,arguments);sh4Put()}})();
+afterRender(()=>{sh4Put()});
 (()=>{const o=openSheet;openSheet=function(){o.apply(this,arguments);sh4Put()}})();
 
 /* ── 2. 의견 보내기 (도움말 맨 위) — 기능 개선 · 불편 · 오류. Claude 앱에서는 함께 보는 기록(db fb/), 공개 주소에서는 이 기기 + 공유로 보내기 ── */

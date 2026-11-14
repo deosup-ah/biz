@@ -3,14 +3,14 @@
 
 /* ── 지점마다 집처럼: 지점 색(11/13 19:29 한 줄 소개는 뺌) ── */
 const BRHOME={aka:['사유의숲','북한산 자락, 아카데미하우스의 서가'],choso:['초소책방','인왕산 옛 초소 자리의 책방'],sojeon:['소전미술관','시흥, 미술관 안의 서가'],nowon:['노원더숲','노원, 동네의 더숲'],nmain:['노원문고 본점','노원문고 본점'],njung:['노원문고 중계점','노원문고 중계점']};
-(()=>{const r=render;render=function(){r.apply(this,arguments);try{const b=BR.find(x=>x.k===S.br),mn=document.querySelector('main');document.body.style.setProperty('--brc',b?b.c:'var(--ink)');
-}catch(e){}}})();
+afterRender(()=>{try{const b=BR.find(x=>x.k===S.br),mn=document.querySelector('main');document.body.style.setProperty('--brc',b?b.c:'var(--ink)');
+}catch(e){}});
 
 /* ── 소식: 크기는 그대로, 「지금」이 느껴지게(빛나는 점 · 날짜 · 넘어가는 시간 줄 · 바로 평대로) ── */
 (()=>{const deck=t=>{const N=(window.NEWS&&NEWS.items)||[],fresh=window.NEWS&&NEWS.asOf===TODAY,i=(S.ui.tki|0)%Math.max(1,N.length),em=t.querySelector('em');
     if(em&&!em.querySelector('.tkdot'))em.innerHTML=`<i class="tkdot" aria-hidden="true"></i>${fresh?'오늘 아침 소식':'소식 · '+(window.NEWS&&NEWS.asOf?mdw(NEWS.asOf).replace(/\(.\)/,''):'')}`;
     let g=t.querySelector('.tkgo');if(!g){g=document.createElement('i');g.className='tkgo';g.dataset.a='newsMake';g.textContent='이 소식으로 평대';t.append(g)}g.dataset.i=i};
-  const r=render;render=function(){r.apply(this,arguments);try{const t=document.querySelector('main .tick');if(!t)return;t.classList.add('live');deck(t);if(!t.dataset.live){t.dataset.live='1';new MutationObserver(()=>{if(!t.querySelector('.tkgo')||!t.querySelector('.tkdot'))deck(t)}).observe(t,{childList:true})}}catch(e){}}})();
+  afterRender(()=>{try{const t=document.querySelector('main .tick');if(!t)return;t.classList.add('live');deck(t);if(!t.dataset.live){t.dataset.live='1';new MutationObserver(()=>{if(!t.querySelector('.tkgo')||!t.querySelector('.tkdot'))deck(t)}).observe(t,{childList:true})}}catch(e){}})})();
 
 /* ── 평대 기록: 무엇을 · 어느 지점에 · 어떤 방식으로 ── */
 const PLOG='sj.plog';const plog=()=>{try{return JSON.parse(localStorage.getItem(PLOG)||'[]')}catch(e){return[]}};
@@ -27,8 +27,8 @@ A.plOpen=()=>{const L=plog().filter(e=>e.br===S.br),by={};L.forEach(e=>{(by[e.d]
   openSheet(`<div class="plx"><div class="igxh"><b>평대 기록</b><span>${esc(brN(S.br))} · ${L.length}건</span></div><p class="note">진열 · 인쇄물 · 인스타를 만들 때마다 날짜와 주제, 방식이 남습니다(이 기기에).</p>
    ${L.length?Object.entries(by).slice(0,20).map(([d,es])=>`<div class="pld"><b>${mdw(d)}</b>${es.map(e=>`<div class="plr"><span>${esc(e.t)}</span><em>${esc(e.k)}</em></div>`).join('')}</div>`).join(''):'<p class="lse">아직 기록이 없습니다. 큐레이션 카드에서 진열을 보내거나 POP를 저장하면 쌓입니다.</p>'}
    <div class="igxa"><button class="btn pri" data-a="plMix">기록 섞어 새 평대</button><button class="btn" data-a="close">닫기</button></div></div>`)};
-(()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn||S.locked||S.mode!=='store'||S.view.store!=='cur'||S.br==='all'||mn.querySelector('.plbar'))return;const wall=mn.querySelector('.wall');if(!wall)return;
-  const L=plog().filter(e=>e.br===S.br),d=document.createElement('button');d.className='plbar';d.dataset.a='plOpen';d.innerHTML=`<b>평대 기록</b><span>${L.length?`${mdw(L[0].d).replace(/\(.\)/,'')} 「${esc(L[0].t)}」 ${esc(L[0].k)} 외 ${Math.max(0,L.length-1)}건`:'진열 · POP를 만들면 여기에 쌓입니다'}</span><i aria-hidden="true">›</i>`;wall.after(d)}catch(e){}}})();
+afterRender(()=>{try{const mn=document.querySelector('main');if(!mn||S.locked||S.mode!=='store'||S.view.store!=='cur'||S.br==='all'||mn.querySelector('.plbar'))return;const wall=mn.querySelector('.wall');if(!wall)return;
+  const L=plog().filter(e=>e.br===S.br),d=document.createElement('button');d.className='plbar';d.dataset.a='plOpen';d.innerHTML=`<b>평대 기록</b><span>${L.length?`${mdw(L[0].d).replace(/\(.\)/,'')} 「${esc(L[0].t)}」 ${esc(L[0].k)} 외 ${Math.max(0,L.length-1)}건`:'진열 · POP를 만들면 여기에 쌓입니다'}</span><i aria-hidden="true">›</i>`;wall.after(d)}catch(e){}});
 
 /* ── 한 장으로 받기: 3D · 평면 · POP · 인스타 표지를 A4 한 장에 ── */
 A.dpSheet=async()=>{try{const t=curT();if(!t){toast('진열 화면에서 눌러 주세요');return}toast('한 장으로 묶는 중입니다');await upFont();

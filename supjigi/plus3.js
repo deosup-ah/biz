@@ -55,8 +55,8 @@ function pl3Corner(){if(S.br!=='aka')return '';pl3OneAdd();const j=pl3Ix(PL3K.ja
    ${a>=0||b>=0?`<section class="pl3ones" aria-label="인물도서관 코너"><h3>인물도서관 코너 · 한 권씩</h3>${one(a,'신영복')}${one(b,'이어령')}</section>`:''}`}
 
 /* ── 홈 큐레이션에 붙이기: 도구 줄 + 이어지는 것 ── */
-(()=>{const r=render;render=function(){r.apply(this,arguments);try{if(S.locked)return;pl3Sub();if(typeof arcStart==='function'&&ARC.st==='idle')arcStart();
+afterRender(()=>{try{if(S.locked)return;pl3Sub();if(typeof arcStart==='function'&&ARC.st==='idle')arcStart();
   const mn=document.querySelector('main');if(!mn||S.mode!=='store'||S.view.store!=='cur'||S.br==='all'||mn.querySelector('.pl3t'))return;
   const anchor=mn.querySelector('.plbar')||mn.querySelector('.wall');if(!anchor)return;
   const w=document.createElement('div');w.innerHTML=`<div class="pl3t" role="group" aria-label="평대 사진"><label class="pl3b"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>평대 사진 남기기<input type="file" accept="image/*" capture="environment" data-c="pl3Ph" hidden></label></div>${pl3Corner()}`;
-  anchor.after(...w.childNodes)}catch(e){console.warn(e)}}})();
+  anchor.after(...w.childNodes)}catch(e){console.warn(e)}});

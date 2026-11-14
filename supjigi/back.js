@@ -23,4 +23,4 @@ window.addEventListener('popstate',()=>{const L=bkLayers();if(L.length){BK.busy=
 /* 겹친 창이 열리면 뒤로 한 칸을 만든다. 버튼으로 닫으면 그 칸은 다음 뒤로에서 건너뛴다 */
 setInterval(()=>{const n=bkLayers().length;if(n>BK.lay){for(let i=BK.lay;i<n;i++)try{history.pushState({bk:'l'},'')}catch(e){}}else if(n<BK.lay&&!BK.busy)BK.stale+=BK.lay-n;BK.lay=n},300);
 A.bkGo=()=>{try{history.back()}catch(e){bkRestore()}};
-(()=>{const r=render;render=function(){r.apply(this,arguments);setTimeout(bkCheck,0)}})();
+afterRender(()=>{setTimeout(bkCheck,0)});

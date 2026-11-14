@@ -61,9 +61,9 @@ A.lvAsk=()=>{const L=lvNow(),nx=L+1,s=lvS(),R=LVREQ[nx];if(!R||!lvReady(nx))retu
   x.fillStyle='#6b6b66';x.font=`600 28px ${F}`;x.fillText('최근에 만든 큐레이션 단어',70,y+30);x.fillStyle='#1a1a1a';x.font=`500 30px ${F}`;let lx=70,ly=y+86;s.words.slice(0,18).forEach(w=>{const tw=x.measureText(w).width+36;if(lx+tw>1010){lx=70;ly+=58}x.strokeStyle='#003128';x.lineWidth=2;x.strokeRect(lx,ly-36,tw-10,48);x.fillText(w,lx+13,ly);lx+=tw});
   x.fillStyle='#3a2f1c';x.font=`400 22px ${F}`;x.fillText('Planned by 쿼부장',840,1328);
   c.toBlob(b=>{if(b){saveFile(`더숲_승급신청_${nx}단계_${TODAY}.png`,b);toast('신청 카드를 저장했습니다. 카카오톡으로 참부장에게 보내 주세요.')}},'image/png')};
-(()=>{const r=render;render=function(){r.apply(this,arguments);try{const t=document.querySelector('.gdtop');if(t&&!t.querySelector('.lvbtn')){const L=lvNow(),b=document.createElement('button');b.className='btn sm lvbtn';b.dataset.a='lvOpen';b.innerHTML=`<em>${L}</em>${LVN[L]}`;b.textContent='도움말';b.dataset.a='gdOpen';t.innerHTML='';t.append(b)}
+afterRender(()=>{try{const t=document.querySelector('.gdtop');if(t&&!t.querySelector('.lvbtn')){const L=lvNow(),b=document.createElement('button');b.className='btn sm lvbtn';b.dataset.a='lvOpen';b.innerHTML=`<em>${L}</em>${LVN[L]}`;b.textContent='도움말';b.dataset.a='gdOpen';t.innerHTML='';t.append(b)}
   Promise.resolve().then(()=>{try{const mn=document.querySelector('main'),w=mn&&mn.querySelector(':scope>.wall');if(w&&!mn.querySelector('.hmore')){const els=['.rfr','.sec.pks','.chips.pkc','.lvplan'].map(s=>mn.querySelector(':scope>'+s)).filter(Boolean);if(els.length){const d=document.createElement('details');d.className='fold hmore';d.open=!!S.ui.hmO;d.innerHTML='<summary>바꾸기 · 다른 지점 큐레이션 · 계절 기획</summary>';const bx=document.createElement('div');bx.className='hmb';bx.append(...els);d.append(bx);d.addEventListener('toggle',()=>{S.ui.hmO=d.open});const an=w.nextElementSibling&&w.nextElementSibling.nextElementSibling&&w.nextElementSibling.nextElementSibling.classList.contains('btns')?w.nextElementSibling.nextElementSibling:w;an.after(d)}}}catch(e){}});
-  }catch(e){}}})();
+  }catch(e){}});
 A.lvFromGd=()=>{A.gdClose();A.lvOpen()};A.dpEx=d=>{const el=$('dpCmd');if(!el)return;el.value=d.c;A.dpCmd()};
 (()=>{const f=A.dpOpen;A.dpOpen=d=>{f(d);try{const box=document.querySelector('#sheetBox .dpe');if(!box||S.ui.dpF)return;const st=$('dpStage');if(st)st.style.display='none';
   const how=box.querySelector('.dphow'),cmd=box.querySelector('.dpcmd'),v=box.querySelector('.dpv'),bk=$('dpBks'),chs=[...box.querySelectorAll(':scope>.chips')];if(!v||!cmd||!bk)return;
@@ -104,11 +104,11 @@ GDS.splice(2,0,['h','> 다음 단계: ???','쓸수록 열립니다. 2단계와 3
 
 /* ── 만들기 · 주제 고도화: POP 느낌(1단계 3가지 → 2단계 9가지), 2단계 3주 연작, 3단계 4주 계절 기획 ── */
 (()=>{const f=A.dSt;A.dSt=d=>{if(+d.v>=3&&lvNow()<2)return lvLock(2);return f(d)};
-  const r=render;render=function(){r.apply(this,arguments);try{const L=lvNow();
+  afterRender(()=>{try{const L=lvNow();
     if(L<2)document.querySelectorAll('.feels button').forEach((b,i)=>{if(i>=3&&!b.querySelector('.lkb')){b.classList.add('lk');b.insertAdjacentHTML('beforeend','<i class="lkb">2단계</i>')}});
     const mn=document.querySelector('main');if(mn&&S.mode==='store'&&S.view.store==='cur'&&!mn.querySelector('.lvplan')){const w=mn.querySelector('.tick')||mn.querySelector('.grid');if(w){const b=document.createElement('div');b.className='lvplan';
       b.innerHTML=`<button class="btn sm" data-a="lvSeason">${L>=3?'':'<u>3단계</u> '}4주 계절 기획 만들기</button>`;w.before(b)}}
-    document.querySelectorAll('details.menu>div').forEach(dv=>{const s=dv.querySelector('[data-a="sendOpen"]');if(s&&!dv.querySelector('[data-a="lvSerial"]')){const b=document.createElement('button');b.dataset.a='lvSerial';b.dataset.i=s.dataset.i;b.innerHTML=(L>=2?'':'<u>2단계</u> ')+'3주 연작으로 만들기';s.before(b)}})}catch(e){}}})();
+    document.querySelectorAll('details.menu>div').forEach(dv=>{const s=dv.querySelector('[data-a="sendOpen"]');if(s&&!dv.querySelector('[data-a="lvSerial"]')){const b=document.createElement('button');b.dataset.a='lvSerial';b.dataset.i=s.dataset.i;b.innerHTML=(L>=2?'':'<u>2단계</u> ')+'3주 연작으로 만들기';s.before(b)}})}catch(e){}})})();
 const lvPut=(T,msg)=>{S.ui.myT=[...T,...(S.ui.myT||[])].slice(0,8);ssT.set(S.ui.myT);S.ui.cTone='내 생각';S.ui.cOpen=null;S.view.store='cur';window.scrollTo(0,0);render();toast(msg)};
 A.lvSerial=d=>{if(lvNow()<2)return lvLock(2);const t=(S.ui.cor||[])[+d.i];if(!t)return;const base=String(t.title||'').replace(/[,.]\s*$/,''),src=[t.src,t.key,base].filter(Boolean).join(' '),st=[['문 열기','처음 만나는 사람을 위한 쉬운 책부터',7],['깊이 읽기','한 걸음 더 들어가는 책',14],['옆으로 넓히기','다른 분야에서 같은 주제를 만나는 책',21]];
   lvAdd('cur','연작 '+base);lvPut(st.map(([a,b,dd],i)=>({id:'s'+Date.now().toString(36)+i,tone:'내 생각',src,title:`${base} ${'①②③'[i]} ${a}`,hook:`3주 연작 ${i+1}주차 · ${b}`,sym:t.sym||'book',bpal:t.bpal||0,ppal:t.ppal||0,until:addDays(TODAY,dd),place:t.place||'입구 평대',pop:{head:`${base}\n${'①②③'[i]} ${a}`,body:b},band:`${base} · ${a}`,pick:i===0?(t.books||[]).slice(0,4).map(b=>b.t):[],key:base})),`「${base}」 3주 연작을 만들었습니다. 맨 앞 세 표지입니다`)};
@@ -127,12 +127,12 @@ const popMach=(w,n)=>[`> ${w}_`,`「${w}」 → ?`,`${w} + 책 = ___`,`if (${w})
 (()=>{try{const i=DPOBJ.findIndex(x=>x[0]==='card');if(i>=0)DPOBJ.splice(i,1)}catch(e){}const cut=P=>{if(P&&P.it)P.it=P.it.filter(i=>i.k!=='card');if(P&&P.need)P.need=P.need.filter(x=>!/이름표/.test(x));if(P&&P.tips)P.tips=P.tips.filter(x=>!/이름표/.test(x));return P};const g=dpPlan;dpPlan=function(){return cut(g.apply(this,arguments))}})();
 
 /* ── 11/12 단순화: 아래 고정 메뉴 · 카드 빠른 버튼 · 홈 단계 한 줄 · 직원에게 보내기 ── */
-(()=>{const r=render;render=function(){r.apply(this,arguments);try{const mn=document.querySelector('main');if(!mn||S.locked)return;
+afterRender(()=>{try{const mn=document.querySelector('main');if(!mn||S.locked)return;
   if(S.mode==='store'&&S.view.store==='cur'){
     const sn=mn.querySelector(':scope>.subnav:not(.subt)');if(sn){const on=sn.querySelector('[aria-pressed="true"]');if(!on||/전체/.test(on.textContent))sn.style.display='none'}
     const pcs=[...mn.querySelectorAll('.pcard')];mn.querySelectorAll('.wall>.cv').forEach(cv=>{const ci=cv.dataset.i,bs=[[{dataset:{a:'dpOpen',i:ci}},'진열 보기'],[{dataset:{a:'toDesign',kind:'pop',s:'c',i:ci}},'POP 만들기']];if(!bs.length)return;const w=document.createElement('div');w.className='cvw';cv.replaceWith(w);const q=document.createElement('div');q.className='cvq';bs.forEach(([o,n])=>{const x=document.createElement('button');Object.assign(x.dataset,o.dataset);x.textContent=n;q.append(x)});w.append(cv,q)});
     const t=mn.querySelector('.gdtop');if(t&&!t.querySelector('.lvline')){const L=lvNow();if(L<3){const s=lvS(),R=LVREQ[L+1],ks=Object.keys(R),pc=Math.round(ks.reduce((a,k)=>a+Math.min(1,lvVal(s,k)/R[k]),0)/ks.length*100),SH={cur:'큐레이션',pop:'인쇄물',dp:'진열안',vid:'영상',send:'주고받기',days:'사용일'};const b=document.createElement('button');b.className='lvline';b.dataset.a='lvOpen';b.innerHTML=`<span>${L+1}단계까지 ${pc}%</span><i><u style="width:${pc}%"></u></i><small>${ks.slice(0,3).map(k=>`${SH[k]} ${Math.min(lvVal(s,k),R[k])}/${R[k]}`).join(' · ')}</small>`;t.prepend(b)}}}
-  }catch(e){}}})();
+  }catch(e){}});
 A.dpSend=async()=>{try{const t=S.ui.cor[S.ui.dp.i],P=dpPlan(t,S.ui.dpM||0),el=$('dpTop');if(!t||!el)return;lvAdd('dp');toast('보낼 그림을 만드는 중입니다');
   const vb=(el.getAttribute('viewBox')||'0 0 900 900').split(/\s+/).map(Number),sw=vb[2],sh=vb[3];let svg=new XMLSerializer().serializeToString(el);if(!/xmlns=/.test(svg.slice(0,200)))svg=svg.replace('<svg','<svg xmlns="http://www.w3.org/2000/svg"');svg=svg.replace(/^<svg([^>]*)>/,(m,a)=>`<svg${a.replace(/\sstyle="[^"]*"/,'').replace(/\s(width|height)="[^"]*"/g,'')} width="${sw}" height="${sh}">`);svg=svg.replace(/^(<svg[^>]*>)/,'$1'+await fontCSS());
   const img=new Image();img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);await img.decode();

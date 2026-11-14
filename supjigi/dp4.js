@@ -3,14 +3,14 @@
 
 /* ── 홈 위쪽 버튼: 가이드 · 교육자료 ── */
 A.edOpen=()=>{A.gdOpen();A.gdTab({t:'b'})};
-(()=>{const r=render;render=function(){r.apply(this,arguments);try{
+afterRender(()=>{try{
   const mn=document.querySelector('main');if(!mn||S.locked)return;
   const home=S.view[S.mode]===TABS[S.mode][0][0];
   if(home&&!mn.querySelector('.gdtop')){const b=document.createElement('div');b.className='gdtop';
     b.innerHTML=`<button class="btn sm" data-a="gdOpen">가이드</button><button class="btn sm" data-a="edOpen">교육자료</button>`;mn.prepend(b)}
   let seen=null;try{seen=sessionStorage.getItem('sj.gdS')}catch(e){}
   if(!seen&&S.loaded){try{sessionStorage.setItem('sj.gdS','1')}catch(e){}if(!$('guide'))A.gdOpen()}
-}catch(e){}}})();
+}catch(e){}});
 
 /* ── 진열 ── */
 const DPSZ2=n=>n<=3?[600,600]:n<=6?[900,900]:[1200,900];

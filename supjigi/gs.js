@@ -27,18 +27,18 @@ A.gsNews=async()=>{const i=$('gsQ'),q=((i&&i.value)||GSN.q).trim();if(!q)return;
 A.gsTake=async d=>{const a=(GSN.L||[])[+d.i];if(!a||typeof arcSave!=='function')return;const id='n'+arcId();
   const ok=await arcSave({id,from:'news:'+a.url,date:a.d||TODAY,p:'d',time:'',t:a.t,k:'기사',iss:'',box:'',th:[],img:[],url:a.url,src:a.src||'',note:'',at:new Date().toISOString()});if(ok){toast('아카이브에 담았습니다');render()}};
 document.addEventListener('keydown',e=>{if(e.target&&e.target.id==='gsQ'&&e.key==='Enter'&&!e.isComposing){e.preventDefault();A.gsNews()}});
-(()=>{const r=render;render=function(){r.apply(this,arguments);try{if(!gsOn()||S.mode!=='aka'||S.view.aka!=='arc')return;const mn=document.querySelector('main');if(!mn||mn.querySelector('.gsn'))return;
+afterRender(()=>{try{if(!gsOn()||S.mode!=='aka'||S.view.aka!=='arc')return;const mn=document.querySelector('main');if(!mn||mn.querySelector('.gsn'))return;
   const got=new Set((ARC.L||[]).map(x=>x.url).filter(Boolean)),L=GSN.L;
   const w=document.createElement('section');w.className='gsn';w.innerHTML=`<h3>기사 찾기</h3><p>구글 · 빙 뉴스에서 찾아, 고른 기사만 아카이브에 담습니다.</p>
    <div class="gsq"><input id="gsQ" value="${esc(GSN.q)}" enterkeyhint="search" aria-label="찾을 말"><button class="btn pri" data-a="gsNews" ${GSN.busy?'disabled':''}>${GSN.busy?'찾는 중…':'찾기'}</button></div>
    ${GSN.err?`<p class="gse">${esc(GSN.err)}</p>`:''}
    ${L?L.length?`<ul>${L.map((a,i)=>`<li><span><b>${esc(a.t)}</b><i>${esc(a.src||'')}${a.d?' · '+esc(a.d):''}</i><a href="${esc(a.url)}" target="_blank" rel="noopener">원문 ↗</a></span>${got.has(a.url)?'<em>담음</em>':`<button class="btn sm" data-a="gsTake" data-i="${i}">담기</button>`}</li>`).join('')}</ul>`:'<p class="gse">찾은 기사가 없습니다. 다른 말로 찾아 보세요.</p>':''}`;
-  const at=mn.querySelector('.arcfd')||mn.querySelector('.arcin');if(at)at.after(w);else mn.append(w)}catch(e){console.warn(e)}}})();
+  const at=mn.querySelector('.arcfd')||mn.querySelector('.arcin');if(at)at.after(w);else mn.append(w)}catch(e){console.warn(e)}});
 
 /* ── 찾은 소식에서 찾기 (어디서나): 언론사 · 제목 · 메모로 바로 거른다 ── */
 const arcFqRun=()=>{const q=(S.ui.arcFq||'').trim().toLowerCase(),fd=document.querySelector('main .arcfd');if(!fd)return;let n=0;
   fd.querySelectorAll('ul>li').forEach(li=>{const on=!q||li.textContent.toLowerCase().replace(/\s/g,'').includes(q.replace(/\s/g,''));li.style.display=on?'':'none';if(on)n++});
   const c=fd.querySelector('.arcfqn');if(c)c.textContent=q?`${n}건`:''};
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='arcFq'){S.ui.arcFq=e.target.value;arcFqRun()}});
-(()=>{const r=render;render=function(){r.apply(this,arguments);try{const fd=document.querySelector('main .arcfd');if(!fd||fd.querySelector('.arcfq'))return;const ul=fd.querySelector('ul');if(!ul)return;
-  const w=document.createElement('div');w.className='arcfq';w.innerHTML=`<input id="arcFq" type="search" value="${esc(S.ui.arcFq||'')}" placeholder="찾기 — 한겨레 · 중앙 · CBS · 개관 …" aria-label="찾은 소식에서 찾기"><span class="arcfqn"></span>`;ul.before(w);arcFqRun()}catch(e){}}})();
+afterRender(()=>{try{const fd=document.querySelector('main .arcfd');if(!fd||fd.querySelector('.arcfq'))return;const ul=fd.querySelector('ul');if(!ul)return;
+  const w=document.createElement('div');w.className='arcfq';w.innerHTML=`<input id="arcFq" type="search" value="${esc(S.ui.arcFq||'')}" placeholder="찾기 — 한겨레 · 중앙 · CBS · 개관 …" aria-label="찾은 소식에서 찾기"><span class="arcfqn"></span>`;ul.before(w);arcFqRun()}catch(e){}});
