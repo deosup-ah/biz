@@ -202,7 +202,7 @@ A.impSave=async()=>{const I=S.ui.imp,br=S.br,g=(r,k)=>I.map[k]>=0?r[I.map[k]]:''
   S.ui.imp=null;S.demoPref=null;render()};
 
 V.store.more=()=>{const an=anomalies('all').length,row=(v,t,d,b)=>`<button class="mrow" data-a="go" data-v="${v}"><span><b>${t}</b><small>${d}</small></span>${b?`<span class="pill p-low">${b}</span>`:''}<span aria-hidden="true">›</span></button>`;
-  return `<div class="sec"><h2>전체 메뉴</h2></div><div class="card" style="padding:4px 16px">${row('club','책모임','큐레이션에서 바로 만든 모임 안 · 공지문 · 일정')}${row('biz','지원사업','다가오는 공모 · 신청서 초안')}${row('today','오늘','어제 매출 · 살펴볼 것 · 다가오는 때',an?an+'건':'')}${row('rank','순위','예스24 · 알라딘과 매장 재고 견주기')}${row('space','공간','지점 배치도 · 매대 주제 · 행사 좌석')}${row('ret','반품','반품 목록 만들고 기록')}${row('data','자료 · 설정','엑셀 올리기 · 북센 여신잔액 · 연결 상태')}</div>
+  return `<div class="sec"><h2>전체 메뉴</h2></div><div class="card" style="padding:4px 16px">${row('club','책모임','큐레이션에서 바로 만든 모임 안 · 공지문 · 일정')}${row('today','오늘','어제 매출 · 살펴볼 것 · 다가오는 때',an?an+'건':'')}${row('rank','순위','예스24 · 알라딘과 매장 재고 견주기')}${row('space','공간','지점 배치도 · 매대 주제 · 행사 좌석')}${row('ret','반품','반품 목록 만들고 기록')}${row('data','자료 · 설정','엑셀 올리기 · 북센 여신잔액 · 연결 상태')}</div>
   <div class="btns"><button class="btn" data-a="big">${document.body.classList.contains('big')?'글자 보통으로':'글자 크게'}</button><button class="btn" data-a="lock">화면 잠그기</button></div>`};
 
 /* 본점 · 중계: 분류가 문구 · 참고서 · 교과서 · 봉투 · 비디오인 것은 재고에서 뺀다(참부장 11/13) */

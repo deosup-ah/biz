@@ -1,0 +1,5 @@
+/* 첫 화면 단순화(참부장 11/14 승인 · 빼기 1): 큐레이션은 넷만 먼저, 나머지는 「더 보기」. 인물도서관 한 권 코너는 접어 둔다 */
+(()=>{const r=render;render=function(){r.apply(this,arguments);Promise.resolve().then(()=>{try{const mn=document.querySelector('main');if(!mn||S.locked||S.mode!=='store'||S.view.store!=='cur')return;
+  const w=mn.querySelector(':scope>.wall');if(w&&!S.ui.wallAll){const C=[...w.children].filter(e=>e.nodeType===1&&!e.classList.contains('wmore'));if(C.length>4&&!mn.querySelector('.wmore')){C.slice(4).forEach(e=>e.hidden=true);const b=document.createElement('button');b.type='button';b.className='btn wmore';b.textContent=`큐레이션 ${C.length-4}개 더 보기`;b.onclick=()=>{S.ui.wallAll=1;render()};w.after(b)}}
+  const o=mn.querySelector('.pl3ones');if(o&&o.tagName!=='DETAILS'){const d=document.createElement('details');d.className='pl3ones';const h=o.querySelector('h3');d.innerHTML=`<summary>${h?h.textContent:'인물도서관 코너'}</summary>`;if(h)h.remove();while(o.firstChild)d.appendChild(o.firstChild);o.replaceWith(d)}
+}catch(e){}})}})();
