@@ -46,13 +46,13 @@ A.fbOpen=()=>{const w=fb4Where();if(typeof A.gdClose==='function')A.gdClose();S.
    <p class="note">쓰다가 막히거나 바꾸고 싶은 것을 한 줄로 적어 주세요. 매일 아침 점검 때 읽고, 빼거나 더해서 고칩니다.</p>
    <div class="chips">${FB4K.map(k=>`<button class="chip" data-a="fbK" data-k="${k}" aria-pressed="${S.ui.fbK===k}">${k}</button>`).join('')}</div>
    <textarea id="fbT" rows="4" placeholder="예) POP 글씨를 더 크게 고칠 수 있으면 좋겠어요"></textarea>
-   <small class="note">${w?`보던 화면 「${esc(w)}」이 함께 적힙니다. `:''}고객 이름 · 연락처는 적지 말아 주세요.${typeof DB!=='undefined'&&DB?'':' 이 화면(공개 주소)에서는 이 기기에만 남으니, 「보내기」 뒤 공유로 전해 주세요.'}</small>
+   <small class="note">${w?`보던 화면 「${esc(w)}」이 함께 적힙니다. `:''}고객 이름 · 연락처는 적지 말아 주세요.${shDB()?'':' 이 화면(공개 주소)에서는 이 기기에만 남으니, 「보내기」 뒤 공유로 전해 주세요.'}</small>
    <div class="btns"><button class="btn pri" data-a="fbSend">보내기</button><button class="btn" data-a="close">닫기</button></div>
    ${L.length?`<div class="fb4l"><b>보낸 의견 ${L.length}</b>${L.slice(0,8).map(e=>`<div><i>${esc(e.d.slice(5).replace('-','/'))} · ${esc(e.k)}${e.st?` · ${esc(e.st)}`:''}</i><p>${esc(e.t)}</p></div>`).join('')}</div>`:''}</div>`)};
 A.fbK=d=>{S.ui.fbK=d.k;document.querySelectorAll('.fb4 [data-a="fbK"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===d.k))};
 A.fbSend=async()=>{const el=$('fbT'),t=(el&&el.value||'').trim();if(!t){toast('한 줄 적어 주세요');return}
   const e={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),d:TODAY,at:new Date().toISOString(),k:S.ui.fbK||FB4K[1],t:t.slice(0,600),w:fb4Where(),v:(document.querySelector('script[src^="ag.js"]')||{}).src||''};
-  const L=fb4Get();L.unshift(e);fb4Set(L);let sent=false;if(typeof DB!=='undefined'&&DB){try{const{id,...b}=e;await DB.doc('fb/'+id).set(b);sent=true}catch(err){}}
+  const L=fb4Get();L.unshift(e);fb4Set(L);let sent=false;if(shDB()){try{const{id,...b}=e;await shDB().doc('fb/'+id).set(b);sent=true}catch(err){}}
   if(sent){toast('받았습니다. 내일 아침 점검 때 반영합니다');A.fbOpen();return}
   const msg=`[워크룸 의견 · ${e.k}] ${e.t}${e.w?` (화면: ${e.w})`:''}`;try{if(navigator.share){await navigator.share({title:'워크룸 의견',text:msg});toast('이 기기에도 남겼습니다');A.fbOpen();return}}catch(err){if(err&&err.name==='AbortError'){A.fbOpen();return}}
   try{await navigator.clipboard.writeText(msg);toast('이 기기에 남기고 글을 복사했습니다. 카톡으로 보내 주세요')}catch(err){toast('이 기기에 남겼습니다')}A.fbOpen()};

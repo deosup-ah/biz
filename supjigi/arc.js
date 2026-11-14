@@ -24,7 +24,7 @@ function arcShrink(file,max,limit){return new Promise((ok,no)=>{const u=URL.crea
 
 /* 불러오기 · 실시간 */
 async function arcStart(){if(ARC.st!=='idle')return;ARC.st='load';
-  let db=null;try{db=window.claude&&window.claude.use?await window.claude.use('db'):null}catch(e){db=null}
+  let db=null;try{db=window.claude&&window.claude.use?await window.claude.use('db'):null}catch(e){db=null}if(!db&&typeof gsOn==='function'&&gsOn())db=GSDB;
   if(!db){ARC.L=ls.get('arc',[]);ARC.st='local';arcPaint();return}
   ARC.db=db;const tm=setTimeout(()=>{if(!ARC.live){ARC.slow=true;arcPaint()}},10000);
   db.collection('arc').onSnapshot(s=>{ARC.L=s.docs.map(d=>({...d.data(),id:d.id}));if(!s.metadata.fromCache){ARC.live=true;ARC.slow=false;clearTimeout(tm)}ARC.st='db';arcPaint()},

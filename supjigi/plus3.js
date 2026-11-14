@@ -7,9 +7,9 @@ const PL3={on:false,sub:false};
 const pl3Id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const pl3Get=()=>{try{return JSON.parse(localStorage.getItem('sj.plog')||'[]')}catch(e){return []}};
 const pl3Set=L=>{try{localStorage.setItem('sj.plog',JSON.stringify(L.slice(0,400)))}catch(e){}};
-async function pl3Push(e){if(!(typeof DB!=='undefined'&&DB))return;try{const{id,...b}=e;await DB.doc('plog/'+id).set(b)}catch(err){}}
-function pl3Sub(){if(PL3.sub||!(typeof DB!=='undefined'&&DB))return;PL3.sub=true;
-  try{DB.collection('plog').onSnapshot(s=>{const L=pl3Get(),M=new Map(L.filter(e=>e.id).map(e=>[e.id,e]));let ch=false;
+async function pl3Push(e){if(!shDB())return;try{const{id,...b}=e;await shDB().doc('plog/'+id).set(b)}catch(err){}}
+function pl3Sub(){if(PL3.sub||!shDB())return;PL3.sub=true;
+  try{shDB().collection('plog').onSnapshot(s=>{const L=pl3Get(),M=new Map(L.filter(e=>e.id).map(e=>[e.id,e]));let ch=false;
     s.docs.forEach(d=>{const v={...d.data(),id:d.id},o=M.get(d.id);if(!o||JSON.stringify(o)!==JSON.stringify(v)){M.set(d.id,v);ch=true}});
     if(ch){const out=[...M.values(),...L.filter(e=>!e.id)].sort((a,b)=>(b.d+(b.at||''))<(a.d+(a.at||''))?-1:1);pl3Set(out);if(S.mode==='store'&&S.view.store==='cur')softRender()}},()=>{})}catch(e){}}
 /* plogAdd 를 감싸 id · 책 목록 · 시각을 붙이고 함께 저장 */
@@ -30,7 +30,7 @@ C.pl3Ph=async el=>{const f=el.files&&el.files[0];el.value='';if(!f)return;if(S.b
 A.plOpen=d=>{if(d&&d.all!==undefined)S.ui.plAll=!!d.all;const all=!!S.ui.plAll,L=pl3Get().filter(e=>all||e.br===S.br),by={};L.forEach(e=>{(by[e.d]=by[e.d]||[]).push(e)});
   openSheet(`<div class="plx"><div class="igxh"><b>평대 기록</b><span>${all?'모든 지점':esc(brN(S.br))} · ${L.length}건</span></div>
    <div class="pl3seg"><button data-a="plOpen" data-all="" aria-pressed="${!all}">이 지점</button><button data-a="plOpen" data-all="1" aria-pressed="${all}">모든 지점</button></div>
-   <p class="note">진열 · 인쇄물 · 인스타 · 평대 사진을 남길 때마다 쌓입니다.${typeof DB!=='undefined'&&DB?'':' (이 화면에서는 이 기기에만 남습니다)'}</p>
+   <p class="note">진열 · 인쇄물 · 인스타 · 평대 사진을 남길 때마다 쌓입니다.${shDB()?'':' (이 화면에서는 이 기기에만 남습니다)'}</p>
    ${L.length?Object.entries(by).slice(0,24).map(([d,es])=>`<div class="pld"><b>${mdw(d)}</b>${es.map(e=>`<div class="plr pl3r">${e.th?`<img src="${e.th}" alt="">`:''}<span><b>${esc(e.t)}</b><i>${all?esc(brN(e.br))+' · ':''}${esc(e.k)}${e.books&&e.books.length?` · 책 ${e.books.length}권`:''}</i>${e.books&&e.books.length?`<small>${e.books.slice(0,6).map(esc).join(' · ')}</small>`:''}</span></div>`).join('')}</div>`).join(''):'<p class="lse">아직 기록이 없습니다. 큐레이션 카드에서 진열을 보내거나, 평대를 사진으로 남기면 쌓입니다.</p>'}
    <div class="igxa"><button class="btn pri" data-a="plMix">기록 섞어 새 평대</button><button class="btn" data-a="close">닫기</button></div></div>`)};
 
