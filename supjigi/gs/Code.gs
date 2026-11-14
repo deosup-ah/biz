@@ -6,7 +6,7 @@ var KEY = 'deosup-workroom';
 var OK = ['arc', 'plog', 'fb', 'arcimg'];
 var PARTS = 12, CH = 45000;
 
-function sh_() { var ss = SpreadsheetApp.getActive(); var s = ss.getSheetByName('기록'); if (!s) { s = ss.insertSheet('기록'); s.appendRow(['이름표', 'id', '시각', '내용']); s.setFrozenRows(1); } return s; }
+function sh_() { var ss = SpreadsheetApp.openById('1UDDVGizvvmzAx_qq592wEkW4s_EXq0noK_ZuTYCIiuU'); var s = ss.getSheetByName('기록'); if (!s) { s = ss.insertSheet('기록'); s.appendRow(['이름표', 'id', '시각', '내용']); s.setFrozenRows(1); } return s; }
 function out_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
 function folder_() { var it = DriveApp.getFoldersByName('워크룸 사진'); return it.hasNext() ? it.next() : DriveApp.createFolder('워크룸 사진'); }
 
