@@ -20,3 +20,13 @@ afterRender(()=>{try{const mn=document.querySelector('main');if(!mn)return;
   const pb=mn.querySelector(':scope>.plbar'),pt=mn.querySelector(':scope>.pl3t');if(pb&&pt){const r=document.createElement('div');r.className='plrow';pb.before(r);r.append(pb,pt);const l=pt.querySelector('.pl3b');if(l){[...l.childNodes].forEach(n=>{if(n.nodeType===3)n.remove()});l.setAttribute('aria-label','평대 사진 남기기');l.title='평대 사진 남기기'}}
   const bar=document.querySelector('header .bar');if(bar&&!S.locked&&!bar.querySelector('.lvbtn')){const b=document.createElement('button');b.className='btn sm lvbtn lvbar';b.dataset.a='gdOpen';b.textContent='도움말';const nb=bar.querySelector('.navb');nb?nb.before(b):bar.append(b)}
 }catch(e){}});
+/* 처음 쓰는 사람: 첫 카드에 「눌러서 시작」(카드를 한 번 열면 사라짐). 숙련자: 데스크톱 단축키 */
+afterRender(()=>{try{if(S.mode!=='store'||S.view.store!=='cur'||ls.get('cvDone',0))return;const w=document.querySelector('main .wall>.cvw');if(w)w.classList.add('hint')}catch(e){}});
+(()=>{const f=A.cOpen;A.cOpen=d=>{ls.set('cvDone',1);return f(d)}})();
+document.addEventListener('keydown',e=>{if(e.metaKey||e.ctrlKey||e.altKey||S.locked)return;const t=e.target,typing=t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable);
+  if(e.key==='Escape'){if(typing){t.blur();return}e.preventDefault();A.bkGo();return}
+  if(typing)return;
+  if(e.key==='/'){const i=document.getElementById('gIn');if(i){e.preventDefault();i.focus()}return}
+  if(e.key==='?'){e.preventDefault();A.gdOpen();return}
+  if(/^[1-9]$/.test(e.key)){const L=navList(),x=L[+e.key-1];if(x){e.preventDefault();BK.nav=1;A.go({v:x[0],m:x[2]})}}});
+afterRender(()=>{try{const g=document.querySelector('.gdtop, header .bar');const sb=document.querySelector('header');if(!sb||sb.querySelector('.kbd'))return;const p=document.createElement('p');p.className='kbd';p.textContent='단축키 · 1~4 화면 · / 찾기 · Esc 뒤로 · ? 도움말';sb.append(p)}catch(e){}});
