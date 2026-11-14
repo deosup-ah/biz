@@ -1,7 +1,7 @@
 /* 공개 주소용 공용 저장소 (구글 시트 + 앱스 스크립트, gs/Code.gs)
    GS_URL 이 비어 있으면 아무 일도 하지 않는다(지금처럼 이 기기에만).
    Claude 앱 안에서는 쓰지 않는다(그쪽은 db). */
-const GS_URL='';
+const GS_URL='https://script.google.com/macros/s/AKfycbzj7xFhY6eG69nnTKzXrJ9SRs0cb_cquSzujT1Pazhhhz7mw96MV5GWl4fnPT2ghoISMg/exec';
 const GS_K='deosup-workroom';
 const gsOn=()=>!!GS_URL&&!(window.claude&&window.claude.use);
 async function gsGet(p){const r=await fetch(GS_URL+'?'+new URLSearchParams(p));return r.json()}
