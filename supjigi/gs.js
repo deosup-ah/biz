@@ -34,3 +34,11 @@ document.addEventListener('keydown',e=>{if(e.target&&e.target.id==='gsQ'&&e.key=
    ${GSN.err?`<p class="gse">${esc(GSN.err)}</p>`:''}
    ${L?L.length?`<ul>${L.map((a,i)=>`<li><span><b>${esc(a.t)}</b><i>${esc(a.src||'')}${a.d?' · '+esc(a.d):''}</i><a href="${esc(a.url)}" target="_blank" rel="noopener">원문 ↗</a></span>${got.has(a.url)?'<em>담음</em>':`<button class="btn sm" data-a="gsTake" data-i="${i}">담기</button>`}</li>`).join('')}</ul>`:'<p class="gse">찾은 기사가 없습니다. 다른 말로 찾아 보세요.</p>':''}`;
   const at=mn.querySelector('.arcfd')||mn.querySelector('.arcin');if(at)at.after(w);else mn.append(w)}catch(e){console.warn(e)}}})();
+
+/* ── 찾은 소식에서 찾기 (어디서나): 언론사 · 제목 · 메모로 바로 거른다 ── */
+const arcFqRun=()=>{const q=(S.ui.arcFq||'').trim().toLowerCase(),fd=document.querySelector('main .arcfd');if(!fd)return;let n=0;
+  fd.querySelectorAll('ul>li').forEach(li=>{const on=!q||li.textContent.toLowerCase().replace(/\s/g,'').includes(q.replace(/\s/g,''));li.style.display=on?'':'none';if(on)n++});
+  const c=fd.querySelector('.arcfqn');if(c)c.textContent=q?`${n}건`:''};
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='arcFq'){S.ui.arcFq=e.target.value;arcFqRun()}});
+(()=>{const r=render;render=function(){r.apply(this,arguments);try{const fd=document.querySelector('main .arcfd');if(!fd||fd.querySelector('.arcfq'))return;const ul=fd.querySelector('ul');if(!ul)return;
+  const w=document.createElement('div');w.className='arcfq';w.innerHTML=`<input id="arcFq" type="search" value="${esc(S.ui.arcFq||'')}" placeholder="찾기 — 한겨레 · 중앙 · CBS · 개관 …" aria-label="찾은 소식에서 찾기"><span class="arcfqn"></span>`;ul.before(w);arcFqRun()}catch(e){}}})();
