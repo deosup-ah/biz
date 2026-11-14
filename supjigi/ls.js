@@ -51,10 +51,8 @@ function lsDraw(){const G=S.ui.ls;if(!G)return;const R=G.rows.slice().sort((a,b)
   scanPaint=function(){if(S.ui.scanTo!=='ls')return sp();const e=$('scanList');if(!e)return;const L=(S.ui.ls&&S.ui.ls.rows)||[];e.innerHTML=L.length?L.slice(0,6).map(r=>`<div><b>${esc(r.t)}</b> <small>${esc(lsGrp(r.n))}${r.ld?' · '+r.ld:''}</small></div>`).join(''):'<div><small>바코드를 하나씩 비춰 주세요. 여러 권 이어서 됩니다</small></div>';const n=$('scanN');if(n)n.textContent=L.length?`${L.length}권 읽음 · 닫기`:'닫기'};
   A.scanClose=function(){const ls=S.ui.scanTo==='ls';S.ui.scanTo=null;sc();if(ls)lsDraw()}})();
 /* 반품 화면 위에 들어가는 길 */
-(()=>{const f=V.store.ret;V.store.ret=()=>{const h=f();if(!LSON||S.br==='all')return h;const i=h.indexOf('<div class="card form">');const box=`<button class="card lsgo" data-a="lsOpen"><b>마지막 판매일로 고르기</b><span>찍으면 책마다 언제 마지막으로 팔렸는지</span></button>`;return i>0?h.slice(0,i)+box+h.slice(i):box+h}})();
 
 /* 위쪽 「찍기」 버튼 하나: 어느 화면에서든 바코드 → 책 카드 */
-afterRender(()=>{try{const bar=document.querySelector('header .bar');if(!LSON||!bar||S.locked||bar.querySelector('.snapb'))return;const b=document.createElement('button');b.className='snapb';b.dataset.a='snap';b.setAttribute('aria-label','찍기');b.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>찍기</span>';const br0=bar.querySelector('.brand');if(br0)br0.after(b);else bar.prepend(b)}catch(e){}});
 A.snap=()=>{if(S.br==='all'){toast('위에서 지점을 먼저 고르세요');return}A.lsOpen();A.lsScan()};
 /* 인쇄물 종류: POP · 띠지 · 목록만 보이고 나머지는 「더 보기」 */
 afterRender(()=>{try{if(S.view[S.mode]!=='design')return;const k=document.querySelector('main .ukind');if(!k||k.querySelector('.kmore'))return;const MAIN=S.mode==='aka'?['pop','band','rent']:['pop','band','list'];let n=0;

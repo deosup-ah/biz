@@ -11,6 +11,6 @@ afterRender(()=>{Promise.resolve().then(()=>{try{const mn=document.querySelector
   h.scrollTop=0}catch(e){}})});
 /* 덜어 내기(참부장 11/14): 열린 카드의 「기타」 접기, 만들기 화면 위 퍼즐 · 말로 찾는 서가 타일, 큐레이션 밖의 「단어 하나로 큐레이션 만들기」 줄 */
 afterRender(()=>{Promise.resolve().then(()=>{try{const mn=document.querySelector('main');if(!mn)return;
-  mn.querySelectorAll('.pcard details.menu').forEach(e=>e.remove());
+  
   document.body.classList.toggle('notcur',!(S.mode==='store'&&S.view.store==='cur'));
 }catch(e){}})});
