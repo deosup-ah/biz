@@ -65,8 +65,8 @@ V.aka.arc=()=>{if(ARC.st==='idle')setTimeout(arcStart,0);const U=S.ui,f=U.arcF||
    </div>
    ${U.arcBusy?`<p class="arcbusy">사진을 줄이는 중…</p>`:''}
   </div>
-  ${(()=>{const F=arcLeft();if(!F.length)return '';const sel=U.arcSel||{},n=F.filter(f=>sel[f.id]).length;return `<details class="arcfd" ${U.arcFdC?'':'open'}><summary data-a="arcFdT"><b>찾은 소식 ${F.length}</b><span>검색된 기사 · 인터뷰 · 행사 · 연혁입니다. 고른 것만 기록으로 담깁니다.</span></summary>
-   <ul>${F.map(f=>`<li><label><input type="checkbox" data-c="arcSel" data-id="${f.id}" ${sel[f.id]?'checked':''}><span class="arcfdd">${arcMD(f.d,f.p)}</span><span class="arck">${f.k}</span><b>${esc(f.t)}</b></label><span class="arcfdm">${f.note?`<i>${esc(f.note)}</i>`:''}<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.src)} ↗</a><button data-a="arcHide" data-id="${f.id}">빼기</button></span></li>`).join('')}</ul>
+  ${(()=>{const F=arcLeft();if(!F.length)return '';const sel=U.arcSel||{},n=F.filter(f=>sel[f.id]).length;return `<details class="arcfd" ${U.arcFdC?'':'open'}><summary data-a="arcFdT"><b>찾은 소식 ${F.length}</b><span>검색된 기사 · 연혁 · E드라이브 작업물 · 드라이브 사진입니다. 고른 것만 기록으로 담깁니다.</span></summary>
+   <ul>${F.map(f=>`<li><label><input type="checkbox" data-c="arcSel" data-id="${f.id}" ${sel[f.id]?'checked':''}><span class="arcfdd">${arcMD(f.d,f.p)}</span><span class="arck">${f.k}</span><b>${esc(f.t)}</b></label>${f.th?`<img class="arcfth" src="${f.th}" alt="" loading="lazy">`:''}<span class="arcfdm">${f.note?`<i>${esc(f.note)}</i>`:''}${f.url?`<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.src)} ↗</a>`:f.img?`<a href="${f.img}" target="_blank" rel="noopener">${esc(f.src)} · 크게 ↗</a>`:`<span>${esc(f.src)}</span>`}<button data-a="arcHide" data-id="${f.id}">빼기</button></span></li>`).join('')}</ul>
    <div class="arcfdb"><button class="btn" data-a="arcSelAll">${n===F.length?'모두 풀기':'모두 고르기'}</button><button class="btn pri" data-a="arcTake" ${n?'':'disabled'}>고른 ${n}건 담기</button></div></details>`})()}
   ${iss.length?`<div class="arciss"><button data-a="arcF" data-n="" aria-pressed="${!f}">전체</button>${iss.map(g=>`<button data-a="arcF" data-n="${esc(g.n)}" aria-pressed="${f===g.n}"><b>${esc(g.n)}</b><i>${g.c} · ${g.a===g.b?arcMD(g.b):arcMD(g.a)+'–'+arcMD(g.b)}</i></button>`).join('')}</div>`:''}
   ${ARC.L.length>8?`<input class="arcq" type="search" data-c="arcQ" value="${esc(q)}" placeholder="기록에서 찾기">`:''}
@@ -119,7 +119,7 @@ C.arcSel=el=>{const s=S.ui.arcSel=S.ui.arcSel||{};if(el.checked)s[el.dataset.id]
 A.arcFdT=(d,el,e)=>{e&&e.preventDefault();S.ui.arcFdC=!S.ui.arcFdC;render()};
 A.arcSelAll=()=>{const F=arcLeft(),s=S.ui.arcSel=S.ui.arcSel||{},all=F.every(f=>s[f.id]);F.forEach(f=>{if(all)delete s[f.id];else s[f.id]=1});render()};
 A.arcHide=d=>{const h=arcHid();h.push(d.id);ls.set('arcHide',h);if(S.ui.arcSel)delete S.ui.arcSel[d.id];render()};
-A.arcTake=async()=>{const s=S.ui.arcSel||{},F=arcLeft().filter(f=>s[f.id]);let n=0;for(const f of F){const o={id:arcId(),from:f.id,date:f.d,p:f.p,time:'',t:f.t,k:f.k,iss:'',box:'',th:[],img:[],url:f.url,src:f.src,note:f.note||'',at:new Date().toISOString()};if(await arcSave(o))n++}S.ui.arcSel={};toast(n+'건을 기록으로 담았습니다.');render()};
+A.arcTake=async()=>{const s=S.ui.arcSel||{},F=arcLeft().filter(f=>s[f.id]);let n=0;for(const f of F){const o={id:arcId(),from:f.id,date:f.d,p:f.p,time:'',t:f.t,k:f.k,iss:'',box:'',th:f.th?[f.img||f.th]:[],img:[],url:f.url||'',src:f.src,note:f.note||'',at:new Date().toISOString()};if(await arcSave(o))n++}S.ui.arcSel={};toast(n+'건을 기록으로 담았습니다.');render()};
 
 /* 아카데미 메뉴에 「아카이브」 */
 TABS.aka.push(['arc','아카이브']);
