@@ -123,4 +123,4 @@ A.arcTake=async()=>{const s=S.ui.arcSel||{},F=arcLeft().filter(f=>s[f.id]);let n
 
 /* 아카데미 메뉴에 「아카이브」 */
 TABS.aka.push(['arc','아카이브']);
-(()=>{const f=navList;navList=function(){const L=f();if(!L.some(x=>x[0]==='arc')){let i=L.findIndex(x=>x[0]==='today');if(i<0)i=L.findIndex(x=>x[0]==='insta');if(i>=0)L.splice(i+1,0,['arc','아카이브','aka',''])}return L}})();
+(()=>{const f=navList;navList=function(){const L=f();if(!L.some(x=>x[0]==='arc')){let i=L.findIndex(x=>x[0]==='today');if(i<0)i=L.findIndex(x=>x[0]==='insta');if(i<0&&akaCtx())i=L.findIndex(x=>x[0]==='design');if(i>=0)L.splice(i+1,0,['arc','아카이브','aka',''])}return L}})();

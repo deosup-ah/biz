@@ -6,7 +6,7 @@ from playwright.async_api import async_playwright
 here=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 W=int(sys.argv[1]) if len(sys.argv)>1 else 360
 srv=subprocess.Popen([sys.executable,'-m','http.server','8770'],cwd=here,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL);time.sleep(1)
-SCREENS=[('aka','store','cur'),('aka','aka','space'),('aka','aka','design'),('aka','aka','insta'),('aka','aka','arc'),('nowon','store','cur'),('nowon','store','design')]
+SCREENS=[('aka','store','cur'),('aka','aka','space'),('aka','aka','design'),('aka','aka','arc'),('nowon','store','cur'),('nowon','store','design')]
 SKIP={'lock','big','print','dl','share','arcAdd','arcTake','arcWipe','arcDel','fbSend','sendGo','setAll','igSave','popSave','gsTake','mic','micTo','camTo','arcPh','pl3Ph','upFile','imp','agSend','dpVideo','dpShot'}
 STATE="JSON.stringify([S.mode,S.view[S.mode],S.br,S.ui.cOpen==null?null:S.ui.cOpen,!!document.getElementById('guide'),!!document.getElementById('agent'),document.getElementById('sheet').classList.contains('on')])"
 OPEN="(()=>{const o=[];const g=document.getElementById('guide');if(g)o.push(g);const a=document.getElementById('agent');if(a&&getComputedStyle(a).display!='none')o.push(a);const s=document.getElementById('sheet');if(s.classList.contains('on'))o.push(s);const c=document.querySelector('.cvlayer');if(c)o.push(c);return o.map(e=>{const B=[...e.querySelectorAll('button,a')].filter(b=>{const r=b.getBoundingClientRect();return r.width>0&&r.bottom>0&&r.top<innerHeight&&/닫기|✕|×|←|이전|돌아|취소/.test(b.textContent+(b.getAttribute('aria-label')||''))});return (e.id||e.className)+':'+(B.length?'ok':'닫기 없음')})})()"

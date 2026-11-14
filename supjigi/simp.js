@@ -14,3 +14,9 @@ afterRender(()=>{Promise.resolve().then(()=>{try{const mn=document.querySelector
   
   document.body.classList.toggle('notcur',!(S.mode==='store'&&S.view.store==='cur'));
 }catch(e){}})});
+/* 더 빼기(참부장 11/14 21:51): 홍보 탭은 만들기 안 「인스타」로, 평대 기록 · 사진 한 줄, 도움말 버튼은 모든 화면에 */
+afterRender(()=>{try{const mn=document.querySelector('main');if(!mn)return;
+  if(S.mode==='aka'&&S.view.aka==='design'){const k=mn.querySelector('.ukind');if(k&&!k.querySelector('.igk')){const b=document.createElement('button');b.type='button';b.className='chip phm igk';b.dataset.a='go';b.dataset.v='insta';b.dataset.m='aka';b.title='인스타';b.innerHTML='<svg viewBox="0 0 32 32" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="20" height="20" rx="5"></rect><circle cx="16" cy="16" r="4.5"></circle><circle cx="22" cy="10" r="0.8"></circle></svg><span>인스타</span>';const mo=k.querySelector('.kmore');mo?mo.before(b):k.append(b)}}
+  const pb=mn.querySelector(':scope>.plbar'),pt=mn.querySelector(':scope>.pl3t');if(pb&&pt){const r=document.createElement('div');r.className='plrow';pb.before(r);r.append(pb,pt);const l=pt.querySelector('.pl3b');if(l){[...l.childNodes].forEach(n=>{if(n.nodeType===3)n.remove()});l.setAttribute('aria-label','평대 사진 남기기');l.title='평대 사진 남기기'}}
+  const bar=document.querySelector('header .bar');if(bar&&!S.locked&&!bar.querySelector('.lvbtn')){const b=document.createElement('button');b.className='btn sm lvbtn lvbar';b.dataset.a='gdOpen';b.textContent='도움말';const nb=bar.querySelector('.navb');nb?nb.before(b):bar.append(b)}
+}catch(e){}});
