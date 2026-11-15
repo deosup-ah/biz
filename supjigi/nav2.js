@@ -20,3 +20,14 @@ afterRender(()=>{try{if(S.view[S.mode]!=='design')return;const mn=document.query
   const s=document.createElement('div');s.className='dsteps';const n=S.ui.dStep||1;
   s.innerHTML=[['고르기','주제 · 종류'],['고치기','글 · 색 · 크기'],['받기','PDF · 이미지']].map(([t,d],i)=>`<button data-a="dStep" data-n="${i+1}" aria-pressed="${n===i+1}"><em>${i+1}</em><b>${t}</b><small>${d}</small></button>`).join('');
   const bk=mn.querySelector(':scope>.bkbar');bk?bk.after(s):mn.prepend(s)}catch(e){}});
+/* 11/15 빼기: 공개 주소에서는 매출 · 주문 탭을 보이지 않는다(실제 매출은 공개 주소에 올리지 않음) */
+(()=>{const f=navList;navList=function(){const L=f();return (typeof gsOn==='function'&&gsOn())?L.filter(t=>!(t[2]==='store'&&(t[0]==='stock'||t[0]==='ana'))):L}})();
+/* 11/15 더하기: 한 번 눌러 남기는 반응 — 화면마다 아래 「좋아요 · 어려워요」. 의견(fb)과 같은 곳에 쌓여 매일 점검이 배운다 */
+A.rxSend=async d=>{const k=d.v==='up'?'좋아요':'어려워요',w=fb4Where(),key='rx:'+TODAY+':'+w;
+  try{if(sessionStorage.getItem(key)===k){toast('이미 남겼어요');return}sessionStorage.setItem(key,k)}catch(e){}
+  const e={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),d:TODAY,at:new Date().toISOString(),k:'반응',t:k,w};
+  const L=fb4Get();L.unshift(e);fb4Set(L);try{if(shDB()){const{id,...b}=e;await shDB().doc('fb/'+id).set(b)}}catch(err){}
+  if(k==='어려워요'){toast('어디가 어려웠는지 한 줄 남겨 주시면 더 빨리 고칩니다');S.ui.fbK=FB4K[0];setTimeout(()=>{try{A.fbOpen()}catch(e){}},700)}else toast('고맙습니다. 내일 아침 점검에 반영합니다');
+  const r=document.querySelector('main .rxbar');if(r)r.classList.add('done')};
+afterRender(()=>{try{const mn=document.querySelector('main');if(!mn||S.locked||mn.querySelector('.rxbar'))return;const b=document.createElement('div');b.className='rxbar';
+  b.innerHTML='<span>이 화면, 어땠나요?</span><button type="button" data-a="rxSend" data-v="up" aria-label="좋아요">좋아요</button><button type="button" data-a="rxSend" data-v="down" aria-label="어려워요">어려워요</button>';mn.append(b)}catch(e){}});
