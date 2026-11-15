@@ -58,5 +58,7 @@ const ARC_FOUND=[
  {id:'g-first1',d:'2026-10-18',p:'d',k:'공간',t:'리모델링 첫 컷 사진 (원본 · 구글 드라이브)',src:'구글 드라이브 · 내부',url:'https://drive.google.com/file/d/1b9noUZCMldqEwA16G9g-9GIRcR35h09i/view'},
  {id:'g-first2',d:'2026-10-18',p:'d',k:'공간',t:'리모델링 첫 컷 사진 2 (원본 · 구글 드라이브)',src:'구글 드라이브 · 내부',url:'https://drive.google.com/file/d/1LwTYhWuzqPoHAQ8fAR4NKOpWPB-cXh4X/view'},
  {id:'g-before',d:'2026-10-18',p:'d',k:'공간',t:'공사 전 사진 — 본관과 여섯 집 (폴더)',src:'구글 드라이브 · 내부',url:'https://drive.google.com/drive/folders/1pnbusotvP6-i377icwUxlhPgr-OwYXeO'},
- {id:'g-after',d:'2026-10-18',p:'d',k:'공간',t:'공사 후 사진 — 본관과 여섯 집 (폴더)',src:'구글 드라이브 · 내부',url:'https://drive.google.com/drive/folders/1HCA_Q3-drlUc5tiEAdAhOBvZl8FYt4dW'}
+ {id:'g-after',d:'2026-10-18',p:'d',k:'공간',t:'공사 후 사진 — 본관과 여섯 집 (폴더)',src:'구글 드라이브 · 내부',url:'https://drive.google.com/drive/folders/1HCA_Q3-drlUc5tiEAdAhOBvZl8FYt4dW'},
+ {id:'e-1kw1',d:'2026-11-15',p:'d',k:'행사',t:'「올해의 한 권이 내년의 첫 한 권에게」 일력 표지 (A3)',src:'워크룸 작업물',th:'arc/e-1kw1_t.jpg',img:'arc/e-1kw1.jpg',note:'고객이 적은 종이를 추려, 그 책과 어울리는 서가에 함께 둔다'},
+ {id:'e-1kw2',d:'2026-11-15',p:'d',k:'행사',t:'「올해의 한 권이 내년의 첫 한 권에게」 적는 장 12칸 (A3)',src:'워크룸 작업물',th:'arc/e-1kw2_t.jpg',img:'arc/e-1kw2.jpg'}
 ];
