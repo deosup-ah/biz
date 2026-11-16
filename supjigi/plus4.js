@@ -40,7 +40,8 @@ afterRender(()=>{sh4Put()});
 const FB4K=['불편해요','이렇게 바꿔 주세요','새 기능','오류'];
 const fb4Get=()=>{try{return JSON.parse(localStorage.getItem('sj.fb')||'[]')}catch(e){return []}};
 const fb4Set=L=>{try{localStorage.setItem('sj.fb',JSON.stringify(L.slice(0,200)))}catch(e){}};
-const fb4Where=()=>{try{const L=navList(),c=navCur(),t=L.find(x=>x[2]+':'+x[0]===c);return [S.br&&S.br!=='all'?brN(S.br):'',t?t[1]:''].filter(Boolean).join(' · ')}catch(e){return ''}};
+/* 11/17 고침: 메뉴에 없는 화면(첫 화면 · 창 등)에서도 어느 화면인지 남긴다 — 「어려워요」가 지점 이름만 남던 일 */
+const fb4Where=()=>{try{const L=navList(),c=navCur(),t=L.find(x=>x[2]+':'+x[0]===c);let n=t?t[1]:'';if(!n){const h=document.querySelector('main h1,main h2,main .ttl');n=((h&&h.textContent)||'').trim().slice(0,20)||((S.mode||'')+'/'+((S.view||{})[S.mode]||''))}return [S.br&&S.br!=='all'?brN(S.br):'',n].filter(Boolean).join(' · ')}catch(e){return ''}};
 A.fbOpen=()=>{const w=fb4Where();if(typeof A.gdClose==='function')A.gdClose();S.ui.fbK=S.ui.fbK||FB4K[1];const L=fb4Get();
   openSheet(`<div class="fb4"><div class="igxh"><b>의견 보내기</b><span>기능 개선 · 불편 · 오류</span></div>
    <p class="note">쓰다가 막히거나 바꾸고 싶은 것을 한 줄로 적어 주세요. 매일 아침 점검 때 읽고, 빼거나 더해서 고칩니다.</p>
