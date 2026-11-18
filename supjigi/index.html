@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head><script>/*새 판 자동 받기*/(function(){var B='11180631';try{fetch('version.txt?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():''}).then(function(v){v=(v||'').trim();if(v&&v!==B&&sessionStorage.getItem('sj.vr')!==v){sessionStorage.setItem('sj.vr',v);var u=new URL(location.href);u.searchParams.set('v',v);location.replace(u.toString())}}).catch(function(){})}catch(e){}})();</script>
+<head><script>/*새 판 자동 받기*/(function(){var B='11181004';try{fetch('version.txt?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():''}).then(function(v){v=(v||'').trim();if(v&&v!==B&&sessionStorage.getItem('sj.vr')!==v){sessionStorage.setItem('sj.vr',v);var u=new URL(location.href);u.searchParams.set('v',v);location.replace(u.toString())}}).catch(function(){})}catch(e){}})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>더숲 워크룸</title>
@@ -1048,7 +1048,55 @@ nav.tabs button:hover{background:#f2eee3!important;color:#1c1c1a!important}
 nav.tabs button[aria-current="page"]{border-left-color:#003128!important;background:#ece8dc!important;color:#003128!important;font-weight:800!important}
 nav.tabs::before,nav.tabs::after,nav.tabs button::before,nav.tabs button::after{display:none!important}nav.tabs{display:flex!important;flex-direction:column!important;gap:2px!important;padding:0!important}nav.tabs button{transform:none!important;translate:none!important;height:48px!important;min-height:0!important;margin:0!important;display:flex!important;align-items:center!important}
 .kbd{padding:0 16px;line-height:1.5}}
-.rxbar{display:flex;align-items:center;justify-content:center;gap:8px;margin:36px 0 8px;padding-top:16px;border-top:1px solid #e4dfd2;font:600 14px Pretendard,sans-serif;color:#8a8577}.rxbar button{min-height:40px;padding:0 16px;border:1px solid #c9c3b3;background:#fff;color:#1c1c1a;font:700 14px Pretendard,sans-serif}.rxbar button:hover{border-color:#003128}.rxbar.done{opacity:.55}.arcfdm2{display:block;margin:8px 0 0}.qbar:empty{display:none!important}</style>
+.rxbar{display:flex;align-items:center;justify-content:center;gap:8px;margin:36px 0 8px;padding-top:16px;border-top:1px solid #e4dfd2;font:600 14px Pretendard,sans-serif;color:#8a8577}.rxbar button{min-height:40px;padding:0 16px;border:1px solid #c9c3b3;background:#fff;color:#1c1c1a;font:700 14px Pretendard,sans-serif}.rxbar button:hover{border-color:#003128}.rxbar.done{opacity:.55}.arcfdm2{display:block;margin:8px 0 0}.qbar:empty{display:none!important}
+/* ===== 리뉴얼 v2 ===== */
+body.v2{--v2bg:#f7f4ec;--v2ink:#1c1c1a;--v2g:#003128;--v2r:#c8553d;--v2mu:#8a8577;--v2ln:#e4dfd2}
+body.v2,body.v2 #app,body.v2 main{background:var(--v2bg)!important}
+body.v2 main>.gdtop,body.v2 main>.card.qadd,body.v2 main>.subnav,body.v2 main>.plrow,body.v2 main>.pl3t,body.v2 main>.pl3pc,body.v2 main>.pl3ones,body.v2 main>.rfr,body.v2 .hpw{display:none!important}
+body.v2 main>.hero{margin:6px 0 10px!important;padding:0!important;border:0!important}body.v2 main>.hero::after,body.v2 main>.hero::before{display:none!important}
+body.v2 main>.hero p{font:600 12.5px Pretendard,sans-serif!important;color:var(--v2mu)!important;letter-spacing:.04em;margin:0 0 2px!important}
+body.v2 main>.hero h2{font:800 26px Pretendard,sans-serif!important;letter-spacing:-.03em!important;border:0!important}
+body.v2 main>.tick{border:0!important;border-top:1px solid var(--v2ink)!important;border-bottom:1px solid #d8d3c4!important;background:none!important;padding:12px 0!important;margin:0 0 6px!important;box-shadow:none!important}
+body.v2 main>.tick::before,body.v2 main>.tick::after{display:none!important}
+/* 큐레이션: 한 줄 목록 */
+body.v2 main>.wall{display:block!important;margin:0 0 18px!important}
+body.v2 .wall>.cvw{border-bottom:1px solid var(--v2ln)}
+body.v2 .wall .cv{display:grid!important;grid-template-columns:36px 1fr 14px!important;grid-template-rows:auto auto!important;column-gap:10px;align-items:start;aspect-ratio:auto!important;min-height:0!important;box-shadow:none!important;background:none!important;padding:15px 0!important;width:100%;text-align:left;transform:none!important}
+body.v2 .wall .cv::after{content:"›";grid-column:3;grid-row:1/3;align-self:center;font:700 18px Pretendard,sans-serif;color:var(--v2g)}
+body.v2 .wall .cvt{grid-column:1;grid-row:1/3;display:block!important;background:none!important;padding:0!important;height:auto!important;border:0!important}
+body.v2 .wall .cvt i{display:block;font:700 21px 'Noto Serif CJK KR',serif!important;color:var(--v2g)!important;line-height:1}
+body.v2 .wall .cvt em{display:none!important}
+body.v2 .wall .cvm{grid-column:2;grid-row:1/3;display:block!important;padding:0!important;background:none!important;border:0!important}
+body.v2 .wall .cvm b{font:800 16px Pretendard,sans-serif!important;letter-spacing:-.02em;color:var(--v2ink)!important;display:block}
+body.v2 .wall .cvm small{font:400 12.5px Pretendard,sans-serif!important;color:#6b675e!important;display:-webkit-box!important;-webkit-line-clamp:1!important;-webkit-box-orient:vertical;overflow:hidden;margin-top:3px!important}
+body.v2 .wall .cvb{display:none!important}
+body.v2 .wall .cvq{display:none!important}
+body.v2 .wall .cvw.hint::after{display:none}body.v2 .cvw.hint .cv{animation:none!important}
+body.v2 .wall .cvm::before{content:attr(data-tg);display:block;font:700 11px Pretendard,sans-serif;color:var(--v2r);margin-bottom:3px}
+body.v2 main>.gbarx{margin:6px 0 14px!important;border:0!important}
+body.v2 main>.gbarx::after{display:none!important}
+body.v2 main>.hmore{margin-top:4px!important}body.v2 main>.hmore>summary{font:600 14px Pretendard,sans-serif!important;color:#5a5a55!important;padding:12px 0!important}body.v2 main>.tick b,body.v2 main>.tick strong{font-size:15px!important}
+/* 머리 */
+body.v2 header .navb{display:none!important}
+body.v2 header .lvbtn{width:34px;height:34px;min-height:0!important;padding:0!important;border-radius:50%!important;font:800 15px Pretendard,sans-serif!important;display:inline-flex!important;align-items:center;justify-content:center}
+@media(max-width:720px){body.v2 header .lvbtn{font-size:0!important;color:transparent}body.v2 header .lvbtn::after{content:'?';font:800 16px Pretendard,sans-serif;color:#1c1c1a}}@media(min-width:721px){body.v2 header .navb{display:flex!important}body.v2 header .lvbtn{width:auto;border-radius:0!important;padding:6px 12px!important}}
+/* 만들기: 인쇄물 / 공간 · 인물 */
+.v2seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--v2ink);margin:4px 0 14px}.v2seg button{padding:11px 4px;border:0;background:none;font:700 14px Pretendard,sans-serif;color:#5a5a55}.v2seg button[aria-pressed="true"]{background:var(--v2g);color:#f7f4ec}
+/* 만들기 단계: 한 화면에 한 단계 */
+body.ds1 main .stagecol>.btns,body.ds1 main details.uedit,body.ds2 main .ukind,body.ds2 main .stagecol>.btns,body.ds3 main .ukind,body.ds3 main details.uedit{display:none!important}
+body.ds2 main details.uedit>summary{display:none!important}
+body.v2 main>.sec:has(+.dz),body.ds1 main>.sec p,body.ds2 main>.sec,body.ds3 main>.sec{display:none!important}body.ds3 main .stagecol>.btns{order:-1;margin-bottom:12px}body.v2 main>.qbar:empty{display:none!important}
+body.ds2 main .dz>.card.form,body.ds3 main .dz>.card.form{display:none!important}
+body.ds3 main .stagecol>.btns{justify-content:center}body.ds3 main .stagecol>.btns [data-a="dPdf"],body.ds3 main .stagecol>.btns [data-a="dPng"]{min-width:120px;min-height:52px;font-size:16px}
+.v2next{position:sticky;bottom:calc(64px + env(safe-area-inset-bottom));display:flex;gap:8px;padding:10px 0;background:linear-gradient(transparent,var(--v2bg) 30%);z-index:20}.v2next .btn{flex:1;min-height:52px;font-size:16px}.v2next .btn.pri{flex:2}
+@media(min-width:721px){.v2next{bottom:0}}
+/* 기록 */
+body.v2 .arcst{display:none!important}
+.v2pl{display:flex;gap:8px;margin:0 0 16px}.v2pl button{flex:1;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;text-align:left;border:0;border-top:1px solid var(--v2ink);border-bottom:1px solid var(--v2ln);background:none;padding:13px 0;font:400 13px Pretendard,sans-serif;color:var(--v2mu)}.v2pl button b{font:800 15px Pretendard,sans-serif;color:var(--v2ink)}.v2pl button i{font-style:normal;color:var(--v2g);font-weight:700}
+.v2pl label{width:52px;display:flex;align-items:center;justify-content:center;border:1px solid var(--v2ink);background:#fff;cursor:pointer}
+.v2ph{display:flex!important;justify-content:center;min-height:52px;margin:0 0 14px}
+.v2log .igxh,.v2log .igxa .btn:not(.pri){display:none}
+</style>
 </head>
 <body>
 <div id="lock"></div>
@@ -1057,29 +1105,29 @@ nav.tabs::before,nav.tabs::after,nav.tabs button::before,nav.tabs button::after{
 <div id="tip"></div><div id="toast" role="status"></div>
 <script>const POSTR=[];function afterRender(f){POSTR.push(f)}</script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="news.js?v=11180631"></script><script src="books.js?v=11180631"></script>
-<script src="core.js?v=11180631"></script><script>(()=>{const r=render;render=function(){r.apply(this,arguments);for(const f of POSTR){try{f()}catch(e){console.warn(e)}}}})();</script>
-<script src="know.js?v=11180631"></script>
-<script src="store.js?v=11180631"></script>
-<script src="recs.js?v=11180631"></script>
-<script src="status.js?v=11180631"></script>
-<script src="studio.js?v=11180631"></script>
-<script src="cur.js?v=11180631"></script>
-<script src="design.js?v=11180631"></script>
-<script src="dp.js?v=11180631"></script>
-<script src="academy.js?v=11180631"></script><script src="auto.js?v=11180631"></script><script src="aka2.js?v=11180631"></script><script src="trend.js?v=11180631"></script><script src="dp2.js?v=11180631"></script><script src="order2.js?v=11180631"></script><script src="quick.js?v=11180631"></script><script src="talk.js?v=11180631"></script><script src="space.js?v=11180631"></script><script src="nav.js?v=11180631"></script><script src="ux.js?v=11180631"></script><script src="apply.js?v=11180631"></script><script src="dp4.js?v=11180631"></script><script src="dp5.js?v=11180631"></script><script src="lv.js?v=11180631"></script>
-<script src="up.js?v=11180631"></script>
-<script src="puzzle.js?v=11180631"></script>
-<script src="igx.js?v=11180631"></script>
-<script src="pzx.js?v=11180631"></script>
-<script src="qr.js?v=11180631"></script>
-<script src="ls.js?v=11180631"></script>
-<script src="wd.js?v=11180631"></script>
-<script src="gd2.js?v=11180631"></script>
-<script src="polish.js?v=11180631"></script>
-<script src="plus2.js?v=11180631"></script><script src="gs.js?v=11180631"></script><script src="arcfound.js?v=11180631"></script><script src="arc.js?v=11180631"></script><script src="arcimg.js?v=11180631"></script><script src="plus3.js?v=11180631"></script>
-<script src="plus4.js?v=11180631"></script><script src="back.js?v=11180631"></script><script src="nav2.js?v=11180631"></script><script src="simp.js?v=11180631"></script>
-<script src="ag.js?v=11180631"></script>
+<script src="news.js?v=11181004"></script><script src="books.js?v=11181004"></script>
+<script src="core.js?v=11181004"></script><script>(()=>{const r=render;render=function(){r.apply(this,arguments);for(const f of POSTR){try{f()}catch(e){console.warn(e)}}}})();</script>
+<script src="know.js?v=11181004"></script>
+<script src="store.js?v=11181004"></script>
+<script src="recs.js?v=11181004"></script>
+<script src="status.js?v=11181004"></script>
+<script src="studio.js?v=11181004"></script>
+<script src="cur.js?v=11181004"></script>
+<script src="design.js?v=11181004"></script>
+<script src="dp.js?v=11181004"></script>
+<script src="academy.js?v=11181004"></script><script src="auto.js?v=11181004"></script><script src="aka2.js?v=11181004"></script><script src="trend.js?v=11181004"></script><script src="dp2.js?v=11181004"></script><script src="order2.js?v=11181004"></script><script src="quick.js?v=11181004"></script><script src="talk.js?v=11181004"></script><script src="space.js?v=11181004"></script><script src="nav.js?v=11181004"></script><script src="ux.js?v=11181004"></script><script src="apply.js?v=11181004"></script><script src="dp4.js?v=11181004"></script><script src="dp5.js?v=11181004"></script><script src="lv.js?v=11181004"></script>
+<script src="up.js?v=11181004"></script>
+<script src="puzzle.js?v=11181004"></script>
+<script src="igx.js?v=11181004"></script>
+<script src="pzx.js?v=11181004"></script>
+<script src="qr.js?v=11181004"></script>
+<script src="ls.js?v=11181004"></script>
+<script src="wd.js?v=11181004"></script>
+<script src="gd2.js?v=11181004"></script>
+<script src="polish.js?v=11181004"></script>
+<script src="plus2.js?v=11181004"></script><script src="gs.js?v=11181004"></script><script src="arcfound.js?v=11181004"></script><script src="arc.js?v=11181004"></script><script src="arcimg.js?v=11181004"></script><script src="plus3.js?v=11181004"></script>
+<script src="plus4.js?v=11181004"></script><script src="back.js?v=11181004"></script><script src="nav2.js?v=11181004"></script><script src="v2.js?v=11181004"></script><script src="simp.js?v=11181004"></script>
+<script src="ag.js?v=11181004"></script>
 <script>boot();</script>
 </body>
 </html>

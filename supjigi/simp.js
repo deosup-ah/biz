@@ -1,6 +1,6 @@
 /* 첫 화면 단순화(참부장 11/14 승인 · 빼기 1): 큐레이션은 넷만 먼저, 나머지는 「더 보기」. 인물도서관 한 권 코너는 접어 둔다 */
 afterRender(()=>{Promise.resolve().then(()=>{try{const mn=document.querySelector('main');if(!mn||S.locked||S.mode!=='store'||S.view.store!=='cur')return;
-  const w=mn.querySelector(':scope>.wall');if(w&&!S.ui.wallAll){const C=[...w.children].filter(e=>e.nodeType===1&&!e.classList.contains('wmore'));if(C.length>4&&!mn.querySelector('.wmore')){C.slice(4).forEach(e=>e.hidden=true);const b=document.createElement('button');b.type='button';b.className='btn wmore';b.textContent=`큐레이션 ${C.length-4}개 더 보기`;b.onclick=()=>{S.ui.wallAll=1;render()};w.after(b)}}
+  const w=mn.querySelector(':scope>.wall');if(w&&!S.ui.wallAll&&!document.body.classList.contains('v2')){const C=[...w.children].filter(e=>e.nodeType===1&&!e.classList.contains('wmore'));if(C.length>4&&!mn.querySelector('.wmore')){C.slice(4).forEach(e=>e.hidden=true);const b=document.createElement('button');b.type='button';b.className='btn wmore';b.textContent=`큐레이션 ${C.length-4}개 더 보기`;b.onclick=()=>{S.ui.wallAll=1;render()};w.after(b)}}
   const o=mn.querySelector('.pl3ones');if(o&&o.tagName!=='DETAILS'){const d=document.createElement('details');d.className='pl3ones';const h=o.querySelector('h3');d.innerHTML=`<summary>${h?h.textContent:'인물도서관 코너'}</summary>`;if(h)h.remove();while(o.firstChild)d.appendChild(o.firstChild);o.replaceWith(d)}
 }catch(e){}})});
 /* 큐레이션 카드를 열면 한 화면으로 띄우고, 맨 위에 「← 큐레이션」(참부장 11/14) */
@@ -29,4 +29,4 @@ document.addEventListener('keydown',e=>{if(e.metaKey||e.ctrlKey||e.altKey||S.loc
   if(e.key==='/'){const i=document.getElementById('gIn');if(i){e.preventDefault();i.focus()}return}
   if(e.key==='?'){e.preventDefault();A.gdOpen();return}
   if(/^[1-9]$/.test(e.key)){const L=navList(),x=L[+e.key-1];if(x){e.preventDefault();BK.nav=1;A.go({v:x[0],m:x[2]})}}});
-afterRender(()=>{try{const g=document.querySelector('.gdtop, header .bar');const sb=document.querySelector('header');if(!sb||sb.querySelector('.kbd'))return;const p=document.createElement('p');p.className='kbd';p.textContent='단축키 · 1~4 화면 · / 찾기 · Esc 뒤로 · ? 도움말';sb.append(p)}catch(e){}});
+afterRender(()=>{try{const g=document.querySelector('.gdtop, header .bar');const sb=document.querySelector('header');if(!sb||sb.querySelector('.kbd'))return;const p=document.createElement('p');p.className='kbd';p.textContent='단축키 · 1~3 화면 · / 찾기 · Esc 뒤로 · ? 도움말';sb.append(p)}catch(e){}});

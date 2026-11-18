@@ -4,7 +4,7 @@ const BK={st:[],last:null,busy:0,nav:0,stale:0,lay:0};
 const bkSnap=()=>({m:S.mode,v:S.view[S.mode],br:S.br,c:S.ui.cOpen==null?null:S.ui.cOpen});
 const bkKey=s=>s?[s.m,s.v,s.br].join('|'):'';
 const bkName=s=>{try{const t=navList().find(x=>x[2]===s.m&&x[0]===s.v);if(s.c!=null)return '큐레이션';if(t)return t[1]}catch(e){}return {design:'만들기',dp:'진열',cur:'큐레이션',more:'더보기',arc:'아카이브'}[s.v]||'이전'};
-document.addEventListener('pointerdown',e=>{const t=e.target;BK.nav=!!(t.closest&&t.closest('#dial,nav.tabs,[data-a="place"],[data-a="home"],[data-a="br"],.places'))},true);
+document.addEventListener('pointerdown',e=>{const t=e.target;BK.nav=!!(t.closest&&t.closest('.v2seg,#dial,nav.tabs,[data-a="place"],[data-a="home"],[data-a="br"],.places'))},true);
 const bkLayers=()=>{const L=[];const g=document.getElementById('guide');if(g)L.push(()=>A.gdClose());const a=document.getElementById('agent');if(a&&getComputedStyle(a).display!=='none')L.push(()=>A.agClose());
   const sh=document.getElementById('sheet');if(sh&&sh.classList.contains('on'))L.push(()=>closeSheet());return L};
 function bkCheck(){if(BK.busy||S.locked)return;const s=bkSnap(),k=bkKey(s);if(!BK.last){BK.last=s;try{history.replaceState({bk:0},'')}catch(e){}return}
