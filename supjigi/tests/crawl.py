@@ -5,7 +5,8 @@ import asyncio,subprocess,os,sys,time,json
 from playwright.async_api import async_playwright
 here=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 W=int(sys.argv[1]) if len(sys.argv)>1 else 360
-srv=subprocess.Popen([sys.executable,'-m','http.server','8770'],cwd=here,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL);time.sleep(1)
+PORT=str(8770+W%1000)
+srv=subprocess.Popen([sys.executable,'-m','http.server',PORT],cwd=here,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL);time.sleep(1)
 SCREENS=[('aka','store','cur'),('aka','aka','space'),('aka','aka','design'),('aka','aka','arc'),('nowon','store','cur'),('nowon','store','design'),('nowon','store','log')]
 SKIP={'lock','big','print','dl','share','arcAdd','arcTake','arcWipe','arcDel','fbSend','sendGo','setAll','igSave','popSave','gsTake','mic','micTo','camTo','arcPh','pl3Ph','upFile','imp','agSend','dpVideo','dpShot'}
 STATE="JSON.stringify([S.mode,S.view[S.mode],S.br,S.ui.cOpen==null?null:S.ui.cOpen,!!document.getElementById('guide'),!!document.getElementById('agent'),document.getElementById('sheet').classList.contains('on')])"
@@ -19,7 +20,7 @@ async def main():
     pg.on('dialog',lambda d:asyncio.ensure_future(d.dismiss()))
     await pg.add_init_script("sessionStorage.setItem('sj.gdS','1');localStorage.setItem('gdSeen','1');window.open=()=>null")
     async def home(br,m,v):
-      await pg.goto('http://127.0.0.1:8770/index.html');await pg.wait_for_timeout(900)
+      await pg.goto('http://127.0.0.1:'+PORT+'/index.html');await pg.wait_for_timeout(900)
       await pg.evaluate(f"S.locked=false;S.loaded=true;document.getElementById('lock').style.display='none';A.place({{k:'{br}'}});S.mode='{m}';S.view['{m}']='{v}';render()");await pg.wait_for_timeout(400)
     for br,m,v in SCREENS:
       await home(br,m,v)
@@ -50,7 +51,7 @@ async def main():
           if s2!=s0:probs.append({'곳':where,'문제':'뒤로 가기로 못 돌아옴','것':[s0,s1,s2]})
     await b.close()
   srv.terminate()
-  json.dump(probs,open('/tmp/crawl.json','w'),ensure_ascii=False,indent=1)
+  json.dump(probs,open(f'/tmp/crawl_{W}.json','w'),ensure_ascii=False,indent=1)
   print(f'{W}폭 · 버튼 {n}개 눌러 봄 · 문제 {len(probs)}건')
   for x in probs:print(' -',x['곳'],'|',x['문제'],'|',json.dumps(x['것'],ensure_ascii=False)[:160])
 asyncio.run(main())

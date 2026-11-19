@@ -63,6 +63,7 @@ const ARC_FOUND=[
  {id:'f-open-soon',d:'2026-01-01',p:'y',k:'연혁',t:'더숲 홈페이지 「더숲-아카데미하우스 OPENING SOON」 개관 예고 페이지',src:'더숲 홈페이지(deosup.com)',url:'https://deosup.com/deosupinbukhansan',note:'11/17 매일 점검 웹 검색. 올린 날짜는 페이지에 없음 — 개관(4월) 전 예고로 보임, 확인 필요'},
  {id:'f-stayfolio',d:'2026-01-01',p:'y',k:'공간',t:'스테이폴리오 「더숲 아카데미하우스」 숙소 소개 · 객실 · 갤러리 페이지',src:'스테이폴리오(stayfolio.com)',url:'https://www.stayfolio.com/findstay/deosupacademyhouse',note:'11/18 매일 점검 웹 검색. 올린 날짜는 페이지에 없음 — 숙박 예약 소개, 확인 필요'},
  {id:'f-moim',d:'2026-01-01',p:'y',k:'모임',t:'더숲 홈페이지 「모임 생활」 게시판(모임 · 프로그램 소개 목록)',src:'더숲 홈페이지(deosup.com)',url:'https://deosup.com/22/?category=41zvq24pL0',note:'11/19 매일 점검 웹 검색. 글마다 날짜 · 아카데미하우스 행사인지 확인 필요'},
+ {id:'f-deosup47',d:'2026-01-01',p:'y',k:'공간',t:'더숲 홈페이지 「더숲 아카데미하우스」 소개 페이지',src:'더숲 홈페이지(deosup.com)',url:'https://deosup.com/47',note:'11/19 저녁 매일 점검 웹 검색. 올린 날짜는 페이지에 없음 — 소개 문구 · 사진이 언제 것인지 확인 필요'},
  {id:'e-1kw1',d:'2026-11-15',p:'d',k:'행사',t:'「올해의 한 권이 내년의 첫 한 권에게」 일력 표지 (A3)',src:'워크룸 작업물',th:'arc/e-1kw1_t.jpg',img:'arc/e-1kw1.jpg',note:'고객이 적은 종이를 추려, 그 책과 어울리는 서가에 함께 둔다'},
  {id:'e-1kw2',d:'2026-11-15',p:'d',k:'행사',t:'「올해의 한 권이 내년의 첫 한 권에게」 적는 장 12칸 (A3)',src:'워크룸 작업물',th:'arc/e-1kw2_t.jpg',img:'arc/e-1kw2.jpg'}
 ];
