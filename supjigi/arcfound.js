@@ -64,6 +64,8 @@ const ARC_FOUND=[
  {id:'f-stayfolio',d:'2026-01-01',p:'y',k:'공간',t:'스테이폴리오 「더숲 아카데미하우스」 숙소 소개 · 객실 · 갤러리 페이지',src:'스테이폴리오(stayfolio.com)',url:'https://www.stayfolio.com/findstay/deosupacademyhouse',note:'11/18 매일 점검 웹 검색. 올린 날짜는 페이지에 없음 — 숙박 예약 소개, 확인 필요'},
  {id:'f-moim',d:'2026-01-01',p:'y',k:'모임',t:'더숲 홈페이지 「모임 생활」 게시판(모임 · 프로그램 소개 목록)',src:'더숲 홈페이지(deosup.com)',url:'https://deosup.com/22/?category=41zvq24pL0',note:'11/19 매일 점검 웹 검색. 글마다 날짜 · 아카데미하우스 행사인지 확인 필요'},
  {id:'f-deosup47',d:'2026-01-01',p:'y',k:'공간',t:'더숲 홈페이지 「더숲 아카데미하우스」 소개 페이지',src:'더숲 홈페이지(deosup.com)',url:'https://deosup.com/47',note:'11/19 저녁 매일 점검 웹 검색. 올린 날짜는 페이지에 없음 — 소개 문구 · 사진이 언제 것인지 확인 필요'},
+ {id:'f-songjh',d:'2026-01-01',p:'y',k:'모임',t:'더숲 「독서 생활」 송지현 소설가와 함께 읽는 한강 『소년이 온다』 『채식주의자』 『서랍에 저녁을 넣어 두었다』',src:'더숲 홈페이지(deosup.com)',url:'https://deosup.com/19/?bmode=view&idx=125409242',note:'11/21 매일 점검 웹 검색. 진행 날짜 · 장소(아카데미하우스인지) 확인 필요'},
+ {id:'f-dining',d:'2026-01-01',p:'y',k:'공간',t:'다이닝코드 「더숲 아카데미하우스」 카페 · 루프탑 소개 · 방문 후기 페이지',src:'다이닝코드(diningcode.com)',url:'https://www.diningcode.com/profile.php?rid=emtiMSVb94pR',note:'11/21 매일 점검 웹 검색. 올린 날짜 없음 — 후기 모음, 고객 이름은 옮기지 않음'},
  {id:'e-1kw1',d:'2026-11-15',p:'d',k:'행사',t:'「올해의 한 권이 내년의 첫 한 권에게」 일력 표지 (A3)',src:'워크룸 작업물',th:'arc/e-1kw1_t.jpg',img:'arc/e-1kw1.jpg',note:'고객이 적은 종이를 추려, 그 책과 어울리는 서가에 함께 둔다'},
  {id:'e-1kw2',d:'2026-11-15',p:'d',k:'행사',t:'「올해의 한 권이 내년의 첫 한 권에게」 적는 장 12칸 (A3)',src:'워크룸 작업물',th:'arc/e-1kw2_t.jpg',img:'arc/e-1kw2.jpg'}
 ];
